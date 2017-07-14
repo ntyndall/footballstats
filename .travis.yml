@@ -1,0 +1,18 @@
+language: r
+cache: packages
+sudo: false
+addons:
+   apt:
+     packages:
+       - libgsl0-dev
+       - libxml2-dev
+       - libhiredis-dev
+
+script: 
+   - if [ "$(Rscript -e "library(testthat);
+             outcome <- source('runTests.R');
+             result <- outcome$value;
+             if (result > 0) { 1 } else { 0 }")" -gt 0 ]; then exit 1; fi
+
+notifications:
+  slack: ntyndall:ffjQMwuOwDH6BvaNDpDzRO2x
