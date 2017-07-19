@@ -21,10 +21,10 @@ initializeAllFunctions <- function(redisHost = "localhost",
   library(slackr)
   library(jsonlite)
   library(redux)
+  library(testthat)
   
   # Load all necessary variables into the global namesapce
   sensitiveInfo()
-  initialize()
   getIDList()
   redisCon <<- redux::hiredis(host = redisHost, port = redisPort)
 }

@@ -1,9 +1,7 @@
 
-library(testthat)
-print("check directory to source functionality...")
-print(getwd())
-
-print("just about to run tests")
+# Load all functions into global namespace
+source('/R/UtilityFunctions/initialize.R')
+initialize()
 results <- test_dir("tests", reporter="summary")
 
 totalError <- 0
@@ -28,17 +26,16 @@ for(i in 1:length(results)) {
   } else {
     cat(paste0(Sys.time(), " : Success in { ", fileName, " } --> ( ", unitTest, " ) \n"))
   }
-  
-  print("after running tests")
-  print(results)
 }
 
-print(paste0("RESULTS ->> ", totalError))
-print("_________________________________")
-
-# Final value that is returned from running the script
-quit(save = 'no', status = 1, runLast = FALSE)
-totalError
+if (totalError > 0) {
+  codeStatus <- 1
+} else {
+  codeStatus <- 0
+}
+quit(save = 'no', 
+     status = codeStatus, 
+     runLast = FALSE)
 
 
                 
