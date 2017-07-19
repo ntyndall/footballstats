@@ -25,7 +25,7 @@ mainController <- function(production = TRUE, seasonStarting = 2015) {
   initializeAllFunctions()
   if (production) {
     dataStore = 10
-  else {
+  } else {
     dataStore = 1
   }
   redis <<- redux::hiredis(db = dataStore)
