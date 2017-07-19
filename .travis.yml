@@ -9,10 +9,13 @@ addons:
        - libhiredis-dev
 
 script: 
-   - if [ "$(Rscript -e "library(testthat);
+   - Rscript -e runTests.R
+   - val = $(Rscript -e "library(testthat);
              result <- source('runTests.R');
              result <- as.integer(result$value);
-             if (result > 0) { 1 } else { 0 }")" -gt 0 ]; then exit 1; fi
+             if (result > 0) { 1 } else { 0 }");
+             valInt=${val/.*};
+             if [ "$valInt" -gt 0 ]; then exit 1; fi
 
 notifications:
   slack: ntyndall:ffjQMwuOwDH6BvaNDpDzRO2x
