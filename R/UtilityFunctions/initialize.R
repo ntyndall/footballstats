@@ -1,4 +1,4 @@
-initialize <- function(location = '/R/') {
+initialize <- function(location) {
   # Begin by sourcing all the package functions
   allFiles <- list.files(path = location,
                          pattern = "\\.[RrSsQq]$",

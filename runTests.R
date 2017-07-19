@@ -1,8 +1,9 @@
 
 # Load all functions into global namespace
 source('/R/UtilityFunctions/initialize.R')
-initialize()
-results <- test_dir("tests", reporter="summary")
+initialize(location = paste0(getwd(), '/R/'))
+results <- test_dir(path = "tests", 
+                    reporter = "summary")
 
 totalError <- 0
 for(i in 1:length(results)) {
