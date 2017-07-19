@@ -56,7 +56,7 @@ mainController <- function(production = TRUE, seasonStarting = 2015) {
     
     # Add event information
     if (nrow(matches) > 0) {
-      print(Sys.time(), ' : Analysing ', length(matches$events), ' events.')
+      print(paste0(Sys.time(), ' : Analysing ', length(matches$events), ' events.'))
       addEventInfo(competitionID = compID,
                    matchIDs = matches$id,
                    matchEvents = matches$events)
@@ -65,7 +65,7 @@ mainController <- function(production = TRUE, seasonStarting = 2015) {
     # Add team information
     teamListLength <- redis$LLEN(key = 'analyseTeams')
     if (teamListLength > 0) {
-      print(Sys.time(), ' : Analysing ', teamListLength, ' new team info.')
+      print(paste0(Sys.time(), ' : Analysing ', teamListLength, ' new team info.'))
       addTeamInfo(competitionID = compID,
                   teamListLength = teamListLength)
     }
@@ -73,7 +73,7 @@ mainController <- function(production = TRUE, seasonStarting = 2015) {
     # Add player information
     playerLength <- redis$LLEN(key = 'analysePlayers')
     if (playerLength > 0) {
-      print(Sys.time(), ' : Analysing ', playerLength, ' new players.')
+      print(paste0(Sys.time(), ' : Analysing ', playerLength, ' new players.'))
       addPlayerInfo(competitionID = compID,
                     playerLength = playerLength)
     }

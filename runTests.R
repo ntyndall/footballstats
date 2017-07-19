@@ -34,7 +34,7 @@ if (totalError > 0) {
 } else {
   codeStatus <- 0
 }
-quit(save = 'no', 
+quit(save = 'no',
      status = codeStatus, 
      runLast = FALSE)
 

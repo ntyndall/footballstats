@@ -20,7 +20,7 @@ getCompetitions <- function(host = HOST, apiKey = API_KEY) {
     seasonIDs <- rawToChar(listOfSeasons$content)
     return(jsonlite::fromJSON(seasonIDs))
   } else {
-    print(paste0(Sys.time(). " : Warning - status code ", listOfSeasons$status_code, " in getCompetition()."))
+    print(paste0(Sys.time(), " : Warning - status code ", listOfSeasons$status_code, " in getCompetition()."))
     return(NULL)
   }
 }
