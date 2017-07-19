@@ -10,8 +10,7 @@ addons:
 
 script: 
    - if [ "$(Rscript -e "library(testthat);
-             outcome <- source('runTests.R');
-             result <- outcome$value;
+             result <- source('runTests.R');
              if (result > 0) { 1 } else { 0 }")" -gt 0 ]; then exit 1; fi
 
 notifications:
