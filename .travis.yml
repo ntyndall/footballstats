@@ -11,6 +11,7 @@ addons:
 script: 
    - if [ "$(Rscript -e "library(testthat);
              result <- source('runTests.R');
+             result <- as.integer(result$value);
              if (result > 0) { 1 } else { 0 }")" -gt 0 ]; then exit 1; fi
 
 notifications:
