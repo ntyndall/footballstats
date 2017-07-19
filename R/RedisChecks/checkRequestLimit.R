@@ -23,19 +23,21 @@
 
 checkRequestLimit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
   
-  requestCount <- as.integer(rredis::redisIncr(key = "requestLimit"))
-  
+  requestCount <- as.integer(redis$INCR(key = "requestLimit"))
   if (requestCount == 1) {
-    rredis::redisExpire(key = "requestLimit", seconds = timePeriod - 1 )
+    redis$EXPIRE(key = "requestLimit", seconds = timePeriod - 1 )
   } else {
     if (requestCount == requestsAllowed) {
-      timeToWait <- as.integer(rredis::redisTTL(key = "requestLimit"))
-      if (timeToWait < 0) {
-        print("No expiry")
-      } else {
-        print(paste0("No more requests remaining, waiting : ", timeToWait, " seconds."))
-        Sys.sleep(timeToWait)
+      timeToWait <- redis$TTL(key = "requestLimit")
+      redis$SET(key = 'requestLimit', value = 0)
+      if (!timeToWait < 0) {
+        print(paste0("No more requests remaining, still need to wait : ", 
+                     timeToWait, " seconds."))
+        redis$SET(key = 'active', value = 'de-activated', EX = timeToWait)
       }
+    } else if (requestCount > requestsAllowed - 100) {
+      print(paste0(Sys.time(), ' : WARNING - only ', requestsAllowed - requestCount, 
+                   ' requests remaining.'))
     }
   }
 }

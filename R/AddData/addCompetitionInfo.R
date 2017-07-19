@@ -10,30 +10,28 @@
 #'  
 #' @return returns nothing, a redis hash is set with season IDs, and a 
 #'  redis set is created to store the current seasonIDs.
-#'  
 
 
-addCompetitionInfo <- function(production = TRUE, daysUntilNextQuery) {
-  if (production) {
-    competitionIDs <- getCompetition(apiKey = API_KEY)
-  }
-  
-  if (is.null(competitionIDs)) {
-    return()
+addCompetitionInfo <- function(daysUntilNextQuery) {
+  if (redis$EXISTS(key = 'active') == 0) {
+    competitionIDs <- getCompetitions(apiKey = API_KEY)
+    checkRequestLimit()
   } else {
+    print(Sys.time(), ' : Run out of requests in addCompetitionInfo()')
+  }
+
+  if (!is.null(competitionIDs)) {
+    total <- 0
     for (i in 1:nrow(competitionIDs)) {
       seasonID <- competitionIDs$id[[i]]
-      seasonName <- competitionIDs$name[[i]]
-      competitionInSet <- rredis::redisSIsMember(set = "competition:set", element = seasonID)
-      if (!competitionInSet) {
-        rredis::redisSAdd(set = "competition:set", element = charToRaw(seasonID))
-        myCompetitionID <- getNextID(IDLookup = "competition")
-        newID <- mapAPIToMyID(APIID = seasonID,
-                              myID = myCompetitionID,
-                              type = "competition")
+      compExists <- redis$SADD(key = 'competition:set',
+                      member = seasonID)
+      if (compExists == 1) {
+        total <- total + 1
       }
     }
-    rredis::redisSet(key = "competition:waitForNextQuery", 
-                     value = as.integer(Sys.Date() + daysUntilNextQuery))
+    print(paste0(Sys.time(), ' : Successfully added ', total, ' new competition IDs to Redis.'))
+    redis$SET(key = 'competition:waitForNextQuery',
+              value = as.integer(Sys.Date() + daysUntilNextQuery))
   }
 }

@@ -17,15 +17,45 @@
 #'
 
 
-addTeamInfo <- function(teamData, competition, nextTeam) {
-  stats <- teamData$statistics
-  myList = list(name = teamData$name,
-                capacity = teamData$venue_capacity,
-                coach = teamData$coach_name)
+addTeamInfo <- function(competitionID, teamListLength) {
+  valuesToRetain <- c("team_id", "is_national", "name", "country",
+                      "founded", "leagues", "venue_name", "venue_id",
+                      "venue_surface", "venue_address", "venue_city",
+                      "venue_capacity", "coach_name", "coach_id")
   
-  as.list(stats)
-  myList <- c(myList, as.list(stats))
+  for (i in 1:teamListLength) {
+    if (redis$EXISTS(key = 'active') == 0) {
+      teamID <- redis$LPOP(key = 'analyseTeams')
+      teamData <- getTeams(teamID = teamID)
+      checkRequestLimit()
+    } else {
+      print(Sys.time(), ' : Run out of requests in addTeamInfo()')
+      teamData <- NULL
+    }
   
-  key <- paste0("teams:", competition, ":", competition, ":", nextTeam)
-  rredis::redisHMSet(key = key, values = myList)
+    if(!is.null(teamData)) {
+      basic <- paste0("comp:team:_basic_:", competitionID, ":", teamData$team_id)
+      squad <- paste0("comp:team:player:_squad_:", competitionID, ":", teamData$team_id)
+      stats <- paste0("comp:team:_stats_:", competitionID, ":", teamData$team_id)
+
+      basicData <- teamData[valuesToRetain]
+      redis$HMSET(key = basic, field = names(basicData), 
+                  value = as.character(basicData))
+      
+      squadInfo <- teamData$squad
+      for (k in 1:nrow(squadInfo)) {
+        playerID <- squadInfo$id[k]
+        squadPlayer <- paste0(squad, ":", playerID)
+        redis$HMSET(key = squadPlayer, field = names(squadInfo[k, ]), 
+                    value = as.character(squadInfo[k, ]))
+        newPlayers <- redis$SADD(key = 'teams:squad:playerIDs', 
+                                 member = playerID)
+        if (newPlayers == 1) {
+          redis$LPUSH(key = 'analysePlayers', value = playerID)
+        }
+      }
+      redis$HMSET(key = stats, field = names(teamData$statistics), 
+                  value = as.character(teamData$statistics))
+    }
+  }
 }

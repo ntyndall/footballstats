@@ -21,82 +21,61 @@
 #'
 
 
-main <- function() {
+mainController <- function(production = TRUE, seasonStarting = 2015) {
   initializeAllFunctions()
-  rredis::redisSelect(0)
+  if (production) {
+    dataStore = 10
+  else {
+    dataStore = 1
+  }
+  redis <<- redux::hiredis(db = dataStore)
   
   # Get competition information
-  nextDate <- rredis::redisGet(key = "competition:waitForNextQuery")
+  nextDate <- redis$GET(key = "competition:waitForNextQuery")
   if (is.null(nextDate) || Sys.Date() > nextDate) {
-    getAllCompetitions(daysUntilNextQuery = 30)
-  }
-  
-  # Get match information ## NEED A BOUNDARY CONDITION HERE!!!
-  lastMatchTime <- rredis::redisGet(key = "match:lastInterval")
-  if (is.null(lastMatchTime)) {
-    lastMatchTime <- Sys.Date() - (365 * 2)
-  } else {
-    as.Date(lastMatchTime, origin = "1970-01-01")
-  }
-  timeFrom <- format(lastMatchTime, "%d.%m.%Y") 
-  timeTo <- format(lastMatchTime + 7, "%d.%m.%Y")
-  rredis::redisSet(key = "match:lastInterval", 
-                   value = as.integer(lastMatchTime))
-  # Get match information
-  getMatchInformation()
-  
-  # Add teams to Redis
-  
-  
-  
-  newTeams <- data.frame()
-  for (i in 1:nrow(myData)) {
-    rredis::redisSelect(0)
-    dataRow <- myData[i, ]
-    nextMatchID <- getNextID(IDLookup = "match")
-    nextEventID <- getNextID(IDLookup = "event")
-    
-    matchResults <- addMatchInfo(dataRow, competition, nextMatchID, nextEventID)
-    mapAPIToMyID(dataRow$id, nextMatchID, "match")
-    
-    teamInSet <- rredis::redisSIsMember(set = paste0("teams:", competition), 
-                           element = dataRow$localteam_id)
-  
-    # Add unseen team to set
-    if (!teamInSet) {
-      rredis::redisSAdd(set = paste0("teams:", competition),
-                        element = charToRaw(dataRow$localteam_id))
-      newTeams <- rbind(newTeams, data.frame(team_id = dataRow$localteam_id))
-    }
-  
-    # Add events
-    events <- dataRow$events[[1]]
-    if (nrow(events) > 0) {
-      for (x in 1:nrow(events)) {
-        nextSingleEventID <- getNextID(IDLookup = "singleEvent")
-        addEventInfo(events[x, ], nextSingleEventID, nextEvent)
-        mapAPIToMyID(events$id[x], nextSingleEventID, "singleEvent")
-      }
-    }
+    addCompetitionInfo(daysUntilNextQuery = 30)
   }
 
-  # Add home team to Redis
-  if (nrow(newTeams) > 0) {
-    for (i in 1:nrow(newTeams)) {
-      singleTeam <- as.character(newTeams$team_id[1])
-      teamData <- httr::GET(paste0(rootURL, "team/", singleTeam, authKey))
-      teamData <- jsonlite::fromJSON(rawToChar(teamData$content))
-      nextTeamID <- getNextID(IDLookup = "team")
-      addTeamInfo(teamData, nextTeamID)
+  # Load all current competitions for analysis
+  competitionsToAnalyse  <- redis$SMEMBERS(key = 'competition:set')
+
+  # Begin finding match information
+  dateFrom <- paste0('31.07.', seasonStarting)
+  dateTo <- paste0('31.07.', seasonStarting + 1)
+  
+  for (i in 1:length(competitionsToAnalyse)) {
+    compID <- competitionsToAnalyse[[i]]
+
+    # Add match information
+    # Matches will control everything! So if a new match is found
+    # then 1) add the events. 2) Check a new team is played. (ALWAYS UPDATE SQUAD LIST)
+    # 3) ALWAYS update player information....
+    matches <- addMatchInfo(competitionID = compID,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo)
+    
+    # Add event information
+    if (nrow(matches) > 0) {
+      print(Sys.time(), ' : Analysing ', length(matches$events), ' events.')
+      addEventInfo(competitionID = compID,
+                   matchIDs = matches$id,
+                   matchEvents = matches$events)
+    }
+    
+    # Add team information
+    teamListLength <- redis$LLEN(key = 'analyseTeams')
+    if (teamListLength > 0) {
+      print(Sys.time(), ' : Analysing ', teamListLength, ' new team info.')
+      addTeamInfo(competitionID = compID,
+                  teamListLength = teamListLength)
+    }
+    
+    # Add player information
+    playerLength <- redis$LLEN(key = 'analysePlayers')
+    if (playerLength > 0) {
+      print(Sys.time(), ' : Analysing ', playerLength, ' new players.')
+      addPlayerInfo(competitionID = compID,
+                    playerLength = playerLength)
     }
   }
-  
-  # Add player information based on home team to Redis
-  singlePlayer <- httr::GET(paste0(HOST, "/player/237?", API_KEY))
-  if (singlePlayer$status_code == 200) {
-   playerInformation <- jsonlite::fromJSON(rawToChar(singlePlayer$content))
-   nextPlayerID <- getNextID(IDLookup = "player")
-   mapAPIToMyID(playerInformation$id, nextPlayerID, "player")
-   
-  }
-}  
+}

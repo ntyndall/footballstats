@@ -4,7 +4,7 @@
 #'  and stores relevant information in redis.
 #'  
 #' @details Event IDs are stored in a Redis set as 
-#'  -> events:{nextEvent}
+#'  -> events:{matchID}
 #'  The actual event information is stored as a hash map as
 #'  -> singleEvent:{nextSingleEvent}
 #'  
@@ -19,23 +19,20 @@
 #'
 
 
-addEventInfo <- function(events, nextSingleEvent, nextEvent) {
-    if (events$team == 'localteam') { 
-      team <- "home" 
-    } else { 
-      team <- "away" 
+addEventInfo <- function(competitionID, matchIDs, matchEvents) {
+  for (i in 1:length(matchEvents)) {
+    eventsPerMatch <- matchEvents[[i]]
+    matchID <- matchIDs[i]
+    if (nrow(eventsPerMatch) > 0) {
+      for (j in 1:nrow(eventsPerMatch)) {
+        event <- eventsPerMatch[j, ]
+        inSet <- redis$SADD(key = paste0("comp:events:", competitionID, ":", matchID), 
+                            member = event$id)
+        if (inSet == 1) {
+          redis$HMSET(key = paste0("comp:match:event:", competitionID, ":", matchID, ":", event$id),
+                      field = names(event), value = as.character(event))
+        }
+      }
     }
-
-    eventList = list(originalID = events$id,
-                     type = events$type,
-                     minute = events$minute,
-                     team = team,
-                     player = events$player,
-                     player_id = events$player,
-                     assist = events$assist,
-                     assist_id = events$assist_id)
-
-    rredis::redisSAdd(set = paste0("events:", nextEvent), element = charToRaw(as.character(nextSingleEvent)))
-    rredis::redisHMSet(key = paste0("singleEvent:", nextSingleEvent),
-                       values = eventList)
+  }
 }

@@ -20,14 +20,10 @@
 getNextID <- function(IDLookup = NULL, IDList = IDList) {
   if (IDLookup %in% IDList) { 
     keyStr <- paste0("next:", IDLookup, ":id") 
-  } else { 
-    IDLookup <- NULL 
-  }
-  
-  if (is.null(IDLookup)) { 
-    return(paste0("Error : Return one of - ", paste0(IDList, collapse = ", ")))
-  } else {
     return(as.integer(rredis::redisIncr(key = keyStr)))
+  } else { 
+    print(paste0("Error : Return one of - ", paste0(IDList, collapse = ", ")))
+    return(-1)
   }
 }
 
