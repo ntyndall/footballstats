@@ -1,6 +1,6 @@
 
 # Load all functions into global namespace
-source('/R/UtilityFunctions/initialize.R')
+source(paste0(getwd(), '/R/UtilityFunctions/initialize.R'))
 initialize(location = paste0(getwd(), '/R/'))
 results <- test_dir(path = "tests", 
                     reporter = "summary")
