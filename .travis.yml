@@ -9,7 +9,7 @@ addons:
        - libhiredis-dev
 
 script: 
-   - Rscript -e "library(testthat); source('runTests.R')
+   - Rscript -e "library(testthat); source('runTests.R')"
 
 notifications:
   slack: ntyndall:ffjQMwuOwDH6BvaNDpDzRO2x
