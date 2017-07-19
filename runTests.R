@@ -1,4 +1,5 @@
 
+library(testthat)
 print("check directory to source functionality...")
 print(getwd())
 
@@ -36,6 +37,7 @@ print(paste0("RESULTS ->> ", totalError))
 print("_________________________________")
 
 # Final value that is returned from running the script
+quit(save = 'no', status = 1, runLast = FALSE)
 totalError
 
 
