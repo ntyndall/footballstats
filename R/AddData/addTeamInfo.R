@@ -1,28 +1,40 @@
 #' @title Add Team Info
 #'
-#' @description A function that takes a data frame containing team
-#'  information and stores that hash within Redis
+#' @description A function that takes a competitionID and integer value
+#'  with details of the teamID list for analysis. Each team is
+#'  queried by the API for relevant information and statistics are
+#'  stored.
 #'  
-#' @details Hash keys are stored as teams:competition:nextTeam
-#'  
-#' @param teamData A dataframe containing all teams data to be stored
-#'  in redis in a hash.
-#' @param competition An integer defining the competition ID that the
+#' @details A number of information is stored. 
+#'  The basic information is stored as;
+#'     ->   comp:team:_basic_:{comp_id}:{team_id}   ->   [HASH]
+#'  The team statistics is stored as;
+#'     ->   comp:team:_stats_:{comp_id}:{team_id}   ->   [HASH]
+#'  Player information relevent to the team is stored as;
+#'     ->   comp:team:player:_squad_:
+#'          {comp_id}:{team_id}:{player_id}   ->   [HASH]
+#'
+#' @param competitionID An integer defining the competitionID that the
 #'  team belongs to.
-#' @param nextTeam An integer value that contains the next team ID
-#'  value mapped from the original value.
+#' @param teamListLength An integer value that defines how long the list 
+#'  containing teamID's is TeamID's are then popped from the list as they 
+#'  are anaylsed.
+#' @param updateData A boolean that is set to TRUE if team data is to be analysed
+#'  again, i.e. after a match. FALSE to ignore and only analyse new teams. Generally
+#'  set to FALSE for first time run.
 #'  
-#' @return Returns nothing, a redis hash map is set with the team
+#' @return Returns nothing. A Redis hash map is set with the team
 #'  information. 
 #'
 
 
-addTeamInfo <- function(competitionID, teamListLength) {
+addTeamInfo <- function(competitionID, teamListLength, updateData) {
   valuesToRetain <- c("team_id", "is_national", "name", "country",
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",
                       "venue_capacity", "coach_name", "coach_id")
   
+  progressBar <- txtProgressBar(min = 0, max = teamListLength, style = 3)
   for (i in 1:teamListLength) {
     if (redis$EXISTS(key = 'active') == 0) {
       teamID <- redis$LPOP(key = 'analyseTeams')
@@ -48,14 +60,20 @@ addTeamInfo <- function(competitionID, teamListLength) {
         squadPlayer <- paste0(squad, ":", playerID)
         redis$HMSET(key = squadPlayer, field = names(squadInfo[k, ]), 
                     value = as.character(squadInfo[k, ]))
-        newPlayers <- redis$SADD(key = 'teams:squad:playerIDs', 
+        
+        # Check if player has been added to the set for analysis later.
+        # Or if it is ready to be updated after another match has been played.
+        newPlayers <- redis$SADD(key = paste0('comp:_playerSetInfo_', competitionID),
                                  member = playerID)
-        if (newPlayers == 1) {
+
+        if (newPlayers == 1 || updateData) {
           redis$LPUSH(key = 'analysePlayers', value = playerID)
         }
       }
       redis$HMSET(key = stats, field = names(teamData$statistics), 
                   value = as.character(teamData$statistics))
     }
+    setTxtProgressBar(progressBar, i)
   }
+  close(progressBar)
 }

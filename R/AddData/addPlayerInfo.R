@@ -1,4 +1,21 @@
 #' @title Add Player Info
+#'
+#' @description A function that takes a competitionID and length of players to 
+#'  analyse. The playerID's are popped from a Redis list and queried. The player
+#'  stats are then stored in appropriate redis keys as necessary.
+#'  
+#' @details Player stats infromation is stored in a hash map as;
+#'     ->   player:team:league:season:
+#'          _stats_`stat_type`:{player_id}:{team_id}:
+#'          {comp_id}:{season}   ->   [HASH]
+#'  
+#' @param competitionID An integer containing the competitionID that the 
+#'  teams and match information belong to.
+#' @param playerLength An integer value that defines the number of players to
+#'  analyse for a given list of ID's previously generated.
+#'  
+#' @return Returns nothing. Redis is updated with player information
+#'
 
 addPlayerInfo <- function(competitionID, playerLength) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
@@ -6,6 +23,7 @@ addPlayerInfo <- function(competitionID, playerLength) {
                       "birthdate", "age", "birthcountry",
                       "birthplace", "position", "height", "weight")
   
+  progressBar <- txtProgressBar(min = 0, max = playerLength, style = 3)
   for (i in 1:playerLength) {
     if (redis$EXISTS(key = 'active') == 0) {
       playerID <- redis$LPOP(key = 'analysePlayers')
@@ -24,7 +42,7 @@ addPlayerInfo <- function(competitionID, playerLength) {
         if (length(statData) != 0 || is.data.frame(statData)) {
           for (k in 1:nrow(statData)) {
             currentStat <- statData[k, ]
-            statKeyName <- paste0('player:team:league:season:stats:_', statNames[j], '_:', 
+            statKeyName <- paste0('player:team:league:season:_stats_', statNames[j], '_:', 
                                   playerData$id, ':', currentStat$id, ':', 
                                   currentStat$league_id, ':', currentStat$season)
             redis$HMSET(key = statKeyName, field = names(currentStat),
@@ -33,5 +51,7 @@ addPlayerInfo <- function(competitionID, playerLength) {
         }
       }
     }
+    setTxtProgressBar(progressBar, i)
   }
+  close(progressBar)
 }
