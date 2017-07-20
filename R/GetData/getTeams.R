@@ -1,9 +1,10 @@
-#' @title Get Matches
+#' @title Get Teams
 #'
 #' @description A function that generates match information.
 #'  
-#' @details The end point `/matches/` is accessed to get a list
-#'  of all match IDs accessible and returns them as a list.
+#' @details The end point `/team/` is accessed to get a list
+#'  of all team information from a teamID. (ID's are pre determined
+#'  from a matchID query).
 #'  
 #' @import httr
 #' 
@@ -12,15 +13,11 @@
 #' @param host An alphanumeric value that contains the particular HOST
 #'  of the API which is loaded into the global environment to allow 
 #'  access to the endpoint.
-#' @param competitionID An integer value of length 4 denoting the competition
-#'  ID noted by the API.
-#' @param dateFrom A POSIXct value converted to dd.mm.yyyy format which denotes
-#'  the start date for querying the API.
-#' @param dateTo A POSIXct value converted to dd.mm.yyyy format which denotes
-#'  the end date for querying the API.
+#' @param teamID An integer value denoting a particular teamID.
 #'  
-#' @return A list of competition IDs and their names if status_code == 200
+#' @return A list of team information for a given teamID if status_code == 200
 #' @return Null for an appropriate response if status_code != 200
+#'
 
 
 getTeams <- function(teamID, host = HOST, apiKey = API_KEY) {
