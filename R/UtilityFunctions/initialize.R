@@ -1,12 +1,15 @@
-initialize <- function(location) {
+initialize <- function(location, redisHost, redisPort, db) {
   # Begin by sourcing all the package functions
   allFiles <- list.files(path = location,
                          pattern = "\\.[RrSsQq]$",
                          recursive = TRUE)
-  allFilesLong <- paste0(location, setdiff(x = allFiles, 
-                                           y = "daemonProcess.R"))
-  capture.output <- sapply(allFilesLong, source, .GlobalEnv)
+  allFiles <- setdiff(x = allFiles, y = c("UtilityFunctions/initialize.R",
+                                          "MainFunctions/storeData.R"))
+  sapply(paste0(location, allFiles), source, .GlobalEnv)
+
   
   # Initalize all libraries and global variables
-  initializeAllFunctions()
+  initializeAllFunctions(redisHost = redisHost,
+                         redisPort = redisPort,
+                         db = db)
 }
