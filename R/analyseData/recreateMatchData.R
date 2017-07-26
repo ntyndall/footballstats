@@ -9,16 +9,18 @@
 #' @param competitionID An integer containing the competitionID that the 
 #'  teams and match information belong to.
 #' @param seasonStarting An integer defining the lower year for details on a season.
+#' @param redisData An environment that defines the redis configuration where data is
+#'  to be searched for.  
 #'  
 #' @return matchData. A data frame containing all the matches in a particular season.
 #' 
 
 
-recreateMatchData <- function(competitionID, seasonStarting) {
-  allMatches <- redis$KEYS(pattern = paste0('comp:season:match:', competitionID, ':', seasonStarting, '*'))
+recreateMatchData <- function(competitionID, seasonStarting, redisData) {
+  allMatches <- redisData$KEYS(pattern = paste0('comp:season:match:', competitionID, ':', seasonStarting, '*'))
   matchData <- data.frame(stringsAsFactors = FALSE)
   for (i in 1:length(allMatches)) {
-    singleMatch <- redis$HGETALL(key = allMatches[i])
+    singleMatch <- redisData$HGETALL(key = allMatches[i])
     singleMatch <- as.character(singleMatch)
   
     matchID <- data.frame(t(singleMatch[c(FALSE, TRUE)]),
