@@ -16,9 +16,14 @@ for(i in 1:length(results)) {
   testResults <- singleTest$results
   failures <- 0
   
+  print(singleTest)
+  print(testResults)
+  print(testResults[[1]])
   for (j in 1:length(testResults)) {
     check <- testResults[[j]]
 
+    print(check)
+    print(check != "As expected ")
     if (check != "As expected ") {
       failures <- failures + 1
     }
