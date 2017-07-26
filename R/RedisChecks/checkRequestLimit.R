@@ -27,17 +27,10 @@ checkRequestLimit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
   if (requestCount == 1) {
     redis$EXPIRE(key = "requestLimit", seconds = timePeriod - 1 )
   } else {
-    if (requestCount == requestsAllowed) {
-      timeToWait <- redis$TTL(key = "requestLimit")
+    if (requestCount > requestsAllowed - 100) {
+      print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for one hour.'))
       redis$SET(key = 'requestLimit', value = 0)
-      if (!timeToWait < 0) {
-        print(paste0("No more requests remaining, still need to wait : ", 
-                     timeToWait, " seconds."))
-        redis$SET(key = 'active', value = 'de-activated', EX = timeToWait)
-      }
-    } else if (requestCount > requestsAllowed - 100) {
-      print(paste0(Sys.time(), ' : WARNING - only ', requestsAllowed - requestCount, 
-                   ' requests remaining.'))
+      Sys.sleep(60 * 60)
     }
   }
 }
