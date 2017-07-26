@@ -13,7 +13,7 @@
 
 
 addCompetitionInfo <- function(daysUntilNextQuery) {
-  if (redis$EXISTS(key = 'active') == 0) {
+  if (redisConnection$EXISTS(key = 'active') == 0) {
     competitionIDs <- getCompetitions(apiKey = API_KEY)
     checkRequestLimit()
   } else {
@@ -24,14 +24,14 @@ addCompetitionInfo <- function(daysUntilNextQuery) {
     total <- 0
     for (i in 1:nrow(competitionIDs)) {
       seasonID <- competitionIDs$id[[i]]
-      compExists <- redis$SADD(key = 'competition:set',
-                      member = seasonID)
+      compExists <- redisConnection$SADD(key = 'competition:set',
+                                         member = seasonID)
       if (compExists == 1) {
         total <- total + 1
       }
     }
     print(paste0(Sys.time(), ' : Successfully added ', total, ' new competition IDs to Redis.'))
-    redis$SET(key = 'competition:waitForNextQuery',
-              value = as.integer(Sys.Date() + daysUntilNextQuery))
+    redisConnection$SET(key = 'competition:waitForNextQuery',
+                        value = as.integer(Sys.Date() + daysUntilNextQuery))
   }
 }

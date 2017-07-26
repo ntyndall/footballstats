@@ -37,7 +37,7 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData) {
                       "visitorteam_name", "visitorteam_score", "ht_score",
                       "ft_score", "et_score", "penalty_local", "penalty_visitor")
   
-  if (redis$EXISTS(key = 'active') == 0) {
+  if (redisConnection$EXISTS(key = 'active') == 0) {
     matches <- getMatches(competitionID = competitionID,
                           dateFrom = dateFrom,
                           dateTo = dateTo)
@@ -55,22 +55,23 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData) {
       
       # Check if team has been added to the set for analysis later.
       # Or if it is ready to be updated after another match has been played.
-      teamInSet <- redis$SADD(key = paste0('comp:_teamSetInfo_:'),
-                              member = matchItems$localteam_id)
+      teamInSet <- redisConnection$SADD(key = paste0('comp:_teamSetInfo_:'),
+                                        member = matchItems$localteam_id)
 
       if (teamInSet == 1 || updateData) {
-        redis$LPUSH(key = 'analyseTeams', value = matchItems$localteam_id)
+        redisConnection$LPUSH(key = 'analyseTeams', 
+                              value = matchItems$localteam_id)
       }
     
       # Check if match belongs to set
-      matchInSet <- redis$SADD(key = paste0('comp:_matchSetInfo_:', competitionID),
-                               member = matchItems$id)
+      matchInSet <- redisConnection$SADD(key = paste0('comp:_matchSetInfo_:', competitionID),
+                                         member = matchItems$id)
       
       if (matchInSet == 1) {
         matchKey <- paste0("comp:season:match:", matchItems$comp_id, ":", 
                            matchItems$season, ":", matchItems$id)
-        redis$HMSET(key = matchKey, field = names(matchItems), 
-                    value = as.character(matchItems))
+        redisConnection$HMSET(key = matchKey, field = names(matchItems), 
+                              value = as.character(matchItems))
       }
     }
     return(matches)

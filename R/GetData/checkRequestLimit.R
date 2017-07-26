@@ -23,13 +23,13 @@
 
 checkRequestLimit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
   
-  requestCount <- as.integer(redis$INCR(key = "requestLimit"))
+  requestCount <- as.integer(redisConnection$INCR(key = "requestLimit"))
   if (requestCount == 1) {
-    redis$EXPIRE(key = "requestLimit", seconds = timePeriod - 1 )
+    redisConnection$EXPIRE(key = "requestLimit", seconds = timePeriod - 1 )
   } else {
     if (requestCount > requestsAllowed - 100) {
       print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for one hour.'))
-      redis$SET(key = 'requestLimit', value = 0)
+      redisConnection$SET(key = 'requestLimit', value = 0)
       Sys.sleep(60 * 60)
     }
   }

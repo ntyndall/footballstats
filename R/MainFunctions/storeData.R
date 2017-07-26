@@ -10,7 +10,7 @@
 #'  (4) Set start seasonDate e.g. seasonStarting = 2015 for 2015/2016 season
 #'  (5) Provide Redis database configured in (1)
 #'  
-#' @param compID An integer containing the competitionID that the 
+#' @param competitionID An integer containing the competitionID that the 
 #'  teams and match information belong to.
 #' @param seasonStarting An integer defining the lower year for details on a season.
 #' @param updateData A boolean to signify whether information is only to be looked at
@@ -18,14 +18,14 @@
 #'  
 
 
-storeData <- function(compID, seasonStarting, updateData) {
+storeData <- function(competitionID, seasonStarting, updateData) {
   initialize(location = paste0(getwd(), '/Desktop/football-project/footballstats/R/'),
              redisHost = 'localhost',
              redisPort = 6379,
              db = 10)
   
-  mainController(redis = redis,
-                 compID = compID, 
+  mainController(redisConnection = redisConnection,
+                 competitionID = competitionID, 
                  updateData = updateData, 
                  seasonStarting = seasonStarting)
 }

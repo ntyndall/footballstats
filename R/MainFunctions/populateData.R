@@ -15,7 +15,7 @@ for (i in 1:nrow(comps)) {
   for (j in 1:length(seasonYear)) {
     print(paste0('looking at season ', seasonYear[j], '/', seasonYear[j] + 1, 
                  ' for competition - ', comps$name[i]))
-    storeData(compID = comps$id[i], 
+    storeData(competitionID = comps$id[i], 
               seasonStarting = seasonYear[j],
               updateData = FALSE)
   }

@@ -20,7 +20,6 @@ initializeAllFunctions <- function(redisHost = "localhost", redisPort = 6379,
   library(ggplot2)
   library(slackr)
   library(jsonlite)
-  library(redux)
   library(testthat)
   library(tcltk)
   if (testing) {

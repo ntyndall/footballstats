@@ -13,8 +13,9 @@
 #'  standing information.
 #'
 
+
 addCompetitionStandingInfo <- function(competitionID) {
-  if (redis$EXISTS(key = 'active') == 0) {
+  if (redisConnection$EXISTS(key = 'active') == 0) {
     standings <- getStandings(competitionID = competitionID)
     checkRequestLimit()
   } else {
@@ -27,8 +28,8 @@ addCompetitionStandingInfo <- function(competitionID) {
       singleTable <- standings[i, ]
       standingKey <- paste0("comp:season:_standing_:", competitionID,
                             singleTable$season)
-      redis$HMSET(key = standingKey, field = names(singleTable),
-                  value = as.character(singleTable))
+      redisConnection$HMSET(key = standingKey, field = names(singleTable),
+                            value = as.character(singleTable))
     }
   }
 }

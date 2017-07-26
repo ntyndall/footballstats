@@ -21,7 +21,7 @@
 #'
 
 
-mainController <- function(redis, compID, updateData = FALSE, 
+mainController <- function(redisConnection, competitionID, updateData = FALSE, 
                            seasonStarting = 2015) {
 
   # Begin finding match information
@@ -29,37 +29,37 @@ mainController <- function(redis, compID, updateData = FALSE,
   dateTo <- paste0('31.07.', seasonStarting + 1)
     
   # Add competition standing
-  addCompetitionStandingInfo(competition = compID)
+  addCompetitionStandingInfo(competition = competitionID)
   
   
-  startingRequests <- as.integer(redis$GET(key = 'requestLimit'))
-  startingTime <- redis$TTL(key = 'requestLimit')
+  startingRequests <- as.integer(redisConnection$GET(key = 'requestLimit'))
+  startingTime <- redisConnection$TTL(key = 'requestLimit')
   
   # Add match information
-  matches <- addMatchInfo(competitionID = compID,
+  matches <- addMatchInfo(competitionID = competitionID,
                           dateFrom = dateFrom,
                           dateTo = dateTo,
                           updateData = updateData)
   
   # Add event information
   if (nrow(matches) > 0) {
-    addEventInfo(competitionID = compID,
+    addEventInfo(competitionID = competitionID,
                  matchIDs = matches$id,
                  matchEvents = matches$events)
   }
   
   # Add team information
-  teamListLength <- redis$LLEN(key = 'analyseTeams')
+  teamListLength <- redisConnection$LLEN(key = 'analyseTeams')
   if (teamListLength > 0) {
-    addTeamInfo(competitionID = compID,
+    addTeamInfo(competitionID = competitionID,
                 teamListLength = teamListLength,
                 updateData = updateData)
   }
   
   # Add player information
-  playerLength <- redis$LLEN(key = 'analysePlayers')
+  playerLength <- redisConnection$LLEN(key = 'analysePlayers')
   if (playerLength > 0) {
-    addPlayerInfo(competitionID = compID,
+    addPlayerInfo(competitionID = competitionID,
                   playerLength = playerLength)
   }
   
