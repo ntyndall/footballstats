@@ -16,21 +16,15 @@ for(i in 1:length(results)) {
   testResults <- singleTest$results
   failures <- 0
   
-  print(singleTest)
-  print(testResults)
-  print(testResults[[1]])
   for (j in 1:length(testResults)) {
     check <- testResults[[j]]
-
-    print(check)
-    print(check != "As expected ")
-    if (check != "As expected ") {
+    if (check[1] != "As expected ") {
       failures <- failures + 1
     }
   }
 
-  fileName <- singleTest$file
-  unitTest <- singleTest$test
+  fileName <- singleTest$file[1]
+  unitTest <- singleTest$test[1]
 
   if (failures > 0) {
     totalError <- totalError + 1
