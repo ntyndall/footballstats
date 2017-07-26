@@ -14,8 +14,8 @@
 #'
 
 
-initializeAllFunctions <- function(redisHost = "localhost",
-                                   redisPort = 6379, db = 10) {
+initializeAllFunctions <- function(redisHost = "localhost", redisPort = 6379, 
+                                   db = 10, testing) {
   # Load all libraries first.
   library(ggplot2)
   library(slackr)
@@ -23,9 +23,16 @@ initializeAllFunctions <- function(redisHost = "localhost",
   library(redux)
   library(testthat)
   library(tcltk)
-  
-  # Load all necessary variables into the global namesapce
-  sensitiveInfo()
-  getIDList()
-  redis <<- redux::hiredis(host = redisHost, port = redisPort, db = db)
+  if (testing) {
+    library(rredis)
+    redisConnection <<- rredis::redisConnect(host = redisHost,
+                                             port = redisPort)
+  } else {
+    library(redux)
+    sensitiveInfo()
+    getIDList()
+    redisConnection <<- redux::hiredis(host = redisHost, 
+                                       port = redisPort, 
+                                       db = db)
+  }
 }

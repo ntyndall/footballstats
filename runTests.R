@@ -1,9 +1,13 @@
 
 # Load all functions into global namespace
 source(paste0(getwd(), '/R/UtilityFunctions/initialize.R'))
-initialize(location = paste0(getwd(), '/R/'))
+initialize(location = paste0(getwd(), '/R/'),
+           testing = TRUE)
 results <- test_dir(path = "tests", 
                     reporter = "summary")
+
+rredis::redisSelect(1)
+print(rredis::redisKeys(pattern = '*'))
 
 totalError <- 0
 for(i in 1:length(results)) {
@@ -38,5 +42,4 @@ quit(save = 'no',
      status = codeStatus, 
      runLast = FALSE)
 
-
-                
+ 
