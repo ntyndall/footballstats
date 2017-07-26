@@ -17,7 +17,7 @@ for(i in 1:length(results)) {
   failures <- 0
   
   for (j in 1:length(testResults)) {
-    check <- testResults[[j]]
+    check <- capture.output(testResults[[j]])
     if (check[1] != "As expected ") {
       failures <- failures + 1
     }
