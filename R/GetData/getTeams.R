@@ -26,8 +26,6 @@ getTeams <- function(teamID, host = HOST, apiKey = API_KEY) {
     team <- rawToChar(teamInfo$content)
     return(jsonlite::fromJSON(team))
   } else {
-    print(paste0(Sys.time(), " : Warning - status code ", teamInfo$status_code, " in getTeams(). ",
-                 "when looking for team -> ", teamID))
     return(NULL)
   }
 }

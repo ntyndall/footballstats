@@ -35,8 +35,8 @@ getMatches <- function(competitionID, dateFrom, dateTo,
     matches <- rawToChar(listOfMatches$content)
     return(jsonlite::fromJSON(matches))
   } else {
-    print(paste0(Sys.time(), " : Warning - status code ", listOfMatches$status_code, " in getMatches(). ",
-                 "when looking for competition -> ", competitionID))
+    #print(paste0(Sys.time(), " : Warning - status code ", listOfMatches$status_code, " in getMatches(). ",
+    #             "when looking for competition -> ", competitionID))
     return(NULL)
   }
 }

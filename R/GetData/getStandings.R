@@ -26,8 +26,8 @@ getStandings <- function(competitionID, host = HOST, apiKey = API_KEY) {
     standings <- rawToChar(listOfStandings$content)
     return(jsonlite::fromJSON(standings))
   } else {
-    print(paste0(Sys.time(), " : Warning - status code ", listOfStandings$status_code, " in getStandings(). ",
-                 "when looking for competition -> ", competitionID))
+    #print(paste0(Sys.time(), " : Warning - status code ", listOfStandings$status_code, " in getStandings(). ",
+    #            "when looking for competition -> ", competitionID))
     return(NULL)
   }
 }
