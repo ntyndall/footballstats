@@ -1,5 +1,5 @@
 initialize <- function(location, redisHost, redisPort,
-                       db, testing = FALSE) {
+                       db = 10, testing = FALSE) {
   # Begin by sourcing all the package functions
   allFiles <- list.files(path = location,
                          pattern = "\\.[RrSsQq]$",

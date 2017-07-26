@@ -2,6 +2,8 @@
 # Load all functions into global namespace
 source(paste0(getwd(), '/R/UtilityFunctions/initialize.R'))
 initialize(location = paste0(getwd(), '/R/'),
+           redisHost = 'localhost',
+           redisPort = 6379,
            testing = TRUE)
 results <- test_dir(path = "tests", 
                     reporter = "summary")
