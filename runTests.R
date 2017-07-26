@@ -12,27 +12,20 @@ rredis::redisSelect(1)
 
 totalError <- 0
 for(i in 1:length(results)) {
-  singleTest <- results[i][[1]]$results
+  singleTest <- results[i][[1]]
+  testResults <- singleTest$results
   failures <- 0
   
-  print('singleTest')
-  print(singleTest)
-  for (j in 1:length(singleTest)) {
-    check <- singleTest[[j]]$message
+  for (j in 1:length(testResults)) {
+    check <- testResults[[j]]
 
-    print('check')
-    print(check)
     if (check != "As expected ") {
       failures <- failures + 1
     }
   }
 
-  fileName <-results[i][[1]]$file
-  unitTest <- results[i][[1]]$test
-  print('other..')
-  print(fileName)
-  print(unitTest)
-  print(failures)  
+  fileName <- singleTest$file
+  unitTest <- singleTest$test
 
   if (failures > 0) {
     totalError <- totalError + 1
@@ -48,8 +41,6 @@ if (totalError > 0) {
   codeStatus <- 0
 }
 
-print('codeStatus')
-print(codeStatus)
 quit(save = 'no',
      status = codeStatus, 
      runLast = FALSE)
