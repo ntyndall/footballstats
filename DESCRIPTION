@@ -16,6 +16,6 @@ Imports:
     tidyr,
     testthat,
     ggplot2,
-    redux,
+    rredis,
     slackr
 
