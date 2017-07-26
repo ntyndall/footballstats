@@ -23,13 +23,17 @@
 
 mainController <- function(redis, compID, updateData = FALSE, 
                            seasonStarting = 2015) {
-  
+
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
   dateTo <- paste0('31.07.', seasonStarting + 1)
     
   # Add competition standing
   addCompetitionStandingInfo(competition = compID)
+  
+  
+  startingRequests <- as.integer(redis$GET(key = 'requestLimit'))
+  startingTime <- redis$TTL(key = 'requestLimit')
   
   # Add match information
   matches <- addMatchInfo(competitionID = compID,
@@ -39,7 +43,6 @@ mainController <- function(redis, compID, updateData = FALSE,
   
   # Add event information
   if (nrow(matches) > 0) {
-    print(paste0(Sys.time(), ' : Analysing ', length(matches$events), ' event(s).'))
     addEventInfo(competitionID = compID,
                  matchIDs = matches$id,
                  matchEvents = matches$events)
@@ -48,7 +51,6 @@ mainController <- function(redis, compID, updateData = FALSE,
   # Add team information
   teamListLength <- redis$LLEN(key = 'analyseTeams')
   if (teamListLength > 0) {
-    print(paste0(Sys.time(), ' : Analysing ', teamListLength, ' new team(s).'))
     addTeamInfo(competitionID = compID,
                 teamListLength = teamListLength,
                 updateData = updateData)
@@ -57,10 +59,16 @@ mainController <- function(redis, compID, updateData = FALSE,
   # Add player information
   playerLength <- redis$LLEN(key = 'analysePlayers')
   if (playerLength > 0) {
-    print(paste0(Sys.time(), ' : Analysing ', playerLength, ' new player(s).'))
     addPlayerInfo(competitionID = compID,
                   playerLength = playerLength)
-    
-    print(paste0(Sys.time(), ' Analysis complete.'))
   }
+  
+  # Count the number of GET requests made. 2 for competition standing and match information
+  uniqueRequests <- 2
+  totalRequests <- uniqueRequests + teamListLength + playerLength
+  print(paste0(Sys.time(), ' : Analysed ', totalRequests, ' unique GET requests.'))
+  print(paste0(Sys.time(), ' : Analysed ', length(matches$events), ' matches/events.'))
+  print(paste0(Sys.time(), ' : Analysed ', teamListLength, ' teams'))
+  print(paste0(Sys.time(), ' : Analysed ', playerLength, ' players.'))
+  cat('\n\n')
 }
