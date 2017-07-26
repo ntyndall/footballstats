@@ -47,16 +47,15 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData) {
     matches <- NULL
   }
   
+  icount <- 0
   if (!is.null(matches)) {
-    print(paste0(Sys.time(), ' : Analysing ', nrow(matches), ' match(es).'))
-    progressBar <- txtProgressBar(min = 0, max = nrow(matches), style = 3)
     for (i in 1:nrow(matches)) {
       single <- matches[i, ]
       matchItems <- single[ ,valuesToRetain] 
       
       # Check if team has been added to the set for analysis later.
       # Or if it is ready to be updated after another match has been played.
-      teamInSet <- redis$SADD(key = paste0('comp:_teamSetInfo_', competitionID),
+      teamInSet <- redis$SADD(key = paste0('comp:_teamSetInfo_:'),
                               member = matchItems$localteam_id)
 
       if (teamInSet == 1 || updateData) {
@@ -73,9 +72,7 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData) {
         redis$HMSET(key = matchKey, field = names(matchItems), 
                     value = as.character(matchItems))
       }
-      setTxtProgressBar(progressBar, i)
     }
-    close(progressBar)
     return(matches)
   } else {
     return(data.frame())

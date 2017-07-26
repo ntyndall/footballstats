@@ -24,7 +24,7 @@ addPlayerInfo <- function(competitionID, playerLength) {
                       "birthplace", "position", "height", "weight")
   
   progressBar <- txtProgressBar(min = 0, max = playerLength, style = 3)
-  for (i in 1:playerLength) {
+  sapply(1:playerLength, function(i) {
     if (redis$EXISTS(key = 'active') == 0) {
       playerID <- redis$LPOP(key = 'analysePlayers')
       playerData <- getPlayers(playerID = playerID)
@@ -37,21 +37,21 @@ addPlayerInfo <- function(competitionID, playerLength) {
     if (!is.null(playerData)) {
       stats <- playerData$player_statistics
       statNames <- names(stats)
-      for (j in 1:length(statNames)) {
+      sapply(1:length(statNames), function(j) {
         statData <- stats[[statNames[j]]]
         if (length(statData) != 0 || is.data.frame(statData)) {
-          for (k in 1:nrow(statData)) {
+          sapply(1:nrow(statData), function(k) {
             currentStat <- statData[k, ]
             statKeyName <- paste0('player:team:league:season:_stats_', statNames[j], '_:', 
                                   playerData$id, ':', currentStat$id, ':', 
                                   currentStat$league_id, ':', currentStat$season)
             redis$HMSET(key = statKeyName, field = names(currentStat),
                        value = as.character(currentStat))
-          }
+          })
         }
-      }
+      })
     }
     setTxtProgressBar(progressBar, i)
-  }
+  })
   close(progressBar)
 }

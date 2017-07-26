@@ -23,11 +23,10 @@
 
 
 addEventInfo <- function(competitionID, matchIDs, matchEvents) {
-  progressBar <- txtProgressBar(min = 0, max = length(matchEvents), style = 3)
   for (i in 1:length(matchEvents)) {
     eventsPerMatch <- matchEvents[[i]]
     matchID <- matchIDs[i]
-    if (nrow(eventsPerMatch) > 0) {
+    if (length(eventsPerMatch) > 0) {
       for (j in 1:nrow(eventsPerMatch)) {
         event <- eventsPerMatch[j, ]
         inSet <- redis$SADD(key = paste0("comp:_eventInSet_:", competitionID), 
@@ -38,7 +37,5 @@ addEventInfo <- function(competitionID, matchIDs, matchEvents) {
         }
       }
     }
-    setTxtProgressBar(progressBar, i)
   }
-  close(progressBar)
 }

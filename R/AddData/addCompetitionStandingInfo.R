@@ -23,16 +23,12 @@ addCompetitionStandingInfo <- function(competitionID) {
   }
   
   if (!is.null(standings)) {
-    print(paste0(Sys.time(), ' : Analysing ', nrow(standings), ' table standing(s).'))
-    progressBar <- txtProgressBar(min = 0, max = nrow(standings), style = 3)
     for (i in 1:nrow(standings)) {
       singleTable <- standings[i, ]
       standingKey <- paste0("comp:season:_standing_:", competitionID,
                             singleTable$season)
       redis$HMSET(key = standingKey, field = names(singleTable),
                   value = as.character(singleTable))
-      setTxtProgressBar(progressBar, i)
     }
-    close(progressBar)
   }
 }

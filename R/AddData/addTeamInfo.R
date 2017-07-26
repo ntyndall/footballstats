@@ -33,8 +33,7 @@ addTeamInfo <- function(competitionID, teamListLength, updateData) {
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",
                       "venue_capacity", "coach_name", "coach_id")
-  
-  progressBar <- txtProgressBar(min = 0, max = teamListLength, style = 3)
+
   for (i in 1:teamListLength) {
     if (redis$EXISTS(key = 'active') == 0) {
       teamID <- redis$LPOP(key = 'analyseTeams')
@@ -55,25 +54,25 @@ addTeamInfo <- function(competitionID, teamListLength, updateData) {
                   value = as.character(basicData))
       
       squadInfo <- teamData$squad
-      for (k in 1:nrow(squadInfo)) {
-        playerID <- squadInfo$id[k]
-        squadPlayer <- paste0(squad, ":", playerID)
-        redis$HMSET(key = squadPlayer, field = names(squadInfo[k, ]), 
-                    value = as.character(squadInfo[k, ]))
-        
-        # Check if player has been added to the set for analysis later.
-        # Or if it is ready to be updated after another match has been played.
-        newPlayers <- redis$SADD(key = paste0('comp:_playerSetInfo_', competitionID),
-                                 member = playerID)
-
-        if (newPlayers == 1 || updateData) {
-          redis$LPUSH(key = 'analysePlayers', value = playerID)
+      if (length(squadInfo) > 0) {
+        for (k in 1:nrow(squadInfo)) {
+          playerID <- squadInfo$id[k]
+          squadPlayer <- paste0(squad, ":", playerID)
+          redis$HMSET(key = squadPlayer, field = names(squadInfo[k, ]), 
+                      value = as.character(squadInfo[k, ]))
+          
+          # Check if player has been added to the set for analysis later.
+          # Or if it is ready to be updated after another match has been played.
+          newPlayers <- redis$SADD(key = paste0('comp:_playerSetInfo_:'),
+                                   member = playerID)
+  
+          if (newPlayers == 1 || updateData) {
+            redis$LPUSH(key = 'analysePlayers', value = playerID)
+          }
         }
       }
       redis$HMSET(key = stats, field = names(teamData$statistics), 
                   value = as.character(teamData$statistics))
     }
-    setTxtProgressBar(progressBar, i)
   }
-  close(progressBar)
 }
