@@ -5,8 +5,12 @@ initialize <- function(location, redisHost, redisPort,
   allFiles <- list.files(path = location,
                          pattern = "\\.[RrSsQq]$",
                          recursive = TRUE)
+  
+  print(allFiles)
+  
   allFiles <- setdiff(x = allFiles, y = c("UtilityFunctions/initialize.R",
-                                          "MainFunctions/populateData.R"))
+                                          "MainFunctions/populateData.R",
+                                          "analyseData/controllerScript.R"))
   sapply(paste0(location, allFiles), source, .GlobalEnv)
 
   print('before loading libraries')

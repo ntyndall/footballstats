@@ -14,3 +14,4 @@ matchData <- recreateMatchData(competitionID = exampleCompetitionID,
 # (3) Generate team form based on match data
 generateTeamForm(competitionID = exampleCompetitionID,
                  redisData = redis)
+

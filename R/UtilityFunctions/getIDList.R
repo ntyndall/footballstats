@@ -14,3 +14,4 @@
 getIDList <- function() {
   ID_LIST <<- c("team", "match", "singleEvent", "event", "competition")
 }
+
