@@ -64,7 +64,7 @@ addTeamInfo <- function(competitionID, teamListLength, updateData) {
           # Check if player has been added to the set for analysis later.
           # Or if it is ready to be updated after another match has been played.
           newPlayers <- redisConnection$SADD(key = paste0('comp:_playerSetInfo_:'),
-                                   member = playerID)
+                                             member = playerID)
   
           if (newPlayers == 1 || updateData) {
             redisConnection$LPUSH(key = 'analysePlayers', value = playerID)
