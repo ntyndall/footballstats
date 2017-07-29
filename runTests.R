@@ -1,34 +1,31 @@
 
 # Load all functions into global namespace
 source(paste0(getwd(), '/R/UtilityFunctions/initialize.R'))
-print('about to initialize')
 initialize(location = paste0(getwd(), '/R/'),
            redisHost = 'localhost',
            redisPort = 6379,
            testing = TRUE)
-print('after initialize')
 results <- test_dir(path = "tests", 
                     reporter = "summary")
 
 rredis::redisSelect(1)
-print(rredis::redisKeys(pattern = '*'))
 
 totalError <- 0
 for(i in 1:length(results)) {
-  singleTest <- results[i][[1]]$results
+  singleTest <- results[i][[1]]
+  testResults <- singleTest$results
   failures <- 0
   
-  for (j in 1:length(singleTest)) {
-    check <- singleTest[[j]]$message
-
-    if (check != "As expected ") {
+  for (j in 1:length(testResults)) {
+    check <- capture.output(testResults[[j]])
+    if (check[1] != "As expected ") {
       failures <- failures + 1
     }
   }
 
-  fileName <-results[i][[1]]$file
-  unitTest <- results[i][[1]]$test
-  
+  fileName <- singleTest$file[1]
+  unitTest <- singleTest$test[1]
+
   if (failures > 0) {
     totalError <- totalError + 1
     cat(paste0(Sys.time(), " : Failure in { ", fileName, " } --> ( ", unitTest, " ) \n"))
@@ -42,6 +39,7 @@ if (totalError > 0) {
 } else {
   codeStatus <- 0
 }
+
 quit(save = 'no',
      status = codeStatus, 
      runLast = FALSE)

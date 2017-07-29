@@ -16,21 +16,17 @@
 
 initializeAllFunctions <- function(redisHost = "localhost", redisPort = 6379, 
                                    db = 10, testing) {
-  print('bef all libs')
   # Load all libraries first.
   library(ggplot2)
   library(slackr)
   library(jsonlite)
   library(testthat)
   library(tcltk)
-  print('about to load...')
   if (testing) {
-    print('rredis...')
     library(rredis)
     redisConnection <<- rredis::redisConnect(host = redisHost,
                                              port = redisPort)
   } else {
-    print('redux..')
     library(redux)
     sensitiveInfo()
     getIDList()
