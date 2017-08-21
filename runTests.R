@@ -9,6 +9,8 @@ results <- test_dir(path = "tests",
                     reporter = "summary")
 
 rredis::redisSelect(1)
+redisConnection <<- redisMapping()
+
 
 totalError <- 0
 for(i in 1:length(results)) {

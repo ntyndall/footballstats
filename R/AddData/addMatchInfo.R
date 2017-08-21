@@ -22,6 +22,9 @@
 #' @param updateData A boolean that is set to TRUE if team data is to be analysed
 #'  again, i.e. after a match. FALSE to ignore and only analyse new teams. Generally
 #'  set to FALSE for first time run.
+#' @param analysingToday A boolean that is set to TRUE if data is being analysing today.
+#'  This is used to figure out if matches have been played during the time of 
+#'  query, if not then wait until todays match has been played.
 #'  
 #' @return Returns a match dataframe containing all match information to update 
 #'  events in a particular match. Redis is updated with match information.
@@ -29,7 +32,7 @@
 #'
 
 
-addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData) {
+addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData, analysingToday = TRUE) {
   valuesToRetain <- c("id", "comp_id", "formatted_date", "season",           
                       "week", "venue", "venue_id", "venue_city",     
                       "status", "timer", "time", "localteam_id",  
@@ -42,12 +45,18 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData) {
                           dateFrom = dateFrom,
                           dateTo = dateTo)
     checkRequestLimit()
+
+    # If getting todays match information, make sure all matches have actually been played.
+    if (analysingToday) {
+       if (any(matches$localteam_score == "")) {
+         return(data.frame(stringsAsFactors = FALSE))
+       }
+    }
   } else {
     print(Sys.time(), ' : Run out of requests in addMatchInfo()')
     matches <- NULL
   }
   
-  icount <- 0
   if (!is.null(matches)) {
     for (i in 1:nrow(matches)) {
       single <- matches[i, ]
@@ -76,6 +85,6 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData) {
     }
     return(matches)
   } else {
-    return(data.frame())
+    return(data.frame(stringsAsFactors = FALSE))
   }
 }
