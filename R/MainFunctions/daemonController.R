@@ -21,10 +21,7 @@ daemonController <- function(redisConnection, competitionID, currentDate,
                              updateData = TRUE) {
   
   # Get todays date information for constructing GET requests later
-  day <- format(x = currentDate, "%d")
-  month <- format(x = currentDate, "%m")
-  year <- format(x = currentDate, "%y")
-  dateTo <- dateFrom <- paste0(day, '.', month, '.', year)
+  dateTo <- dateFrom <- formatDates(standardDateFormat = currentDate)
   analysingToday <- as.integer(currentDate) == as.integer(Sys.Date())
   
   # -------------------- #

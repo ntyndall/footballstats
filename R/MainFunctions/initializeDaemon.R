@@ -73,19 +73,11 @@ initializeDaemon <- function(loopOver = TRUE, loopOverToday = TRUE,
     # Always look a few days in the future to get fixtures
     # Only active when the daemon has caught up with today
     if (currentDate == as.integer(Sys.Date) && timeToClassify) {
-      # Put classification stuff here...
+      
+      # Calculate new query dates...
       datePOS <- as.Date(currentDate, origin = '1970-01-01') + 1
-      datePOSFuture <- datePOS + 4
-      # dateFrom
-      dayFrom <- format(x = datePOS, "%d")
-      monthFrom <- format(x = datePOS, "%m")
-      yearFrom <- format(x = datePOS, "%y")
-      dateFrom <- paste0(dayFrom, '.', monthFrom, '.', yearFrom)
-      # dateTo
-      dayTo <- format(x = datePOSFuture, "%d")
-      monthTo <- format(x = datePOSFuture, "%m")
-      yearTo <- format(x = datePOSFuture, "%y")
-      dateTo <- paste0(dayTo, '.', monthTo, '.', yearTo)
+      dateFrom <- formatDates(standardDateFormat = datePOS)
+      dateTo <- formatDates(standardDateFormat = datePOS + 4)
       
       # Query in the future for matches
       classifyFixtures(redisConnection = redisConnection,
