@@ -5,13 +5,13 @@
 #'  later analysis.
 #'  
 #' @details Match information is stored in a hash map as;
-#'     ->   comp:season:match:{comp_id}:{season}:{match_id}   ->   [HASH]
+#'     ->   [csm]:{comp_id}:{season}:{match_id}   ->   [HASH]
 #'  The matches involved are first checked to see if they already exist
 #'  in redis by checking the set;
-#'     ->   comp:_matchSetInfo_:{comp_id}   ->   [SET]
+#'     ->   [c_matchSetInfo]:{comp_id}   ->   [SET]
 #'  The teams involved in the match are checked to see if they are new,
 #'  by checking the set in redis;
-#'     ->   comp:_teamSetInfo_:{comp_id}   ->   [SET]
+#'     ->   [c_teamSetInfo]:{comp_id}   ->   [SET]
 #'  
 #' @param competitionID An integer containing the competitionID that the 
 #'  teams and match information belong to.
@@ -64,7 +64,7 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData, analysingT
       
       # Check if team has been added to the set for analysis later.
       # Or if it is ready to be updated after another match has been played.
-      teamInSet <- redisConnection$SADD(key = paste0('comp:_teamSetInfo_:'),
+      teamInSet <- redisConnection$SADD(key = paste0('c_teamSetInfo:', competitionID),
                                         member = matchItems$localteam_id)
 
       if (teamInSet == 1 || updateData) {
@@ -73,11 +73,11 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData, analysingT
       }
     
       # Check if match belongs to set
-      matchInSet <- redisConnection$SADD(key = paste0('comp:_matchSetInfo_:', competitionID),
+      matchInSet <- redisConnection$SADD(key = paste0('c_matchSetInfo:', competitionID),
                                          member = matchItems$id)
       
       if (matchInSet == 1) {
-        matchKey <- paste0("comp:season:match:", matchItems$comp_id, ":", 
+        matchKey <- paste0("csm:", matchItems$comp_id, ":", 
                            matchItems$season, ":", matchItems$id)
         redisConnection$HMSET(key = matchKey, field = names(matchItems), 
                               value = as.character(matchItems))

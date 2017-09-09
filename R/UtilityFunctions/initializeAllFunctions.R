@@ -22,6 +22,7 @@ initializeAllFunctions <- function(redisHost = "localhost", redisPort = 6379,
   library(jsonlite)
   library(testthat)
   library(tcltk)
+  library(e1071)
   if (testing) {
     library(rredis)
     redisConnection <<- rredis::redisConnect(host = redisHost,

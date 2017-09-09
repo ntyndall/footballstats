@@ -22,24 +22,35 @@
 
 
 mainController <- function(redisConnection, competitionID, updateData = FALSE, 
-                           seasonStarting = 2015) {
+                           seasonStarting) {
 
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
-  dateTo <- paste0('31.07.', seasonStarting + 1)
-    
+  dateTo <- formatDates(standardDateFormat = Sys.Date() - 1)
+
   # Add competition standing
   addCompetitionStandingInfo(competition = competitionID)
   
-  
+  # Lookup request timings 
   startingRequests <- as.integer(redisConnection$GET(key = 'requestLimit'))
   startingTime <- redisConnection$TTL(key = 'requestLimit')
-  
+ 
   # Add match information
   matches <- addMatchInfo(competitionID = competitionID,
                           dateFrom = dateFrom,
                           dateTo = dateTo,
                           updateData = updateData)
+  print(paste0(Sys.time(), ': Matches complete.'))
+  
+  # Add commentary information
+  if (nrow(matches) > 0) {
+    addCommentaryInfo(competitionID = competitionID,
+                      matchIDs = matches$id,
+                      localteam = matches$localteam_id,
+                      visitorteam = matches$visitorteam_id)
+  }
+  print(paste0(Sys.time(), ': Commentary complete.'))
+  
   
   # Add event information
   if (nrow(matches) > 0) {
@@ -47,6 +58,7 @@ mainController <- function(redisConnection, competitionID, updateData = FALSE,
                  matchIDs = matches$id,
                  matchEvents = matches$events)
   }
+  print(paste0(Sys.time(), ': Events complete.'))
   
   # Add team information
   teamListLength <- redisConnection$LLEN(key = 'analyseTeams')
@@ -55,17 +67,21 @@ mainController <- function(redisConnection, competitionID, updateData = FALSE,
                 teamListLength = teamListLength,
                 updateData = updateData)
   }
+  print(paste0(Sys.time(), ': Teams complete.'))
   
   # Add player information
   playerLength <- redisConnection$LLEN(key = 'analysePlayers')
   if (playerLength > 0) {
     addPlayerInfo(competitionID = competitionID,
-                  playerLength = playerLength)
+                  playerLength = playerLength,
+                  currentSeasonYear = seasonStarting)
   }
+  print(paste0(Sys.time(), ': Players complete.'))
   
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
   totalRequests <- uniqueRequests + teamListLength + playerLength
+  print(paste0(Sys.time(), ' ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*'))
   print(paste0(Sys.time(), ' : Analysed ', totalRequests, ' unique GET requests.'))
   print(paste0(Sys.time(), ' : Analysed ', length(matches$events), ' matches/events.'))
   print(paste0(Sys.time(), ' : Analysed ', teamListLength, ' teams'))

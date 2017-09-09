@@ -16,11 +16,11 @@
 #' 
 
 
-recreateMatchData <- function(competitionID, seasonStarting, redisData) {
-  allMatches <- redisData$KEYS(pattern = paste0('comp:season:match:', competitionID, ':', seasonStarting, '*'))
+recreateMatchData <- function(redisConnection, competitionID, seasonStarting) {
+  allMatches <- redisConnection$KEYS(pattern = paste0('csm:', competitionID, ':', seasonStarting, '*'))
   matchData <- data.frame(stringsAsFactors = FALSE)
   for (i in 1:length(allMatches)) {
-    singleMatch <- redisData$HGETALL(key = allMatches[i])
+    singleMatch <- redisConnection$HGETALL(key = allMatches[i])
     singleMatch <- as.character(singleMatch)
   
     matchID <- data.frame(t(singleMatch[c(FALSE, TRUE)]),

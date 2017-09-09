@@ -7,12 +7,11 @@
 #'  
 #' @details A number of information is stored. 
 #'  The basic information is stored as;
-#'     ->   comp:team:_basic_:{comp_id}:{team_id}   ->   [HASH]
+#'     ->   [ct_basic]:{comp_id}:{team_id}   ->   [HASH]
 #'  The team statistics is stored as;
-#'     ->   comp:team:_stats_:{comp_id}:{team_id}   ->   [HASH]
+#'     ->   [ct_stats]:{comp_id}:{team_id}   ->   [HASH]
 #'  Player information relevent to the team is stored as;
-#'     ->   comp:team:player:_squad_:
-#'          {comp_id}:{team_id}:{player_id}   ->   [HASH]
+#'     ->   [ctp]:{comp_id}:{team_id}:{player_id}   ->   [HASH]
 #'
 #' @param competitionID An integer defining the competitionID that the
 #'  team belongs to.
@@ -45,9 +44,9 @@ addTeamInfo <- function(competitionID, teamListLength, updateData) {
     }
   
     if(!is.null(teamData)) {
-      basic <- paste0("comp:team:_basic_:", competitionID, ":", teamData$team_id)
-      squad <- paste0("comp:team:player:_squad_:", competitionID, ":", teamData$team_id)
-      stats <- paste0("comp:team:_stats_:", competitionID, ":", teamData$team_id)
+      basic <- paste0("ct_basic:", competitionID, ":", teamData$team_id)
+      stats <- paste0("ct_stats:", competitionID, ":", teamData$team_id)
+      squad <- paste0("ctp:", competitionID, ":", teamData$team_id)
 
       basicData <- teamData[valuesToRetain]
       redisConnection$HMSET(key = basic, field = names(basicData), 
@@ -63,7 +62,7 @@ addTeamInfo <- function(competitionID, teamListLength, updateData) {
           
           # Check if player has been added to the set for analysis later.
           # Or if it is ready to be updated after another match has been played.
-          newPlayers <- redisConnection$SADD(key = paste0('comp:_playerSetInfo_:'),
+          newPlayers <- redisConnection$SADD(key = paste0('c_playerSetInfo'),
                                              member = playerID)
   
           if (newPlayers == 1 || updateData) {
@@ -71,7 +70,8 @@ addTeamInfo <- function(competitionID, teamListLength, updateData) {
           }
         }
       }
-      redisConnection$HMSET(key = stats, field = names(teamData$statistics), 
+      redisConnection$HMSET(key = stats, 
+                            field = names(teamData$statistics), 
                             value = as.character(teamData$statistics))
     }
   }

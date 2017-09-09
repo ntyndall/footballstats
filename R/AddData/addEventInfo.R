@@ -5,10 +5,9 @@
 #'  added to redis as single events.
 #'  
 #' @details EventID's are checked if they have been analysed already;
-#'     ->    comp:_eventInSet_:{comp_id}   ->   [SET]   
-#'The actual event information is stored as a hash map as; 
-#'     ->   comp:match:event:_singleEvent_:
-#'          {comp_id}:{match_id}:{event_id}   ->   [HASH]
+#'     ->   [c_eventInSet]:{comp_id}   ->   [SET]   
+#'  The actual event information is stored as a hash map as; 
+#'     ->   [cme]:{comp_id}:{match_id}:{event_id}  ->   [HASH]
 #'  
 #' @param competitionID An integer defining the competitionID that the
 #'  team belongs to.
@@ -29,10 +28,10 @@ addEventInfo <- function(competitionID, matchIDs, matchEvents) {
     if (length(eventsPerMatch) > 0) {
       for (j in 1:nrow(eventsPerMatch)) {
         event <- eventsPerMatch[j, ]
-        inSet <- redisConnection$SADD(key = paste0("comp:_eventInSet_:", competitionID), 
+        inSet <- redisConnection$SADD(key = paste0("c_eventInSet:", competitionID), 
                                       member = event$id)
         if (inSet == 1) {
-          redisConnection$HMSET(key = paste0("comp:match:event:_singleEvent_", competitionID, ":", matchID, ":", event$id),
+          redisConnection$HMSET(key = paste0("cme:", competitionID, ":", matchID, ":", event$id),
                                 field = names(event), value = as.character(event))
         }
       }

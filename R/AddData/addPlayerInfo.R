@@ -5,9 +5,7 @@
 #'  stats are then stored in appropriate redis keys as necessary.
 #'  
 #' @details Player stats infromation is stored in a hash map as;
-#'     ->   player:team:league:season:
-#'          _stats_`stat_type`:{player_id}:{team_id}:
-#'          {comp_id}:{season}   ->   [HASH]
+#'     ->   [ctps]:{comp_id}:{team_id}:{player_id}:{season}:[_stats_`statType`_]   ->   [HASH]
 #'  
 #' @param competitionID An integer containing the competitionID that the 
 #'  teams and match information belong to.
@@ -17,7 +15,8 @@
 #' @return Returns nothing. Redis is updated with player information
 #'
 
-addPlayerInfo <- function(competitionID, playerLength) {
+
+addPlayerInfo <- function(competitionID, playerLength, currentSeasonYear) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",
@@ -42,11 +41,21 @@ addPlayerInfo <- function(competitionID, playerLength) {
         if (length(statData) != 0 || is.data.frame(statData)) {
           sapply(1:nrow(statData), function(k) {
             currentStat <- statData[k, ]
-            statKeyName <- paste0('player:team:league:season:_stats_', statNames[j], '_:', 
-                                  playerData$id, ':', currentStat$id, ':', 
-                                  currentStat$league_id, ':', currentStat$season)
-            redisConnection$HMSET(key = statKeyName, field = names(currentStat),
-                                  value = as.character(currentStat))
+            season <- substr(currentStat$season, 1, 4)
+            
+            if (nchar(season) == 4) {
+              seasonInt <- as.integer(season)
+            } else {
+              seasonInt <- 0
+            }
+            
+            if (seasonInt == currentSeasonYear) {
+              statKeyName <- paste0('ctps_', statNames[j], ':', currentStat$league_id, ':',
+                                    currentStat$id, ':', playerData$id, ':', season)
+              redisConnection$HMSET(key = statKeyName, 
+                                    field = names(currentStat),
+                                    value = as.character(currentStat))
+            }
           })
         }
       })
