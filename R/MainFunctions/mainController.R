@@ -81,10 +81,10 @@ mainController <- function(redisConnection, competitionID, updateData = FALSE,
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
   totalRequests <- uniqueRequests + teamListLength + playerLength
-  print(paste0(Sys.time(), ' ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*'))
+  print(paste0(Sys.time(), ' : ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*'))
   print(paste0(Sys.time(), ' : Analysed ', totalRequests, ' unique GET requests.'))
   print(paste0(Sys.time(), ' : Analysed ', length(matches$events), ' matches/events.'))
   print(paste0(Sys.time(), ' : Analysed ', teamListLength, ' teams'))
   print(paste0(Sys.time(), ' : Analysed ', playerLength, ' players.'))
-  cat('\n\n')
+  cat('\n')
 }

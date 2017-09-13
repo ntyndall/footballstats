@@ -36,7 +36,7 @@ addTeamInfo <- function(competitionID, teamListLength, updateData) {
   for (i in 1:teamListLength) {
     if (redisConnection$EXISTS(key = 'active') == 0) {
       teamID <- redisConnection$LPOP(key = 'analyseTeams')
-      teamData <- getTeams(teamID = teamID)
+      teamData <- getGeneralData(endpoint = paste0( "/team/", teamID, "?"))
       checkRequestLimit()
     } else {
       print(Sys.time(), ' : Run out of requests in addTeamInfo()')
