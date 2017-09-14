@@ -1,5 +1,15 @@
-
-
+#' @title Predict Future Matches
+#'
+#' @description ...
+#'  
+#' @param competitionID An integer value denoting the competition ID.
+#' @param seasonStarting An integer denoting the start year of the season.
+#' @param returnItems A vector of character values that hold the names of
+#'  fields to be returned for the commentary statistics.
+#' @param SVMfit An SVM object used as the classifier for predicting future
+#'  matches.
+#'
+#' @return ...
 
 
 predictFutureMatches <- function(competitionID, seasonStarting, returnItems, SVMfit) {
@@ -127,15 +137,16 @@ predictFutureMatches <- function(competitionID, seasonStarting, returnItems, SVM
     names(singleAway) <- returnItems
     singleAway$form <- form
     
-    
-    # If both agree then go for it
+   # Predict scores now
     predHome <- predict(fit, singleHome)
     predAway <- predict(fit, singleAway)
     
+    if (predHome == predAway) {
+      predHome <- predAway <- 'D'
+    }
     txt <- as.character(paste0('[', predHome, '] ', homeName, ' vs. ', awayName, ' [', predAway, ']'))
     cat(paste0(Sys.time(), ' : ', txt, '\n'))
     Sys.sleep(1)
-    # What if they don't agree?
     
   }
   return(NULL)

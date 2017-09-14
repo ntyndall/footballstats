@@ -54,7 +54,8 @@ mainController(redisConnection = redisConnection,
 buildGeneralClassifier(redisConnection = redisConnection,
                        competitionID = premiership,
                        matchData = matchData,
-                       seasonStarting = 2017)
+                       seasonStarting = 2017,
+                       returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
 
 
 

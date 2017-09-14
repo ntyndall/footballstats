@@ -35,11 +35,6 @@ calculateBestSVMFit <- function(totalData) {
   predTwo = predict(fitTwo, newData)
   secondResults <- table(predTwo, totalData$res)
   
-  one <- sum(firstResults[c(1, 5, 9)])
-  two <- sum(secondResults[c(1, 5, 9)])
-  if (one >= two) {
-    return(fitOne)
-  } else {
-    return(fitTwo)
-  }
+  return(c(sum(firstResults[c(1, 5, 9)]), sum(secondResults[c(1, 5, 9)])) %>% purrr::when(.[1] >= .[2] ~ fitOne,
+                                                                                          ~ fitTwo))
 }

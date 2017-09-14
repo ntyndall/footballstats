@@ -3,7 +3,7 @@
 
 
 buildGeneralClassifier <- function(redisConnection, competitionID, matchData, seasonStarting,
-                                   matchLimit = 75) {
+                                   returnItems, matchLimit = 75) {
 
   # Query Redis and return everything from the competition. 
   matchData <- recreateMatchData(redisConnection = redisConnection, 
@@ -22,7 +22,7 @@ buildGeneralClassifier <- function(redisConnection, competitionID, matchData, se
                                 seasonStarting = seasonStarting,
                                 commentaryKeys = as.character(redisConnection$KEYS(pattern = 'cmt_commentary*')),
                                 matchData = matchData,
-                                returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
+                                returnItems = returnItems)
   
   # Build and tune an SVM
   SVMFit <- calculateBestSVMFit(totalData = totalData)
@@ -30,12 +30,8 @@ buildGeneralClassifier <- function(redisConnection, competitionID, matchData, se
   # Predict future results
   resultsPredicted <- predictFutureMatches(competitionID = competitionID,
                                            seasonStarting = seasonStarting,
-                                           returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
+                                           returnItems = returnItems,
                                            SVMfit = SVMFit)
-  
-  # Send data to Slack
-  sendResultsToSlack(resultsPredicted = resultsPredicted)
-  
 }
 
 
