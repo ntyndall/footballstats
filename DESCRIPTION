@@ -17,5 +17,6 @@ Imports:
     testthat,
     ggplot2,
     rredis,
-    slackr
+    slackr,
+    purrr
 
