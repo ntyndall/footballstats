@@ -13,138 +13,65 @@
 
 
 predictFutureMatches <- function(competitionID, seasonStarting, returnItems, SVMfit) {
+  
+  # Get from and to dates for future fixtures
   dateFrom <- formatDates(standardDateFormat = Sys.Date() + 1)
   dateTo <- formatDates(standardDateFormat = Sys.Date()  + 8)
-  matchEndpoint <- paste0("/matches?comp_id=", competitionID, "&from_date=", dateFrom,
-                          "&to_date=", dateTo, "&")
-  fixtureList <- getGeneralData(endpoint = matchEndpoint)
   
+  # Define variable names and keys
+  matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
+  matchEndpoint <- paste0("/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&")
+  localVisitor <- c('localteam_id', 'visitorteam_id')
+  
+  # Get fixtures 
+  fixtureList <- getGeneralData(endpoint = matchEndpoint)
   cat(paste0(Sys.time(), ' : About to report on results...\n'))
-  for (i in 1:nrow(fixtureList)) {
+  
+  # Loop over each fixture
+  for (i in 1:row(fixtureList)) {
     singleFixture <- fixtureList[i, ]
-    home <- singleFixture$localteam_id
     homeName <- singleFixture$localteam_name
-    away <- singleFixture$visitorteam_id
     awayName <- singleFixture$visitorteam_name
-    
-    homeCommentary <- as.character(redisConnection$KEYS(pattern = paste0('cmt*:', home)))
-    awayCommentary <- as.character(redisConnection$KEYS(pattern = paste0('cmt*:', away)))
-    
-    currentStats <- NULL
-    totalForm <- data.frame(stringsAsFactors = FALSE)
-    for (j in 1:length(homeCommentary)) {
 
-      results <- redisConnection$HMGET(key = homeCommentary[j], 
-                                       field = returnItems)
-      names(results) <- returnItems
-      results$possesiontime <- gsub(pattern = "%", replacement = "", results$possesiontime)
-      resultsAsNums <- as.double(results)
+    fixtureAggregate <- lapply(1:2, function(j) {
+      # Decide to analyse home team and then away team
+      homeOrAway <- singleFixture[[localVisitor[j]]]
+      commentary <- as.character(redisConnection$KEYS(pattern = paste0('cmt*:', homeOrAway)))
+      
+      # Determine the statistics of a commentary
+      currentStats <- commentaryStatistics(commentary = commentary,
+                                           returnItems = returnItems)
       
       # Also get the match ID's
-      matchID <- strsplit(x = homeCommentary[j], split = ':')[[1]][3]
-
-      redisKey <- paste0('csm:', competitionID, ':2017/2018:', matchID)
-      matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
-      singleTeamHome <- redisConnection$HMGET(key = redisKey, field = matchFieldNames)
-      names(singleTeamHome) <- matchFieldNames
+      matchIDs <- sapply(1:length(commentary), function(k) {
+        strsplit(x = commentary[[k]], split = ':')[[1]][3] 
+      })
+      
+      # Determine forms from a vector of matches
+      form <- getFormFromMatchIDs(matchIDs = matchIDs)
+      list(currentStats, form)
+      
+    })
     
-      if (home == singleTeamHome$localteam_id) {
-        res <- 'W'
-      } else {
-        res <- 'L'
-      }
-      
-      if (singleTeamHome$localteam_score == singleTeamHome$visitorteam_score) {
-        singleResult <- "D"
-      } else if (singleTeamHome$localteam_score > singleTeamHome$visitorteam_score) {
-        singleResult <- res
-      } else {
-        singleResult <- res
-      }
-      totalForm <- rbind(totalForm, data.frame(date = singleTeamHome$formatted_date,
-                                               form = singleResult,
-                                               stringsAsFactors = FALSE))
-
-      
-      if (j == 1) {
-        currentStats <- resultsAsNums
-      } else {
-        currentStats <- (currentStats*(j-1) + resultsAsNums)/j
-      }
-      
+    # Create the appropriate data structures for the SVM
+    predictions <- sapply(1:2, function(k) {
+      singleTeam <- data.frame(t(as.integer(fixtureAggregate[[k]][[1]])))
+      names(singleTeam) <- returnItems
+      wld <- strsplit(fixtureAggregate[[k]][[2]], '')[[1]]
+      singleTeam$form <- as.integer((sum(wld == "W")*2) + sum(wld == "D"))
+      predict(SVMFit, singleTeam)
+    })
+    
+    # Predict scores now
+    predictions <- as.character(predictions)
+    phome <- predicitons[1]
+    paway <- predicitons[2]
+    
+    if (phome == paway) {
+      phome <- paway <- 'D'
     }
-    indexSort <- sort.int(totalForm$date, decreasing = FALSE, index.return = TRUE)$ix
-    totalForm <- totalForm[indexSort, ]
-    form <- totalForm$form[1:3]
-    form <- paste(form, collapse = '')
     
-    singleHome <- data.frame(t(as.integer(currentStats)), stringsAsFactors = FALSE)
-    names(singleHome) <- returnItems
-    singleHome$form <- form
-    
-    
-    
-    # Same again but for away team.
-    currentStats <- NULL
-    totalForm <- data.frame(stringsAsFactors = FALSE)
-    for (j in 1:length(awayCommentary)) {
-      
-      results <- redisConnection$HMGET(key = awayCommentary[j], 
-                                       field = returnItems)
-      names(results) <- returnItems
-      results$possesiontime <- gsub(pattern = "%", replacement = "", results$possesiontime)
-      resultsAsNums <- as.double(results)
-      
-      # Also get the match ID's
-      matchID <- strsplit(x = awayCommentary[j], split = ':')[[1]][3]
-      
-      redisKey <- paste0('csm:', competitionID, ':2017/2018:', matchID)
-      matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
-      singleTeamHome <- redisConnection$HMGET(key = redisKey, field = matchFieldNames)
-      names(singleTeamHome) <- matchFieldNames
-      
-      if (away == singleTeamHome$localteam_id) {
-        res <- 'W'
-      } else {
-        res <- 'L'
-      }
-      
-      if (singleTeamHome$localteam_score == singleTeamHome$visitorteam_score) {
-        singleResult <- "D"
-      } else if (singleTeamHome$localteam_score > singleTeamHome$visitorteam_score) {
-        singleResult <- res
-      } else {
-        singleResult <- res
-      }
-      totalForm <- rbind(totalForm, data.frame(date = singleTeamHome$formatted_date,
-                                               form = singleResult,
-                                               stringsAsFactors = FALSE))
-      
-      
-      if (j == 1) {
-        currentStats <- resultsAsNums
-      } else {
-        currentStats <- (currentStats*(j-1) + resultsAsNums)/j
-      }
-      
-    }
-    indexSort <- sort.int(totalForm$date, decreasing = FALSE, index.return = TRUE)$ix
-    totalForm <- totalForm[indexSort, ]
-    form <- totalForm$form[1:3]
-    form <- paste(form, collapse = '')
-   
-    singleAway <- data.frame(t(as.integer(currentStats)), stringsAsFactors = FALSE)
-    names(singleAway) <- returnItems
-    singleAway$form <- form
-    
-   # Predict scores now
-    predHome <- predict(fit, singleHome)
-    predAway <- predict(fit, singleAway)
-    
-    if (predHome == predAway) {
-      predHome <- predAway <- 'D'
-    }
-    txt <- as.character(paste0('[', predHome, '] ', homeName, ' vs. ', awayName, ' [', predAway, ']'))
+    txt <- as.character(paste0('[', phome, '] ', homeName, ' vs. ', awayName, ' [', paway, ']'))
     cat(paste0(Sys.time(), ' : ', txt, '\n'))
     Sys.sleep(1)
     

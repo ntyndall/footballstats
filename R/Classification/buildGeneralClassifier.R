@@ -33,5 +33,3 @@ buildGeneralClassifier <- function(redisConnection, competitionID, matchData, se
                                            returnItems = returnItems,
                                            SVMfit = SVMFit)
 }
-
-
