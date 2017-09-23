@@ -3,7 +3,7 @@
 
 
 buildGeneralClassifier <- function(redisConnection, competitionID, matchData, seasonStarting,
-                                   returnItems, matchLimit = 75) {
+                                   returnItems, matchLimit = 150) {
 
   # Query Redis and return everything from the competition. 
   matchData <- recreateMatchData(redisConnection = redisConnection, 
@@ -23,13 +23,51 @@ buildGeneralClassifier <- function(redisConnection, competitionID, matchData, se
                                 commentaryKeys = as.character(redisConnection$KEYS(pattern = 'cmt_commentary*')),
                                 matchData = matchData,
                                 returnItems = returnItems)
-  
-  # Build and tune an SVM
-  SVMFit <- calculateBestSVMFit(totalData = totalData)
 
-  # Predict future results
+  # Get the binning limits...
+  binList <- getBinns(totalData = totalData)
+  
+  # apply it to the totalData...
+  # Map current form to an integer value also.
+  allForms <- strsplit(totalData$form, '')
+  totalData$form <- sapply(1:length(allForms), function(x) {
+    wld <- allForms[[x]]
+    as.integer((sum(wld == "W")*2) + sum(wld == "D"))
+  })
+
+  binNames <- names(binList)
+  for (i in 1:length(binList)) {
+    singleBin <- binList[[binNames[i]]]
+    vec <- totalData[[binNames[i]]]
+    for (j in 1:bins) {
+      vec[which(vec > (singleBin[j] - 1e-5) & vec <= singleBin[j+1])] <- j * (-1)
+    }
+    totalData[[binNames[i]]] <- vec
+  }
+  
+  # Readjust thresholds of the integer valued metrics
+  #totalData <- mapMetricsToThresholds(totalData = totalData)
+  
+  # Test the last match data...
+  testData <- matchData[(nrow(matchData) - 9):nrow(matchData), ]
+  totalData <- totalData[-c((nrow(totalData) - 18):nrow(totalData)), ]
+  
+  # Optimize the SVM by looping through all available variables
+  SVMDetails <- optimizeSVM(totalData = totalData, 
+                            testData = testData,
+                            binList = binList)
+  
+  # Optional...
+  testOutDetails(totalData = totalData, 
+                 testData = testData,
+                 SVMFit = SVMDetails[[1]]],
+                 subsetItems = SVMDetails[[2]],
+                 allItems = returnItems)
+  
+
+  # Predict actual future results
   resultsPredicted <- predictFutureMatches(competitionID = competitionID,
                                            seasonStarting = seasonStarting,
-                                           returnItems = returnItems,
-                                           SVMfit = SVMFit)
+                                           returnItems = SVMDetails[[2]],
+                                           SVMfit = SVMDetails[[1]])
 }

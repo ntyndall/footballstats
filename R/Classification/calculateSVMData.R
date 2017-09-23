@@ -60,6 +60,12 @@ calculateSVMData <- function(competitionID, seasonStarting, commentaryKeys, matc
     singleItem$form <- form
     singleItem$res <- winLoseDraw
   
+    # Calculate additional metrics
+    singleItem <- calculateAdditionalMetrics(competitionID = competitionID,
+                                             teamID = teamID,
+                                             seasonStarting = seasonStarting,
+                                             singleItem = singleItem)
+
     # Bind the data frames together into one
     totalData <- rbind(totalData, singleItem)
   }
