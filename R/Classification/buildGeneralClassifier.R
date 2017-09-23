@@ -60,7 +60,7 @@ buildGeneralClassifier <- function(redisConnection, competitionID, matchData, se
   # Optional...
   testOutDetails(totalData = totalData, 
                  testData = testData,
-                 SVMFit = SVMDetails[[1]]],
+                 SVMFit = SVMDetails[[1]],
                  subsetItems = SVMDetails[[2]],
                  allItems = returnItems)
   
