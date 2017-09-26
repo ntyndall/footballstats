@@ -14,14 +14,11 @@ getBinns <- function(totalData) {
   
   # Create endpoints for new grouping
   totalLimits <- lapply(1:length(itemsForSVM), function(i) {
-    print(i)
     vec <- totalData[[itemsForSVM[i]]]
-    
     minim <- min(vec)
     maxim <- max(vec)
     diff <- maxim - minim
     bins <- diff %>% purrr::when(. >= 5 ~ 5, ~ .)
-    
     limits <- seq(minim, maxim, diff/bins)
     return(limits)
   })

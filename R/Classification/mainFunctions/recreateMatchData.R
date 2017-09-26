@@ -16,7 +16,7 @@
 #' 
 
 
-recreateMatchData <- function(redisConnection, competitionID, seasonStarting) {
+recreateMatchData <- function(redisConnection, competitionID, seasonStarting, matchLimit) {
   allMatches <- redisConnection$KEYS(pattern = paste0('csm:', competitionID, ':', seasonStarting, '*'))
   matchData <- data.frame(stringsAsFactors = FALSE)
   for (i in 1:length(allMatches)) {
@@ -35,5 +35,14 @@ recreateMatchData <- function(redisConnection, competitionID, seasonStarting) {
   }
   # Re-order the dataframe by date.
   matchData$formatted_date <- as.Date(matchData$formatted_date, '%d.%m.%Y')
-  return(matchData[order(matchData$formatted_date), ])
+  matchData <- matchData[order(matchData$formatted_date), ]
+  
+  # Only look back at the previous `x` matches.
+  if (nrow(matchData) == 0) {
+    print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
+    matchData <- data.frame(stringsAsFactors = FALSE)
+  } else if (nrow(matchData) > matchLimit) {
+    matchData <- matchData[1:matchLimit, ]
+  }
+  return(matchData)
 }

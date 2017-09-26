@@ -1,9 +1,11 @@
 #'
 
 calculateBestSVMFit <- function(totalData) {
-  # Build SVM (Subset totalData to find useful classes)
+  # Split data into actual data and one similar minus the results
   newData <- totalData
   newData$res <- NULL
+  
+  # Create a basic SVM with no tuning
   fitOne <- svm(totalData$res ~ ., 
                 data = newData, 
                 type = 'C-classification', 
@@ -30,6 +32,5 @@ calculateBestSVMFit <- function(totalData) {
   secondResults <- table(predTwo, totalData$res)
   
   # Return the best from normal and fit SVM's
-  return(c(sum(firstResults[c(1, 5, 9)]), sum(secondResults[c(1, 5, 9)])) %>% purrr::when(.[1] >= .[2] ~ fitOne,
-                                                                                          ~ fitTwo))
+  return(c(sum(firstResults[c(1, 5, 9)]), sum(secondResults[c(1, 5, 9)])) %>% purrr::when(.[1] >= .[2] ~ fitOne, ~ fitTwo))
 }

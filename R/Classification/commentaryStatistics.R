@@ -1,5 +1,15 @@
-
-
+#' @title GCommentary Statistics
+#'
+#' @description A function that takes the commentary values stored in redis and
+#'  calculates an average value for the list of variables in the key for that team.
+#'  
+#' @param commentary A character vector of redis keys that hold a teams match
+#'  commentary.
+#' @param returnItems A vector of character values that hold the names of
+#'  fields to be returned for the commentary statistics.
+#'
+#' @return A average statistics for a particular team.
+#'
 
 
 commentaryStatistics <- function(commentary, returnItems) {
