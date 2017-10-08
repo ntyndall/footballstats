@@ -1,6 +1,0 @@
-
-
-
-sendResultsToSlack <- function(resultsPredicted) {
-  
-}
