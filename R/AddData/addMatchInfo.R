@@ -32,7 +32,8 @@
 #'
 
 
-addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData, analysingToday = TRUE) {
+addMatchInfo <- function(competitionID, dateFrom, dateTo, seasonStarting, updateData, 
+                         analysingToday = TRUE) {
   valuesToRetain <- c("id", "comp_id", "formatted_date", "season",           
                       "week", "venue", "venue_id", "venue_city",     
                       "status", "timer", "time", "localteam_id",  
@@ -77,7 +78,7 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, updateData, analysingT
       
       if (matchInSet == 1) {
         matchKey <- paste0("csm:", matchItems$comp_id, ":", 
-                           matchItems$season, ":", matchItems$id)
+                           seasonStarting, ":", matchItems$id)
         redisConnection$HMSET(key = matchKey, field = names(matchItems), 
                               value = as.character(matchItems))
       }

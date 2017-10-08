@@ -55,7 +55,7 @@ addCommentaryInfo <- function(competitionID, matchIDs, localteam, visitorteam) {
         }
       }
       
-      playerStatsLocal <- commentary$player_stats$localteam$player
+      playerStatsLocal <- commentary$player_stats$localteam$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
       localNames <- names(playerStatsLocal)
       if (nrow(playerStatsLocal) > 0 && analyseLocal) {
         for (j in 1:nrow(playerStatsLocal)) {
@@ -65,7 +65,7 @@ addCommentaryInfo <- function(competitionID, matchIDs, localteam, visitorteam) {
         }
       }
       
-      playerStatsVisitor <- commentary$player_stats$visitorteam$player
+      playerStatsVisitor <- commentary$player_stats$visitorteam$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
       visitorNames <- names(playerStatsVisitor)
       if (nrow(playerStatsVisitor) > 0 && analyseVisitor) {
         for (j in 1:nrow(playerStatsVisitor)) {

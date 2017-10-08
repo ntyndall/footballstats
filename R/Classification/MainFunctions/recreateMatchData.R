@@ -27,11 +27,7 @@ recreateMatchData <- function(redisConnection, competitionID, seasonStarting, ma
                           stringsAsFactors = FALSE)
     matchIDName <- singleMatch[c(TRUE, FALSE)]
     names(matchID) <- matchIDName
-    if (i == 0) {
-      matchData <- matchID
-    } else {
-      matchData <- rbind(matchData, matchID)
-    }
+    matchData <- rbind(matchData, matchID)
   }
   # Re-order the dataframe by date.
   matchData$formatted_date <- as.Date(matchData$formatted_date, '%d.%m.%Y')

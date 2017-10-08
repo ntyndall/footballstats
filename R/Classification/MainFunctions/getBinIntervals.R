@@ -1,6 +1,6 @@
 
 
-getBinns <- function(totalData) {
+getBinIntervals <- function(totalData) {
   # Take integer values and divide into histogram type classes.
   itemsForSVM <- names(totalData)
   itemsForSVM <- subset(itemsForSVM, itemsForSVM != 'res')

@@ -39,6 +39,7 @@ mainController <- function(redisConnection, competitionID, updateData = FALSE,
   matches <- addMatchInfo(competitionID = competitionID,
                           dateFrom = dateFrom,
                           dateTo = dateTo,
+                          seasonStarting = seasonStarting, 
                           updateData = updateData)
   print(paste0(Sys.time(), ': Matches complete.'))
   

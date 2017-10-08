@@ -14,7 +14,7 @@
 
 addCompetitionInfo <- function(daysUntilNextQuery) {
   if (redisConnection$EXISTS(key = 'active') == 0) {
-    competitionIDs <- getCompetitions(endpoint = "/competitions?",
+    competitionIDs <- getGeneralData(endpoint = "/competitions?",
                                       apiKey = API_KEY)
     checkRequestLimit()
   } else {

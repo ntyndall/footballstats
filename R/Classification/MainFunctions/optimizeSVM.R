@@ -20,7 +20,8 @@
 #'  the best factors to use in the second key.
 
 
-optimizeSVM <- function(totalData, testData, binList, returnItems, testing = TRUE) {
+optimizeSVM <- function(totalData, seasonStarting, testData, binList, returnItems, 
+                        matchFieldNames, testing = TRUE) {
   # Optimize classifier by varying all the possible attributes
   bLLength <- length(binList)
   bestResult <- 0
@@ -43,12 +44,15 @@ optimizeSVM <- function(totalData, testData, binList, returnItems, testing = TRU
         SVMfit <- calculateBestSVMFit(totalData = holdData)
         
         # Build and tune an SVM
+        print('get')
         currentResult <- generatePredictions(fixtureList = testData, 
+                                             seasonStarting = seasonStarting,
                                              testing = testing, 
                                              returnItems = returnItems,
                                              subsetItems = names(holdingList),
                                              SVMfit = SVMfit, 
-                                             binList = holdingList)
+                                             binList = holdingList,
+                                             matchFieldNames = matchFieldNames)
 
         # If the current result is better than assign that to be the new SVM.
         if (currentResult > bestResult) {

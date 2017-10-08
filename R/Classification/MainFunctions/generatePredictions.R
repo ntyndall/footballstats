@@ -21,21 +21,28 @@
 #'
 
 
-generatePredictions <- function(fixtureList, testing, returnItems, subsetItems, SVMfit, 
-                                binList = NULL, correct = 0, totalTxt = c()) {
+generatePredictions <- function(fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit, 
+                                matchFieldNames, binList = NULL, correct = 0, totalTxt = c()) {
   
   emojiHash <- lookUpSlackEmoji()
+  teamNameHash <- teamAbbreviations()
   
   # Loop over each fixture
   for (i in 1:nrow(fixtureList)) {
+    print('#1')
     singleFixture <- fixtureList[i, ]
     homeName <- singleFixture$localteam_name
     awayName <- singleFixture$visitorteam_name
     
+    print('#2')
     # Get home and away statistics
+    print(singleFixture)
+    print(returnItems)
     fixtureAggregate <- getHomeAndAwayStats(singleFixture = singleFixture, 
+                                            seasonStarting = seasonStarting,
                                             localVisitor = c('localteam_id', 'visitorteam_id'),
                                             returnItems = returnItems,
+                                            matchFieldNames = matchFieldNames,
                                             testing = testing)
 
     # Create the appropriate data structures for the SVM
@@ -83,7 +90,7 @@ generatePredictions <- function(fixtureList, testing, returnItems, subsetItems, 
     
     # Logs for console and for slack
     txt <- as.character(paste0('[', pHome, '] ', homeName, ' vs. ', awayName, ' [', pAway, ']'))
-    txtForSlack <- as.character(paste0(homeEmjoji . ' `', txt, '` ', awayEmoji))
+    txtForSlack <- as.character(paste0(homeEmoji, ' `', txt, '` ', awayEmoji))
     totalTxt <- c(totalTxt, txtForSlack)
     cat(paste0(Sys.time(), ' : ', txt, '\n'))
     Sys.sleep(1)

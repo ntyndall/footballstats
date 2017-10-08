@@ -14,7 +14,8 @@
 #'
 
 
-getHomeAndAwayStats <- function(singleFixture, localVisitor, returnItems, testing) {
+getHomeAndAwayStats <- function(singleFixture, seasonStarting, localVisitor, returnItems, 
+                                matchFieldNames, testing) {
   fixtureAggregate <- lapply(1:2, function(j) {
     # Decide to analyse home team and then away team
     homeOrAway <- singleFixture[[localVisitor[j]]]
@@ -35,7 +36,9 @@ getHomeAndAwayStats <- function(singleFixture, localVisitor, returnItems, testin
     })
     
     # Determine forms from a vector of matches
-    form <- getFormFromMatchIDs(matchIDs = matchIDs)
+    form <- getFormFromMatchIDs(matchIDs = matchIDs,
+                                seasonStarting = seasonStarting,
+                                matchFieldNames = matchFieldNames)
     list(currentStats, form)
   })
   return(fixtureAggregate)

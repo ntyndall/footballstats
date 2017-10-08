@@ -1,8 +1,8 @@
 
 
-getFormFromMatchIDs <- function(matchIDs, formLimit = 3) {
+getFormFromMatchIDs <- function(matchIDs, seasonStarting, matchFieldNames, formLimit = 3) {
   formList <- lapply(1:length(matchIDs), function(k) {
-    redisKey <- paste0('csm:', competitionID, ':2017/2018:', matchIDs[k])
+    redisKey <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs[k])
     singleMatch <- redisConnection$HMGET(key = redisKey, 
                                          field = matchFieldNames)
     names(singleMatch) <- matchFieldNames 

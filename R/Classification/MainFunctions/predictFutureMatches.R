@@ -30,6 +30,7 @@ predictFutureMatches <- function(competitionID, seasonStarting, returnItems, sub
   
   # Generate predictions based on actual fixtures!
   numOfPredicted <- generatePredictions(fixtureList = fixtureList,
+                                        seasonStarting = seasonStarting,
                                         testing = FALSE,
                                         returnItems = returnItems,
                                         subsetItems = subsetItems,
