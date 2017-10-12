@@ -12,10 +12,8 @@
 #' @return Returns one of 'W' / 'L' / 'D'.
 #'
 
-resultOfMatch <- function(scoreHome, scoreAway, homeOrAway) {
-  return(c(scoreHome, scoreAway, homeOrAway) %>% purrr::when(.[1] == .[2] ~ 'D',
-                                                             .[3] == 'localteam_id' ~ g(f(`>`)),
-                                                             ~ g(f(`<`)),
-                                                             f = function(op) op(.[1], .[2]),
-                                                             g = function(el) el %>% purrr::when(. ~ 'W', ~ 'L')))
+resultOfMatch <- function(scoreCurrent, scoreOther) {
+  return(c(scoreCurrent, scoreOther) %>% purrr::when(.[1] == .[2] ~ 'D', 
+                                                     .[1] > .[2] ~ 'W', 
+                                                     ~ 'L'))
 }

@@ -18,8 +18,12 @@ commentaryStatistics <- function(commentary, returnItems) {
                                   returnItems = returnItems))
   })
   
-  columns <- ncol(vals)
-  return(sapply(1:nrow(vals), function(k) {
-    sum(vals[k, 1:columns])/as.double(columns)
-  }))
+  if (length(returnItems) == 1) {
+    return(sum(vals)/as.double(length(vals)))
+  } else {
+    columns <- ncol(vals)
+    return(sapply(1:nrow(vals), function(k) {
+      sum(vals[k, 1:columns])/as.double(columns)
+    }))
+  }
 }

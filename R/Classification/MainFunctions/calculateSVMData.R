@@ -39,21 +39,24 @@ calculateSVMData <- function(competitionID, seasonStarting, commentaryKeys,
     singleMatchInfo <- matchInfo[c(FALSE, TRUE)]
     names(singleMatchInfo) <- matchInfo[c(TRUE, FALSE)]
 
+    # Need to choose which current team is being analysed for each match.
+    currentTeam <- singleMatchInfo[as.integer(which(singleMatchInfo == teamID))]
+    scoreCurrent <- as.integer(singleMatchInfo[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'localteam_score', ~ 'visitorteam_score')])
+    scoreOther <-  as.integer(singleMatchInfo[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'visitorteam_score', ~ 'localteam_score')])
+    
     # Get the result of the match whether it was a home or away game
-    winLoseDraw <- resultOfMatch(scoreHome = as.integer(singleMatchInfo$localteam_score), 
-                                 scoreAway = as.integer(singleMatchInfo$visitorteam_score), 
-                                 homeOrAway = names(which(singleMatchInfo == teamID)))
+    winLoseDraw <- resultOfMatch(scoreCurrent = scoreCurrent, 
+                                 scoreOther = scoreOther)
 
     # Calculate team form (Don't include if 3 matches don't exist yet!)
     formResults <- calculateTeamForm(matchData = matchData, 
-                                     teamID = teamID, 
-                                     whichTeam = c('localteam_id', 'visitorteam_id'))
+                                     teamID = teamID)
     
     # Create a data frame of forms and dates.
-    totalForm <- data.frame(date = c(formResults[[1]][[2]], formResults[[2]][[2]]),
-                            form = c(formResults[[1]][[1]], formResults[[2]][[1]]),
+    totalForm <- data.frame(date = formResults[[2]],
+                            form = formResults[[1]],
                             stringsAsFactors = FALSE)
-    
+  
     # Find out form relative to current date.
     form <- formRelativeToDate(matchInfo = singleMatchInfo,
                                totalForm = totalForm)

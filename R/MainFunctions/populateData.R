@@ -44,21 +44,26 @@ initialize(location = '~/Desktop/football-project/footballstats/R/',
 competitions <- addCompetitionInfo()
 comps <- jsonlite::fromJSON(seasonIDs)
 
+# Subset the available competitions
+subsetCompetitions <- c('1102', '1204', '1205', '1229', '1232',
+                        '1352', '1425', '1457')
+newCompetitions <- competitions[match(subsetCompetitions, competitions$id), ]
 
-ignoreCompetitionIDs <- c("1005", "1007", "1198", 
-                          "1199", "1397")
-competitions <- competitions[c(1:nrow(competitions))[-match(ignoreCompetitionIDs, competitions$id)], ]
 
 # Gather all information to be stored in Redis.
-for (i in 3:nrow(competitions)) {
-  print(paste0('Storing... ' , i, ' / ', nrow(competitions), ' (', competitions$name[i], ' - ', competitions$region[i], ').'))
+for (i in 1:nrow(newCompetitions)) {
+  print(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (', newCompetitions$name[i], ' - ', newCompetitions$region[i], ').'))
   mainController(redisConnection = redisConnection,
-                 competitionID = competitions$id[i], 
+                 competitionID = newCompetitions$id[i], 
                  seasonStarting = 2017,
                  updateData = FALSE)
 }
+
 # Build a classifier with the current match data
-buildGeneralClassifier(redisConnection = redisConnection,
-                       competitionID = premiership,
-                       seasonStarting = 2017,
-                       returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
+for (i in 3:nrow(newCompetitions)) {
+  buildGeneralClassifier(redisConnection = redisConnection,
+                         competitionID = newCompetitions$id[i],
+                         competitionName = newCompetitions$name[i],
+                         seasonStarting = 2017,
+                         returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
+}

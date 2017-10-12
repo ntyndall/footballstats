@@ -1,16 +1,21 @@
 
 
-getFormFromMatchIDs <- function(matchIDs, seasonStarting, matchFieldNames, formLimit = 3) {
+getFormFromMatchIDs <- function(competitionID, matchIDs, seasonStarting, matchFieldNames, teamID, formLimit = 3) {
   formList <- lapply(1:length(matchIDs), function(k) {
     redisKey <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs[k])
     singleMatch <- redisConnection$HMGET(key = redisKey, 
                                          field = matchFieldNames)
     names(singleMatch) <- matchFieldNames 
     
-    # Determine the result of the match for the home team
-    singleResult <- resultOfMatch(scoreHome = as.integer(singleMatch$localteam_score), 
-                                  scoreAway = as.integer(singleMatch$visitorteam_score), 
-                                  homeOrAway = names(which(singleMatch == home)))
+    # Need to choose which current team is being analysed for each match.
+    currentTeam <- matchFieldNames[as.integer(which(singleMatch == teamID))]
+    
+    scoreCurrent <- as.integer(singleMatch[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'localteam_score', ~ 'visitorteam_score')])
+    scoreOther <-  as.integer(singleMatch[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'visitorteam_score', ~ 'localteam_score')])
+    
+    # Determine the result of the match for the current team
+    singleResult <- resultOfMatch(scoreCurrent = scoreCurrent, 
+                                  scoreOther = scoreOther)
     list(singleMatch$formatted_date, singleResult)
   })
   

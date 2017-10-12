@@ -29,8 +29,8 @@
 
 
 
-buildGeneralClassifier <- function(redisConnection, competitionID, seasonStarting,
-                                   returnItems, matchLimit = 150) {
+buildGeneralClassifier <- function(redisConnection, competitionID, competitionName, 
+                                   seasonStarting, returnItems, matchLimit = 150) {
 
   # Query Redis and return everything from the competition. 
   print(paste0(Sys.time(), ' : Recreating match data.'))
@@ -68,7 +68,8 @@ buildGeneralClassifier <- function(redisConnection, competitionID, seasonStartin
   # Optimize the SVM by looping through all available variables
   matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
   print(paste0(Sys.time(), ' : Optimizing the SVM Classifier.'))
-  SVMDetails <- optimizeSVM(totalData = totalData,
+  SVMDetails <- optimizeSVM(competitionID = competitionID,
+                            totalData = totalData,
                             seasonStarting = seasonStarting,
                             testData = testData,
                             binList = binList,
@@ -79,8 +80,11 @@ buildGeneralClassifier <- function(redisConnection, competitionID, seasonStartin
   # Predict actual future results
   print(paste0(Sys.time(), ' : Predicting actual upcoming fixtures.'))
   predictFutureMatches(competitionID = competitionID,
+                       competitionName = competitionName,
                        seasonStarting = seasonStarting,
                        returnItems = returnItems,
+                       matchFieldNames = matchFieldNames,
                        subsetItems = SVMDetails[[2]],
-                       SVMfit = SVMDetails[[1]])
+                       SVMfit = SVMDetails[[1]], 
+                       binList = binList)
 }

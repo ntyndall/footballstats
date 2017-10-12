@@ -14,7 +14,8 @@
 #' @return Nothing. Print results to screen.
 
 
-predictFutureMatches <- function(competitionID, seasonStarting, returnItems, subsetItems, SVMfit) {
+predictFutureMatches <- function(competitionID, competitionName, seasonStarting, returnItems, 
+                                 matchFieldNames, subsetItems, SVMfit, binList) {
   
   # Get from and to dates for future fixtures
   dateFrom <- formatDates(standardDateFormat = Sys.Date() + 1)
@@ -27,13 +28,22 @@ predictFutureMatches <- function(competitionID, seasonStarting, returnItems, sub
   # Get fixtures 
   fixtureList <- getGeneralData(endpoint = matchEndpoint)
   cat(paste0(Sys.time(), ' : About to report on results...\n'))
-  
+
   # Generate predictions based on actual fixtures!
-  numOfPredicted <- generatePredictions(fixtureList = fixtureList,
-                                        seasonStarting = seasonStarting,
-                                        testing = FALSE,
-                                        returnItems = returnItems,
-                                        subsetItems = subsetItems,
-                                        SVMfit = SVMfit)
-  print(paste0(Sys.time(), ' : Predicted a total of ', numOfPredicted, ' matches.'))
+  if (!is.null(fixtureList)) {
+    numOfPredicted <- generatePredictions(competitionID = competitionID,
+                                          fixtureList = fixtureList,
+                                          seasonStarting = seasonStarting,
+                                          testing = FALSE,
+                                          returnItems = returnItems,
+                                          subsetItems = subsetItems,
+                                          SVMfit = SVMfit,
+                                          matchFieldNames = matchFieldNames,
+                                          competitionName = competitionName,
+                                          binList = binList,
+                                          printToSlack = TRUE)
+    print(paste0(Sys.time(), ' : Predicted a total of ', numOfPredicted, ' matches.'))
+  } else {
+    print(paste0(Sys.time(), ' : No upcoming fixture in the next week!'))
+  }
 }

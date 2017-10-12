@@ -20,11 +20,12 @@
 #'  the best factors to use in the second key.
 
 
-optimizeSVM <- function(totalData, seasonStarting, testData, binList, returnItems, 
-                        matchFieldNames, testing = TRUE) {
+optimizeSVM <- function(competitionID, totalData, seasonStarting, testData, matchData, binList, 
+                        returnItems, matchFieldNames, testing = TRUE) {
+
   # Optimize classifier by varying all the possible attributes
   bLLength <- length(binList)
-  bestResult <- 0
+  bestResult <- overtake <- 0
   vec <- c(1:bLLength)
   for (i in 1:bLLength) {
     for (j in 1:bLLength) {
@@ -32,20 +33,23 @@ optimizeSVM <- function(totalData, seasonStarting, testData, binList, returnItem
       holdData <- totalData
       if (i <= j) {
         remove <- vec[i:j]
-        if (length(remove) == bLLength) { 
+        if (length(remove) > (bLLength - 2)) { 
           next 
         }
         
+        #print(paste0(Sys.time(), ' : Scanning through ', i, ' - ', j, '.'))
+        
         # Delete rows and subset to vary the classification classes
         holdingList[remove] <- NULL
-        holdData <- subset(totalData, select = c(names(holdingList), 'res'))
-        
+        holdData <- holdData[ , c(names(holdingList), 'res')]
+
         # Build and tune an SVM
         SVMfit <- calculateBestSVMFit(totalData = holdData)
+        holdData$res <- NULL
         
         # Build and tune an SVM
-        print('get')
-        currentResult <- generatePredictions(fixtureList = testData, 
+        currentResult <- generatePredictions(competitionID = competitionID,
+                                             fixtureList = testData, 
                                              seasonStarting = seasonStarting,
                                              testing = testing, 
                                              returnItems = returnItems,
@@ -56,7 +60,9 @@ optimizeSVM <- function(totalData, seasonStarting, testData, binList, returnItem
 
         # If the current result is better than assign that to be the new SVM.
         if (currentResult > bestResult) {
-          print(paste0('New best result! .. ', currentResult, ' (overtaking ', bestResult, ')'))
+          stri <- paste0(paste(rep(' ', (overtake * 3) + 1), collapse = ''), '|_')
+          overtake <- overtake + 1
+          print(paste0(Sys.time(), ' :', stri, ' New best result - ', currentResult, ' (from ', bestResult, ')'))
           bestResult <- max(currentResult, bestResult)
           bestFactors <- names(holdingList)
           bestSVM <- SVMfit

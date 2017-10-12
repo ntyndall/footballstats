@@ -7,8 +7,10 @@ getCommentaryFromRedis <- function(keyName, returnItems) {
                                    field = returnItems)
 
   names(results) <- returnItems
-  results$possesiontime <- gsub(pattern = "%", 
-                                replacement = "", 
-                                x = results$possesiontime)
+  if ("possesiontime" %in% returnItems) {
+    results$possesiontime <- gsub(pattern = "%", 
+                                  replacement = "", 
+                                  x = results$possesiontime)
+  }
   return(as.double(results))
 }

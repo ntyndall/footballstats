@@ -14,12 +14,13 @@
 #'
 
 
-getHomeAndAwayStats <- function(singleFixture, seasonStarting, localVisitor, returnItems, 
+getHomeAndAwayStats <- function(competitionID, singleFixture, seasonStarting, localVisitor, returnItems, 
                                 matchFieldNames, testing) {
   fixtureAggregate <- lapply(1:2, function(j) {
     # Decide to analyse home team and then away team
-    homeOrAway <- singleFixture[[localVisitor[j]]]
-    commentary <- as.character(redisConnection$KEYS(pattern = paste0('cmt*:', homeOrAway)))
+    teamID <- singleFixture[[localVisitor[j]]]
+    commentary <- as.character(redisConnection$KEYS(pattern = paste0('cmt_commentary:', competitionID, ':*', teamID)))
+    
     
     # For testing only: Don't include the very last commentary!
     if (testing) {
@@ -29,16 +30,18 @@ getHomeAndAwayStats <- function(singleFixture, seasonStarting, localVisitor, ret
     # Determine the statistics of a commentary
     currentStats <- commentaryStatistics(commentary = commentary,
                                          returnItems = returnItems)
-    
+  
     # Also get the match ID's
     matchIDs <- sapply(1:length(commentary), function(k) {
       strsplit(x = commentary[[k]], split = ':')[[1]][3] 
     })
     
     # Determine forms from a vector of matches
-    form <- getFormFromMatchIDs(matchIDs = matchIDs,
+    form <- getFormFromMatchIDs(competitionID = competitionID,
+                                matchIDs = matchIDs,
                                 seasonStarting = seasonStarting,
-                                matchFieldNames = matchFieldNames)
+                                matchFieldNames = matchFieldNames,
+                                teamID = teamID)
     list(currentStats, form)
   })
   return(fixtureAggregate)

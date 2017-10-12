@@ -15,21 +15,21 @@
 #'
 
 
-calculateTeamForm <- function(matchData, teamID, whichTeam) {
-  
+calculateTeamForm <- function(matchData, teamID) {
+  teamID <- as.integer(teamID)
   teamsResult <- dateOfMatch <- c()
-  lapply(1:length(whichTeam), function(i) {
-    truth <- matchData[[whichTeam[i]]] == teamID
-    if (any(truth)) {
-      single <- matchData[which(truth), ]
-      results <- sapply(1:nrow(single), function(x) {
-        resultOfMatch(scoreHome =  as.integer(single$localteam_score[x]), 
-                      scoreAway = as.integer(single$visitorteam_score[x]), 
-                      homeOrAway = whichTeam[i])
-      })
-      list(results, as.integer(single$formatted_date))
-    } else {
-      list('', '')
-    }
+  singleTeam <- matchData[matchData$localteam_id == teamID | matchData$visitorteam_id == teamID, ]
+
+  # Go through each match the team has played
+  results <- sapply(1:nrow(singleTeam), function(x) {
+    singleMatch <- as.list(singleTeam[x, ])
+    
+    currentTeam <- singleMatch[as.integer(which(singleMatch == as.character(teamID)))]
+    scoreCurrent <- as.integer(singleMatch[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'localteam_score', ~ 'visitorteam_score')])
+    scoreOther <-  as.integer(singleMatch[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'visitorteam_score', ~ 'localteam_score')])
+    
+    resultOfMatch(scoreCurrent =  scoreCurrent, 
+                  scoreOther = scoreOther)
   })
+  return(list(results, as.integer(singleTeam$formatted_date)))
 }
