@@ -30,48 +30,20 @@ addCommentaryInfo <- function(competitionID, matchIDs, localteam, visitorteam) {
       commentary <- NULL
     }
 
+    localAway <- c('localteam', 'visitorteam')
     teamIDs <- c(localteam[i], visitorteam[i])
     if (!is.null(commentary)) {
       teamStats <- commentary$match_stats
       if (length(teamStats) == 2) {
-        local <- teamStats[['localteam']]
-        if (!is.null(local)) {
-          analyseLocal <- TRUE
-          redisConnection$HMSET(key = paste0("cmt_commentary:", competitionID, ":", matchIDs[i], ":", localteam[i]),
-                                field = names(local), 
-                                value = as.character(local))
-        } else {
-          analyseLocal <- FALSE
-        }
-        
-        visitor <- teamStats[['visitorteam']]
-        if (!is.null(visitor)) {
-          analyseVisitor <- TRUE
-          redisConnection$HMSET(key = paste0("cmt_commentary:", competitionID, ":", matchIDs[i], ":", visitorteam[i]),
-                                field = names(visitor), 
-                                value = as.character(visitor))
-        } else {
-         analyseVisitor <- FALSE 
-        }
-      }
-      
-      playerStatsLocal <- commentary$player_stats$localteam$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
-      localNames <- names(playerStatsLocal)
-      if (nrow(playerStatsLocal) > 0 && analyseLocal) {
-        for (j in 1:nrow(playerStatsLocal)) {
-          redisConnection$HMSET(key = paste0("cmp:", competitionID, ":", matchIDs[i], ":", playerStatsLocal[j, ]$id),
-                                field = localNames, 
-                                value = as.character(playerStatsLocal[j, ]))
-        }
-      }
-      
-      playerStatsVisitor <- commentary$player_stats$visitorteam$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
-      visitorNames <- names(playerStatsVisitor)
-      if (nrow(playerStatsVisitor) > 0 && analyseVisitor) {
-        for (j in 1:nrow(playerStatsVisitor)) {
-          redisConnection$HMSET(key = paste0("cmp:", competitionID, ":", matchIDs[i], ":", playerStatsVisitor[j, ]$id),
-                                field = visitorNames, 
-                                value = as.character(playerStatsVisitor[j, ]))
+        for (j in 1:length(localAway)) {
+          singleTeamStats <- teamStats[[localAway[j]]]
+          if (!is.null(singleTeamStats)) {
+            addCommentaryInfoSub(competitionID = competitionID, 
+                                 matchID = matchIDs[i], 
+                                 teamInfo, teamIDs[j],
+                                 teamStats = singleTeamStats,
+                                 commentary = commentary$player_stats[[localAway[j]]])
+          }
         }
       }
     }
