@@ -77,10 +77,10 @@ generatePredictions <- function(competitionID, fixtureList, seasonStarting, test
 
     # Rules based on wrong outcomes!
     pHome <- c(pHome, pAway) %>% purrr::when(.[1] == 'D' && .[2] == 'W' ~ 'L', 
-                                             ~ .[1] == 'L' && .[2] == 'D' ~ 'L',
+                                             ~ .[1] == 'D' && .[2] == 'L' ~ 'W',
                                              ~ .[1])
-    pAway <- c(pAway, pHome) %>% purrr::when(.[1] == 'D' && .[2] == 'W' ~ 'L', 
-                                             ~ .[1] == 'L' && .[2] == 'D' ~ 'L',
+    pAway <- c(pAway, pHome) %>% purrr::when(.[1] == 'D' && .[2] == 'L' ~ 'W', 
+                                             ~ .[1] == 'D' && .[2] == 'W' ~ 'L',
                                              ~ .[1])
     
     if (pHome == pAway) { pHome <- pAway <- 'D' }
