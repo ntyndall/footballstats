@@ -37,11 +37,8 @@ generatePredictions <- function(competitionID, fixtureList, seasonStarting, test
     awayName <- singleFixture$visitorteam_name
     
     # Remove form from the item subsetting
-    if ("form" %in% subsetItems) {
-      forStatistics <- subsetItems[-c(which("form" == subsetItems))]
-    } else {
-      forStatistics <- subsetItems
-    }
+    forStatistics <- list('form', subsetItems) %>% 
+      purrr::when(.[[1]] %in% .[[2]] ~ .[[2]][-c(which(.[[1]] == .[[2]]))], ~ .[[2]])
     
     # Get home and away statistics
     fixtureAggregate <- getHomeAndAwayStats(competitionID = competitionID, 
@@ -108,6 +105,11 @@ generatePredictions <- function(competitionID, fixtureList, seasonStarting, test
     txtForSlack <- as.character(paste0(homeEmoji, ' `', txt, '` ', awayEmoji))
     totalTxt <- c(totalTxt, txtForSlack)
     #cat(paste0(Sys.time(), ' : ', txt, '\n'))
+    
+    # When making a prediction - store the guess for later
+    redisConnection$HMSET(key = paste0('c:', competitionID, ':pred:', singleFixture$id), 
+                          field = c('home', 'away'),
+                          value = c(pHome, pAway))
     Sys.sleep(1)
   }
   

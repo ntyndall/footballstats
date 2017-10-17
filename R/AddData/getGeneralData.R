@@ -20,10 +20,6 @@
 
 getGeneralData <- function(endpoint, host = HOST, apiKey = API_KEY) {
   listOfSeasons <- httr::GET(paste0(HOST, endpoint, API_KEY))
-  if (listOfSeasons$status_code == 200) {
-    seasonIDs <- rawToChar(listOfSeasons$content)
-    return(jsonlite::fromJSON(seasonIDs))
-  } else {
-    return(NULL)
-  }
+  return(listOfSeasons$status_code %>% 
+    purrr::when(. == 200 ~ jsonlite::fromJSON(rawToChar(listOfSeasons$content)), ~ NULL))
 }

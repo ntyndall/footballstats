@@ -67,7 +67,7 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, seasonStarting, update
       teamInSet <- redisConnection$SADD(key = paste0('c_teamSetInfo:', competitionID),
                                         member = matchItems$localteam_id)
 
-      if (teamInSet == 1 || updateData) {
+      if (teamInSet || updateData) {
         redisConnection$LPUSH(key = 'analyseTeams', 
                               value = matchItems$localteam_id)
       }
@@ -76,11 +76,15 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, seasonStarting, update
       matchInSet <- redisConnection$SADD(key = paste0('c_matchSetInfo:', competitionID),
                                          member = matchItems$id)
       
-      if (matchInSet == 1) {
+      if (matchInSet) {
         matchKey <- paste0("csm:", matchItems$comp_id, ":", 
                            seasonStarting, ":", matchItems$id)
         redisConnection$HMSET(key = matchKey, field = names(matchItems), 
                               value = as.character(matchItems))
+        
+        if (redisConnection$EXISTS(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
+          redisConnection$SADD(key = paste0('c:', competitionID, ':ready:', matchItems$id))
+        }
       }
     }
     return(matches)
