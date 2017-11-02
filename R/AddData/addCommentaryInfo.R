@@ -40,7 +40,7 @@ addCommentaryInfo <- function(competitionID, matchIDs, localteam, visitorteam) {
           if (!is.null(singleTeamStats)) {
             addCommentaryInfoSub(competitionID = competitionID, 
                                  matchID = matchIDs[i], 
-                                 teamInfo, teamIDs[j],
+                                 teamInfo = teamIDs[j],
                                  teamStats = singleTeamStats,
                                  commentary = commentary$player_stats[[localAway[j]]])
           }

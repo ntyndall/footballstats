@@ -56,7 +56,7 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, seasonStarting, update
     print(Sys.time(), ' : Run out of requests in addMatchInfo()')
     matches <- NULL
   }
-  
+
   if (!is.null(matches)) {
     for (i in 1:nrow(matches)) {
       single <- matches[i, ]
@@ -83,7 +83,8 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, seasonStarting, update
                               value = as.character(matchItems))
         
         if (redisConnection$EXISTS(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
-          redisConnection$SADD(key = paste0('c:', competitionID, ':ready:', matchItems$id))
+          redisConnection$SADD(key = paste0('c:', competitionID, ':ready'),
+                               member = matchItems$id)
         }
       }
     }

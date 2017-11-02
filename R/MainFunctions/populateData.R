@@ -56,17 +56,17 @@ for (i in 1:nrow(newCompetitions)) {
   mainController(redisConnection = redisConnection,
                  competitionID = newCompetitions$id[i], 
                  seasonStarting = 2017,
-                 updateData = FALSE)
+                 updateData = TRUE)
 }
 
 # Send predicitons guessed correctly to Slack
-for (i in 1:nrow(newCompetitions)) {
-  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
-                              competitionName = newCompetitions$name[i])
-}
+#for (i in 1:nrow(newCompetitions)) {
+#  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
+#                              competitionName = newCompetitions$name[i])
+#}
 
 # Build a classifier with the current match data
-for (i in 3:nrow(newCompetitions)) {
+for (i in 1:nrow(newCompetitions)) {
   buildGeneralClassifier(redisConnection = redisConnection,
                          competitionID = newCompetitions$id[i],
                          competitionName = newCompetitions$name[i],

@@ -12,7 +12,7 @@
 #'  redis set is created to store the current seasonIDs.
 
 
-addCompetitionInfo <- function(daysUntilNextQuery) {
+addCompetitionInfo <- function() {
   if (redisConnection$EXISTS(key = 'active') == 0) {
     competitionIDs <- getGeneralData(endpoint = "/competitions?",
                                       apiKey = API_KEY)
@@ -32,7 +32,8 @@ addCompetitionInfo <- function(daysUntilNextQuery) {
       }
     }
     print(paste0(Sys.time(), ' : Successfully added ', total, ' new competition IDs to Redis.'))
-    redisConnection$SET(key = 'competition:waitForNextQuery',
-                        value = as.integer(Sys.Date() + daysUntilNextQuery))
+    #redisConnection$SET(key = 'competition:waitForNextQuery',
+    #                    value = as.integer(Sys.Date() + daysUntilNextQuery))
+    return(competitionIDs)
   }
 }
