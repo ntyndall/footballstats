@@ -23,7 +23,7 @@ addCommentaryInfo <- function(competitionID, matchIDs, localteam, visitorteam) {
   
   for (i in 1:length(matchIDs)) {
     if (redisConnection$EXISTS(key = 'active') == 0) {
-      commentary <- getCommentaryInfo(matchID = matchIDs[i])
+      commentary <- get_data(endpoint = paste0("/commentaries/", matchIDs[i], "?"))
       check_request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addCommentaryInfo()')
