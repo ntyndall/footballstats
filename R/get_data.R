@@ -1,4 +1,4 @@
-#' @title Get GeneralData
+#' @title get_data
 #'
 #' @description A function that generates JSON data from a particular
 #'  endpoint provided to the function as a string.
@@ -18,7 +18,7 @@
 #'
 
 
-getGeneralData <- function(endpoint, host = HOST, apiKey = API_KEY) {
+get_data <- function(endpoint, host = HOST, apiKey = API_KEY) {
   listOfSeasons <- httr::GET(paste0(HOST, endpoint, API_KEY))
   return(listOfSeasons$status_code %>% 
     purrr::when(. == 200 ~ jsonlite::fromJSON(rawToChar(listOfSeasons$content)), ~ NULL))

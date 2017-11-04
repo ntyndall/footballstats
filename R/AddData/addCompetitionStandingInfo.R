@@ -16,7 +16,7 @@
 
 addCompetitionStandingInfo <- function(competitionID) {
   if (redisConnection$EXISTS(key = 'active') == 0) {
-    standings <- getGeneralData(endpoint = paste0("/standings/", competitionID, "?"))
+    standings <- get_data(endpoint = paste0("/standings/", competitionID, "?"))
     checkRequestLimit()
   } else {
     print(Sys.time(), ' : Run out of requests in addCompetitionStandingInfo()')

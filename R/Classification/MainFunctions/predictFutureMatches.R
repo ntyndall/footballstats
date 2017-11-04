@@ -26,7 +26,7 @@ predictFutureMatches <- function(competitionID, competitionName, seasonStarting,
   matchEndpoint <- paste0("/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&")
   
   # Get fixtures 
-  fixtureList <- getGeneralData(endpoint = matchEndpoint)
+  fixtureList <- get_data(endpoint = matchEndpoint)
   cat(paste0(Sys.time(), ' : About to report on results...\n'))
 
   # Generate predictions based on actual fixtures!

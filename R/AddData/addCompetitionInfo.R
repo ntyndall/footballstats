@@ -14,8 +14,8 @@
 
 addCompetitionInfo <- function() {
   if (redisConnection$EXISTS(key = 'active') == 0) {
-    competitionIDs <- getGeneralData(endpoint = "/competitions?",
-                                      apiKey = API_KEY)
+    competitionIDs <- get_data(endpoint = "/competitions?",
+                               apiKey = API_KEY)
     checkRequestLimit()
   } else {
     print(Sys.time(), ' : Run out of requests in addCompetitionInfo()')
