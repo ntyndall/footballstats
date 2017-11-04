@@ -44,7 +44,7 @@ addMatchInfo <- function(competitionID, dateFrom, dateTo, seasonStarting, update
   if (redisConnection$EXISTS(key = 'active') == 0) {
     matches <- get_data(endpoint = paste0("/matches?comp_id=", competitionID, "&from_date=", dateFrom,
                                           "&to_date=", dateTo, "&"))
-    checkRequestLimit()
+    check_request_limit()
 
     # If getting todays match information, make sure all matches have actually been played.
     if (analysingToday) {

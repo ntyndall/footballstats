@@ -1,4 +1,4 @@
-#' @title Check Request Limit
+#' @title check_request_limit
 #'
 #' @description A function that stores the number of requests made to the 
 #'  API within a given time period. The redis key is available through
@@ -21,7 +21,7 @@
 #'
 
 
-checkRequestLimit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
+check_request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
   
   requestCount <- as.integer(redisConnection$INCR(key = "requestLimit"))
   if (requestCount == 1) {

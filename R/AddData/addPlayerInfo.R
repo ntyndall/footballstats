@@ -27,7 +27,7 @@ addPlayerInfo <- function(competitionID, playerLength, currentSeasonYear) {
     if (redisConnection$EXISTS(key = 'active') == 0) {
       playerID <- redisConnection$LPOP(key = 'analysePlayers')
       playerData <- get_data(endpoint = paste0("/player/", playerID, "?"))
-      checkRequestLimit()
+      check_request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addPlayerInfo()')
       playerData <- NULL
