@@ -1,7 +1,7 @@
 
 
 
-formatDates <- function(standardDateFormat) {
+utils_format_dates <- function(standardDateFormat) {
   day <- format(x = standardDateFormat, "%d")
   month <- format(x = standardDateFormat, "%m")
   year <- format(x = standardDateFormat, "%y")

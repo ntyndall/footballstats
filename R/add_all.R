@@ -1,4 +1,4 @@
-#' @title Main
+#' @title add_all
 #'
 #' @description A function that is called from a shell script to kick off
 #'  the storing of important data and also any machine learning mechanisms
@@ -21,61 +21,61 @@
 #'
 
 
-mainController <- function(redisConnection, competitionID, updateData = FALSE, 
-                           seasonStarting) {
+add_all <- function(redisConnection, competitionID, updateData = FALSE, 
+                    seasonStarting) {
 
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
-  dateTo <- formatDates(standardDateFormat = Sys.Date() - 1)
+  dateTo <- utils_format_dates(standardDateFormat = Sys.Date() - 1)
 
   # Add competition standing
-  addCompetitionStandingInfo(competition = competitionID)
+  add_comp_standings(competition = competitionID)
   
   # Lookup request timings 
   startingRequests <- as.integer(redisConnection$GET(key = 'requestLimit'))
   startingTime <- redisConnection$TTL(key = 'requestLimit')
  
   # Add match information
-  matches <- addMatchInfo(competitionID = competitionID,
-                          dateFrom = dateFrom,
-                          dateTo = dateTo,
-                          seasonStarting = seasonStarting, 
-                          updateData = updateData)
+  matches <- add_match_info(competitionID = competitionID,
+                            dateFrom = dateFrom,
+                            dateTo = dateTo,
+                            seasonStarting = seasonStarting, 
+                            updateData = updateData)
   print(paste0(Sys.time(), ': Matches complete.'))
   
   # Add commentary information
   if (nrow(matches) > 0) {
-    addCommentaryInfo(competitionID = competitionID,
-                      matchIDs = matches$id,
-                      localteam = matches$localteam_id,
-                      visitorteam = matches$visitorteam_id)
+    add_commentary_info(competitionID = competitionID,
+                        matchIDs = matches$id,
+                        localteam = matches$localteam_id,
+                        visitorteam = matches$visitorteam_id)
   }
   print(paste0(Sys.time(), ': Commentary complete.'))
   
   
   # Add event information
   if (nrow(matches) > 0) {
-    addEventInfo(competitionID = competitionID,
-                 matchIDs = matches$id,
-                 matchEvents = matches$events)
+    add_event_info(competitionID = competitionID,
+                   matchIDs = matches$id,
+                   matchEvents = matches$events)
   }
   print(paste0(Sys.time(), ': Events complete.'))
   
   # Add team information
   teamListLength <- redisConnection$LLEN(key = 'analyseTeams')
   if (teamListLength > 0) {
-    addTeamInfo(competitionID = competitionID,
-                teamListLength = teamListLength,
-                updateData = updateData)
+    add_team_info(competitionID = competitionID,
+                  teamListLength = teamListLength,
+                  updateData = updateData)
   }
   print(paste0(Sys.time(), ': Teams complete.'))
   
   # Add player information
   playerLength <- redisConnection$LLEN(key = 'analysePlayers')
   if (playerLength > 0) {
-    addPlayerInfo(competitionID = competitionID,
-                  playerLength = playerLength,
-                  currentSeasonYear = seasonStarting)
+    add_player_info(competitionID = competitionID,
+                    playerLength = playerLength,
+                    currentSeasonYear = seasonStarting)
   }
   print(paste0(Sys.time(), ': Players complete.'))
   

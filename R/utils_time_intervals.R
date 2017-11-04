@@ -1,4 +1,4 @@
-getTimeIntervals <- function() {
+utils_time_intervals <- function() {
   lastMatchTime <- redis$GET(key = 'match:lastInterval')
   if (is.null(lastMatchTime)) {
     lastMatchTime <- Sys.Date() - (365 * 2)

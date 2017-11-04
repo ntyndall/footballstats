@@ -31,7 +31,6 @@
 #'       -->  where x = { club, club_intl, cups, national}
 
 
-source(paste0(getwd(), '/Desktop/football-project/footballstats/R/MainFunctions/storeData.R'))
 source(paste0(getwd(), '/Desktop/football-project/footballstats/R/UtilityFunctions/initialize.R'))
 
 initialize(location = '~/Desktop/football-project/footballstats/R/', 
@@ -54,10 +53,10 @@ for (i in 1:nrow(newCompetitions)) {
 
   # Gather all information to be stored in Redis.
   print(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (', newCompetitions$name[i], ' - ', newCompetitions$region[i], ').'))
-  mainController(redisConnection = redisConnection,
-                 competitionID = newCompetitions$id[i], 
-                 updateData = FALSE)
-                 seasonStarting = 2017,
+  add_all(redisConnection = redisConnection,
+          competitionID = newCompetitions$id[i], 
+          updateData = FALSE)
+          seasonStarting = 2017,
   
   # Send predicitons guessed correctly to Slack
   #  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],

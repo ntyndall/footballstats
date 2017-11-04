@@ -1,4 +1,4 @@
-#' @title Sensitive Info Mock
+#' @title utils_mock_sensitive
 #'
 #' @description A function that loads all sensitive information into a 
 #'  global namespace for use throughout the code.
@@ -13,7 +13,7 @@
 #' @return Returns nothing.
 #'
 
-sensitiveInfoMock <- function() {
+utils_mock_sensitive <- function() {
   HOST <<- ""
   API_KEY <<- ""
   ROOT <<- ""

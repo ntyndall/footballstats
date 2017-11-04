@@ -1,4 +1,4 @@
-#' @title Redis Mapping
+#' @title utils_redis_map
 #'
 #' @description A function that maps the rredis capability to the
 #'  same format as redux method calls to allow for proper testing.
@@ -11,7 +11,7 @@
 #'
 
 
-redisMapping <- function() {
+utils_redis_map <- function() {
   return(list(SET = function(key, value) { rredis::redisSet(key = key, value = value) },
               GET = function(key) { rredis::redisGet(key = key) },
               HMSET = function(key, field, value) { listToSet <- as.list(value);
