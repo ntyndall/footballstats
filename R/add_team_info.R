@@ -1,4 +1,4 @@
-#' @title Add Team Info
+#' @title add_team_info
 #'
 #' @description A function that takes a competitionID and integer value
 #'  with details of the teamID list for analysis. Each team is
@@ -27,7 +27,7 @@
 #'
 
 
-addTeamInfo <- function(competitionID, teamListLength, updateData) {
+add_team_info <- function(competitionID, teamListLength, updateData) {
   valuesToRetain <- c("team_id", "is_national", "name", "country",
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",

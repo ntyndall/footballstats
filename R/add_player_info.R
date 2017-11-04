@@ -1,4 +1,4 @@
-#' @title Add Player Info
+#' @title add_player_info
 #'
 #' @description A function that takes a competitionID and length of players to 
 #'  analyse. The playerID's are popped from a Redis list and queried. The player
@@ -16,7 +16,7 @@
 #'
 
 
-addPlayerInfo <- function(competitionID, playerLength, currentSeasonYear) {
+add_player_info <- function(competitionID, playerLength, currentSeasonYear) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",

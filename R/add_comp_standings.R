@@ -1,4 +1,4 @@
-#' @title Add Competition Standing Info
+#' @title add_comp_standings
 #'
 #' @description A function that takes a competitionID and returns the current
 #'  table information.
@@ -14,7 +14,7 @@
 #'
 
 
-addCompetitionStandingInfo <- function(competitionID) {
+add_comp_standings <- function(competitionID) {
   if (redisConnection$EXISTS(key = 'active') == 0) {
     standings <- get_data(endpoint = paste0("/standings/", competitionID, "?"))
     check_request_limit()

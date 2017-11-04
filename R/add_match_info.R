@@ -1,4 +1,4 @@
-#' @title Add Match Info
+#' @title add_match_info
 #'
 #' @description A function that takes a competitionID and season year to query
 #'  for all the matches in a particular season and saves new teams to a set for 
@@ -32,7 +32,7 @@
 #'
 
 
-addMatchInfo <- function(competitionID, dateFrom, dateTo, seasonStarting, updateData, 
+add_match_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateData, 
                          analysingToday = TRUE) {
   valuesToRetain <- c("id", "comp_id", "formatted_date", "season",           
                       "week", "venue", "venue_id", "venue_city",     

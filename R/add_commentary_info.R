@@ -1,4 +1,4 @@
-#' @title Add Commentary Info
+#' @title add_commentary_info
 #'
 #' @description A function that takes a competitionID and matchID's, and
 #'  determines general match statistics for both local team and visitor 
@@ -19,7 +19,21 @@
 #'
 
 
-addCommentaryInfo <- function(competitionID, matchIDs, localteam, visitorteam) {
+add_commentary_info <- function(competitionID, matchIDs, localteam, visitorteam) {
+
+  commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
+    redisConnection$HMSET(key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamInfo),
+                          field = names(teamStats), 
+                          value = as.character(teamStats))
+    playerStats <- commentary$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
+    if (nrow(playerStats) > 0) {
+      for (j in 1:nrow(playerStats)) {
+        redisConnection$HMSET(key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
+                              field = names(playerStats), 
+                              value = as.character(playerStats[j, ]))
+      }
+    }  
+  }
   
   for (i in 1:length(matchIDs)) {
     if (redisConnection$EXISTS(key = 'active') == 0) {
@@ -38,11 +52,11 @@ addCommentaryInfo <- function(competitionID, matchIDs, localteam, visitorteam) {
         for (j in 1:length(localAway)) {
           singleTeamStats <- teamStats[[localAway[j]]]
           if (!is.null(singleTeamStats)) {
-            addCommentaryInfoSub(competitionID = competitionID, 
-                                 matchID = matchIDs[i], 
-                                 teamInfo = teamIDs[j],
-                                 teamStats = singleTeamStats,
-                                 commentary = commentary$player_stats[[localAway[j]]])
+            commentary_sub(competitionID = competitionID, 
+                           matchID = matchIDs[i], 
+                           teamInfo = teamIDs[j],
+                           teamStats = singleTeamStats,
+                           commentary = commentary$player_stats[[localAway[j]]])
           }
         }
       }

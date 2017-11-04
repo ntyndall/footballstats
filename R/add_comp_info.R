@@ -1,4 +1,4 @@
-#' @title Add Competition Info
+#' @title add_comp_info
 #'
 #' @description A function that checks a unique competition has been 
 #'  obtained and is added to a hashMap of the form ....
@@ -12,7 +12,7 @@
 #'  redis set is created to store the current seasonIDs.
 
 
-addCompetitionInfo <- function() {
+add_comp_info <- function() {
   if (redisConnection$EXISTS(key = 'active') == 0) {
     competitionIDs <- get_data(endpoint = "/competitions?",
                                apiKey = API_KEY)
