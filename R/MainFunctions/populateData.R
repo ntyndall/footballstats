@@ -50,23 +50,20 @@ subsetCompetitions <- c('1102', '1204', '1205', '1229', '1232',
 newCompetitions <- competitions[match(subsetCompetitions, competitions$id), ]
 
 
-# Gather all information to be stored in Redis.
 for (i in 1:nrow(newCompetitions)) {
+
+  # Gather all information to be stored in Redis.
   print(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (', newCompetitions$name[i], ' - ', newCompetitions$region[i], ').'))
   mainController(redisConnection = redisConnection,
                  competitionID = newCompetitions$id[i], 
+                 updateData = FALSE)
                  seasonStarting = 2017,
-                 updateData = TRUE)
-}
-
-# Send predicitons guessed correctly to Slack
-#for (i in 1:nrow(newCompetitions)) {
-#  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
-#                              competitionName = newCompetitions$name[i])
-#}
-
-# Build a classifier with the current match data
-for (i in 1:nrow(newCompetitions)) {
+  
+  # Send predicitons guessed correctly to Slack
+  #  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
+  #                              competitionName = newCompetitions$name[i])
+  
+  # Build a classifier with the current match data
   buildGeneralClassifier(redisConnection = redisConnection,
                          competitionID = newCompetitions$id[i],
                          competitionName = newCompetitions$name[i],
