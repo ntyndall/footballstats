@@ -19,4 +19,5 @@ Imports:
     e1071,
     hashmap,
     covr,
+    shiny,
     tcltk
