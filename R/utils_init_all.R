@@ -29,12 +29,13 @@ initializeAllFunctions <- function(redisHost = "localhost", redisPort = 6379,
     library(rredis)
     redisConnection <<- rredis::redisConnect(host = redisHost,
                                              port = redisPort)
-  } else {
-    library(redux)
-    sensitiveInfo()
-    getIDList()
-    redisConnection <<- redux::hiredis(host = redisHost, 
-                                       port = redisPort, 
-                                       db = db)
   }
+#  } else {
+#    library(redux)
+#    sensitiveInfo()
+#    getIDList()
+#    redisConnection <<- redux::hiredis(host = redisHost, 
+#                                       port = redisPort, 
+#                                       db = db)
+#  }
 }

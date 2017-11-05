@@ -7,7 +7,6 @@ Depends: R (>= 3.2.3)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-SystemRequirements: libhiredis-dev
 Imports:
     dplyr,
     httr,
@@ -20,5 +19,4 @@ Imports:
     purrr,
     e1071,
     hashmap,
-    redux,
     tcltk
