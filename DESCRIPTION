@@ -20,4 +20,5 @@ Imports:
     hashmap,
     covr,
     shiny,
-    tcltk
+    tcltk,
+    magrittr

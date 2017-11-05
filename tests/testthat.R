@@ -43,10 +43,6 @@ if (totalError > 0) {
   codeStatus <- 0
 }
 
-
-print('now test')
-report()
-
 quit(save = 'no',
      status = codeStatus,
      runLast = FALSE)

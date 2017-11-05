@@ -13,6 +13,9 @@ services:
 #script: 
 #   - Rscript -e "library(testthat); #source('run_tests.R')"
 
+after_success:
+  - Rscript -e 'covr::codecov()'
+
 notifications:
   slack: ntyndall:ffjQMwuOwDH6BvaNDpDzRO2x
   email:
