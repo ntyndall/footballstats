@@ -13,7 +13,6 @@ Imports:
     jsonlite,
     stringr,
     testthat,
-    ggplot2,
     rredis,
     slackr,
     purrr,
