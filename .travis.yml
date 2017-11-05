@@ -15,3 +15,6 @@ services:
 
 notifications:
   slack: ntyndall:ffjQMwuOwDH6BvaNDpDzRO2x
+  email:
+    on_success: change
+    on_failure: change
