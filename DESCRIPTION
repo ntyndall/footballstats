@@ -3,7 +3,7 @@ Title: Classify and predict football results
 Version: 0.3.0
 Authors@R: person("Niall", "Tyndall", email = "ntyndall@gmail.com", role = c("aut", "cre"))
 Description: Classification of football matches
-Depends: R (>= 3.3.3)
+Depends: R (>= 3.2.3)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -13,14 +13,12 @@ Imports:
     httr,
     jsonlite,
     stringr,
-    tidyr,
     testthat,
     ggplot2,
     rredis,
     slackr,
     purrr,
     e1071,
-    covr,
     tcltk
 Suggests: 
     testthat

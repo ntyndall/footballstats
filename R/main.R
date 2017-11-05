@@ -31,41 +31,41 @@
 #'       -->  where x = { club, club_intl, cups, national}
 
 
-source(paste0(getwd(), '/Desktop/football-project/footballstats/R/UtilityFunctions/initialize.R'))
-
-initialize(location = '~/Desktop/football-project/footballstats/R/', 
-           redisHost = 'localhost',
-           redisPort = 6379, 
-           db = 1)
-
-# Load competitions and run the functionality below. 
-# (Figure out competition ID's with a single GET request first!)
-competitions <- addCompetitionInfo()
-comps <- jsonlite::fromJSON(seasonIDs)
-
-# Subset the available competitions
-subsetCompetitions <- c('1102', '1204', '1205', '1229', '1232',
-                        '1352', '1425', '1457')
-newCompetitions <- competitions[match(subsetCompetitions, competitions$id), ]
-
-
-for (i in 1:nrow(newCompetitions)) {
-
-  # Gather all information to be stored in Redis.
-  print(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (', newCompetitions$name[i], ' - ', newCompetitions$region[i], ').'))
-  add_all(redisConnection = redisConnection,
-          competitionID = newCompetitions$id[i], 
-          updateData = FALSE)
-          seasonStarting = 2017,
+everything <- function()  {
+  initialize(location = '~/Desktop/football-project/footballstats/R/', 
+             redisHost = 'localhost',
+             redisPort = 6379, 
+             db = 1)
   
-  # Send predicitons guessed correctly to Slack
-  #  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
-  #                              competitionName = newCompetitions$name[i])
+  # Load competitions and run the functionality below. 
+  # (Figure out competition ID's with a single GET request first!)
+  competitions <- addCompetitionInfo()
+  comps <- jsonlite::fromJSON(seasonIDs)
   
-  # Build a classifier with the current match data
-  classify_all(redisConnection = redisConnection,
-               competitionID = newCompetitions$id[i],
-               competitionName = newCompetitions$name[i],
-               seasonStarting = 2017,
-               returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
+  # Subset the available competitions
+  subsetCompetitions <- c('1102', '1204', '1205', '1229', '1232',
+                          '1352', '1425', '1457')
+  newCompetitions <- competitions[match(subsetCompetitions, competitions$id), ]
+  
+  
+  for (i in 1:nrow(newCompetitions)) {
+  
+    # Gather all information to be stored in Redis.
+    print(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (', newCompetitions$name[i], ' - ', newCompetitions$region[i], ').'))
+    add_all(redisConnection = redisConnection,
+            competitionID = newCompetitions$id[i], 
+            updateData = FALSE,
+            seasonStarting = 2017)
+    
+    # Send predicitons guessed correctly to Slack
+    #  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
+    #                              competitionName = newCompetitions$name[i])
+    
+    # Build a classifier with the current match data
+    classify_all(redisConnection = redisConnection,
+                 competitionID = newCompetitions$id[i],
+                 competitionName = newCompetitions$name[i],
+                 seasonStarting = 2017,
+                 returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
+  }
 }
