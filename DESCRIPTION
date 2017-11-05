@@ -19,6 +19,6 @@ Imports:
     slackr,
     purrr,
     e1071,
+    hashmap,
+    redux,
     tcltk
-Suggests: 
-    testthat
