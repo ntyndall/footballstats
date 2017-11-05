@@ -20,5 +20,7 @@ Imports:
     slackr,
     purrr,
     e1071,
+    covr,
     tcltk
-
+Suggests: 
+    testthat
