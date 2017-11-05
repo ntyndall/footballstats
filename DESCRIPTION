@@ -18,4 +18,5 @@ Imports:
     purrr,
     e1071,
     hashmap,
+    covr,
     tcltk

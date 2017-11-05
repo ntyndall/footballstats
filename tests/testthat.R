@@ -1,6 +1,6 @@
 library(testthat)
 library(footballstats)
-
+library(covr)
 
 print('get here')
 #test_check("footballstats")
@@ -42,6 +42,10 @@ if (totalError > 0) {
 } else {
   codeStatus <- 0
 }
+
+
+print('now test')
+report()
 
 quit(save = 'no',
      status = codeStatus,
