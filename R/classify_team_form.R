@@ -1,4 +1,4 @@
-#' @title Calculate Team Form
+#' @title classify_team_form
 #'
 #' @description A function that generates both the team form and date of 
 #'  the match in a list. A list is generated for both of these in terms 
@@ -15,7 +15,7 @@
 #'
 
 
-calculateTeamForm <- function(matchData, teamID) {
+classify_team_form <- function(matchData, teamID) {
   teamID <- as.integer(teamID)
   teamsResult <- dateOfMatch <- c()
   singleTeam <- matchData[matchData$localteam_id == teamID | matchData$visitorteam_id == teamID, ]
@@ -25,11 +25,15 @@ calculateTeamForm <- function(matchData, teamID) {
     singleMatch <- as.list(singleTeam[x, ])
     
     currentTeam <- singleMatch[as.integer(which(singleMatch == as.character(teamID)))]
-    scoreCurrent <- as.integer(singleMatch[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'localteam_score', ~ 'visitorteam_score')])
-    scoreOther <-  as.integer(singleMatch[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'visitorteam_score', ~ 'localteam_score')])
+    scoreCurrent <- as.integer(singleMatch[currentTeam %>% 
+                                             purrr::when(. == 'localteam_id' ~ 'localteam_score', 
+                                                         ~ 'visitorteam_score')])
+    scoreOther <-  as.integer(singleMatch[currentTeam %>% 
+                                            purrr::when(. == 'localteam_id' ~ 'visitorteam_score', 
+                                                        ~ 'localteam_score')])
     
-    resultOfMatch(scoreCurrent =  scoreCurrent, 
-                  scoreOther = scoreOther)
+    classify_match_result(scoreCurrent =  scoreCurrent, 
+                          scoreOther = scoreOther)
   })
   return(list(results, as.integer(singleTeam$formatted_date)))
 }

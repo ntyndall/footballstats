@@ -1,4 +1,4 @@
-#' @title Predict Future Matches
+#' @title classify_predict_matches
 #'
 #' @description A function that queries the endpoint and redis to obtain
 #'  upcoming matches then with the current optimized SVM, attempts to predict
@@ -14,12 +14,12 @@
 #' @return Nothing. Print results to screen.
 
 
-predictFutureMatches <- function(competitionID, competitionName, seasonStarting, returnItems, 
-                                 matchFieldNames, subsetItems, SVMfit, binList) {
+classify_predict_matches <- function(competitionID, competitionName, seasonStarting, returnItems, 
+                                     matchFieldNames, subsetItems, SVMfit, binList) {
   
   # Get from and to dates for future fixtures
-  dateFrom <- formatDates(standardDateFormat = Sys.Date() + 1)
-  dateTo <- formatDates(standardDateFormat = Sys.Date()  + 8)
+  dateFrom <- utils_format_dates(standardDateFormat = Sys.Date() + 1)
+  dateTo <- utils_format_dates(standardDateFormat = Sys.Date()  + 8)
   
   # Define variable names and keys
   matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
@@ -31,17 +31,17 @@ predictFutureMatches <- function(competitionID, competitionName, seasonStarting,
 
   # Generate predictions based on actual fixtures!
   if (!is.null(fixtureList)) {
-    numOfPredicted <- generatePredictions(competitionID = competitionID,
-                                          fixtureList = fixtureList,
-                                          seasonStarting = seasonStarting,
-                                          testing = FALSE,
-                                          returnItems = returnItems,
-                                          subsetItems = subsetItems,
-                                          SVMfit = SVMfit,
-                                          matchFieldNames = matchFieldNames,
-                                          competitionName = competitionName,
-                                          binList = binList,
-                                          printToSlack = TRUE)
+    numOfPredicted <- classify_generate_predictions(competitionID = competitionID,
+                                                    fixtureList = fixtureList,
+                                                    seasonStarting = seasonStarting,
+                                                    testing = FALSE,
+                                                    returnItems = returnItems,
+                                                    subsetItems = subsetItems,
+                                                    SVMfit = SVMfit,
+                                                    matchFieldNames = matchFieldNames,
+                                                    competitionName = competitionName,
+                                                    binList = binList,
+                                                    printToSlack = TRUE)
     print(paste0(Sys.time(), ' : Predicted a total of ', numOfPredicted, ' matches.'))
   } else {
     print(paste0(Sys.time(), ' : No upcoming fixture in the next week!'))

@@ -1,6 +1,6 @@
 
 
-getFormFromMatchIDs <- function(competitionID, matchIDs, seasonStarting, matchFieldNames, teamID, formLimit = 3) {
+classify_form_from_match <- function(competitionID, matchIDs, seasonStarting, matchFieldNames, teamID, formLimit = 3) {
   formList <- lapply(1:length(matchIDs), function(k) {
     redisKey <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs[k])
     singleMatch <- redisConnection$HMGET(key = redisKey, 
@@ -14,8 +14,8 @@ getFormFromMatchIDs <- function(competitionID, matchIDs, seasonStarting, matchFi
     scoreOther <-  as.integer(singleMatch[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'visitorteam_score', ~ 'localteam_score')])
     
     # Determine the result of the match for the current team
-    singleResult <- resultOfMatch(scoreCurrent = scoreCurrent, 
-                                  scoreOther = scoreOther)
+    singleResult <- classify_match_result(scoreCurrent = scoreCurrent, 
+                                          scoreOther = scoreOther)
     list(singleMatch$formatted_date, singleResult)
   })
   

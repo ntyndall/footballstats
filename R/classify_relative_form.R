@@ -1,7 +1,7 @@
 
 
 
-formRelativeToDate <- function(matchInfo, totalForm) {
+classify_relative_form <- function(matchInfo, totalForm) {
   # Determine current match date
   currentDate <- as.integer(as.Date(matchInfo$formatted_date, '%d.%m.%Y'))
   

@@ -1,4 +1,4 @@
-#' @title Calculate SVM Data
+#' @title classify_calculate_svm
 #'
 #' @description A function that takes current statistical data and combines
 #'  it into a dataframe to be passed later to an SVM classifier.
@@ -15,9 +15,9 @@
 #'
 
 
-calculateSVMData <- function(competitionID, seasonStarting, commentaryKeys, 
-                             commentaryNames, matchData,
-                             totalData = data.frame(stringsAsFactors = FALSE)) {
+classify_calculate_svm <- function(competitionID, seasonStarting, commentaryKeys, 
+                                   commentaryNames, matchData,
+                                   totalData = data.frame(stringsAsFactors = FALSE)) {
   
   for (i in 1:length(commentaryKeys)) {
     # Parse out commentary items and create a single row data frame
@@ -27,8 +27,8 @@ calculateSVMData <- function(competitionID, seasonStarting, commentaryKeys,
     teamID <- elementsSplit[4]
     
     # Get Commentary results from Redis
-    results <- getCommentaryFromRedis(keyName = singleCommentary,
-                                      returnItems = commentaryNames)
+    results <- classify_commentary_from_redis(keyName = singleCommentary,
+                                              returnItems = commentaryNames)
 
     # Create single row of information
     singleItem <- data.frame(t(results), stringsAsFactors = FALSE)
@@ -45,12 +45,12 @@ calculateSVMData <- function(competitionID, seasonStarting, commentaryKeys,
     scoreOther <-  as.integer(singleMatchInfo[currentTeam %>% purrr::when(. == 'localteam_id' ~ 'visitorteam_score', ~ 'localteam_score')])
     
     # Get the result of the match whether it was a home or away game
-    winLoseDraw <- resultOfMatch(scoreCurrent = scoreCurrent, 
-                                 scoreOther = scoreOther)
+    winLoseDraw <- classify_match_result(scoreCurrent = scoreCurrent, 
+                                         scoreOther = scoreOther)
 
     # Calculate team form (Don't include if 3 matches don't exist yet!)
-    formResults <- calculateTeamForm(matchData = matchData, 
-                                     teamID = teamID)
+    formResults <- classify_team_form(matchData = matchData, 
+                                      teamID = teamID)
     
     # Create a data frame of forms and dates.
     totalForm <- data.frame(date = formResults[[2]],
@@ -58,8 +58,8 @@ calculateSVMData <- function(competitionID, seasonStarting, commentaryKeys,
                             stringsAsFactors = FALSE)
   
     # Find out form relative to current date.
-    form <- formRelativeToDate(matchInfo = singleMatchInfo,
-                               totalForm = totalForm)
+    form <- classify_relative_form(matchInfo = singleMatchInfo,
+                                   totalForm = totalForm)
 
     # Only if the match has seen 3 previous games do we add a row to the totalData frame
     # This keeps the forms consistent to the previous 3 matches!

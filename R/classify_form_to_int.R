@@ -1,4 +1,4 @@
-#' @title Map Form To Integer
+#' @title classify_form_to_int
 #'
 #' @description A function that converts a form vector e.g. 'WLD' into an integer
 #'  value defined by the function default values for win / lose / draw.
@@ -12,7 +12,7 @@
 #'
 
 
-mapFormToInteger <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0) {
+classify_form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0) {
   oldForms <- strsplit(oldForms, '')
   newForms <- sapply(1:length(oldForms), function(x) {
     wld <- oldForms[[x]]

@@ -1,6 +1,6 @@
 #'
 
-calculateBestSVMFit <- function(totalData) {
+classify_best_svm <- function(totalData) {
   # Split data into actual data and one similar minus the results
   newData <- totalData
   newData$res <- NULL

@@ -1,4 +1,4 @@
-#' @title Generate Predictions
+#' @title classify_generate_predictions
 #'
 #' @description Another layer which can handle both normal fixture prediction
 #'  and also predicting a test data set with known results.
@@ -21,13 +21,12 @@
 #'
 
 
-generatePredictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit, 
-                                matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
-                                printToSlack = FALSE) {
+classify_generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit, 
+                                          matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
+                                          printToSlack = FALSE) {
   
   # Set up slack details
-  emojiHash <- lookUpSlackEmoji()
-  #teamNameHash <- teamAbbreviations()
+  emojiHash <- classify_emoji()
 
   # Loop over each fixture
   for (i in 1:nrow(fixtureList)) {
@@ -41,13 +40,13 @@ generatePredictions <- function(competitionID, fixtureList, seasonStarting, test
       purrr::when(.[[1]] %in% .[[2]] ~ .[[2]][-c(which(.[[1]] == .[[2]]))], ~ .[[2]])
     
     # Get home and away statistics
-    fixtureAggregate <- getHomeAndAwayStats(competitionID = competitionID, 
-                                            singleFixture = singleFixture, 
-                                            seasonStarting = seasonStarting,
-                                            localVisitor = c('localteam_id', 'visitorteam_id'),
-                                            returnItems = forStatistics,
-                                            matchFieldNames = matchFieldNames,
-                                            testing = testing)
+    fixtureAggregate <- classify_homeaway_stat(competitionID = competitionID, 
+                                               singleFixture = singleFixture, 
+                                               seasonStarting = seasonStarting,
+                                               localVisitor = c('localteam_id', 'visitorteam_id'),
+                                               returnItems = forStatistics,
+                                               matchFieldNames = matchFieldNames,
+                                               testing = testing)
 
     # Create the appropriate data structures for the SVM
     predictions <- as.character(sapply(1:2, function(k) {
@@ -55,7 +54,7 @@ generatePredictions <- function(competitionID, fixtureList, seasonStarting, test
       names(singleTeam) <- forStatistics
 
       # Map the current form to an integer based on rules in mapForm~
-      singleTeam$form <- mapFormToInteger(oldForms = fixtureAggregate[[k]][[2]])
+      singleTeam$form <- classify_form_to_int(oldForms = fixtureAggregate[[k]][[2]])
     
       # Only look at certain combinations if testing is enabled
         for (i in 1:length(subsetItems)) {
@@ -97,8 +96,10 @@ generatePredictions <- function(competitionID, fixtureList, seasonStarting, test
     }
     
     # Set up emojis from the hash
-    homeEmoji <- emojiHash$find(as.integer(singleFixture$localteam_id)) %>% purrr::when(is.na(.) ~ ':blank-team:', ~ .)
-    awayEmoji <- emojiHash$find(as.integer(singleFixture$visitorteam_id)) %>% purrr::when(is.na(.) ~ ':blank-team:', ~ .)
+    homeEmoji <- emojiHash$find(as.integer(singleFixture$localteam_id)) %>% 
+      purrr::when(is.na(.) ~ ':blank-team:', ~ .)
+    awayEmoji <- emojiHash$find(as.integer(singleFixture$visitorteam_id)) %>% 
+      purrr::when(is.na(.) ~ ':blank-team:', ~ .)
     
     # Logs for console and for slack
     txt <- as.character(paste0('[', pHome, '] ', homeName, ' vs. ', awayName, ' [', pAway, ']'))

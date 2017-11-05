@@ -2,7 +2,7 @@
 
 
 
-checkAvailableCommentaryNames <- function(commentaryKeys, excludeNames = c('table_id')) {
+classify_available_commentaries <- function(commentaryKeys, excludeNames = c('table_id')) {
   allAvailable <- c()
    for (x in 1:length(commentaryKeys)) {
     results <- as.character(redisConnection$HGETALL(key = commentaryKeys[x]))

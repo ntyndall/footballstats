@@ -1,4 +1,4 @@
-#' @title Optimize SVM
+#' @title classify_optimize_svm
 #'
 #' @description A function that loops through all possibilities of the variables
 #'  to be included in the classifier. That means the recent form and results 
@@ -20,8 +20,8 @@
 #'  the best factors to use in the second key.
 
 
-optimizeSVM <- function(competitionID, totalData, seasonStarting, testData, matchData, binList, 
-                        returnItems, matchFieldNames, testing = TRUE) {
+classify_optimize_svm <- function(competitionID, totalData, seasonStarting, testData, matchData, 
+                                  binList, returnItems, matchFieldNames, testing = TRUE) {
 
   # Optimize classifier by varying all the possible attributes
   bLLength <- length(binList)
@@ -44,19 +44,19 @@ optimizeSVM <- function(competitionID, totalData, seasonStarting, testData, matc
         holdData <- holdData[ , c(names(holdingList), 'res')]
 
         # Build and tune an SVM
-        SVMfit <- calculateBestSVMFit(totalData = holdData)
+        SVMfit <- classify_best_svm(totalData = holdData)
         holdData$res <- NULL
         
         # Build and tune an SVM
-        currentResult <- generatePredictions(competitionID = competitionID,
-                                             fixtureList = testData, 
-                                             seasonStarting = seasonStarting,
-                                             testing = testing, 
-                                             returnItems = returnItems,
-                                             subsetItems = names(holdingList),
-                                             SVMfit = SVMfit, 
-                                             binList = holdingList,
-                                             matchFieldNames = matchFieldNames)
+        currentResult <- classify_generate_predictions(competitionID = competitionID,
+                                                       fixtureList = testData, 
+                                                       seasonStarting = seasonStarting,
+                                                       testing = testing, 
+                                                       returnItems = returnItems,
+                                                       subsetItems = names(holdingList),
+                                                       SVMfit = SVMfit, 
+                                                       binList = holdingList,
+                                                       matchFieldNames = matchFieldNames)
 
         # If the current result is better than assign that to be the new SVM.
         if (currentResult > bestResult) {

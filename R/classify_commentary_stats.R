@@ -1,4 +1,4 @@
-#' @title GCommentary Statistics
+#' @title classify_commentary_stats
 #'
 #' @description A function that takes the commentary values stored in redis and
 #'  calculates an average value for the list of variables in the key for that team.
@@ -12,10 +12,10 @@
 #'
 
 
-commentaryStatistics <- function(commentary, returnItems) {
+classify_commentary_stats <- function(commentary, returnItems) {
   vals <- sapply(1:length(commentary), function(j) {
-    return(getCommentaryFromRedis(keyName = commentary[j],
-                                  returnItems = returnItems))
+    return(classify_commentary_from_redis(keyName = commentary[j],
+                                          returnItems = returnItems))
   })
   
   if (length(returnItems) == 1) {

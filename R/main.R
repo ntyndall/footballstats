@@ -63,9 +63,9 @@ for (i in 1:nrow(newCompetitions)) {
   #                              competitionName = newCompetitions$name[i])
   
   # Build a classifier with the current match data
-  buildGeneralClassifier(redisConnection = redisConnection,
-                         competitionID = newCompetitions$id[i],
-                         competitionName = newCompetitions$name[i],
-                         seasonStarting = 2017,
-                         returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
+  classify_all(redisConnection = redisConnection,
+               competitionID = newCompetitions$id[i],
+               competitionName = newCompetitions$name[i],
+               seasonStarting = 2017,
+               returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
 }

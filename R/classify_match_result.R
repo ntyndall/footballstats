@@ -1,4 +1,4 @@
-#' @title Result Of Match
+#' @title classify_match_result
 #'
 #' @description A function that returns a single character value of
 #'  'W' / 'L' / 'D' depending on the scores and which team scored them.
@@ -12,7 +12,8 @@
 #' @return Returns one of 'W' / 'L' / 'D'.
 #'
 
-resultOfMatch <- function(scoreCurrent, scoreOther) {
+
+classify_match_result <- function(scoreCurrent, scoreOther) {
   return(c(scoreCurrent, scoreOther) %>% purrr::when(.[1] == .[2] ~ 'D', 
                                                      .[1] > .[2] ~ 'W', 
                                                      ~ 'L'))

@@ -16,7 +16,7 @@
 #' 
 
 
-recreateMatchData <- function(redisConnection, competitionID, seasonStarting, matchLimit) {
+classify_recreate_matchdata <- function(redisConnection, competitionID, seasonStarting, matchLimit) {
   allMatches <- redisConnection$KEYS(pattern = paste0('csm:', competitionID, ':', seasonStarting, '*'))
   matchData <- data.frame(stringsAsFactors = FALSE)
   for (i in 1:length(allMatches)) {

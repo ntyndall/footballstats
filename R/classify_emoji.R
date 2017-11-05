@@ -2,7 +2,7 @@
 
 
 
-lookUpSlackEmoji <- function() {
+classify_emoji <- function() {
   
   # England details
   englandOne <- paste0(':premier-', 

@@ -1,4 +1,4 @@
-#' @title Get Home And Away Stats
+#' @title classify_homeaway_stat
 #'
 #' @description A function to set up a match performance of two teams which returns
 #'  their current statistics and their form.
@@ -14,8 +14,8 @@
 #'
 
 
-getHomeAndAwayStats <- function(competitionID, singleFixture, seasonStarting, localVisitor, returnItems, 
-                                matchFieldNames, testing) {
+classify_homeaway_stat <- function(competitionID, singleFixture, seasonStarting, localVisitor, 
+                                   returnItems, matchFieldNames, testing) {
   fixtureAggregate <- lapply(1:2, function(j) {
     # Decide to analyse home team and then away team
     teamID <- singleFixture[[localVisitor[j]]]
@@ -28,8 +28,8 @@ getHomeAndAwayStats <- function(competitionID, singleFixture, seasonStarting, lo
     }
   
     # Determine the statistics of a commentary
-    currentStats <- commentaryStatistics(commentary = commentary,
-                                         returnItems = returnItems)
+    currentStats <- classify_commentary_stats(commentary = commentary,
+                                              returnItems = returnItems)
   
     # Also get the match ID's
     matchIDs <- sapply(1:length(commentary), function(k) {
@@ -37,11 +37,11 @@ getHomeAndAwayStats <- function(competitionID, singleFixture, seasonStarting, lo
     })
     
     # Determine forms from a vector of matches
-    form <- getFormFromMatchIDs(competitionID = competitionID,
-                                matchIDs = matchIDs,
-                                seasonStarting = seasonStarting,
-                                matchFieldNames = matchFieldNames,
-                                teamID = teamID)
+    form <- classify_form_from_match(competitionID = competitionID,
+                                     matchIDs = matchIDs,
+                                     seasonStarting = seasonStarting,
+                                     matchFieldNames = matchFieldNames,
+                                     teamID = teamID)
     list(currentStats, form)
   })
   return(fixtureAggregate)

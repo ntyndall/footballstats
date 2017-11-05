@@ -2,7 +2,7 @@
 
 
 
-getCommentaryFromRedis <- function(keyName, returnItems) {
+classify_commentary_from_redis <- function(keyName, returnItems) {
   results <- redisConnection$HMGET(key = keyName, 
                                    field = returnItems)
 

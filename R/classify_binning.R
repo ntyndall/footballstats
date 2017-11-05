@@ -1,6 +1,18 @@
 
 
-getBinIntervals <- function(totalData) {
+classify_bin_intervals <- function(dataSet, binList) {
+  binNames <- names(binList)
+  for (i in 1:length(binList)) {
+    singleBin <- binList[[binNames[i]]]
+    vec <- dataSet[[binNames[i]]]
+    vec  <- findInterval(vec, singleBin) * (-1)
+    dataSet[[binNames[i]]] <- vec
+  }
+  return(dataSet)
+}
+
+
+classify_get_bins <- function(totalData) {
   # Take integer values and divide into histogram type classes.
   itemsForSVM <- names(totalData)
   itemsForSVM <- subset(itemsForSVM, itemsForSVM != 'res')
