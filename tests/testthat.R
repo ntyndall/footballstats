@@ -8,8 +8,9 @@ print('get here')
 results <- test_dir(path = "testthat",
                     reporter = "summary")
 
+rredis::redisConnect(host = 'localhost', port = 6379)
 rredis::redisSelect(1)
-redisConnection <<- redisMapping()
+#redisConnection <<- redisMapping()
 
 
 totalError <- 0
