@@ -1,10 +1,17 @@
 
 # Load all functions into global namespace
-source(paste0(getwd(), '/R/UtilityFunctions/initialize.R'))
-initialize(location = paste0(getwd(), '/R/'),
-           redisHost = 'localhost',
-           redisPort = 6379,
-           testing = TRUE)
+#source(paste0(getwd(), '/R/UtilityFunctions/initialize.R'))
+#initialize(location = paste0(getwd(), '/R/'),
+#           redisHost = 'localhost',
+#           redisPort = 6379,
+#           testing = TRUE)
+library(footballstats)
+print('check own library loaded successfully')
+initializeAllFunctions(redisHost = 'localhost', redisPort = 6379, db = 10, testing = TRUE)
+print(classify_form_to_int(oldForms = 'WLD'))
+print('-------------------------')
+
+
 results <- test_dir(path = "tests", 
                     reporter = "summary")
 

@@ -10,7 +10,7 @@ addons:
 services: 
    - redis-server
 script: 
-   - Rscript -e "library(testthat); source('runTests.R')"
+   - Rscript -e "library(testthat); source('run_tests.R')"
 
 notifications:
   slack: ntyndall:ffjQMwuOwDH6BvaNDpDzRO2x
