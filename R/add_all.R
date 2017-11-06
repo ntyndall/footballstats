@@ -26,61 +26,68 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
 
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
-  dateTo <- utils_format_dates(standardDateFormat = Sys.Date() - 1)
+  dateTo <- footballstats::format_dates(
+    standardDateFormat = Sys.Date() - 1)
 
   # Add competition standing
-  add_comp_standings(competition = competitionID,
-                     KEYS = KEYS)
+  footballstats::acomp_standings(
+    competition = competitionID,
+    KEYS = KEYS)
   
   # Lookup request timings 
   startingRequests <- as.integer(redisConnection$GET(key = 'requestLimit'))
   startingTime <- redisConnection$TTL(key = 'requestLimit')
  
   # Add match information
-  matches <- add_match_info(competitionID = competitionID,
-                            dateFrom = dateFrom,
-                            dateTo = dateTo,
-                            seasonStarting = seasonStarting, 
-                            updateData = updateData,
-                            KEYS = KEYS)
+  matches <- footballstats::amatch_info(
+    competitionID = competitionID,
+    dateFrom = dateFrom,
+    dateTo = dateTo,
+    seasonStarting = seasonStarting, 
+    updateData = updateData,
+    KEYS = KEYS)
   print(paste0(Sys.time(), ': Matches complete.'))
   
   # Add commentary information
   if (nrow(matches) > 0) {
-    add_commentary_info(competitionID = competitionID,
-                        matchIDs = matches$id,
-                        localteam = matches$localteam_id,
-                        visitorteam = matches$visitorteam_id,
-                        KEYS = KEYS)
+    footballstats::acommentary_info(
+      competitionID = competitionID,
+      matchIDs = matches$id,
+      localteam = matches$localteam_id,
+      visitorteam = matches$visitorteam_id,
+      KEYS = KEYS)
   }
   print(paste0(Sys.time(), ': Commentary complete.'))
   
   
   # Add event information
   if (nrow(matches) > 0) {
-    add_event_info(competitionID = competitionID,
-                   matchIDs = matches$id,
-                   matchEvents = matches$events)
+    footballstats::aevent_info(
+      competitionID = competitionID,
+      matchIDs = matches$id,
+      matchEvents = matches$events)
   }
   print(paste0(Sys.time(), ': Events complete.'))
   
   # Add team information
   teamListLength <- redisConnection$LLEN(key = 'analyseTeams')
   if (teamListLength > 0) {
-    add_team_info(competitionID = competitionID,
-                  teamListLength = teamListLength,
-                  updateData = updateData,
-                  KEYS = KEYS)
+    footballstats::ateam_info(
+      competitionID = competitionID,
+      teamListLength = teamListLength,
+      updateData = updateData,
+      KEYS = KEYS)
   }
   print(paste0(Sys.time(), ': Teams complete.'))
   
   # Add player information
   playerLength <- redisConnection$LLEN(key = 'analysePlayers')
   if (playerLength > 0) {
-    add_player_info(competitionID = competitionID,
-                    playerLength = playerLength,
-                    currentSeasonYear = seasonStarting,
-                    KEYS = KEYS)
+    footballstats::aplayer_info(
+      competitionID = competitionID,
+      playerLength = playerLength,
+      currentSeasonYear = seasonStarting,
+      KEYS = KEYS)
   }
   print(paste0(Sys.time(), ': Players complete.'))
   
