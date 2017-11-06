@@ -27,7 +27,7 @@
 #'
 
 
-add_team_info <- function(competitionID, teamListLength, updateData) {
+add_team_info <- function(competitionID, teamListLength, updateData, KEYS) {
   valuesToRetain <- c("team_id", "is_national", "name", "country",
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",
@@ -36,7 +36,8 @@ add_team_info <- function(competitionID, teamListLength, updateData) {
   for (i in 1:teamListLength) {
     if (redisConnection$EXISTS(key = 'active') == 0) {
       teamID <- redisConnection$LPOP(key = 'analyseTeams')
-      teamData <- get_data(endpoint = paste0( "/team/", teamID, "?"))
+      teamData <- get_data(endpoint = paste0( "/team/", teamID, "?"),
+                           KEYS = KEYS)
       check_request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addTeamInfo()')

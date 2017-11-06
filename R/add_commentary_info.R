@@ -19,25 +19,12 @@
 #'
 
 
-add_commentary_info <- function(competitionID, matchIDs, localteam, visitorteam) {
-
-  commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
-    redisConnection$HMSET(key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamInfo),
-                          field = names(teamStats), 
-                          value = as.character(teamStats))
-    playerStats <- commentary$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
-    if (nrow(playerStats) > 0) {
-      for (j in 1:nrow(playerStats)) {
-        redisConnection$HMSET(key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
-                              field = names(playerStats), 
-                              value = as.character(playerStats[j, ]))
-      }
-    }  
-  }
+add_commentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS) {
   
   for (i in 1:length(matchIDs)) {
     if (redisConnection$EXISTS(key = 'active') == 0) {
-      commentary <- get_data(endpoint = paste0("/commentaries/", matchIDs[i], "?"))
+      commentary <- get_data(endpoint = paste0("/commentaries/", matchIDs[i], "?"),
+                             KEYS = KEYS)
       check_request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addCommentaryInfo()')
@@ -62,4 +49,21 @@ add_commentary_info <- function(competitionID, matchIDs, localteam, visitorteam)
       }
     }
   }
+}
+
+
+
+
+commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
+  redisConnection$HMSET(key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamInfo),
+                        field = names(teamStats), 
+                        value = as.character(teamStats))
+  playerStats <- commentary$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
+  if (nrow(playerStats) > 0) {
+    for (j in 1:nrow(playerStats)) {
+      redisConnection$HMSET(key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
+                            field = names(playerStats), 
+                            value = as.character(playerStats[j, ]))
+    }
+  }  
 }

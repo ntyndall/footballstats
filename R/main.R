@@ -32,14 +32,16 @@
 
 
 everything <- function()  {
-  initialize(location = '~/Desktop/football-project/footballstats/R/', 
-             redisHost = 'localhost',
-             redisPort = 6379, 
-             db = 1)
   
-  # Load competitions and run the functionality below. 
-  # (Figure out competition ID's with a single GET request first!)
-  competitions <- addCompetitionInfo()
+  # Obtain API and sensitive key information
+  KEYS <- sensitive_keys()
+  
+  # Make a connection to redis for storing data
+  redisConnection <- rredis::redisConnect(host = 'localhost', port = 6379)
+  rredis::redisSelect(1)
+
+  # Load competitions and run the functionality below.
+  competitions <- add_comp_info(KEYS = KEYS)
   comps <- jsonlite::fromJSON(seasonIDs)
   
   # Subset the available competitions
@@ -47,7 +49,7 @@ everything <- function()  {
                           '1352', '1425', '1457')
   newCompetitions <- competitions[match(subsetCompetitions, competitions$id), ]
   
-  
+  # Loop over all competitions being analysed
   for (i in 1:nrow(newCompetitions)) {
   
     # Gather all information to be stored in Redis.
@@ -55,7 +57,8 @@ everything <- function()  {
     add_all(redisConnection = redisConnection,
             competitionID = newCompetitions$id[i], 
             updateData = FALSE,
-            seasonStarting = 2017)
+            seasonStarting = 2017,
+            KEYS = KEYS)
     
     # Send predicitons guessed correctly to Slack
     #  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
@@ -66,6 +69,7 @@ everything <- function()  {
                  competitionID = newCompetitions$id[i],
                  competitionName = newCompetitions$name[i],
                  seasonStarting = 2017,
-                 returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'))
+                 returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
+                 KEYS = KEYS)
   }
 }

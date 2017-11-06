@@ -18,8 +18,8 @@
 #'
 
 
-get_data <- function(endpoint, host = HOST, apiKey = API_KEY) {
-  listOfSeasons <- httr::GET(paste0(HOST, endpoint, API_KEY))
+get_data <- function(endpoint, KEYS) {
+  listOfSeasons <- httr::GET(paste0(KEYS$HOST, endpoint, KEYS$API_KEY))
   return(listOfSeasons$status_code %>% 
     purrr::when(. == 200 ~ jsonlite::fromJSON(rawToChar(listOfSeasons$content)), ~ NULL))
 }

@@ -14,9 +14,10 @@
 #'
 
 
-add_comp_standings <- function(competitionID) {
+add_comp_standings <- function(competitionID, KEYS) {
   if (redisConnection$EXISTS(key = 'active') == 0) {
-    standings <- get_data(endpoint = paste0("/standings/", competitionID, "?"))
+    standings <- get_data(endpoint = paste0("/standings/", competitionID, "?"),
+                          KEYS = KEYS)
     check_request_limit()
   } else {
     print(Sys.time(), ' : Run out of requests in addCompetitionStandingInfo()')

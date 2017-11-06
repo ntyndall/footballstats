@@ -16,7 +16,7 @@
 #'
 
 
-add_player_info <- function(competitionID, playerLength, currentSeasonYear) {
+add_player_info <- function(competitionID, playerLength, currentSeasonYear, KEYS) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",
@@ -26,7 +26,8 @@ add_player_info <- function(competitionID, playerLength, currentSeasonYear) {
   sapply(1:playerLength, function(i) {
     if (redisConnection$EXISTS(key = 'active') == 0) {
       playerID <- redisConnection$LPOP(key = 'analysePlayers')
-      playerData <- get_data(endpoint = paste0("/player/", playerID, "?"))
+      playerData <- get_data(endpoint = paste0("/player/", playerID, "?"),
+                             KEYS = KEYS)
       check_request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addPlayerInfo()')

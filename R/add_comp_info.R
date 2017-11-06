@@ -12,10 +12,10 @@
 #'  redis set is created to store the current seasonIDs.
 
 
-add_comp_info <- function() {
+add_comp_info <- function(KEYS) {
   if (redisConnection$EXISTS(key = 'active') == 0) {
     competitionIDs <- get_data(endpoint = "/competitions?",
-                               apiKey = API_KEY)
+                               KEYS = KEYS)
     check_request_limit()
   } else {
     print(Sys.time(), ' : Run out of requests in addCompetitionInfo()')

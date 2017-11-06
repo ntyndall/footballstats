@@ -22,14 +22,15 @@
 
 
 add_all <- function(redisConnection, competitionID, updateData = FALSE, 
-                    seasonStarting) {
+                    seasonStarting, KEYS) {
 
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
   dateTo <- utils_format_dates(standardDateFormat = Sys.Date() - 1)
 
   # Add competition standing
-  add_comp_standings(competition = competitionID)
+  add_comp_standings(competition = competitionID,
+                     KEYS = KEYS)
   
   # Lookup request timings 
   startingRequests <- as.integer(redisConnection$GET(key = 'requestLimit'))
@@ -40,7 +41,8 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
                             dateFrom = dateFrom,
                             dateTo = dateTo,
                             seasonStarting = seasonStarting, 
-                            updateData = updateData)
+                            updateData = updateData,
+                            KEYS = KEYS)
   print(paste0(Sys.time(), ': Matches complete.'))
   
   # Add commentary information
@@ -48,7 +50,8 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
     add_commentary_info(competitionID = competitionID,
                         matchIDs = matches$id,
                         localteam = matches$localteam_id,
-                        visitorteam = matches$visitorteam_id)
+                        visitorteam = matches$visitorteam_id,
+                        KEYS = KEYS)
   }
   print(paste0(Sys.time(), ': Commentary complete.'))
   
@@ -66,7 +69,8 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
   if (teamListLength > 0) {
     add_team_info(competitionID = competitionID,
                   teamListLength = teamListLength,
-                  updateData = updateData)
+                  updateData = updateData,
+                  KEYS = KEYS)
   }
   print(paste0(Sys.time(), ': Teams complete.'))
   
@@ -75,7 +79,8 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
   if (playerLength > 0) {
     add_player_info(competitionID = competitionID,
                     playerLength = playerLength,
-                    currentSeasonYear = seasonStarting)
+                    currentSeasonYear = seasonStarting,
+                    KEYS = KEYS)
   }
   print(paste0(Sys.time(), ': Players complete.'))
   

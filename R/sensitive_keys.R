@@ -1,4 +1,4 @@
-#' @title utils_mock_sensitive
+#' @title sensitive_keys
 #'
 #' @description A function that loads all sensitive information into a 
 #'  global namespace for use throughout the code.
@@ -13,10 +13,8 @@
 #' @return Returns nothing.
 #'
 
-utils_mock_sensitive <- function() {
-  HOST <<- ""
-  API_KEY <<- ""
-  ROOT <<- ""
-  DIR_LOCATION <<- paste0(ROOT, "/R")
-  SLACK <<- ""
+sensitive_keys <- function(fsHost = "", fsApiKey = "", fsSlack = "") {
+  return(list(FS_HOST = fsHost,
+              FS_APIKEY= fsApikey,
+              FS_SLACK = fsSlack))
 }
