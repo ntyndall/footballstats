@@ -33,33 +33,40 @@ classify_all <- function(redisConnection, competitionID, competitionName,
 
   # Query Redis and return everything from the competition. 
   print(paste0(Sys.time(), ' : Recreating match data.'))
-  matchData <- classify_recreate_matchdata(redisConnection = redisConnection, 
-                                           competitionID = competitionID, 
-                                           seasonStarting = seasonStarting,
-                                           matchLimit = matchLimit)
+  matchData <- footballstats::recreate_matchdata(
+    redisConnection = redisConnection, 
+    competitionID = competitionID, 
+    seasonStarting = seasonStarting,
+    matchLimit = matchLimit)
 
   matchData[ , c('localteam_id', 'localteam_name')]
   # Check the keyNames from the current list of commentarys.
-  commentaryKeys <- as.character(redisConnection$KEYS(pattern = paste0('cmt_commentary:', competitionID, '*')))
-  commentaryNames <- classify_available_commentaries(commentaryKeys = commentaryKeys)
+  commentaryKeys <- as.character(redisConnection$KEYS(
+    pattern = paste0('cmt_commentary:', competitionID, '*')))
+  commentaryNames <- footballstats::available_commentaries(
+    commentaryKeys = commentaryKeys)
 
   # Construct data set for building an SVM
   print(paste0(Sys.time(), ' : Creating a dataframe from the match data.'))
-  totalData <- classify_calculate_svm(competitionID = competitionID,
-                                      seasonStarting = seasonStarting,
-                                      commentaryKeys = commentaryKeys,
-                                      commentaryNames = commentaryNames,
-                                      matchData = matchData)
+  totalData <- footballstats::calculate_svm(
+    competitionID = competitionID,
+    seasonStarting = seasonStarting,
+    commentaryKeys = commentaryKeys,
+    commentaryNames = commentaryNames,
+    matchData = matchData)
 
   # Get the binning limits
-  binList <- classify_get_bins(totalData = totalData)
+  binList <- footballstats::get_bins(
+    totalData = totalData)
   
   # Map current form to an integer value also.
-  totalData$form <- classify_form_to_int(oldForms = totalData$form)
+  totalData$form <- footballstats::form_to_int(
+    oldForms = totalData$form)
   
   # Map the values from the binList to a number between... -(binNo) <= x <= -1
-  totalData <- classify_bin_intervals(dataSet = totalData,
-                                      binList = binList)
+  totalData <- footballstats::bin_intervals(
+    dataSet = totalData,
+    binList = binList)
 
   # Test the last match data...
   testData <- matchData[(nrow(matchData) - 9):nrow(matchData), ]
@@ -68,23 +75,25 @@ classify_all <- function(redisConnection, competitionID, competitionName,
   # Optimize the SVM by looping through all available variables
   matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
   print(paste0(Sys.time(), ' : Optimizing the SVM Classifier.'))
-  SVMDetails <- classify_optimize_svm(competitionID = competitionID,
-                                      totalData = totalData,
-                                      seasonStarting = seasonStarting,
-                                      testData = testData,
-                                      binList = binList,
-                                      returnItems = commentaryNames,
-                                      matchFieldNames = matchFieldNames,
-                                      testing = TRUE)
+  SVMDetails <- footballstats::optimize_svm(
+    competitionID = competitionID,
+    totalData = totalData,
+    seasonStarting = seasonStarting,
+    testData = testData,
+    binList = binList,
+    returnItems = commentaryNames,
+    matchFieldNames = matchFieldNames,
+    testing = TRUE)
  
   # Predict actual future results
   print(paste0(Sys.time(), ' : Predicting actual upcoming fixtures.'))
-  classify_predict_matches(competitionID = competitionID,
-                           competitionName = competitionName,
-                           seasonStarting = seasonStarting,
-                           returnItems = returnItems,
-                           matchFieldNames = matchFieldNames,
-                           subsetItems = SVMDetails[[2]],
-                           SVMfit = SVMDetails[[1]], 
-                           binList = binList)
+  footballstats::predict_matches(
+    competitionID = competitionID,
+    competitionName = competitionName,
+    seasonStarting = seasonStarting,
+    returnItems = returnItems,
+    matchFieldNames = matchFieldNames,
+    subsetItems = SVMDetails[[2]],
+    SVMfit = SVMDetails[[1]], 
+    binList = binList)
 }

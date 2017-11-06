@@ -1,6 +1,6 @@
 
 
-classify_bin_intervals <- function(dataSet, binList) {
+bin_intervals <- function(dataSet, binList) {
   binNames <- names(binList)
   for (i in 1:length(binList)) {
     singleBin <- binList[[binNames[i]]]
@@ -12,7 +12,7 @@ classify_bin_intervals <- function(dataSet, binList) {
 }
 
 
-classify_get_bins <- function(totalData) {
+get_bins <- function(totalData) {
   # Take integer values and divide into histogram type classes.
   itemsForSVM <- names(totalData)
   itemsForSVM <- subset(itemsForSVM, itemsForSVM != 'res')
@@ -30,7 +30,7 @@ classify_get_bins <- function(totalData) {
     minim <- min(vec)
     maxim <- max(vec)
     diff <- maxim - minim
-    bins <- diff %>% purrr::when(. >= 5 ~ 5, ~ .)
+    bins <- ifelse(diff >= 20, yes = 5, no = diff)
     limits <- seq(minim, maxim, diff/bins)
     return(limits)
   })

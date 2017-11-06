@@ -1,4 +1,4 @@
-#' @title classify_generate_predictions
+#' @title generate_predictions
 #'
 #' @description Another layer which can handle both normal fixture prediction
 #'  and also predicting a test data set with known results.
@@ -21,12 +21,12 @@
 #'
 
 
-classify_generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit, 
-                                          matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
-                                          printToSlack = FALSE) {
+generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit, 
+                                 matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
+                                 printToSlack = FALSE) {
   
   # Set up slack details
-  emojiHash <- classify_emoji()
+  emojiHash <- footballstats::classify_emoji()
 
   # Loop over each fixture
   for (i in 1:nrow(fixtureList)) {
@@ -40,13 +40,14 @@ classify_generate_predictions <- function(competitionID, fixtureList, seasonStar
       purrr::when(.[[1]] %in% .[[2]] ~ .[[2]][-c(which(.[[1]] == .[[2]]))], ~ .[[2]])
     
     # Get home and away statistics
-    fixtureAggregate <- classify_homeaway_stat(competitionID = competitionID, 
-                                               singleFixture = singleFixture, 
-                                               seasonStarting = seasonStarting,
-                                               localVisitor = c('localteam_id', 'visitorteam_id'),
-                                               returnItems = forStatistics,
-                                               matchFieldNames = matchFieldNames,
-                                               testing = testing)
+    fixtureAggregate <- footballstats::homeaway_stats(
+      competitionID = competitionID, 
+      singleFixture = singleFixture, 
+      seasonStarting = seasonStarting,
+      localVisitor = c('localteam_id', 'visitorteam_id'),
+      returnItems = forStatistics,
+      matchFieldNames = matchFieldNames,
+      testing = testing)
 
     # Create the appropriate data structures for the SVM
     predictions <- as.character(sapply(1:2, function(k) {
@@ -54,7 +55,8 @@ classify_generate_predictions <- function(competitionID, fixtureList, seasonStar
       names(singleTeam) <- forStatistics
 
       # Map the current form to an integer based on rules in mapForm~
-      singleTeam$form <- classify_form_to_int(oldForms = fixtureAggregate[[k]][[2]])
+      singleTeam$form <- footballstats::form_to_int(
+        oldForms = fixtureAggregate[[k]][[2]])
     
       # Only look at certain combinations if testing is enabled
         for (i in 1:length(subsetItems)) {
@@ -64,7 +66,7 @@ classify_generate_predictions <- function(competitionID, fixtureList, seasonStar
           singleTeam[[subsetItems[i]]] <- vec
         }
       if (i == 1) { print(singleTeam) }
-      as.character(predict(SVMfit, singleTeam))
+      as.character(stats::predict(SVMfit, singleTeam))
     }))
    
     # Predict scores now
@@ -72,22 +74,27 @@ classify_generate_predictions <- function(competitionID, fixtureList, seasonStar
     pAway <- predictions[2]
 
     # Rules based on wrong outcomes!
-    pHome <- c(pHome, pAway) %>% purrr::when(.[1] == 'D' && .[2] == 'W' ~ 'L', 
-                                             ~ .[1] == 'D' && .[2] == 'L' ~ 'W',
-                                             ~ .[1])
-    pAway <- c(pAway, pHome) %>% purrr::when(.[1] == 'D' && .[2] == 'L' ~ 'W', 
-                                             ~ .[1] == 'D' && .[2] == 'W' ~ 'L',
-                                             ~ .[1])
+    pHome <- c(pHome, pAway) %>% 
+      purrr::when(.[1] == 'D' && .[2] == 'W' ~ 'L', 
+                  .[1] == 'D' && .[2] == 'L' ~ 'W',
+                  .[1])
+    pAway <- c(pAway, pHome) %>% 
+      purrr::when(.[1] == 'D' && .[2] == 'L' ~ 'W', 
+                  .[1] == 'D' && .[2] == 'W' ~ 'L',
+                  .[1])
     
-    if (pHome == pAway) { pHome <- pAway <- 'D' }
+    if (pHome == pAway) { 
+      pHome <- pAway <- 'D' 
+    }
     
     # Take format of [2-1], split, convert and decide on win / lose / draw.
     if (testing) {
       res <- strsplit(singleFixture$ft_score, '')[[1]]
       res <- as.numeric(strsplit(paste(res[c(-1, -length(res))], collapse = ''), '-')[[1]])
-      actual <- res %>% purrr::when(.[1] == .[2] ~ c('D', 'D'),
-                                    .[1] > .[2] ~ c('W', 'L'),
-                                    ~ c('L', 'W'))
+      actual <- res %>% 
+        purrr::when(.[1] == .[2] ~ c('D', 'D'), 
+                    .[1] > .[2] ~ c('W', 'L'),
+                    c('L', 'W'))
       if (actual[1] == pHome && actual[2] == pAway) {
         correct <- correct + 1
       }

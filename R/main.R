@@ -34,7 +34,7 @@
 everything <- function()  {
   
   # Obtain API and sensitive key information
-  KEYS <- sensitive_keys()
+  KEYS <- footballstats::sensitive_keys()
   
   # Make a connection to redis for storing data
   redisConnection <- rredis::redisConnect(host = 'localhost', port = 6379)
@@ -54,22 +54,22 @@ everything <- function()  {
   
     # Gather all information to be stored in Redis.
     print(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (', newCompetitions$name[i], ' - ', newCompetitions$region[i], ').'))
-    add_all(redisConnection = redisConnection,
-            competitionID = newCompetitions$id[i], 
-            updateData = FALSE,
-            seasonStarting = 2017,
-            KEYS = KEYS)
+    footballstats::add_all(redisConnection = redisConnection,
+      competitionID = newCompetitions$id[i], 
+      updateData = FALSE,
+      seasonStarting = 2017,
+      KEYS = KEYS)
     
     # Send predicitons guessed correctly to Slack
     #  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
     #                              competitionName = newCompetitions$name[i])
     
     # Build a classifier with the current match data
-    classify_all(redisConnection = redisConnection,
-                 competitionID = newCompetitions$id[i],
-                 competitionName = newCompetitions$name[i],
-                 seasonStarting = 2017,
-                 returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
-                 KEYS = KEYS)
+    footballstats::classify_all(redisConnection = redisConnection,
+      competitionID = newCompetitions$id[i],
+      competitionName = newCompetitions$name[i],
+      seasonStarting = 2017,
+      returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
+      KEYS = KEYS)
   }
 }

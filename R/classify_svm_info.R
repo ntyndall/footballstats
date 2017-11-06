@@ -1,4 +1,49 @@
-#' @title classify_optimize_svm
+#'
+
+best_svm <- function(totalData) {
+  # Split data into actual data and one similar minus the results
+  newData <- totalData
+  newData$res <- NULL
+  
+  # Create a basic SVM with no tuning
+  fitOne <- e1071::svm(
+    totalData$res ~ ., 
+    data = newData, 
+    type = 'C-classification', 
+    kernel = 'radial')
+
+  predOne = stats::predict(fitOne, newData)
+  firstResults <- table(predOne, totalData$res)
+  
+  # Tune SVM
+  tuningParameters <- e1071::tune(
+    method = svm,
+    train.x = newData, 
+    train.y = as.factor(totalData$res),
+    kernel = 'radial', 
+    ranges = list(cost = 2^(2:9), 
+                  gamma = seq(0.1, 2, 0.1)))
+
+  # Create a new SVM based on tuning parameters
+  fitTwo <- e1071::svm(
+    totalData$res ~ ., 
+    data = newData, 
+    type = 'C-classification', 
+    kernel = 'radial',
+    cost = tuningParameters$best.parameters$cost, 
+    gamma = tuningParameters$best.parameters$gamma)
+
+  predTwo = stats::predict(fitTwo, newData)
+  secondResults <- table(predTwo, totalData$res)
+  
+  # Return the best from normal and fit SVM's
+  return(c(sum(firstResults[c(1, 5, 9)]), 
+           sum(secondResults[c(1, 5, 9)])) %>% 
+             purrr::when(.[1] >= .[2] ~ fitOne, ~ fitTwo))
+}
+
+
+#' @title optimize_svm
 #'
 #' @description A function that loops through all possibilities of the variables
 #'  to be included in the classifier. That means the recent form and results 
@@ -20,9 +65,9 @@
 #'  the best factors to use in the second key.
 
 
-classify_optimize_svm <- function(competitionID, totalData, seasonStarting, testData, matchData, 
-                                  binList, returnItems, matchFieldNames, testing = TRUE) {
-
+optimize_svm <- function(competitionID, totalData, seasonStarting, testData, matchData, 
+                         binList, returnItems, matchFieldNames, testing = TRUE) {
+  
   # Optimize classifier by varying all the possible attributes
   bLLength <- length(binList)
   bestResult <- overtake <- 0
@@ -42,22 +87,24 @@ classify_optimize_svm <- function(competitionID, totalData, seasonStarting, test
         # Delete rows and subset to vary the classification classes
         holdingList[remove] <- NULL
         holdData <- holdData[ , c(names(holdingList), 'res')]
-
+        
         # Build and tune an SVM
-        SVMfit <- classify_best_svm(totalData = holdData)
+        SVMfit <- footballstats::best_svm(
+          totalData = holdData)
         holdData$res <- NULL
         
         # Build and tune an SVM
-        currentResult <- classify_generate_predictions(competitionID = competitionID,
-                                                       fixtureList = testData, 
-                                                       seasonStarting = seasonStarting,
-                                                       testing = testing, 
-                                                       returnItems = returnItems,
-                                                       subsetItems = names(holdingList),
-                                                       SVMfit = SVMfit, 
-                                                       binList = holdingList,
-                                                       matchFieldNames = matchFieldNames)
-
+        currentResult <- footballstats::generate_predictions(
+          competitionID = competitionID,
+          fixtureList = testData, 
+          seasonStarting = seasonStarting,
+          testing = testing, 
+          returnItems = returnItems,
+          subsetItems = names(holdingList),
+          SVMfit = SVMfit, 
+          binList = holdingList,
+          matchFieldNames = matchFieldNames)
+        
         # If the current result is better than assign that to be the new SVM.
         if (currentResult > bestResult) {
           stri <- paste0(paste(rep(' ', (overtake * 3) + 1), collapse = ''), '|_')
@@ -72,3 +119,4 @@ classify_optimize_svm <- function(competitionID, totalData, seasonStarting, test
   }
   return(list(bestSVM, bestFactors))
 }
+
