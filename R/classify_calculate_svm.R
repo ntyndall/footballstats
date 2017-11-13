@@ -36,9 +36,8 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
     names(singleItem) <- commentaryNames
     
     # Get single match information
-    matchInfo <- redisConnection$HGETALL(key = paste0('csm:', competitionID, ':', seasonStarting, ':', matchID))
-    singleMatchInfo <- matchInfo[c(FALSE, TRUE)]
-    names(singleMatchInfo) <- matchInfo[c(TRUE, FALSE)]
+    singleMatchInfo <- rredis::redisHGetAll(
+      key = paste0('csm:', competitionID, ':', seasonStarting, ':', matchID))
 
     # Need to choose which current team is being analysed for each match.
     currentTeam <- singleMatchInfo[as.integer(which(singleMatchInfo == teamID))]

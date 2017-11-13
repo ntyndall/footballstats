@@ -22,11 +22,11 @@
 acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS) {
   
   for (i in 1:length(matchIDs)) {
-    if (redisConnection$EXISTS(key = 'active') == 0) {
+    if (rredis::redisExists(key = 'active')) {
       commentary <- footballstats::get_data(
         endpoint = paste0("/commentaries/", matchIDs[i], "?"),
         KEYS = KEYS)
-      footballstats::check_request_limit()
+      footballstats::request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addCommentaryInfo()')
       commentary <- NULL
@@ -69,10 +69,11 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 
 
 acomp_info <- function(KEYS) {
-  if (redisConnection$EXISTS(key = 'active') == 0) {
-    competitionIDs <- get_data(endpoint = "/competitions?",
-                               KEYS = KEYS)
-    check_request_limit()
+  if (rredis::redisExists(key = 'active')) {
+    competitionIDs <- footballstats::get_data(
+      endpoint = "/competitions?",
+      KEYS = KEYS)
+    footballstats::request_limit()
   } else {
     print(Sys.time(), ' : Run out of requests in addCompetitionInfo()')
   }
@@ -81,8 +82,9 @@ acomp_info <- function(KEYS) {
     total <- 0
     for (i in 1:nrow(competitionIDs)) {
       seasonID <- competitionIDs$id[[i]]
-      compExists <- redisConnection$SADD(key = 'competition:set',
-                                         member = seasonID)
+      compExists <- rredis::redisSAdd(
+        set = 'competition:set',
+        element = seasonID)
       if (compExists == 1) {
         total <- total + 1
       }
@@ -112,10 +114,11 @@ acomp_info <- function(KEYS) {
 
 
 acomp_standings <- function(competitionID, KEYS) {
-  if (redisConnection$EXISTS(key = 'active') == 0) {
-    standings <- get_data(endpoint = paste0("/standings/", competitionID, "?"),
-                          KEYS = KEYS)
-    check_request_limit()
+  if (rredis::redisExists(key = 'active')) {
+    standings <- footballstats::get_data(
+      endpoint = paste0("/standings/", competitionID, "?"),
+      KEYS = KEYS)
+    footballstats::request_limit()
   } else {
     print(Sys.time(), ' : Run out of requests in addCompetitionStandingInfo()')
     standings <- NULL
@@ -124,10 +127,12 @@ acomp_standings <- function(competitionID, KEYS) {
   if (!is.null(standings)) {
     for (i in 1:nrow(standings)) {
       singleTable <- standings[i, ]
-      standingKey <- paste0("comp:season:_standing_:", competitionID,
-                            singleTable$season)
-      redisConnection$HMSET(key = standingKey, field = names(singleTable),
-                            value = as.character(singleTable))
+      standingKey <- paste0(
+        "comp:season:_standing_:", competitionID, singleTable$season)
+      rredis::redisHMSet(
+        key = standingKey,
+        values = singleTable
+      )
     }
   }
 }
@@ -163,13 +168,13 @@ aevent_info <- function(competitionID, matchIDs, matchEvents) {
     if (length(eventsPerMatch) > 0) {
       for (j in 1:nrow(eventsPerMatch)) {
         event <- eventsPerMatch[j, ]
-        inSet <- redisConnection$SADD(
-          key = paste0("c_eventInSet:", competitionID), 
-          member = event$id)
-        if (inSet == 1) {
-          redisConnection$HMSET(
+        inSet <- rredis::redisSAdd(
+          set = paste0("c_eventInSet:", competitionID),
+          element = event$id)
+        if (as.logical(as.integer(inSet))) {
+          rredis::redisHMSet(
             key = paste0("cme:", competitionID, ":", matchID, ":", event$id),
-            field = names(event), value = as.character(event))
+            values = event)
         }
       }
     }
@@ -220,11 +225,12 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
                       "visitorteam_name", "visitorteam_score", "ht_score",
                       "ft_score", "et_score", "penalty_local", "penalty_visitor")
   
-  if (redisConnection$EXISTS(key = 'active') == 0) {
-    matches <- get_data(endpoint = paste0("/matches?comp_id=", competitionID, "&from_date=", dateFrom,
-                                          "&to_date=", dateTo, "&"),
-                        KEYS = KEYS)
-    check_request_limit()
+  if (rredis::redisExists(key = 'active')) {
+    matches <- footballstats::get_data(
+      endpoint = paste0(
+        "/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&"),
+      KEYS = KEYS)
+    footballstats::request_limit()
     
     # If getting todays match information, make sure all matches have actually been played.
     if (analysingToday) {
@@ -244,27 +250,34 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
       
       # Check if team has been added to the set for analysis later.
       # Or if it is ready to be updated after another match has been played.
-      teamInSet <- redisConnection$SADD(key = paste0('c_teamSetInfo:', competitionID),
-                                        member = matchItems$localteam_id)
+      teamInSet <- rredis::redisSAdd(
+        set = paste0('c_teamSetInfo:', competitionID),
+        element = matchItems$localteam_id)
       
-      if (teamInSet || updateData) {
-        redisConnection$LPUSH(key = 'analyseTeams', 
-                              value = matchItems$localteam_id)
+      if (as.logical(as.integer(teamInSet)) || updateData) {
+        rredis::redisLPush(
+          key = 'analyseTeams', 
+          value = matchItems$localteam_id)
       }
       
       # Check if match belongs to set
-      matchInSet <- redisConnection$SADD(key = paste0('c_matchSetInfo:', competitionID),
-                                         member = matchItems$id)
+      matchInSet <- rredis::redisSAdd(
+        set = paste0('c_matchSetInfo:', competitionID),
+        element = matchItems$id)
       
-      if (matchInSet) {
-        matchKey <- paste0("csm:", matchItems$comp_id, ":", 
-                           seasonStarting, ":", matchItems$id)
-        redisConnection$HMSET(key = matchKey, field = names(matchItems), 
-                              value = as.character(matchItems))
+      if (as.logical(as.integer(matchInSet))) {
+        matchKey <- paste0(
+          "csm:", matchItems$comp_id, ":", 
+          seasonStarting, ":", matchItems$id)
+
+        rredis::redisHMSet(
+          key = matchKey, 
+          values = matchItems)
         
-        if (redisConnection$EXISTS(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
-          redisConnection$SADD(key = paste0('c:', competitionID, ':ready'),
-                               member = matchItems$id)
+        if (rredis::redisExists(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
+          rredis::redisSAdd(
+            set = paste0('c:', competitionID, ':ready'),
+            element = matchItems$id)
         }
       }
     }
@@ -298,14 +311,16 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear, KEYS) {
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",
                       "birthplace", "position", "height", "weight")
-  
+
   progressBar <- txtProgressBar(min = 0, max = playerLength, style = 3)
   sapply(1:playerLength, function(i) {
-    if (redisConnection$EXISTS(key = 'active') == 0) {
-      playerID <- redisConnection$LPOP(key = 'analysePlayers')
-      playerData <- get_data(endpoint = paste0("/player/", playerID, "?"),
-                             KEYS = KEYS)
-      check_request_limit()
+    if (rredis::redisExists(key = 'active')) {
+      playerID <- rredis::redisLPop(
+        key = 'analysePlayers')
+      playerData <- footballstats::get_data(
+        endpoint = paste0("/player/", playerID, "?"),
+        KEYS = KEYS)
+      footballstats::request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addPlayerInfo()')
       playerData <- NULL
@@ -328,11 +343,12 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear, KEYS) {
             }
             
             if (seasonInt == currentSeasonYear) {
-              statKeyName <- paste0('ctps_', statNames[j], ':', currentStat$league_id, ':',
-                                    currentStat$id, ':', playerData$id, ':', season)
-              redisConnection$HMSET(key = statKeyName, 
-                                    field = names(currentStat),
-                                    value = as.character(currentStat))
+              statKeyName <- paste0(
+                'ctps_', statNames[j], ':', currentStat$league_id, ':',
+                currentStat$id, ':', playerData$id, ':', season)
+              rredis::redisHMSet(
+                key = statKeyName, 
+                values = currentStat)
             }
           })
         }
@@ -380,11 +396,13 @@ ateam_info <- function(competitionID, teamListLength, updateData, KEYS) {
                       "venue_capacity", "coach_name", "coach_id")
   
   for (i in 1:teamListLength) {
-    if (redisConnection$EXISTS(key = 'active') == 0) {
-      teamID <- redisConnection$LPOP(key = 'analyseTeams')
-      teamData <- get_data(endpoint = paste0( "/team/", teamID, "?"),
-                           KEYS = KEYS)
-      check_request_limit()
+    if (rredis::redisExists(key = 'active')) {
+      teamID <- rredis::redisLPop(
+        key = 'analyseTeams')
+      teamData <- footballstats::get_data(
+        endpoint = paste0( "/team/", teamID, "?"),
+        KEYS = KEYS)
+      footballstats::request_limit()
     } else {
       print(Sys.time(), ' : Run out of requests in addTeamInfo()')
       teamData <- NULL
@@ -396,46 +414,50 @@ ateam_info <- function(competitionID, teamListLength, updateData, KEYS) {
       squad <- paste0("ctp:", competitionID, ":", teamData$team_id)
       
       basicData <- teamData[valuesToRetain]
-      redisConnection$HMSET(key = basic, field = names(basicData), 
-                            value = as.character(basicData))
+      rredis::redisHMSet(
+        key = basic, 
+        values = basicData)
       
       squadInfo <- teamData$squad
       if (length(squadInfo) > 0) {
         for (k in 1:nrow(squadInfo)) {
           playerID <- squadInfo$id[k]
           squadPlayer <- paste0(squad, ":", playerID)
-          redisConnection$HMSET(key = squadPlayer, field = names(squadInfo[k, ]), 
-                                value = as.character(squadInfo[k, ]))
+          rredis::redisHMSet(
+            key = squadPlayer, 
+            values = squadInfo[k, ])
           
           # Check if player has been added to the set for analysis later.
           # Or if it is ready to be updated after another match has been played.
-          newPlayers <- redisConnection$SADD(key = paste0('c_playerSetInfo'),
-                                             member = playerID)
+          newPlayers <- rredis::redisSAdd(
+            set = paste0('c_playerSetInfo'),
+            element = playerID)
           
-          if (newPlayers == 1 || updateData) {
-            redisConnection$LPUSH(key = 'analysePlayers', value = playerID)
+          if (as.logical(as.integer(newPlayers)) || updateData) {
+            rredis::redisLPush(
+              key = 'analysePlayers', 
+              value = playerID)
           }
         }
       }
-      redisConnection$HMSET(key = stats, 
-                            field = names(teamData$statistics), 
-                            value = as.character(teamData$statistics))
+      rredis::redisHMSet(
+        key = stats, 
+        values = teamData$statistics)
     }
   }
 }
 
 commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
-  redisConnection$HMSET(
+  rredis::redisHMSet(
     key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamInfo),
-    field = names(teamStats), 
-    value = as.character(teamStats))
-  playerStats <- commentary$player %>% purrr::when(is.null(.) ~ data.frame(), ~ .)
+    values = teamStats)
+  playerStats <- commentary$player %>% 
+    purrr::when(is.null(.) ~ data.frame(), ~ .)
   if (nrow(playerStats) > 0) {
     for (j in 1:nrow(playerStats)) {
-      redisConnection$HMSET(
+      rredis::redisHMSet(
         key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
-        field = names(playerStats), 
-        value = as.character(playerStats[j, ]))
+        values = playerStats)
     }
   }  
 }

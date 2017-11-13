@@ -13,8 +13,9 @@
 #' @return Returns nothing.
 #'
 
+
 sensitive_keys <- function() {
-  print('Loading global environment variables...')
+  print(paste0(Sys.time(), ' : Loading global environment variables...'))
   fsHost <- Sys.getenv("FS_HOST")
   fsApikey <- Sys.getenv("FS_APIKEY")
   fsSlack <- Sys.getenv("FS_SLACK")
@@ -72,15 +73,20 @@ format_dates <- function(standardDateFormat) {
 #'
 
 
-check_request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
+request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
   
-  requestCount <- as.integer(redisConnection$INCR(key = "requestLimit"))
+  requestCount <- as.integer(rredis::redisIncr(
+    key = "requestLimit"))
   if (requestCount == 1) {
-    redisConnection$EXPIRE(key = "requestLimit", seconds = timePeriod - 1 )
+    rredis::redisExpire(
+      key = "requestLimit", 
+      seconds = timePeriod - 1 )
   } else {
     if (requestCount > requestsAllowed - 100) {
       print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for one hour.'))
-      redisConnection$SET(key = 'requestLimit', value = 0)
+      rredis::redisSet(
+        key = 'requestLimit', 
+        value = 0)
       Sys.sleep(60 * 60)
     }
   }

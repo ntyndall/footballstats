@@ -16,11 +16,13 @@
 #' 
 
 
-recreate_matchdata <- function(redisConnection, competitionID, seasonStarting, matchLimit) {
-  allMatches <- redisConnection$KEYS(pattern = paste0('csm:', competitionID, ':', seasonStarting, '*'))
+recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
+  allMatches <- rredis::redisKeys(
+    pattern = paste0('csm:', competitionID, ':', seasonStarting, '*'))
   matchData <- data.frame(stringsAsFactors = FALSE)
   for (i in 1:length(allMatches)) {
-    singleMatch <- redisConnection$HGETALL(key = allMatches[i])
+    singleMatch <- rredis::redisHGetAll(
+      key = allMatches[i])
     singleMatch <- as.character(singleMatch)
     
     matchID <- data.frame(t(singleMatch[c(FALSE, TRUE)]),
@@ -49,9 +51,10 @@ recreate_matchdata <- function(redisConnection, competitionID, seasonStarting, m
 available_commentaries <- function(commentaryKeys, excludeNames = c('table_id')) {
   allAvailable <- c()
    for (x in 1:length(commentaryKeys)) {
-    results <- as.character(redisConnection$HGETALL(key = commentaryKeys[x]))
-    cNames <- results[c(TRUE, FALSE)]
-    cValues <- results[c(FALSE, TRUE)]
+    results <- rredis::redisHGetAll(
+      key = commentaryKeys[x])
+    cNames <- names(results)
+    cValues <- as.character(results)
     empties <- cValues == ""
     
     # Remove any empty string fields
@@ -96,7 +99,8 @@ homeaway_stats <- function(competitionID, singleFixture, seasonStarting,
   fixtureAggregate <- lapply(1:2, function(j) {
     # Decide to analyse home team and then away team
     teamID <- singleFixture[[localVisitor[j]]]
-    commentary <- as.character(redisConnection$KEYS(pattern = paste0('cmt_commentary:', competitionID, ':*', teamID)))
+    commentary <- as.character(rredis::redisKeys(
+      pattern = paste0('cmt_commentary:', competitionID, ':*', teamID)))
     
     
     # For testing only: Don't include the very last commentary!
@@ -160,8 +164,9 @@ commentary_stats <- function(commentary, returnItems) {
 
 
 commentary_from_redis <- function(keyName, returnItems) {
-  results <- redisConnection$HMGET(key = keyName, 
-                                   field = returnItems)
+  results <- rredis::redisHMGet(
+    key = keyName, 
+    fields = returnItems)
   
   names(results) <- returnItems
   if ("possesiontime" %in% returnItems) {

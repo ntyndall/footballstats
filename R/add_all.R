@@ -21,7 +21,7 @@
 #'
 
 
-add_all <- function(redisConnection, competitionID, updateData = FALSE, 
+add_all <- function(competitionID, updateData = FALSE, 
                     seasonStarting, KEYS) {
 
   # Begin finding match information
@@ -35,8 +35,10 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
     KEYS = KEYS)
   
   # Lookup request timings 
-  startingRequests <- as.integer(redisConnection$GET(key = 'requestLimit'))
-  startingTime <- redisConnection$TTL(key = 'requestLimit')
+  startingRequests <- as.integer(rredis::redisGet(
+    key = 'requestLimit'))
+  startingTime <- rredis::redisTTL(
+    key = 'requestLimit')
  
   # Add match information
   matches <- footballstats::amatch_info(
@@ -70,7 +72,9 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ': Events complete.'))
   
   # Add team information
-  teamListLength <- redisConnection$LLEN(key = 'analyseTeams')
+  teamListLength <- rredis::redisLLen(
+    key = 'analyseTeams')
+
   if (teamListLength > 0) {
     footballstats::ateam_info(
       competitionID = competitionID,
@@ -81,7 +85,9 @@ add_all <- function(redisConnection, competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ': Teams complete.'))
   
   # Add player information
-  playerLength <- redisConnection$LLEN(key = 'analysePlayers')
+  playerLength <- as.integer(rredis::redisLLen(
+    key = 'analysePlayers'))
+
   if (playerLength > 0) {
     footballstats::aplayer_info(
       competitionID = competitionID,

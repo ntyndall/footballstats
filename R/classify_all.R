@@ -17,7 +17,6 @@
 #'                  mapFormToInteger() }
 #'   5) predictFutureMatches() -> formatDates() -> getGeneralData() ->  { classify_generate_predictions() -> ... }
 #'
-#' @param redisConnection
 #' @param competitionID
 #' @param seasonStarting
 #' @param returnItems
@@ -28,20 +27,19 @@
 
 
 
-classify_all <- function(redisConnection, competitionID, competitionName, 
+classify_all <- function(competitionID, competitionName, 
                          seasonStarting, returnItems, matchLimit = 150) {
 
   # Query Redis and return everything from the competition. 
   print(paste0(Sys.time(), ' : Recreating match data.'))
   matchData <- footballstats::recreate_matchdata(
-    redisConnection = redisConnection, 
     competitionID = competitionID, 
     seasonStarting = seasonStarting,
     matchLimit = matchLimit)
 
   matchData[ , c('localteam_id', 'localteam_name')]
   # Check the keyNames from the current list of commentarys.
-  commentaryKeys <- as.character(redisConnection$KEYS(
+  commentaryKeys <- as.character(rredis::redisKeys(
     pattern = paste0('cmt_commentary:', competitionID, '*')))
   commentaryNames <- footballstats::available_commentaries(
     commentaryKeys = commentaryKeys)

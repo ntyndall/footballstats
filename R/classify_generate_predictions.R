@@ -115,17 +115,33 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
     #cat(paste0(Sys.time(), ' : ', txt, '\n'))
     
     # When making a prediction - store the guess for later
-    redisConnection$HMSET(key = paste0('c:', competitionID, ':pred:', singleFixture$id), 
-                          field = c('home', 'away'),
-                          value = c(pHome, pAway))
+    rredis::redisHMSet(
+      key = paste0('c:', competitionID, ':pred:', singleFixture$id), 
+      values = list(home = pHome, away = pAway))
     Sys.sleep(1)
   }
   
   if (printToSlack) {
-    slackr::slackrSetup(channel = '#results', api_token = SLACK)
-    firstMsg <- paste0(':soccer: _Reporting on results for week ', fixtureList$week[1], ' (', competitionName, ')_ :soccer: ')
-    slackr::slackr_msg(txt = firstMsg, channel = '#results', api_token = SLACK, username = 'predictions')
-    slackr::slackr_msg(txt = totalTxt, channel = '#results', api_token = SLACK, username = 'predictions')
+    slackr::slackrSetup(
+      channel = '#results', 
+      api_token = SLACK)
+
+    firstMsg <- paste0(
+      ':soccer: _Reporting on results for week ', 
+      fixtureList$week[1], ' (', competitionName, 
+      ')_ :soccer: ')
+
+    slackr::slackr_msg(
+      txt = firstMsg, 
+      channel = '#results', 
+      api_token = SLACK, 
+      username = 'predictions')
+
+    slackr::slackr_msg(
+      txt = totalTxt, 
+      channel = '#results', 
+      api_token = SLACK, 
+      username = 'predictions')
   }
   return(correct)
 }
