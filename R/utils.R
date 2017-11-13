@@ -19,12 +19,32 @@ sensitive_keys <- function() {
   fsHost <- Sys.getenv("FS_HOST")
   fsApikey <- Sys.getenv("FS_APIKEY")
   fsSlack <- Sys.getenv("FS_SLACK")
+  prof <- footballstats::possible_env()
   
-  return(list(FS_HOST = fsHost,
-              FS_APIKEY= fsApikey,
-              FS_SLACK = fsSlack))
+  if (any(nchar(c(fsHost, fsApikey, fsSlack)) < 1)) {
+    stop(paste0('Halting - please set environment variables for `FS_HOST`, `FS_APIKEY`, and `FS_SLACK`.', 
+                '\n Possible locations include :: \n ',
+                paste(' -->', prof, collapse = '\n '),
+                '\n\n Current values are : \n',
+                paste0('FS_HOST = ', fsHost, '\n'),
+                paste0('FS_APIKEY = ', fsApikey, '\n'),
+                paste0('FS_SLACK = ', fsSlack, '\n')))
+  } else {
+    return(list(FS_HOST = fsHost,
+                FS_APIKEY= fsApikey,
+                FS_SLACK = fsSlack))
+  }
 }
 
+
+possible_env <- function() {
+  return(Filter(function(f) nchar(f) > 0, c(
+    Sys.getenv("R_PROFILE"),
+    file.path(Sys.getenv("R_HOME"), "etc", "Rprofile.site"),
+    Sys.getenv("R_PROFILE_USER"),
+    file.path(getwd(), ".Rprofile"))))
+  
+}
 
 time_intervals <- function() {
   lastMatchTime <- redis$GET(key = 'match:lastInterval')
