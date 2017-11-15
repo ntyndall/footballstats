@@ -1,6 +1,7 @@
 library(testthat)
 library(footballstats)
 library(covr)
+library(purrr)
 
 #test_check("footballstats")
 
