@@ -19,7 +19,8 @@
 #'
 
 
-acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS) {
+acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS,
+                             bypass = FALSE) {
   
   for (i in 1:length(matchIDs)) {
     if (rredis::redisExists(key = 'active')) {
@@ -68,7 +69,7 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 #'  redis set is created to store the current seasonIDs.
 
 
-acomp_info <- function(KEYS) {
+acomp_info <- function(KEYS, bypass = FALSE) {
   if (rredis::redisExists(key = 'active')) {
     competitionIDs <- footballstats::get_data(
       endpoint = "/competitions?",
@@ -113,7 +114,7 @@ acomp_info <- function(KEYS) {
 #'
 
 
-acomp_standings <- function(competitionID, KEYS) {
+acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
   if (rredis::redisExists(key = 'active')) {
     standings <- footballstats::get_data(
       endpoint = paste0("/standings/", competitionID, "?"),
@@ -161,7 +162,7 @@ acomp_standings <- function(competitionID, KEYS) {
 #'
 
 
-aevent_info <- function(competitionID, matchIDs, matchEvents) {
+aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
   for (i in 1:length(matchEvents)) {
     eventsPerMatch <- matchEvents[[i]]
     matchID <- matchIDs[i]
@@ -217,7 +218,7 @@ aevent_info <- function(competitionID, matchIDs, matchEvents) {
 
 
 amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateData, 
-                           analysingToday = TRUE, KEYS) {
+                        analysingToday = TRUE, KEYS, bypass = FALSE) {
   valuesToRetain <- c("id", "comp_id", "formatted_date", "season",           
                       "week", "venue", "venue_id", "venue_city",     
                       "status", "timer", "time", "localteam_id",  
@@ -225,12 +226,19 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
                       "visitorteam_name", "visitorteam_score", "ht_score",
                       "ft_score", "et_score", "penalty_local", "penalty_visitor")
   
-  if (rredis::redisExists(key = 'active')) {
+  if (bypass) {
+    ## Load data here
+    data(matchData, package = 'footballstats', envir = .GlobalEnv)
+    matches <- matchData
+  } else {  
     matches <- footballstats::get_data(
       endpoint = paste0(
         "/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&"),
       KEYS = KEYS)
     footballstats::request_limit()
+  }
+
+  if (!is.null(matches)) {
     
     # If getting todays match information, make sure all matches have actually been played.
     if (analysingToday) {
@@ -238,12 +246,8 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
         return(data.frame(stringsAsFactors = FALSE))
       }
     }
-  } else {
-    print(Sys.time(), ' : Run out of requests in addMatchInfo()')
-    matches <- NULL
-  }
-  
-  if (!is.null(matches)) {
+    
+    # Loop over all match data
     for (i in 1:nrow(matches)) {
       single <- matches[i, ]
       matchItems <- single[ ,valuesToRetain] 
@@ -306,7 +310,8 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
 #'
 
 
-aplayer_info <- function(competitionID, playerLength, currentSeasonYear, KEYS) {
+aplayer_info <- function(competitionID, playerLength, currentSeasonYear, 
+                         KEYS, bypass = FALSE) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",
@@ -389,7 +394,8 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear, KEYS) {
 #'
 
 
-ateam_info <- function(competitionID, teamListLength, updateData, KEYS) {
+ateam_info <- function(competitionID, teamListLength, updateData,
+                       KEYS, bypass = FALSE) {
   valuesToRetain <- c("team_id", "is_national", "name", "country",
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",

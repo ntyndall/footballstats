@@ -2,16 +2,20 @@ library(testthat)
 library(footballstats)
 library(covr)
 
-print('get here')
 #test_check("footballstats")
 
-results <- test_dir(path = "testthat",
-                    reporter = "summary")
+# Set global variable to bypass the API calls
+bypass <<- TRUE
 
-rredis::redisConnect(host = 'localhost', port = 6379)
-rredis::redisSelect(1)
-#redisConnection <<- redisMapping()
 
+results <- testthat::test_dir(
+  path = "testthat",
+  reporter = "summary")
+
+rredis::redisConnect(
+  host = 'localhost', 
+  port = 6379)
+rredis::redisSelect(3)
 
 totalError <- 0
 for(i in 1:length(results)) {
