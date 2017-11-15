@@ -1,6 +1,9 @@
 context("test-amatch_info.R")
 
 test_that("Check the keys are as they should be by adding match data", {
+
+  rredis::redisConnect(host = 'localhost', port = 6379)
+  rredis::redisSelect(3)
   
   newMatchData <- footballstats::amatch_info(
     competitionID = 1204, 
