@@ -23,3 +23,4 @@ Imports:
     magrittr
 Suggests:
     covr
+RoxygenNote: 6.0.1
