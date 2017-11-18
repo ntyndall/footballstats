@@ -34,7 +34,7 @@ test_that("Check the keys are as they should be by adding team data", {
   # Check the keys exist
   expect_that( 'ct_basic:1204:9002' %>% rredis::redisExists(), is_true() )
   expect_that( 'ct_stats:1204:9002' %>% rredis::redisExists(), is_true() )
-  expect_that( 'analyseTeams' %>% rredis::redisExists(), is_false() )
+  ## expect_that( 'analyseTeams' %>% rredis::redisExists(), is_false() )
 
   # Check basic statistics
   basicStats <- rredis::redisHGetAll(
