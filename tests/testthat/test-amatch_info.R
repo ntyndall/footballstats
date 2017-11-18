@@ -1,8 +1,10 @@
 context("test-amatch_info.R")
 
 rredis::redisConnect(
-  host = 'localhost', port = 6379)
+  host = 'localhost',
+  port = 6379)
 rredis::redisSelect(3)
+rredis::redisFlushDB()
 
 test_that("Check the keys are as they should be by adding match data", {
 
