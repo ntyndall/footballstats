@@ -417,24 +417,12 @@ ateam_info <- function(competitionID, teamListLength, updateData,
                       "venue_surface", "venue_address", "venue_city",
                       "venue_capacity", "coach_name", "coach_id")
 
-  if (rredis::redisExists(key = 'c_playerSetInfo')) {
-    rredis::redisDelete(
-      key = 'c_playerSetInfo')
-  }
-
-  if (rredis::redisExists(key = 'analysePlayers')) {
-    rredis::redisDelete(
-      key = 'analysePlayers')
-  }
-
   if (bypass) {
     data(teamData, package = 'footballstats', envir = .GlobalEnv)
   }
 
   for (i in 1:teamListLength) {
-    if (bypass) {
-      teamID <- teamData$id[i]
-    } else {
+    if (!bypass) {
       teamID <- rredis::redisLPop(
         key = 'analyseTeams')
       teamData <- footballstats::get_data(
@@ -482,6 +470,18 @@ ateam_info <- function(competitionID, teamListLength, updateData,
         values = teamData$statistics)
     }
   }
+
+  # Remove the keys for the next call to this function
+  if (rredis::redisExists(key = 'c_playerSetInfo')) {
+    rredis::redisDelete(
+      key = 'c_playerSetInfo')
+  }
+
+  if (rredis::redisExists(key = 'analysePlayers')) {
+    rredis::redisDelete(
+      key = 'analysePlayers')
+  }
+
 }
 
 commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
