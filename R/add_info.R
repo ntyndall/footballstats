@@ -23,15 +23,18 @@
 acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS,
                              bypass = FALSE) {
 
+  if (bypass) {
+    data(commentaryData, package = 'footballstats', envir = .GlobalEnv)
+  }
+
   for (i in 1:length(matchIDs)) {
-    if (rredis::redisExists(key = 'active')) {
+    if (bypass) {
+      commentary <- commentaryData[[i]]
+    } else {
       commentary <- footballstats::get_data(
         endpoint = paste0("/commentaries/", matchIDs[i], "?"),
         KEYS = KEYS)
       footballstats::request_limit()
-    } else {
-      print(Sys.time(), ' : Run out of requests in addCommentaryInfo()')
-      commentary <- NULL
     }
 
     localAway <- c('localteam', 'visitorteam')
@@ -71,13 +74,15 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 
 
 acomp_info <- function(KEYS, bypass = FALSE) {
-  if (rredis::redisExists(key = 'active')) {
+
+  if (bypass) {
+    data(compData, package = 'footballstats', envir = .GlobalEnv)
+    competitionIDs <- compData
+  } else {
     competitionIDs <- footballstats::get_data(
       endpoint = "/competitions?",
       KEYS = KEYS)
     footballstats::request_limit()
-  } else {
-    print(Sys.time(), ' : Run out of requests in addCompetitionInfo()')
   }
 
   if (!is.null(competitionIDs)) {
@@ -86,7 +91,7 @@ acomp_info <- function(KEYS, bypass = FALSE) {
       seasonID <- competitionIDs$id[[i]]
       compExists <- rredis::redisSAdd(
         set = 'competition:set',
-        element = seasonID)
+        element = seasonID %>% as.character() %>% charToRaw())
       if (compExists == 1) {
         total <- total + 1
       }
@@ -116,14 +121,15 @@ acomp_info <- function(KEYS, bypass = FALSE) {
 
 
 acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
-  if (rredis::redisExists(key = 'active')) {
+
+  if (bypass) {
+    data(standingData, package = 'footballstats', envir = .GlobalEnv)
+    standings <- standingData
+  } else {
     standings <- footballstats::get_data(
       endpoint = paste0("/standings/", competitionID, "?"),
       KEYS = KEYS)
     footballstats::request_limit()
-  } else {
-    print(Sys.time(), ' : Run out of requests in addCompetitionStandingInfo()')
-    standings <- NULL
   }
 
   if (!is.null(standings)) {
@@ -172,8 +178,10 @@ aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
         event <- eventsPerMatch[j, ]
         inSet <- rredis::redisSAdd(
           set = paste0("c_eventInSet:", competitionID),
-          element = event$id)
-        if (as.logical(as.integer(inSet))) {
+          element = event$id %>% as.character() %>% charToRaw()) %>%
+            as.integer() %>%
+              as.logical()
+        if (inSet) {
           rredis::redisHMSet(
             key = paste0("cme:", competitionID, ":", matchID, ":", event$id),
             values = event)
@@ -229,7 +237,6 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
                       "ft_score", "et_score", "penalty_local", "penalty_visitor")
 
   if (bypass) {
-    ## Load data here
     data(matchData, package = 'footballstats', envir = .GlobalEnv)
     matches <- matchData
   } else {
@@ -258,20 +265,24 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
       # Or if it is ready to be updated after another match has been played.
       teamInSet <- rredis::redisSAdd(
         set = paste0('c_teamSetInfo:', competitionID),
-        element = charToRaw(matchItems$localteam_id))
+        element = matchItems$localteam_id %>% as.character() %>% charToRaw()) %>%
+          as.integer() %>%
+            as.logical()
 
-      if (as.logical(as.integer(teamInSet)) || updateData) {
+      if (teamInSet || updateData) {
         rredis::redisLPush(
           key = 'analyseTeams',
-          value = matchItems$localteam_id)
+          value = matchItems$localteam_id %>% as.character() %>% charToRaw())
       }
 
       # Check if match belongs to set
       matchInSet <- rredis::redisSAdd(
         set = paste0('c_matchSetInfo:', competitionID),
-        element = matchItems$id)
+        element = matchItems$id %>% as.character() %>% charToRaw()) %>%
+          as.integer() %>%
+            as.logical()
 
-      if (as.logical(as.integer(matchInSet))) {
+      if (matchInSet) {
         matchKey <- paste0(
           "csm:", matchItems$comp_id, ":",
           seasonStarting, ":", matchItems$id)
@@ -283,7 +294,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
         if (rredis::redisExists(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
           rredis::redisSAdd(
             set = paste0('c:', competitionID, ':ready'),
-            element = charToRaw(matchItems$id))
+            element = matchItems$id %>% as.character() %>% charToRaw())
         }
       }
     }
@@ -319,18 +330,22 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
                       "birthdate", "age", "birthcountry",
                       "birthplace", "position", "height", "weight")
 
+  if (bypass) {
+    data(playerData, package = 'footballstats', envir = .GlobalEnv)
+  }
+
   progressBar <- txtProgressBar(min = 0, max = playerLength, style = 3)
   sapply(1:playerLength, function(i) {
-    if (rredis::redisExists(key = 'active')) {
+
+    if (bypass) {
+      playerID <- playerData$id[i]
+    } else {
       playerID <- rredis::redisLPop(
         key = 'analysePlayers')
       playerData <- footballstats::get_data(
         endpoint = paste0("/player/", playerID, "?"),
         KEYS = KEYS)
       footballstats::request_limit()
-    } else {
-      print(Sys.time(), ' : Run out of requests in addPlayerInfo()')
-      playerData <- NULL
     }
 
     if (!is.null(playerData)) {
@@ -343,11 +358,10 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
             currentStat <- statData[k, ]
             season <- substr(currentStat$season, 1, 4)
 
-            if (nchar(season) == 4) {
-              seasonInt <- as.integer(season)
-            } else {
-              seasonInt <- 0
-            }
+            seasonInt <- ifelse(
+              test = nchar(season) == 4,
+              yes = season %>% as.integer(),
+              no = 0)
 
             if (seasonInt == currentSeasonYear) {
               statKeyName <- paste0(
@@ -403,17 +417,30 @@ ateam_info <- function(competitionID, teamListLength, updateData,
                       "venue_surface", "venue_address", "venue_city",
                       "venue_capacity", "coach_name", "coach_id")
 
+  if (rredis::redisExists(key = 'c_playerSetInfo')) {
+    rredis::redisDelete(
+      key = 'c_playerSetInfo')
+  }
+
+  if (rredis::redisExists(key = 'analysePlayers')) {
+    rredis::redisDelete(
+      key = 'analysePlayers')
+  }
+
+  if (bypass) {
+    data(teamData, package = 'footballstats', envir = .GlobalEnv)
+  }
+
   for (i in 1:teamListLength) {
-    if (rredis::redisExists(key = 'active')) {
+    if (bypass) {
+      teamID <- teamData$id[i]
+    } else {
       teamID <- rredis::redisLPop(
         key = 'analyseTeams')
       teamData <- footballstats::get_data(
         endpoint = paste0( "/team/", teamID, "?"),
         KEYS = KEYS)
       footballstats::request_limit()
-    } else {
-      print(Sys.time(), ' : Run out of requests in addTeamInfo()')
-      teamData <- NULL
     }
 
     if(!is.null(teamData)) {
@@ -439,12 +466,14 @@ ateam_info <- function(competitionID, teamListLength, updateData,
           # Or if it is ready to be updated after another match has been played.
           newPlayers <- rredis::redisSAdd(
             set = paste0('c_playerSetInfo'),
-            element = playerID)
+            element = playerID %>% as.character() %>% charToRaw()) %>%
+              as.integer() %>%
+                as.logical()
 
-          if (as.logical(as.integer(newPlayers)) || updateData) {
+          if (newPlayers || updateData) {
             rredis::redisLPush(
               key = 'analysePlayers',
-              value = playerID)
+              value = playerID %>% as.character() %>% charToRaw())
           }
         }
       }
