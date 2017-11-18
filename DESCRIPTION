@@ -7,17 +7,20 @@ Depends: R (>= 3.2.3)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-SystemRequirements: libhiredis-dev
 Imports:
     dplyr,
     httr,
     jsonlite,
     stringr,
     testthat,
-    ggplot2,
     rredis,
     slackr,
     purrr,
     e1071,
-    tcltk
-
+    hashmap,
+    shiny,
+    tcltk,
+    magrittr
+Suggests:
+    covr
+RoxygenNote: 6.0.1

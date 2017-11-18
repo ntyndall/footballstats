@@ -1,6 +1,7 @@
 language: r
 cache: packages
 sudo: false
+warnings_are_errors: false
 addons:
    apt:
      packages:
@@ -9,8 +10,14 @@ addons:
        - libhiredis-dev
 services: 
    - redis-server
-script: 
-   - Rscript -e "library(testthat); source('runTests.R')"
+#script: 
+#   - Rscript -e "library(testthat); #source('run_tests.R')"
+
+after_success:
+  - Rscript -e 'covr::codecov()'
 
 notifications:
   slack: ntyndall:ffjQMwuOwDH6BvaNDpDzRO2x
+  email:
+    on_success: change
+    on_failure: change
