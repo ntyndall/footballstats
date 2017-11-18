@@ -25,11 +25,11 @@ test_that("Check the keys are as they should be by adding team data", {
   # Check redis for expected output
   teamIDs <- rredis::redisKeys(
     pattern = 'ctp:*') %>%
-    strsplit(split = ':') %>%
-    purrr::map(4) %>%
-    purrr::flatten_chr() %>%
-    as.integer() %>%
-    sort()
+      strsplit(split = ':') %>%
+        purrr::map(4) %>%
+          purrr::flatten_chr() %>%
+            as.integer() %>%
+              sort()
 
   # Check the keys exist
   expect_that( 'ct_basic:1204:9002' %>% rredis::redisExists(), is_true() )
