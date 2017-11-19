@@ -334,14 +334,14 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
     data(playerData, package = 'footballstats', envir = .GlobalEnv)
   }
 
-  progressBar <- txtProgressBar(min = 0, max = playerLength, style = 3)
+  progressBar <- utils::txtProgressBar(
+    min = 0,
+    max = playerLength,
+    style = 3)
   sapply(1:playerLength, function(i) {
-
-    if (bypass) {
-      playerID <- playerData$id[i]
-    } else {
-      playerID <- rredis::redisLPop(
-        key = 'analysePlayers')
+    playerID <- rredis::redisLPop(
+      key = 'analysePlayers')
+    if (!bypass) {
       playerData <- footballstats::get_data(
         endpoint = paste0("/player/", playerID, "?"),
         KEYS = KEYS)
