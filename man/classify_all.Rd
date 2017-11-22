@@ -5,7 +5,7 @@
 \title{classify_all}
 \usage{
 classify_all(competitionID, competitionName, seasonStarting, returnItems,
-  matchLimit = 150)
+  matchLimit = 150, KEYS)
 }
 \arguments{
 \item{matchLimit}{}

@@ -47,7 +47,7 @@ main <- function()  {
   # Load competitions and run the functionality below.
   competitions <- footballstats::acomp_info(
     KEYS = KEYS)
-  comps <- jsonlite::fromJSON(seasonIDs)
+  #comps <- jsonlite::fromJSON(seasonIDs)
 
   # Subset the available competitions
   subsetCompetitions <- c('1102', '1204', '1205', '1229',

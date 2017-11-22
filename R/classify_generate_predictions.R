@@ -24,7 +24,7 @@
 
 generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit,
                                  matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
-                                 printToSlack = FALSE) {
+                                 printToSlack = FALSE, KEYS) {
 
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
@@ -125,7 +125,7 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
   if (printToSlack) {
     slackr::slackrSetup(
       channel = '#results',
-      api_token = SLACK)
+      api_token = KEYS$FS_SLACK)
 
     firstMsg <- paste0(
       ':soccer: _Reporting on results for week ',
@@ -135,13 +135,13 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
     slackr::slackr_msg(
       txt = firstMsg,
       channel = '#results',
-      api_token = SLACK,
+      api_token = KEYS$FS_SLACK,
       username = 'predictions')
 
     slackr::slackr_msg(
       txt = totalTxt,
       channel = '#results',
-      api_token = SLACK,
+      api_token = KEYS$FS_SLACK,
       username = 'predictions')
   }
   return(correct)

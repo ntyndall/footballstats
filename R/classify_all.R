@@ -30,7 +30,7 @@
 
 
 classify_all <- function(competitionID, competitionName,
-                         seasonStarting, returnItems, matchLimit = 150) {
+                         seasonStarting, returnItems, matchLimit = 150, KEYS) {
 
   # Query Redis and return everything from the competition.
   print(paste0(Sys.time(), ' : Recreating match data.'))
@@ -95,5 +95,6 @@ classify_all <- function(competitionID, competitionName,
     matchFieldNames = matchFieldNames,
     subsetItems = SVMDetails[[2]],
     SVMfit = SVMDetails[[1]],
-    binList = binList)
+    binList = binList,
+    KEYS = KEYS)
 }

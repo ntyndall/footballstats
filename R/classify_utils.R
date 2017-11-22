@@ -24,12 +24,11 @@ recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
   for (i in 1:length(allMatches)) {
     singleMatch <- rredis::redisHGetAll(
       key = allMatches[i])
-    singleMatch <- as.character(singleMatch)
 
-    matchID <- data.frame(t(singleMatch[c(FALSE, TRUE)]),
+    matchID <- data.frame(singleMatch %>% as.character() %>% t(),
                           stringsAsFactors = FALSE)
     matchIDName <- singleMatch[c(TRUE, FALSE)]
-    names(matchID) <- matchIDName
+    names(matchID) <- names(singleMatch)
     matchData <- rbind(matchData, matchID)
   }
   # Re-order the dataframe by date.
@@ -200,7 +199,7 @@ commentary_from_redis <- function(keyName, returnItems) {
 #' @export
 
 
-classify_match_result <- function(scoreCurrent, scoreOther) {
+match_result <- function(scoreCurrent, scoreOther) {
   return(c(scoreCurrent, scoreOther) %>%
            purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L'))
 }

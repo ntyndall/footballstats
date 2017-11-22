@@ -72,8 +72,8 @@ add_all <- function(competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ': Events complete.'))
 
   # Add team information
-  teamListLength <- rredis::redisLLen(
-    key = 'analyseTeams')
+  teamListLength <- as.integer(rredis::redisLLen(
+    key = 'analyseTeams'))
 
   if (teamListLength > 0) {
     footballstats::ateam_info(

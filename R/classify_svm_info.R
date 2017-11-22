@@ -19,7 +19,7 @@ best_svm <- function(totalData) {
 
   # Tune SVM
   tuningParameters <- e1071::tune(
-    method = svm,
+    method = 'svm',
     train.x = newData,
     train.y = as.factor(totalData$res),
     kernel = 'radial',
