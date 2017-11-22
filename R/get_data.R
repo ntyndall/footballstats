@@ -3,8 +3,6 @@
 #' @description A function that generates JSON data from a particular
 #'  endpoint provided to the function as a string.
 #'
-#' @import httr
-#'
 #' @param endpoint A character string that defines the endpoint and parameters
 #'  utilized to gather the data. The endpoint is accessed by concatenating the
 #'  string HOST -> endpoint -> apiKey.
@@ -16,6 +14,7 @@
 #' @return A list of data corresponding to the `endpoint` if status_code == 200
 #' @return Null for an appropriate response if status_code != 200
 #'
+#' @export
 
 
 get_data <- function(endpoint, KEYS) {

@@ -1,6 +1,5 @@
-
-
-
+#'
+#' @export
 
 
 evaluatedPredictionsToSlack <- function(competitionID, competitionName, seasonStarting) {
@@ -11,17 +10,17 @@ evaluatedPredictionsToSlack <- function(competitionID, competitionName, seasonSt
     matchID <- strsplit(x = readyToEvaluate, split = ':')[[4]]
 
     predictResults <- rredis::redisHMGet(
-      key = paste0('c:', competitionID, ':pred:', matchID), 
+      key = paste0('c:', competitionID, ':pred:', matchID),
       fields = c('home', 'away'))
-  
+
     matchKey <- paste0("csm:", competitionID, ":", seasonStarting, ":", matchID)
-   
+
     actualResults <- rredis::redisHMGet(
-      key = matchKey, 
+      key = matchKey,
       fields = c('localteam', '....'))
-    
+
     # Convert actual score to 'L' / 'W' / 'D'
     # ...
   }
-  
+
 }

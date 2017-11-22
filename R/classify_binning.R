@@ -1,4 +1,7 @@
 
+#'
+#' @export
+
 
 bin_intervals <- function(dataSet, binList) {
   binNames <- names(binList)
@@ -11,19 +14,21 @@ bin_intervals <- function(dataSet, binList) {
   return(dataSet)
 }
 
+#'
+#' @export
 
 get_bins <- function(totalData) {
   # Take integer values and divide into histogram type classes.
   itemsForSVM <- names(totalData)
   itemsForSVM <- subset(itemsForSVM, itemsForSVM != 'res')
-  
+
   # Map current form to an integer value also.
   allForms <- strsplit(totalData$form, '')
   totalData$form <- sapply(1:length(allForms), function(x) {
     wld <- allForms[[x]]
     as.integer((sum(wld == "W")*2) + sum(wld == "D"))
   })
-  
+
   # Create endpoints for new grouping
   totalLimits <- lapply(1:length(itemsForSVM), function(i) {
     vec <- totalData[[itemsForSVM[i]]]
@@ -36,5 +41,5 @@ get_bins <- function(totalData) {
   })
   names(totalLimits) <- itemsForSVM
   return(totalLimits)
-  
+
 }

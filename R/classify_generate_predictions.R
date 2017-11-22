@@ -2,7 +2,7 @@
 #'
 #' @description Another layer which can handle both normal fixture prediction
 #'  and also predicting a test data set with known results.
-#'  
+#'
 #' @param fixtureList A data frame containing match localteam vs. visitorteam
 #'  information which CAN include actual results if testing == TRUE.
 #' @param testing A boolean value which decides whether to read the actual result
@@ -19,30 +19,31 @@
 #'
 #' @return The agregated value of `correct`.
 #'
+#' @export
 
 
-generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit, 
+generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit,
                                  matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
                                  printToSlack = FALSE) {
-  
+
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
 
   # Loop over each fixture
   for (i in 1:nrow(fixtureList)) {
     singleFixture <- fixtureList[i, ]
-    
+
     homeName <- singleFixture$localteam_name
     awayName <- singleFixture$visitorteam_name
-    
+
     # Remove form from the item subsetting
-    forStatistics <- list('form', subsetItems) %>% 
+    forStatistics <- list('form', subsetItems) %>%
       purrr::when(.[[1]] %in% .[[2]] ~ .[[2]][-c(which(.[[1]] == .[[2]]))], ~ .[[2]])
-    
+
     # Get home and away statistics
     fixtureAggregate <- footballstats::homeaway_stats(
-      competitionID = competitionID, 
-      singleFixture = singleFixture, 
+      competitionID = competitionID,
+      singleFixture = singleFixture,
       seasonStarting = seasonStarting,
       localVisitor = c('localteam_id', 'visitorteam_id'),
       returnItems = forStatistics,
@@ -57,7 +58,7 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
       # Map the current form to an integer based on rules in mapForm~
       singleTeam$form <- footballstats::form_to_int(
         oldForms = fixtureAggregate[[k]][[2]])
-    
+
       # Only look at certain combinations if testing is enabled
         for (i in 1:length(subsetItems)) {
           vec <- singleTeam[[subsetItems[i]]]
@@ -68,31 +69,31 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
       if (i == 1) { print(singleTeam) }
       as.character(stats::predict(SVMfit, singleTeam))
     }))
-   
+
     # Predict scores now
     pHome <- predictions[1]
     pAway <- predictions[2]
 
     # Rules based on wrong outcomes!
-    pHome <- c(pHome, pAway) %>% 
-      purrr::when(.[1] == 'D' && .[2] == 'W' ~ 'L', 
+    pHome <- c(pHome, pAway) %>%
+      purrr::when(.[1] == 'D' && .[2] == 'W' ~ 'L',
                   .[1] == 'D' && .[2] == 'L' ~ 'W',
                   .[1])
-    pAway <- c(pAway, pHome) %>% 
-      purrr::when(.[1] == 'D' && .[2] == 'L' ~ 'W', 
+    pAway <- c(pAway, pHome) %>%
+      purrr::when(.[1] == 'D' && .[2] == 'L' ~ 'W',
                   .[1] == 'D' && .[2] == 'W' ~ 'L',
                   .[1])
-    
-    if (pHome == pAway) { 
-      pHome <- pAway <- 'D' 
+
+    if (pHome == pAway) {
+      pHome <- pAway <- 'D'
     }
-    
+
     # Take format of [2-1], split, convert and decide on win / lose / draw.
     if (testing) {
       res <- strsplit(singleFixture$ft_score, '')[[1]]
       res <- as.numeric(strsplit(paste(res[c(-1, -length(res))], collapse = ''), '-')[[1]])
-      actual <- res %>% 
-        purrr::when(.[1] == .[2] ~ c('D', 'D'), 
+      actual <- res %>%
+        purrr::when(.[1] == .[2] ~ c('D', 'D'),
                     .[1] > .[2] ~ c('W', 'L'),
                     c('L', 'W'))
       if (actual[1] == pHome && actual[2] == pAway) {
@@ -101,46 +102,46 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
     } else {
       correct <- correct + 1
     }
-    
+
     # Set up emojis from the hash
-    homeEmoji <- emojiHash$find(as.integer(singleFixture$localteam_id)) %>% 
+    homeEmoji <- emojiHash$find(as.integer(singleFixture$localteam_id)) %>%
       purrr::when(is.na(.) ~ ':blank-team:', ~ .)
-    awayEmoji <- emojiHash$find(as.integer(singleFixture$visitorteam_id)) %>% 
+    awayEmoji <- emojiHash$find(as.integer(singleFixture$visitorteam_id)) %>%
       purrr::when(is.na(.) ~ ':blank-team:', ~ .)
-    
+
     # Logs for console and for slack
     txt <- as.character(paste0('[', pHome, '] ', homeName, ' vs. ', awayName, ' [', pAway, ']'))
     txtForSlack <- as.character(paste0(homeEmoji, ' `', txt, '` ', awayEmoji))
     totalTxt <- c(totalTxt, txtForSlack)
     #cat(paste0(Sys.time(), ' : ', txt, '\n'))
-    
+
     # When making a prediction - store the guess for later
     rredis::redisHMSet(
-      key = paste0('c:', competitionID, ':pred:', singleFixture$id), 
+      key = paste0('c:', competitionID, ':pred:', singleFixture$id),
       values = list(home = pHome, away = pAway))
     Sys.sleep(1)
   }
-  
+
   if (printToSlack) {
     slackr::slackrSetup(
-      channel = '#results', 
+      channel = '#results',
       api_token = SLACK)
 
     firstMsg <- paste0(
-      ':soccer: _Reporting on results for week ', 
-      fixtureList$week[1], ' (', competitionName, 
+      ':soccer: _Reporting on results for week ',
+      fixtureList$week[1], ' (', competitionName,
       ')_ :soccer: ')
 
     slackr::slackr_msg(
-      txt = firstMsg, 
-      channel = '#results', 
-      api_token = SLACK, 
+      txt = firstMsg,
+      channel = '#results',
+      api_token = SLACK,
       username = 'predictions')
 
     slackr::slackr_msg(
-      txt = totalTxt, 
-      channel = '#results', 
-      api_token = SLACK, 
+      txt = totalTxt,
+      channel = '#results',
+      api_token = SLACK,
       username = 'predictions')
   }
   return(correct)

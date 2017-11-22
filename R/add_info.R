@@ -71,6 +71,8 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 #'
 #' @return returns nothing, a redis hash is set with season IDs, and a
 #'  redis set is created to store the current seasonIDs.
+#'
+#' @export
 
 
 acomp_info <- function(KEYS, bypass = FALSE) {
@@ -118,6 +120,7 @@ acomp_info <- function(KEYS, bypass = FALSE) {
 #' @return Returns nothing, a redis hash map is set with the competition
 #'  standing information.
 #'
+#' @export
 
 
 acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
@@ -167,6 +170,7 @@ acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
 #' @return Returns nothing, a redis hash map is set with the event information
 #'  and IDs are stored as a redis set.
 #'
+#' @export
 
 
 aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
@@ -321,6 +325,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
 #'
 #' @return Returns nothing. Redis is updated with player information
 #'
+#' @export
 
 
 aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
@@ -408,6 +413,7 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
 #' @return Returns nothing. A Redis hash map is set with the team
 #'  information.
 #'
+#' @export
 
 
 ateam_info <- function(competitionID, teamListLength, updateData,
@@ -483,6 +489,10 @@ ateam_info <- function(competitionID, teamListLength, updateData,
   }
 
 }
+
+#'
+#' @export
+
 
 commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
   rredis::redisHMSet(

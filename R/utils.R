@@ -1,17 +1,18 @@
 #' @title sensitive_keys
 #'
-#' @description A function that loads all sensitive information into a 
+#' @description A function that loads all sensitive information into a
 #'  global namespace for use throughout the code.
-#'  
-#' @details Set up: 
+#'
+#' @details Set up:
 #'  1) Fill in the appropriate sensitive information.
-#'  2) Copy this file to sensitiveInfo.R and rename the 
+#'  2) Copy this file to sensitiveInfo.R and rename the
 #'     function to sensitiveInfo()
 #'
 #' @param None
-#'  
+#'
 #' @return Returns nothing.
 #'
+#' @export
 
 
 sensitive_keys <- function() {
@@ -20,9 +21,9 @@ sensitive_keys <- function() {
   fsApikey <- Sys.getenv("FS_APIKEY")
   fsSlack <- Sys.getenv("FS_SLACK")
   prof <- footballstats::possible_env()
-  
+
   if (any(nchar(c(fsHost, fsApikey, fsSlack)) < 1)) {
-    stop(paste0('Halting - please set environment variables for `FS_HOST`, `FS_APIKEY`, and `FS_SLACK`.', 
+    stop(paste0('Halting - please set environment variables for `FS_HOST`, `FS_APIKEY`, and `FS_SLACK`.',
                 '\n Possible locations include :: \n ',
                 paste(' -->', prof, collapse = '\n '),
                 '\n\n Current values are : \n',
@@ -36,6 +37,9 @@ sensitive_keys <- function() {
   }
 }
 
+#'
+#' @export
+
 
 possible_env <- function() {
   return(Filter(function(f) nchar(f) > 0, c(
@@ -43,8 +47,12 @@ possible_env <- function() {
     file.path(Sys.getenv("R_HOME"), "etc", "Rprofile.site"),
     Sys.getenv("R_PROFILE_USER"),
     file.path(getwd(), ".Rprofile"))))
-  
+
 }
+
+#'
+#' @export
+
 
 time_intervals <- function() {
   lastMatchTime <- redis$GET(key = 'match:lastInterval')
@@ -62,6 +70,9 @@ time_intervals <- function() {
   return(lastMatchTime)
 }
 
+#'
+#' @export
+
 
 format_dates <- function(standardDateFormat) {
   day <- format(x = standardDateFormat, "%d")
@@ -72,40 +83,40 @@ format_dates <- function(standardDateFormat) {
 
 #' @title check_request_limit
 #'
-#' @description A function that stores the number of requests made to the 
+#' @description A function that stores the number of requests made to the
 #'  API within a given time period. The redis key is available through
 #'     ->   requestLimit
-#'  If limit is reached then the code will stall until requests are free 
+#'  If limit is reached then the code will stall until requests are free
 #'  to query the API again successfully.
-#'  
+#'
 #' @details The API is constrained to 1000 request per hour (default), or
-#'  x calls per t time. So this function is checked each time before an 
+#'  x calls per t time. So this function is checked each time before an
 #'  endpoint is hit and waits a given time if no requests are remaining.
 #'
-#' @import rredis
-#' 
+#'
 #' @param requestsAllowed An integer value that defines the number of requests
 #'  that can be made in a given time period.
 #' @param timePeriod An integer value in seconds that defines the time period
 #'  where `requestsAllowed` API calls are allowed.
-#'  
+#'
 #' @return Nothing. Redis is updated with the correct requestLimit values.
 #'
+#' @export
 
 
 request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
-  
+
   requestCount <- as.integer(rredis::redisIncr(
     key = "requestLimit"))
   if (requestCount == 1) {
     rredis::redisExpire(
-      key = "requestLimit", 
+      key = "requestLimit",
       seconds = timePeriod - 1 )
   } else {
     if (requestCount > requestsAllowed - 100) {
       print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for one hour.'))
       rredis::redisSet(
-        key = 'requestLimit', 
+        key = 'requestLimit',
         value = 0)
       Sys.sleep(60 * 60)
     }
