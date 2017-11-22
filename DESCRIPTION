@@ -1,6 +1,6 @@
 Package: footballstats
 Title: Classify and predict football results
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: person("Niall", "Tyndall", email = "ntyndall@gmail.com", role = c("aut", "cre"))
 Description: Classification of football matches
 Depends: R (>= 3.2.3)
