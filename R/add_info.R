@@ -11,7 +11,7 @@
 #'
 #' @param competitionID An integer defining the competitionID that the
 #'  team belongs to.
-#' @param matchIDs An integer character vector of matchIDs that match
+#' @param matchIDs A character vector of matchIDs that match
 #'  the matchEvents.
 #'
 #' @return Returns nothing, a redis hash map is set with the
@@ -500,7 +500,7 @@ commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commenta
     for (j in 1:nrow(playerStats)) {
       rredis::redisHMSet(
         key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
-        values = playerStats)
+        values = playerStats[j, ])
     }
   }
 }
