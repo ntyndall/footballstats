@@ -11,7 +11,7 @@ test_that('test the request limitations can be implemented', {
   allowedRequests <- 200
   timePeriod <- 10
 
-  request_limit(
+  footballstats::request_limit(
     requestsAllowed = allowedRequests,
     timePeriod = timePeriod)
 
@@ -29,7 +29,7 @@ test_that('test the request limitations can be implemented', {
     key = 'requestLimit',
     value = 200 %>% as.character() %>% charToRaw())
 
-  request_limit(
+  footballstats::request_limit(
     requestsAllowed = 210,
     timePeriod = 1)
 
