@@ -12,7 +12,8 @@ test_that("Save competition IDs from /competitions/ into a set", {
   res <- format_dates(standardDateFormat = newDate)
 
   newCompetitions <- footballstats::acomp_info(
-    KEYS = NULL)
+    KEYS = NULL,
+    bypass = TRUE)
 
   expect_that( newCompetitions, is_a('data.frame') )
   expect_that( nrow(newCompetitions), equals(22) )
