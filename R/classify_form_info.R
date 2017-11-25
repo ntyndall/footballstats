@@ -23,6 +23,10 @@ form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0)
 }
 
 
+#' @title Caclulate Form from Match
+#' @export
+
+
 form_from_match <- function(competitionID, matchIDs, seasonStarting, matchFieldNames,
                             teamID, formLimit = 3) {
   formList <- lapply(1:length(matchIDs), function(k) {
@@ -104,7 +108,7 @@ relative_form <- function(matchInfo, totalForm) {
 
 
 team_form <- function(matchData, teamID) {
-  teamID <- as.integer(teamID)
+  teamID <- teamID %>% as.integer()
   teamsResult <- dateOfMatch <- c()
   singleTeam <- matchData[matchData$localteam_id == teamID | matchData$visitorteam_id == teamID, ]
 
@@ -126,8 +130,9 @@ team_form <- function(matchData, teamID) {
                   ~ 'localteam_score')] %>%
       as.integer()
 
-    match_result(scoreCurrent =  scoreCurrent,
-                 scoreOther = scoreOther)
+    footballstats::match_result(
+      scoreCurrent =  scoreCurrent,
+      scoreOther = scoreOther)
   })
   return(list(results, as.integer(singleTeam$formatted_date)))
 }
