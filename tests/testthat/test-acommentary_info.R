@@ -35,7 +35,7 @@ test_that("Send in a single commentary to see it is stored correctly", {
     purrr::flatten_chr() %>%
     unique()
 
-  expect_that( singleMatch, equals(1) )
+  expect_that( singleMatch %>% length(), equals(1) )
 
   checkPlayerExists <- rredis::redisHMGet(
     key = paste0('cmp:1204:', matchID, ':153493'),
