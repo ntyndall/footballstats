@@ -44,5 +44,6 @@ test_that("Convert a simple date to one used by the API", {
   expect_that( components[1], equals('06') )
   expect_that( components[2], equals('11') )
   expect_that( components[3], equals('2017') )
+
 })
 

@@ -30,12 +30,12 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
   for (i in 1:length(matchIDs)) {
     if (bypass) {
       commentary <- commentaryData[[i]]
-    } else {
+    } else {  # nocov start
       commentary <- footballstats::get_data(
         endpoint = paste0("/commentaries/", matchIDs[i], "?"),
         KEYS = KEYS)
       footballstats::request_limit()
-    }
+    }  # nocov end
 
     localAway <- c('localteam', 'visitorteam')
     teamIDs <- c(localteam[i], visitorteam[i])
@@ -69,7 +69,7 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 #'  runs are performed or testing carried out.
 #' @param seasonIDs A list containing seasonIDs...
 #'
-#' @return returns nothing, a redis hash is set with season IDs, and a
+#' @return returns competitionIDs, a redis hash is set with season IDs, and a
 #'  redis set is created to store the current seasonIDs.
 #'
 #' @export
@@ -79,12 +79,12 @@ acomp_info <- function(KEYS, bypass = FALSE) {
 
   if (bypass) {
     competitionIDs <- footballstats::compData
-  } else {
+  } else {  # nocov start
     competitionIDs <- footballstats::get_data(
       endpoint = "/competitions?",
       KEYS = KEYS)
     footballstats::request_limit()
-  }
+  }  # nocov end
 
   if (!is.null(competitionIDs)) {
     total <- 0
@@ -124,12 +124,12 @@ acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
 
   if (bypass) {
     standings <- footballstats::standingData
-  } else {
+  } else {  # nocov start
     standings <- footballstats::get_data(
       endpoint = paste0("/standings/", competitionID, "?"),
       KEYS = KEYS)
     footballstats::request_limit()
-  }
+  }  # nocov end
 
   if (!is.null(standings)) {
     for (i in 1:nrow(standings)) {
@@ -238,13 +238,13 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
 
   if (bypass) {
     matches <- footballstats::matchData
-  } else {
+  } else {  # nocov start
     matches <- footballstats::get_data(
       endpoint = paste0(
         "/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&"),
       KEYS = KEYS)
     footballstats::request_limit()
-  }
+  }  # nocov end
 
   if (!is.null(matches)) {
 
@@ -342,12 +342,12 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
   sapply(1:playerLength, function(i) {
     playerID <- rredis::redisLPop(
       key = 'analysePlayers')
-    if (!bypass) {
+    if (!bypass) {  # nocov start
       playerData <- footballstats::get_data(
         endpoint = paste0("/player/", playerID, "?"),
         KEYS = KEYS)
       footballstats::request_limit()
-    }
+    }  # nocov end
 
     if (!is.null(playerData)) {
       stats <- playerData$player_statistics
@@ -424,14 +424,14 @@ ateam_info <- function(competitionID, teamListLength, updateData,
   }
 
   for (i in 1:teamListLength) {
-    if (!bypass) {
+    if (!bypass) {  # nocov start
       teamID <- rredis::redisLPop(
         key = 'analyseTeams')
       teamData <- footballstats::get_data(
         endpoint = paste0( "/team/", teamID, "?"),
         KEYS = KEYS)
       footballstats::request_limit()
-    }
+    }  # nocov end
 
     if(!is.null(teamData)) {
       basic <- paste0("ct_basic:", competitionID, ":", teamData$team_id)
