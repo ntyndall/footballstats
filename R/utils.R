@@ -117,8 +117,8 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
       print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for one hour.'))
       rredis::redisSet(
         key = 'requestLimit',
-        value = 0)
-      Sys.sleep(60 * 60)
+        value = "0" %>% charToRaw())
+      Sys.sleep(timePeriod)
     }
   }
 }
