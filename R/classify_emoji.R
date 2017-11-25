@@ -1,9 +1,8 @@
-
-#'
+#' @title Emoji's for Slack
 #' @export
 
 
-classify_emoji <- function() {
+classify_emoji <- function() { # nocov start
 
   # England details
   englandOne <- paste0(':premier-',
@@ -78,8 +77,9 @@ classify_emoji <- function() {
                   16994, 17029, 17057, 16980, 17053, 17002, 17097,
                   17027, 16981, 17060, 17068)
 
-  myHash <- hashmap::hashmap(keys = as.integer(c(englandOneIds, englandTwoIds, belgiumIds, greeceIds, portugalIds, germanyIds,
-                                                 russiaIds, turkeyIds)),
-                             values = c(englandOne, englandTwo, belgium, greece, portugal, germany, russia, turkey))
+  myHash <- hashmap::hashmap(
+    keys = as.integer(c(englandOneIds, englandTwoIds, belgiumIds,
+                        greeceIds, portugalIds, germanyIds, russiaIds, turkeyIds)),
+    values = c(englandOne, englandTwo, belgium, greece, portugal, germany, russia, turkey))
   return(myHash)
-}
+} # nocov end

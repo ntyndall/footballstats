@@ -17,7 +17,7 @@
 #' @export
 
 
-get_data <- function(endpoint, KEYS) {
+get_data <- function(endpoint, KEYS) { # nocov start
   listOfSeasons <- httr::GET(
     url = paste0(
       KEYS$FS_HOST, endpoint, KEYS$FS_APIKEY))
@@ -27,4 +27,4 @@ get_data <- function(endpoint, KEYS) {
         rawToChar() %>%
           jsonlite::fromJSON(),
       ~ NULL))
-}
+} # nocov end
