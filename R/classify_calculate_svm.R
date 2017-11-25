@@ -42,12 +42,17 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
 
     # Need to choose which current team is being analysed for each match.
     currentTeam <- singleMatchInfo[as.integer(which(singleMatchInfo == teamID))]
-    scoreCurrent <- as.integer(singleMatchInfo[ifelse(currentTeam == 'localteam_id',
-                                                      yes = 'localteam_score',
-                                                      no = 'visitorteam_score')])
-    scoreOther <-  as.integer(singleMatchInfo[ifelse(currentTeam == 'localteam_id',
-                                                     yes = 'visitorteam_score',
-                                                     no = 'localteam_score')])
+    scoreCurrent <- singleMatchInfo[ifelse(
+      currentTeam == 'localteam_id',
+      yes = 'localteam_score',
+      no = 'visitorteam_score')] %>%
+      as.integer()
+
+    scoreOther <-  singleMatchInfo[ifelse(
+      currentTeam == 'localteam_id',
+      yes = 'visitorteam_score',
+      no = 'localteam_score')] %>%
+      as.integer()
 
     # Get the result of the match whether it was a home or away game
     winLoseDraw <- footballstats::match_result(
@@ -60,9 +65,10 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
       teamID = teamID)
 
     # Create a data frame of forms and dates.
-    totalForm <- data.frame(date = formResults[[2]],
-                            form = formResults[[1]],
-                            stringsAsFactors = FALSE)
+    totalForm <- data.frame(
+      date = formResults[[2]],
+      form = formResults[[1]],
+      stringsAsFactors = FALSE)
 
     # Find out form relative to current date.
     form <- footballstats::relative_form(

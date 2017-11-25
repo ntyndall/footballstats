@@ -2,21 +2,21 @@ library(testthat)
 library(footballstats)
 library(covr)
 library(purrr)
+library(rredis)
 
 #test_check("footballstats")
 
 # Set global variable to bypass the API calls
 bypass <<- TRUE
 
+rredis::redisConnect(
+  host = 'localhost',
+  port = 6379)
+rredis::redisSelect(3)
 
 results <- testthat::test_dir(
   path = "testthat",
   reporter = "summary")
-
-rredis::redisConnect(
-  host = 'localhost', 
-  port = 6379)
-rredis::redisSelect(3)
 
 totalError <- 0
 for(i in 1:length(results)) {
@@ -42,11 +42,10 @@ for(i in 1:length(results)) {
   }
 }
 
-if (totalError > 0) {
-  codeStatus <- 1
-} else {
-  codeStatus <- 0
-}
+codeStatus <- ifelse(
+  test = totalError > 0,
+  yes = 1,
+  no = 0)
 
 quit(save = 'no',
      status = codeStatus,

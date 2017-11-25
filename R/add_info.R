@@ -24,7 +24,7 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
                              bypass = FALSE) {
 
   if (bypass) {
-    data(commentaryData, package = 'footballstats', envir = .GlobalEnv)
+    commentaryData <- footballstats::commentaryData
   }
 
   for (i in 1:length(matchIDs)) {
@@ -78,8 +78,7 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 acomp_info <- function(KEYS, bypass = FALSE) {
 
   if (bypass) {
-    data(compData, package = 'footballstats', envir = .GlobalEnv)
-    competitionIDs <- compData
+    competitionIDs <- footballstats::compData
   } else {
     competitionIDs <- footballstats::get_data(
       endpoint = "/competitions?",
@@ -124,8 +123,7 @@ acomp_info <- function(KEYS, bypass = FALSE) {
 acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
 
   if (bypass) {
-    data(standingData, package = 'footballstats', envir = .GlobalEnv)
-    standings <- standingData
+    standings <- footballstats::standingData
   } else {
     standings <- footballstats::get_data(
       endpoint = paste0("/standings/", competitionID, "?"),
@@ -239,8 +237,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
                       "ft_score", "et_score", "penalty_local", "penalty_visitor")
 
   if (bypass) {
-    data(matchData, package = 'footballstats', envir = .GlobalEnv)
-    matches <- matchData
+    matches <- footballstats::matchData
   } else {
     matches <- footballstats::get_data(
       endpoint = paste0(
@@ -335,7 +332,7 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
                       "birthplace", "position", "height", "weight")
 
   if (bypass) {
-    data(playerData, package = 'footballstats', envir = .GlobalEnv)
+    playerData <- footballstats::playerData
   }
 
   progressBar <- utils::txtProgressBar(
@@ -423,7 +420,7 @@ ateam_info <- function(competitionID, teamListLength, updateData,
                       "venue_capacity", "coach_name", "coach_id")
 
   if (bypass) {
-    data(teamData, package = 'footballstats', envir = .GlobalEnv)
+    teamData <- footballstats::teamData
   }
 
   for (i in 1:teamListLength) {
@@ -489,7 +486,7 @@ ateam_info <- function(competitionID, teamListLength, updateData,
 
 }
 
-#'
+#' @title Commentary Sub-function
 #' @export
 
 

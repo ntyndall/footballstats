@@ -1,10 +1,11 @@
 context("test-utils.R")
 
+rredis::redisFlushDB()
+
 test_that('test the request limitations can be implemented', {
 
   allowedRequests <- 200
   timePeriod <- 10
-
 
   request_limit(
     requestsAllowed = allowedRequests,
