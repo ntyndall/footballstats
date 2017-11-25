@@ -13,7 +13,7 @@ test_that("Send in a single commentary to see it is stored correctly", {
   matches <- footballstats::matchData
   localteam <- matches$localteam_id[1]
   visitorteam <- matches$visitorteam_id[1]
-  matchID <- commentaryData[[1]]$match_id
+  matchID <- commentaryData$match_id
 
 
   footballstats::acommentary_info(
