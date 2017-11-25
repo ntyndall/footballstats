@@ -15,7 +15,7 @@
 #' @export
 
 
-sensitive_keys <- function() {
+sensitive_keys <- function() {  # nocov start
   print(paste0(Sys.time(), ' : Loading global environment variables...'))
   fsHost <- Sys.getenv("FS_HOST")
   fsApikey <- Sys.getenv("FS_APIKEY")
@@ -35,26 +35,26 @@ sensitive_keys <- function() {
                 FS_APIKEY= fsApikey,
                 FS_SLACK = fsSlack))
   }
-}
+}  # nocov end
 
 #'
 #' @export
 
 
-possible_env <- function() {
+possible_env <- function() {  # nocov start
   return(Filter(function(f) nchar(f) > 0, c(
     Sys.getenv("R_PROFILE"),
     file.path(Sys.getenv("R_HOME"), "etc", "Rprofile.site"),
     Sys.getenv("R_PROFILE_USER"),
     file.path(getwd(), ".Rprofile"))))
 
-}
+} # nocov end
 
 #'
 #' @export
 
 
-time_intervals <- function() {
+time_intervals <- function() { # nocov start
   lastMatchTime <- redis$GET(key = 'match:lastInterval')
   if (is.null(lastMatchTime)) {
     lastMatchTime <- Sys.Date() - (365 * 2)
@@ -68,7 +68,7 @@ time_intervals <- function() {
     as.Date(lastMatchTime, origin = "1970-01-01")
   }
   return(lastMatchTime)
-}
+} # nocov end
 
 #'
 #' @export

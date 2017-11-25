@@ -99,8 +99,6 @@ acomp_info <- function(KEYS, bypass = FALSE) {
       }
     }
     print(paste0(Sys.time(), ' : Successfully added ', total, ' new competition IDs to Redis.'))
-    #redisConnection$SET(key = 'competition:waitForNextQuery',
-    #                    value = as.integer(Sys.Date() + daysUntilNextQuery))
     return(competitionIDs)
   }
 }
@@ -295,6 +293,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
           key = matchKey,
           values = matchItems)
 
+        # Push matches that have already been predicted to a set
         if (rredis::redisExists(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
           rredis::redisSAdd(
             set = paste0('c:', competitionID, ':ready'),

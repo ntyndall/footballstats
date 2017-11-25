@@ -50,6 +50,15 @@ add_all <- function(competitionID, updateData = FALSE,
     KEYS = KEYS)
   print(paste0(Sys.time(), ': Matches complete.'))
 
+  # Store predicted vs. real outcomes
+  readyToAnalyseKey <- paste0('c:', competitionID, ':ready')
+  if (rredis::redisExists(key = readyToAnalyseKey)) {
+    footballstats::predict_vs_real(
+      competitionID = competitionID,
+      readyToAnalyseKey = readyToAnalyseKey,
+      matches = matches)
+  }
+
   # Add commentary information
   if (nrow(matches) > 0) {
     footballstats::acommentary_info(
