@@ -176,9 +176,10 @@ commentary_from_redis <- function(keyName, returnItems) {
 
   names(results) <- returnItems
   if ("possesiontime" %in% returnItems) {
-    results$possesiontime <- gsub(pattern = "%",
-                                  replacement = "",
-                                  x = results$possesiontime)
+    results$possesiontime <- gsub(
+      pattern = "%",
+      replacement = "",
+      x = results$possesiontime)
   }
   return(as.double(results))
 }
@@ -201,5 +202,8 @@ commentary_from_redis <- function(keyName, returnItems) {
 
 match_result <- function(scoreCurrent, scoreOther) {
   return(c(scoreCurrent, scoreOther) %>%
-           purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L'))
+           purrr::when(
+             .[1] == .[2] ~ 'D',
+             .[1] > .[2] ~ 'W',
+             'L'))
 }
