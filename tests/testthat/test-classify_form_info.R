@@ -12,3 +12,42 @@ test_that('Calculate score based on vector of forms', {
   expect_that( footballstats::form_to_int(oldForms = 'L'), equals(0) )
 
 })
+
+
+test_that("Send in a single commentary to see it is stored correctly", {
+
+  # Get the match info coupled to the commentary
+  singleMatch <- footballstats::matchData[1, ]
+
+  # The home team as the teamID
+  scoreResults <- footballstats::current_or_other(
+    singleMatch = singleMatch,
+    teamID = singleMatch$localteam_id)
+
+  expect_that( singleMatch$localteam_score %>% as.integer(),
+               equals(scoreResults$current %>% as.integer()) )
+  expect_that( singleMatch$visitorteam_score %>% as.integer(),
+               equals(scoreResults$other %>% as.integer()) )
+
+  # The away team as the teamID
+  scoreResults <- footballstats::current_or_other(
+    singleMatch = singleMatch,
+    teamID = singleMatch$visitorteam_id)
+
+  expect_that( singleMatch$visitorteam_score %>% as.integer(),
+               equals(scoreResults$current %>% as.integer()) )
+  expect_that( singleMatch$localteam_score %>% as.integer(),
+               equals(scoreResults$other %>% as.integer()) )
+
+})
+
+
+test_that("Does the list return a character result of 'W' / 'L' / 'D' ", {
+
+  subFunc <- function(c, o) footballstats::match_result(scoreCurrent = c, scoreOther = o)
+
+  expect_that( subFunc(c = 2, o = 1), equals('W') )
+  expect_that( subFunc(c = 1, o = 1), equals('D') )
+  expect_that( subFunc(c = 0, o = 1), equals('L') )
+
+})
