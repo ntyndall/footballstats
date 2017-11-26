@@ -11,7 +11,7 @@ acommentary_info(competitionID, matchIDs, localteam, visitorteam, KEYS,
 \item{competitionID}{An integer defining the competitionID that the
 team belongs to.}
 
-\item{matchIDs}{An integer character vector of matchIDs that match
+\item{matchIDs}{A character vector of matchIDs that match
 the matchEvents.}
 }
 \value{

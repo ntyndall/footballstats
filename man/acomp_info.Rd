@@ -13,7 +13,7 @@ runs are performed or testing carried out.}
 \item{seasonIDs}{A list containing seasonIDs...}
 }
 \value{
-returns nothing, a redis hash is set with season IDs, and a
+returns competitionIDs, a redis hash is set with season IDs, and a
  redis set is created to store the current seasonIDs.
 }
 \description{
