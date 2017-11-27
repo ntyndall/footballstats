@@ -39,22 +39,22 @@ test_that("Test that match data can be recreated easily.", {
 })
 
 
-test_that("Test that match data can be recreated easily.", {
+test_that("Test that commentary data is sent to Redis.", {
 
   # Recreate the match data that is in redis
-  recreated <- recreate_matchdata(
+  recreated <- footballstats::recreate_matchdata(
     competitionID = competitionID,
     seasonStarting = 2017,
     matchLimit = 1000)
 
   # Choose the right match ID to analyse
-  expect_that( recreated$id[1], equals('2212950') )
+  recreated <- recreated[recreated$id == '2212950', ]
 
-  acommentary_info(
+  footballstats::acommentary_info(
     competitionID = competitionID,
-    matchIDs = recreated$id[1],
-    localteam = recreated$localteam_id[1],
-    visitorteam = recreated$visitorteam_id[1],
+    matchIDs = recreated$id,
+    localteam = recreated$localteam_id,
+    visitorteam = recreated$visitorteam_id,
     KEYS = NULL,
     bypass = TRUE)
 
