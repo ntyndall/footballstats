@@ -105,7 +105,6 @@ homeaway_stats <- function(competitionID, singleFixture, seasonStarting,
     commentary <- as.character(rredis::redisKeys(
       pattern = paste0('cmt_commentary:', competitionID, ':*', teamID)))
 
-
     # For testing only: Don't include the very last commentary!
     if (testing) {
       commentary <- commentary[1:(length(commentary) - 1)]
