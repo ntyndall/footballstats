@@ -51,3 +51,30 @@ test_that("Does the list return a character result of 'W' / 'L' / 'D' ", {
   expect_that( subFunc(c = 0, o = 1), equals('L') )
 
 })
+
+
+test_that("Create team form.", {
+
+  matchData <- footballstats::matchData %>% footballstats::order_matchdata()
+
+  # Choose the first team from the ordered data set
+  teamID <- matchData$localteam_id[2]
+
+  formList <- footballstats::team_form(
+    matchData = matchData,
+    teamID = teamID)
+
+  numMatches <- sum(matchData[matchData$localteam_id == teamID, ] %>% nrow(),
+      matchData[matchData$visitorteam_id == teamID, ] %>% nrow())
+
+  expect_that( numMatches, equals(formList[[1]] %>% length()) )
+  expect_that( numMatches, equals(formList[[2]] %>% length()) )
+  expect_that( formList[[1]] %>% paste(collapse = ''), equals('WDWWLWW') )
+
+  sortedDates <- formList[[2]] %>% sort()
+
+  expect_that( sortedDates[1], equals(17418) )
+  expect_that( sortedDates[numMatches], equals(17467) )
+
+})
+
