@@ -2,6 +2,11 @@ context('test-classify_calculate_svm.R')
 
 competitionID <- 1204
 seasonStarting <- 2017
+rredis::redisConnect(
+  host = 'localhost',
+  port = 6379)
+rredis::redisSelect(3)
+rredis::redisFlushDB()
 
 test_that('Calculate SVM from the test match data', {
 
@@ -34,6 +39,7 @@ test_that('Calculate SVM from the test match data', {
   commentaryNames <- footballstats::available_commentaries(
     commentaryKeys = commentaryKeys)
 
+  print(commentaryNames)
   totalData <- footballstats::calculate_svm(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
