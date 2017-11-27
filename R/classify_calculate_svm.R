@@ -34,7 +34,7 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
 
     # Create single row of information
     singleItem <- data.frame(t(results), stringsAsFactors = FALSE)
-    names(singleItem) <- commentaryNames
+  names(singleItem) <- commentaryNames
 
     # Get single match information
     singleMatchInfo <- rredis::redisHGetAll(

@@ -24,12 +24,12 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
                              bypass = FALSE) {
 
   if (bypass) {
-    commentaryData <- footballstats::commentaryData
+    fullCommentary <- footballstats::fullCommentary
   }
 
   for (i in 1:length(matchIDs)) {
     if (bypass) {
-      commentary <- commentaryData[[i]]
+      commentary <- fullCommentary[[i]]
     } else {  # nocov start
       commentary <- footballstats::get_data(
         endpoint = paste0("/commentaries/", matchIDs[i], "?"),
