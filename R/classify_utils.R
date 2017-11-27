@@ -39,13 +39,22 @@ recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
     print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
   } else if (nrow(matchData) > matchLimit) {
     # Re-order the dataframe by date.
-    matchData$formatted_date <- as.Date(matchData$formatted_date, '%d.%m.%Y')
-    matchData <- matchData[order(matchData$formatted_date), ]
-    matchData <- matchData[1:matchLimit, ]
+    matchData <- footballstats::order_matchdata(
+      matchData = matchData,
+      limit = matchLimit)
   }
   return(matchData)
 }
 
+#' @title Order Match Dataset
+#' @export
+
+
+order_matchdata <- function(matchData, limit = 5000) {
+  matchData$formatted_date <- matchData$formatted_date %>% as.Date('%d.%m.%Y')
+  matchData <- matchData[matchData$formatted_date %>% order(), ]
+  return(matchData[1:limit, ])
+}
 
 #'
 #' @export
