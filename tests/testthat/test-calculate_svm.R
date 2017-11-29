@@ -50,13 +50,13 @@ test_that('Calculate SVM from the test match data', {
   expect_that( totalData %>% names() %>% length(), equals(11) )
   expect_that( totalData$shots_total %>% range(), equals(c(1, 30)) )
   expect_that( totalData$shots_ongoal %>% range(), equals(c(0, 14)) )
-  expect_that( totalData$fouls %>% range(), equals(c(2, 18)) )
+  expect_that( totalData$fouls %>% range(), equals(c(2, 20)) )
   expect_that( totalData$corners %>% range(), equals(c(0, 11)) )
   expect_that( totalData$offsides %>% range(), equals(c(0, 8)) )
-  expect_that( totalData$possesiontime %>% range(), equals(c(21, 79)) )
-  expect_that( totalData$yellowcards %>% range(), equals(c(0, 5)) )
+  expect_that( totalData$possesiontime %>% range(), equals(c(22, 78)) )
+  expect_that( totalData$yellowcards %>% range(), equals(c(0, 4)) )
   expect_that( totalData$redcards %>% range(), equals(c(0, 1)) )
-  expect_that( totalData$saves %>% range(), equals(c(0, 10)) )
+  expect_that( totalData$saves %>% range(), equals(c(0, 9)) )
 
   uniqueResults <- totalData$res %>% unique()
 
