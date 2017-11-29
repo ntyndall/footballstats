@@ -40,6 +40,8 @@ test_that('Calculate SVM from the test match data', {
     commentaryKeys = commentaryKeys)
 
   print(commentaryNames)
+  print(commentaryKeys)
+
   totalData <- footballstats::calculate_svm(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
