@@ -35,9 +35,9 @@ recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
   }
 
   # Only look back at the previous `x` matches.
-  if (nrow(matchData) == 0) {
+  if (`<`(matchData %>% nrow(), 1)) {
     print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
-  } else if (nrow(matchData) > matchLimit) {
+  } else {
     # Re-order the dataframe by date.
     matchData <- footballstats::order_matchdata(
       matchData = matchData,
@@ -51,9 +51,9 @@ recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
 
 
 order_matchdata <- function(matchData, limit = 5000) {
-  matchData$formatted_date <- matchData$formatted_date %>% as.Date('%d.%m.%Y')
+  matchData$formatted_date %<>% as.Date('%d.%m.%Y')
   matchData <- matchData[matchData$formatted_date %>% order(), ]
-  limit <- min(limit, nrow(matchData))
+  limit <- min(limit, matchData %>% nrow())
   return(matchData[1:limit, ])
 }
 

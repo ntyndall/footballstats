@@ -98,7 +98,7 @@ relative_form <- function(matchInfo, totalForm) {
 
 
 team_form <- function(matchData, teamID) {
-  teamID <- teamID %>% as.integer()
+  teamID %<>% as.integer()
   teamsResult <- dateOfMatch <- c()
   singleTeam <- matchData[matchData$localteam_id == teamID | matchData$visitorteam_id == teamID, ]
 
@@ -106,7 +106,7 @@ team_form <- function(matchData, teamID) {
   results <- sapply(1:nrow(singleTeam), function(x) {
     # Need to choose which current team is being analysed for each match.
     scorers <- footballstats::current_or_other(
-      singleMatch = as.list(singleTeam[x, ]),
+      singleMatch = singleTeam[x, ] %>% as.list(),
       teamID = teamID)
 
     # Determine the result of the match for the current team

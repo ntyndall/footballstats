@@ -39,9 +39,6 @@ test_that('Calculate SVM from the test match data', {
   commentaryNames <- footballstats::available_commentaries(
     commentaryKeys = commentaryKeys)
 
-  print(commentaryNames)
-  print(commentaryKeys)
-
   totalData <- footballstats::calculate_svm(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
@@ -49,7 +46,6 @@ test_that('Calculate SVM from the test match data', {
     commentaryNames = commentaryNames,
     matchData = matchData)
 
-  print(head(totalData))
   expect_that( totalData %>% nrow(), equals(80) )
   expect_that( totalData %>% names() %>% length(), equals(11) )
   expect_that( totalData$shots_total %>% range(), equals(c(1, 30)) )

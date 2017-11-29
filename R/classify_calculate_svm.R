@@ -21,7 +21,6 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
                           totalData = data.frame(stringsAsFactors = FALSE)) {
 
   for (i in 1:length(commentaryKeys)) {
-    print('#1')
     # Parse out commentary items and create a single row data frame
     singleCommentary <- commentaryKeys[i]
     elementsSplit <- strsplit(singleCommentary, ':')[[1]]
@@ -33,8 +32,6 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
       keyName = singleCommentary,
       returnItems = commentaryNames)
 
-    print('#2')
-    print(results)
     # Create single row of information
     singleItem <- data.frame(t(results), stringsAsFactors = FALSE)
     names(singleItem) <- commentaryNames
@@ -43,8 +40,6 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
     singleMatchInfo <- rredis::redisHGetAll(
       key = paste0('csm:', competitionID, ':', seasonStarting, ':', matchID))
 
-    print('#3')
-    print(singleMatchInfo)
     # Need to choose which current team is being analysed for each match.
     currentTeam <- singleMatchInfo[as.integer(which(singleMatchInfo == teamID))]
     scoreCurrent <- singleMatchInfo[ifelse(
@@ -53,9 +48,6 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
       no = 'visitorteam_score')] %>%
       as.integer()
 
-    print('#4')
-    print(currentTeam)
-    print(scoreCurrent)
     scoreOther <-  singleMatchInfo[ifelse(
       currentTeam == 'localteam_id',
       yes = 'visitorteam_score',
@@ -67,16 +59,11 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
       scoreCurrent = scoreCurrent,
       scoreOther = scoreOther)
 
-    print('#5')
-    print(winLoseDraw)
-
     # Calculate team form (Don't include if 3 matches don't exist yet!)
     formResults <- footballstats::team_form(
       matchData = matchData,
       teamID = teamID)
 
-    print('#6')
-    print(formResults)
     # Create a data frame of forms and dates.
     totalForm <- data.frame(
       date = formResults[[2]],
@@ -88,8 +75,6 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
       matchInfo = singleMatchInfo,
       totalForm = totalForm)
 
-    print('#7')
-    print(form)
     # Only if the match has seen 3 previous games do we add a row to the totalData frame
     # This keeps the forms consistent to the previous 3 matches!
     if (!is.null(form)) {
