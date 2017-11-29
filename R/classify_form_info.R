@@ -98,7 +98,7 @@ relative_form <- function(matchInfo, totalForm) {
 
 
 team_form <- function(matchData, teamID) {
-  teamID %<>% as.integer()
+  teamID <- teamID %>% as.integer()
   teamsResult <- dateOfMatch <- c()
   singleTeam <- matchData[matchData$localteam_id == teamID | matchData$visitorteam_id == teamID, ]
 
