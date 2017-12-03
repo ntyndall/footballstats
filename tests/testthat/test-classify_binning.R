@@ -13,6 +13,10 @@ test_that('Generate basic binnings for features of totalData', {
 
 test_that('Generate basic binnings for features of totalData', {
 
+  totalData <- footballstats::totalData
+  binList <- footballstats::get_bins(
+    totalData = totalData)
+
   totalData$form <- footballstats::form_to_int(
     oldForms = totalData$form)
 

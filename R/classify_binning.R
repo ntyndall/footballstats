@@ -24,18 +24,18 @@ get_bins <- function(totalData) {
 
   # Map current form to an integer value also.
   allForms <- strsplit(totalData$form, '')
-  sum_form <- function(wld, f, p) `*`(`==`(wld, f) %>% sum(), p)
+  sum_form <- function(wld, f, p) `*`(`==`(wld, f) %>% sum, p)
   totalData$form <- sapply(1:length(allForms), function(x) {
     `+`(sum_form(allForms[[x]], 'W', 2), sum_form(allForms[[x]], 'D', 1)) %>%
-      as.integer()
+      as.integer
   })
 
   # Create endpoints for new grouping
   totalLimits <- lapply(1:length(itemsForSVM), function(i) {
     vec <- totalData[[itemsForSVM[i]]]
-    minim <- vec %>% min()
-    maxim <- vec %>% max()
-    len <- vec %>% unique() %>% length()
+    minim <- vec %>% min
+    maxim <- vec %>% max
+    len <- vec %>% unique %>% length
     diff <- maxim - minim
     bins <- ifelse(len >= 6, yes = 5, no = len)
     limits <- seq(minim, maxim, diff/bins)
