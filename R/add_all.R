@@ -22,7 +22,7 @@
 
 
 add_all <- function(competitionID, updateData = FALSE,
-                    seasonStarting, KEYS) {
+                    seasonStarting, KEYS) { # nocov start
 
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
@@ -115,4 +115,4 @@ add_all <- function(competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ' : Analysed ', teamListLength, ' teams'))
   print(paste0(Sys.time(), ' : Analysed ', playerLength, ' players.'))
   cat('\n')
-}
+} # nocov end
