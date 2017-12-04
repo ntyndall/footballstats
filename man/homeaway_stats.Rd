@@ -2,7 +2,7 @@
 % Please edit documentation in R/classify_utils.R
 \name{homeaway_stats}
 \alias{homeaway_stats}
-\title{classify_homeaway_stat}
+\title{classify_homeaway_stats}
 \usage{
 homeaway_stats(competitionID, singleFixture, seasonStarting, localVisitor,
   returnItems, matchFieldNames, testing)

@@ -9,7 +9,7 @@ predict_vs_real <- function(competitionID, readyToAnalyse, matches) {
     purrr::map(4) %>%
     purrr::flatten_chr()
 
-  readyToAnalyse <- intersect(matches$id, matchIDs)
+  readyToAnalyse <- intersect(matches$id, readyToAnalyse)
   if (!identical(readyToAnalyse, character(0))) {
     readyLen <- readyToAnalyse %>% length
     print(paste0(' Checking off ', readyLen, ' already predicted matches.'))

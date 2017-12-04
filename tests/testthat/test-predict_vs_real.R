@@ -17,10 +17,10 @@ test_that("Test a predicted result can be recorded as true or false.", {
     values = list(home = 'W', away = 'L'))
 
   readyToAnalyse <- paste0(keyType, '*') %>% rredis::redisKeys()
-  predict_vs_real(
+  footballstats::predict_vs_real(
     competitionID = competitionID,
     readyToAnalyse = readyToAnalyse,
-    matches = matchData )
+    matches = matchData)
 
   result <- rredis::redisHGet(
     key = paste0(keyType, matchData$id),
