@@ -2,31 +2,32 @@
 #' @export
 
 
-predict_vs_real <- function(competitionID, readyToAnalyseKey, matches) {
+predict_vs_real <- function(competitionID, readyToAnalyse, matches) {
 
-  matchIDs <- rredis::redisSMembers(
-    set = readyToAnalyseKey
-  ) %>% purrr::flatten_chr()
+  readyToAnalyse <- readyToAnalyse %>%
+    strsplit(split = '[:]') %>%
+    purrr::map(4) %>%
+    purrr::flatten_chr()
 
   readyToAnalyse <- intersect(matches$id, matchIDs)
   if (!identical(readyToAnalyse, character(0))) {
-    print(paste0(' Checking off ', length(readyToAnalyse), ' already predicted matches.'))
+    readyLen <- readyToAnalyse %>% length
+    print(paste0(' Checking off ', readyLen, ' already predicted matches.'))
 
-    for (i in 1:length(readyToAnalyse)) {
+    for (i in 1:readyLen) {
       matchID <- readyToAnalyse[i]
       resultKey <- paste0('c:', competitionID, ':pred:', matchID)
-      predicted <- rredis::redisHGetAll(
-        key = resultKey)
+      predicted <- resultKey %>% rredis::redisHGetAll()
 
-      if (!('prediction' %in% (predicted %>% names()))) {
+      if (!('prediction' %in% (predicted %>% names))) {
 
         # Convert data to something meaningful
-        home <- predicted$home %>% as.character()
-        away <- predicted$away %>% as.character()
+        home <- predicted$home %>% as.character
+        away <- predicted$away %>% as.character
 
         actual <- matches[which(matches$id == matchID), ]
-        hm <- actual$localteam_score %>% as.integer()
-        aw <- actual$visitorteam_score %>% as.integer()
+        hm <- actual$localteam_score %>% as.integer
+        aw <- actual$visitorteam_score %>% as.integer
 
         cond <- function(h, a) {
          return(ifelse(
@@ -36,12 +37,12 @@ predict_vs_real <- function(competitionID, readyToAnalyseKey, matches) {
         }
 
         # Was the prediction correct?
-        if (hm > aw) {
-          correct <- cond(h = 'W', a = 'L')
+        correct <- if (hm > aw) {
+          cond(h = 'W', a = 'L')
         } else if (hm == aw) {
-          correct <- cond(h = 'D', a = 'D')
+          cond(h = 'D', a = 'D')
         } else {
-          correct <- cond(h = 'L', a = 'W')
+          cond(h = 'L', a = 'W')
         }
 
         # Update hash with the results of the prediction

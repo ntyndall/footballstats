@@ -116,9 +116,9 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
 
     # When making a prediction - store the guess for later
     if (real) {
-    rredis::redisHMSet(
-      key = paste0('c:', competitionID, ':pred:', singleFixture$id),
-      values = list(home = pHome, away = pAway))
+      rredis::redisHMSet(
+        key = paste0('c:', competitionID, ':pred:', singleFixture$id),
+        values = list(home = pHome, away = pAway))
     }
     Sys.sleep(1)
   }
