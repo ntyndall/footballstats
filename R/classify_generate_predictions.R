@@ -24,7 +24,7 @@
 
 generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit,
                                  matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
-                                 printToSlack = FALSE, KEYS) {
+                                 printToSlack = FALSE, KEYS, real = FALSE) {
 
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
@@ -116,13 +116,15 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
     #cat(paste0(Sys.time(), ' : ', txt, '\n'))
 
     # When making a prediction - store the guess for later
+    if (real) {
     rredis::redisHMSet(
       key = paste0('c:', competitionID, ':pred:', singleFixture$id),
       values = list(home = pHome, away = pAway))
+    }
     Sys.sleep(1)
   }
 
-  if (printToSlack) {
+  if (printToSlack && real) {
     slackr::slackrSetup(
       channel = '#results',
       api_token = KEYS$FS_SLACK)

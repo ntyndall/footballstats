@@ -90,7 +90,7 @@ available_commentaries <- function(commentaryKeys, excludeNames = c('table_id'))
 }
 
 
-#' @title classify_homeaway_stat
+#' @title classify_homeaway_stats
 #'
 #' @description A function to set up a match performance of two teams which returns
 #'  their current statistics and their form.

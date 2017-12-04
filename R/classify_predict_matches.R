@@ -17,7 +17,7 @@
 
 
 predict_matches <- function(competitionID, competitionName, seasonStarting, returnItems,
-                            matchFieldNames, subsetItems, SVMfit, binList, KEYS) {
+                            matchFieldNames, subsetItems, SVMfit, binList, printToSlack, KEYS) {
 
   # Get from and to dates for future fixtures
   dateFrom <- footballstats::format_dates(
@@ -30,10 +30,14 @@ predict_matches <- function(competitionID, competitionName, seasonStarting, retu
   matchEndpoint <- paste0("/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&")
 
   # Get fixtures
-  fixtureList <- footballstats::get_data(
-    endpoint = matchEndpoint,
-    KEYS = KEYS)
-  cat(paste0(Sys.time(), ' : About to report on results...\n'))
+  if (KEYS %>% is.null) {
+    fixtureList <- footballstats::matchData[60:70, ]
+  } else {
+    fixtureList <- footballstats::get_data(
+      endpoint = matchEndpoint,
+      KEYS = KEYS)
+    cat(paste0(Sys.time(), ' : About to report on results...\n'))
+  }
 
   # Generate predictions based on actual fixtures!
   if (!is.null(fixtureList)) {
@@ -48,8 +52,9 @@ predict_matches <- function(competitionID, competitionName, seasonStarting, retu
       matchFieldNames = matchFieldNames,
       competitionName = competitionName,
       binList = binList,
-      printToSlack = TRUE,
-      KEYS = KEYS)
+      printToSlack = printToSlack,
+      KEYS = KEYS,
+      real = TRUE)
     print(paste0(Sys.time(), ' : Predicted a total of ', numOfPredicted, ' matches.'))
   } else {
     print(paste0(Sys.time(), ' : No upcoming fixture in the next week!'))

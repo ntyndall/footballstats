@@ -33,7 +33,7 @@
 #' @export
 
 
-main <- function() { # nocov start 
+main <- function() { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys()
@@ -76,6 +76,8 @@ main <- function() { # nocov start
       competitionName = newCompetitions$name[i],
       seasonStarting = 2017,
       returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
+      printToSlack = printToSlack,
+      bypass = TRUE,
       KEYS = KEYS)
   }
 } # nocov end
