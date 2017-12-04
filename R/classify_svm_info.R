@@ -70,8 +70,9 @@ best_svm <- function(totalData) {
 
 
 optimize_svm <- function(competitionID, totalData, seasonStarting, testData, matchData,
-                         binList, returnItems, matchFieldNames, testing = TRUE) {
+                         binList, returnItems, matchFieldNames, testing) {
 
+  print(binList)
   # Optimize classifier by varying all the possible attributes
   bLLength <- length(binList)
   bestResult <- overtake <- 0
@@ -90,11 +91,10 @@ optimize_svm <- function(competitionID, totalData, seasonStarting, testData, mat
 
         # Delete rows and subset to vary the classification classes
         holdingList[remove] <- NULL
-        holdData <- holdData[ , c(names(holdingList), 'res')]
+        holdData <- holdData[ ,c(holdingList %>% names, 'res')]
 
         # Build and tune an SVM
-        SVMfit <- footballstats::best_svm(
-          totalData = holdData)
+        SVMfit <- holdData %>% footballstats::best_svm()
         holdData$res <- NULL
 
         # Build and tune an SVM
@@ -102,7 +102,7 @@ optimize_svm <- function(competitionID, totalData, seasonStarting, testData, mat
           competitionID = competitionID,
           fixtureList = testData,
           seasonStarting = seasonStarting,
-          testing = testing,
+          testing = TRUE,
           returnItems = returnItems,
           subsetItems = names(holdingList),
           SVMfit = SVMfit,
@@ -115,7 +115,7 @@ optimize_svm <- function(competitionID, totalData, seasonStarting, testData, mat
           overtake <- overtake + 1
           print(paste0(Sys.time(), ' :', stri, ' New best result - ', currentResult, ' (from ', bestResult, ')'))
           bestResult <- max(currentResult, bestResult)
-          bestFactors <- names(holdingList)
+          bestFactors <- holdingList %>% names
           bestSVM <- SVMfit
         }
       }

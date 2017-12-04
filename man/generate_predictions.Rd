@@ -7,7 +7,7 @@
 generate_predictions(competitionID, fixtureList, seasonStarting, testing,
   returnItems, subsetItems, SVMfit, matchFieldNames, competitionName = "",
   binList = NULL, correct = 0, totalTxt = c(), printToSlack = FALSE,
-  KEYS)
+  KEYS, real = FALSE)
 }
 \arguments{
 \item{fixtureList}{A data frame containing match localteam vs. visitorteam

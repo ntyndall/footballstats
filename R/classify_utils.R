@@ -21,30 +21,41 @@ recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
   allMatches <- rredis::redisKeys(
     pattern = paste0('csm:', competitionID, ':', seasonStarting, '*'))
   matchData <- data.frame(stringsAsFactors = FALSE)
-  for (i in 1:length(allMatches)) {
-    singleMatch <- rredis::redisHGetAll(
-      key = allMatches[i])
+  if (!is.null(allMatches)) {
+    for (i in 1:length(allMatches)) {
+      singleMatch <- rredis::redisHGetAll(
+        key = allMatches[i])
 
-    matchID <- data.frame(singleMatch %>% as.character() %>% t(),
-                          stringsAsFactors = FALSE)
-    matchIDName <- singleMatch[c(TRUE, FALSE)]
-    names(matchID) <- names(singleMatch)
-    matchData <- rbind(matchData, matchID)
+      matchID <- data.frame(singleMatch %>% as.character() %>% t(),
+                            stringsAsFactors = FALSE)
+      matchIDName <- singleMatch[c(TRUE, FALSE)]
+      names(matchID) <- names(singleMatch)
+      matchData <- rbind(matchData, matchID)
+    }
   }
-  # Re-order the dataframe by date.
-  matchData$formatted_date <- as.Date(matchData$formatted_date, '%d.%m.%Y')
-  matchData <- matchData[order(matchData$formatted_date), ]
 
   # Only look back at the previous `x` matches.
-  if (nrow(matchData) == 0) {
+  if (`<`(matchData %>% nrow(), 1)) {
     print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
-    matchData <- data.frame(stringsAsFactors = FALSE)
-  } else if (nrow(matchData) > matchLimit) {
-    matchData <- matchData[1:matchLimit, ]
+  } else {
+    # Re-order the dataframe by date.
+    matchData <- footballstats::order_matchdata(
+      matchData = matchData,
+      limit = matchLimit)
   }
   return(matchData)
 }
 
+#' @title Order Match Dataset
+#' @export
+
+
+order_matchdata <- function(matchData, limit = 5000) {
+  matchData$formatted_date <- matchData$formatted_date %>% as.Date('%d.%m.%Y')
+  matchData <- matchData[matchData$formatted_date %>% order(), ]
+  limit <- min(limit, matchData %>% nrow())
+  return(matchData[1:limit, ])
+}
 
 #'
 #' @export
@@ -54,14 +65,12 @@ available_commentaries <- function(commentaryKeys, excludeNames = c('table_id'))
    for (x in 1:length(commentaryKeys)) {
     results <- rredis::redisHGetAll(
       key = commentaryKeys[x])
-    cNames <- names(results)
-    cValues <- as.character(results)
+    cNames <- results %>% names
+    cValues <- results %>% as.character
     empties <- cValues == ""
 
     # Remove any empty string fields
-    if (any(empties)) {
-      cNames <- cNames[-which(empties)]
-    }
+    cNames <- if (empties %>% any) cNames[-which(empties)] else cNames
 
     # Remove any predefined variables that should never be used
     intersection <- intersect(cNames, excludeNames)
@@ -69,17 +78,13 @@ available_commentaries <- function(commentaryKeys, excludeNames = c('table_id'))
       cNames <- cNames[-match(c(intersection), cNames)]
     }
 
-    if (x == 1) {
-      allAvailable <- cNames
-    } else {
-      allAvailable <- intersect(cNames, allAvailable)
-    }
+    allAvailable <- if (x == 1) cNames else intersect(cNames, allAvailable)
   }
   return(allAvailable)
 }
 
 
-#' @title classify_homeaway_stat
+#' @title classify_homeaway_stats
 #'
 #' @description A function to set up a match performance of two teams which returns
 #'  their current statistics and their form.
@@ -103,7 +108,6 @@ homeaway_stats <- function(competitionID, singleFixture, seasonStarting,
     teamID <- singleFixture[[localVisitor[j]]]
     commentary <- as.character(rredis::redisKeys(
       pattern = paste0('cmt_commentary:', competitionID, ':*', teamID)))
-
 
     # For testing only: Don't include the very last commentary!
     if (testing) {
@@ -174,32 +178,11 @@ commentary_from_redis <- function(keyName, returnItems) {
     key = keyName,
     fields = returnItems)
 
-  names(results) <- returnItems
   if ("possesiontime" %in% returnItems) {
-    results$possesiontime <- gsub(pattern = "%",
-                                  replacement = "",
-                                  x = results$possesiontime)
+    results$possesiontime <- gsub(
+      pattern = "%",
+      replacement = "",
+      x = results$possesiontime)
   }
   return(as.double(results))
-}
-
-#' @title classify_match_result
-#'
-#' @description A function that returns a single character value of
-#'  'W' / 'L' / 'D' depending on the scores and which team scored them.
-#'
-#' @param scoreHome An integer value denoting the home team score.
-#' @param scoreAway An integer value denoting the away team score.
-#' @param homeOrAway A character vector which is either 'localteam_id'
-#'  or 'visitorteam_id', to conduct the correct operation on the two
-#'  score parameters.
-#'
-#' @return Returns one of 'W' / 'L' / 'D'.
-#'
-#' @export
-
-
-match_result <- function(scoreCurrent, scoreOther) {
-  return(c(scoreCurrent, scoreOther) %>%
-           purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L'))
 }

@@ -5,7 +5,7 @@
 \title{classify_predict_matches}
 \usage{
 predict_matches(competitionID, competitionName, seasonStarting, returnItems,
-  matchFieldNames, subsetItems, SVMfit, binList, KEYS)
+  matchFieldNames, subsetItems, SVMfit, binList, printToSlack, KEYS)
 }
 \arguments{
 \item{competitionID}{An integer value denoting the competition ID.}

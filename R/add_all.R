@@ -22,12 +22,11 @@
 
 
 add_all <- function(competitionID, updateData = FALSE,
-                    seasonStarting, KEYS) {
+                    seasonStarting, KEYS) { # nocov start
 
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
-  dateTo <- footballstats::format_dates(
-    standardDateFormat = Sys.Date() - 1)
+  dateTo <- (Sys.Date() - 1) %>% footballstats::format_dates()
 
   # Add competition standing
   footballstats::acomp_standings(
@@ -35,10 +34,8 @@ add_all <- function(competitionID, updateData = FALSE,
     KEYS = KEYS)
 
   # Lookup request timings
-  startingRequests <- as.integer(rredis::redisGet(
-    key = 'requestLimit'))
-  startingTime <- rredis::redisTTL(
-    key = 'requestLimit')
+  startingRequests <- 'requestLimit' %>% rredis::redisGet() %>% as.integer
+  startingTime <- 'requestLimit' %>% rredis::redisTTL()
 
   # Add match information
   matches <- footballstats::amatch_info(
@@ -51,11 +48,11 @@ add_all <- function(competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ': Matches complete.'))
 
   # Store predicted vs. real outcomes
-  readyToAnalyseKey <- paste0('c:', competitionID, ':ready')
-  if (rredis::redisExists(key = readyToAnalyseKey)) {
+  readyToAnalyse <- paste0('c:', competitionID, ':pred:*') %>% rredis::redisKeys()
+  if (!(readyToAnalyse %>% is.null)) {
     footballstats::predict_vs_real(
       competitionID = competitionID,
-      readyToAnalyseKey = readyToAnalyseKey,
+      readyToAnalyseKey = readyToAnalyse,
       matches = matches)
   }
 
@@ -81,8 +78,7 @@ add_all <- function(competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ': Events complete.'))
 
   # Add team information
-  teamListLength <- as.integer(rredis::redisLLen(
-    key = 'analyseTeams'))
+  teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
 
   if (teamListLength > 0) {
     footballstats::ateam_info(
@@ -94,8 +90,7 @@ add_all <- function(competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ': Teams complete.'))
 
   # Add player information
-  playerLength <- as.integer(rredis::redisLLen(
-    key = 'analysePlayers'))
+  playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
 
   if (playerLength > 0) {
     footballstats::aplayer_info(
@@ -115,4 +110,4 @@ add_all <- function(competitionID, updateData = FALSE,
   print(paste0(Sys.time(), ' : Analysed ', teamListLength, ' teams'))
   print(paste0(Sys.time(), ' : Analysed ', playerLength, ' players.'))
   cat('\n')
-}
+} # nocov end

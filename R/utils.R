@@ -114,7 +114,7 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
       seconds = timePeriod - 1 )
   } else {
     if (requestCount > requestsAllowed - 100) {
-      print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for one hour.'))
+      print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for ', timePeriod, ' seconds.'))
       rredis::redisSet(
         key = 'requestLimit',
         value = "0" %>% charToRaw())

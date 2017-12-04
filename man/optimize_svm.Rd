@@ -5,7 +5,7 @@
 \title{optimize_svm}
 \usage{
 optimize_svm(competitionID, totalData, seasonStarting, testData, matchData,
-  binList, returnItems, matchFieldNames, testing = TRUE)
+  binList, returnItems, matchFieldNames, testing)
 }
 \arguments{
 \item{totalData}{A dataframe containing the data used by the classifier with

@@ -4,5 +4,5 @@
 \alias{predict_vs_real}
 \title{Predictions vs Actual Results}
 \usage{
-predict_vs_real(competitionID, readyToAnalyseKey, matches)
+predict_vs_real(competitionID, readyToAnalyse, matches)
 }

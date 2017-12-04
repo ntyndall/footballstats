@@ -36,24 +36,14 @@ form_from_match <- function(competitionID, matchIDs, seasonStarting, matchFieldN
       fields = matchFieldNames)
 
     # Need to choose which current team is being analysed for each match.
-    currentTeam <- matchFieldNames[as.integer(which(singleMatch == teamID))]
-
-    scoreCurrent <- singleMatch[
-      currentTeam %>%
-      purrr::when(. == 'localteam_id' ~ 'localteam_score',
-                  ~ 'visitorteam_score')] %>%
-      as.integer()
-
-    scoreOther <-  singleMatch[
-      currentTeam %>%
-      purrr::when(. == 'localteam_id' ~ 'visitorteam_score',
-                  ~ 'localteam_score')] %>%
-      as.integer()
+    scorers <- footballstats::current_or_other(
+      singleMatch = singleMatch,
+      teamID = teamID)
 
     # Determine the result of the match for the current team
     singleResult <- footballstats::match_result(
-      scoreCurrent = scoreCurrent,
-      scoreOther = scoreOther)
+      scoreCurrent = scorers$current,
+      scoreOther = scorers$other)
     list(singleMatch$formatted_date, singleResult)
   })
 
@@ -114,25 +104,64 @@ team_form <- function(matchData, teamID) {
 
   # Go through each match the team has played
   results <- sapply(1:nrow(singleTeam), function(x) {
-    singleMatch <- as.list(singleTeam[x, ])
+    # Need to choose which current team is being analysed for each match.
+    scorers <- footballstats::current_or_other(
+      singleMatch = singleTeam[x, ] %>% as.list(),
+      teamID = teamID)
 
-    currentTeam <- singleMatch[as.integer(which(singleMatch == as.character(teamID)))]
-
-    scoreCurrent <- singleMatch[
-      currentTeam %>%
-      purrr::when(. == 'localteam_id' ~ 'localteam_score',
-                  ~ 'visitorteam_score')] %>%
-      as.integer()
-
-    scoreOther <- singleMatch[
-      currentTeam %>%
-      purrr::when(. == 'localteam_id' ~ 'visitorteam_score',
-                  ~ 'localteam_score')] %>%
-      as.integer()
-
+    # Determine the result of the match for the current team
     footballstats::match_result(
-      scoreCurrent =  scoreCurrent,
-      scoreOther = scoreOther)
+      scoreCurrent = scorers$current,
+      scoreOther = scorers$other)
   })
   return(list(results, as.integer(singleTeam$formatted_date)))
+}
+
+#' @title Current or Other
+#' @export
+
+
+current_or_other <- function(singleMatch, teamID) {
+  currentTeam <- singleMatch[
+    (singleMatch == teamID %>% as.character()) %>% which()] %>% names()
+
+  scoreCurrent <- singleMatch[
+    currentTeam %>%
+      purrr::when(
+        . == 'localteam_id' ~ 'localteam_score',
+        ~ 'visitorteam_score')] %>%
+    as.integer()
+
+  scoreOther <- singleMatch[
+    currentTeam %>%
+      purrr::when(
+        . == 'localteam_id' ~ 'visitorteam_score',
+        ~ 'localteam_score')] %>%
+    as.integer()
+
+  return(list(current = scoreCurrent, other = scoreOther))
+}
+
+#' @title classify_match_result
+#'
+#' @description A function that returns a single character value of
+#'  'W' / 'L' / 'D' depending on the scores and which team scored them.
+#'
+#' @param scoreHome An integer value denoting the home team score.
+#' @param scoreAway An integer value denoting the away team score.
+#' @param homeOrAway A character vector which is either 'localteam_id'
+#'  or 'visitorteam_id', to conduct the correct operation on the two
+#'  score parameters.
+#'
+#' @return Returns one of 'W' / 'L' / 'D'.
+#'
+#' @export
+
+
+match_result <- function(scoreCurrent, scoreOther) {
+  return(c(scoreCurrent, scoreOther) %>%
+           purrr::when(
+             .[1] == .[2] ~ 'D',
+             .[1] > .[2] ~ 'W',
+             'L'))
 }

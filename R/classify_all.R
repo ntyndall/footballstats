@@ -29,8 +29,9 @@
 
 
 
-classify_all <- function(competitionID, competitionName,
-                         seasonStarting, returnItems, matchLimit = 150, KEYS) {
+classify_all <- function(competitionID, competitionName, seasonStarting,
+                         returnItems, matchLimit = 150, testing = FALSE,
+                         printToSlack, KEYS) {
 
   # Query Redis and return everything from the competition.
   print(paste0(Sys.time(), ' : Recreating match data.'))
@@ -55,13 +56,14 @@ classify_all <- function(competitionID, competitionName,
     commentaryNames = commentaryNames,
     matchData = matchData)
 
+  # Subset for return Items only
+  totalData <- totalData[ , c(returnItems, 'res', 'form')]
+
   # Get the binning limits
-  binList <- footballstats::get_bins(
-    totalData = totalData)
+  binList <- totalData %>% footballstats::get_bins()
 
   # Map current form to an integer value also.
-  totalData$form <- footballstats::form_to_int(
-    oldForms = totalData$form)
+  totalData$form <- totalData$form %>% footballstats::form_to_int()
 
   # Map the values from the binList to a number between... -(binNo) <= x <= -1
   totalData <- footballstats::bin_intervals(
@@ -83,7 +85,7 @@ classify_all <- function(competitionID, competitionName,
     binList = binList,
     returnItems = commentaryNames,
     matchFieldNames = matchFieldNames,
-    testing = TRUE)
+    testing = testing)
 
   # Predict actual future results
   print(paste0(Sys.time(), ' : Predicting actual upcoming fixtures.'))
@@ -96,5 +98,6 @@ classify_all <- function(competitionID, competitionName,
     subsetItems = SVMDetails[[2]],
     SVMfit = SVMDetails[[1]],
     binList = binList,
+    printToSlack = printToSlack,
     KEYS = KEYS)
 }
