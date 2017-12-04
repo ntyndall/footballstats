@@ -66,7 +66,6 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
           vec  <- findInterval(vec, singleBin) * (-1)
           singleTeam[[subsetItems[i]]] <- vec
         }
-      if (i == 1) { print(singleTeam) }
       as.character(stats::predict(SVMfit, singleTeam))
     }))
 
@@ -124,7 +123,7 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
     Sys.sleep(1)
   }
 
-  if (printToSlack && real) {
+  if (printToSlack && real) { # nocov start
     slackr::slackrSetup(
       channel = '#results',
       api_token = KEYS$FS_SLACK)
@@ -145,6 +144,6 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
       channel = '#results',
       api_token = KEYS$FS_SLACK,
       username = 'predictions')
-  }
+  } # nocov end
   return(correct)
 }

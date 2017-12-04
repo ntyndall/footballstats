@@ -65,14 +65,12 @@ available_commentaries <- function(commentaryKeys, excludeNames = c('table_id'))
    for (x in 1:length(commentaryKeys)) {
     results <- rredis::redisHGetAll(
       key = commentaryKeys[x])
-    cNames <- names(results)
-    cValues <- as.character(results)
+    cNames <- results %>% names
+    cValues <- results %>% as.character
     empties <- cValues == ""
 
     # Remove any empty string fields
-    if (any(empties)) {
-      cNames <- cNames[-which(empties)]
-    }
+    cNames <- if (empties %>% any) cNames[-which(empties)] else cNames
 
     # Remove any predefined variables that should never be used
     intersection <- intersect(cNames, excludeNames)
@@ -80,11 +78,7 @@ available_commentaries <- function(commentaryKeys, excludeNames = c('table_id'))
       cNames <- cNames[-match(c(intersection), cNames)]
     }
 
-    if (x == 1) {
-      allAvailable <- cNames
-    } else {
-      allAvailable <- intersect(cNames, allAvailable)
-    }
+    allAvailable <- if (x == 1) cNames else intersect(cNames, allAvailable)
   }
   return(allAvailable)
 }

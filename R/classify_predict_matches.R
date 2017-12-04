@@ -32,12 +32,12 @@ predict_matches <- function(competitionID, competitionName, seasonStarting, retu
   # Get fixtures
   if (KEYS %>% is.null) {
     fixtureList <- footballstats::matchData[60:70, ]
-  } else {
+  } else { # nocov start
     fixtureList <- footballstats::get_data(
       endpoint = matchEndpoint,
       KEYS = KEYS)
     cat(paste0(Sys.time(), ' : About to report on results...\n'))
-  }
+  } # nocov end
 
   # Generate predictions based on actual fixtures!
   if (!is.null(fixtureList)) {
