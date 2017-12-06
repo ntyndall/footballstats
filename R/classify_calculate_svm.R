@@ -78,19 +78,26 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
     # Only if the match has seen 3 previous games do we add a row to the totalData frame
     # This keeps the forms consistent to the previous 3 matches!
     if (!is.null(form)) {
-      # Append the form and results to single row data
-      singleItem$form <- form
-      singleItem$res <- winLoseDraw
-
       # Calculate additional metrics
       #singleItem <- calculateAdditionalMetrics(competitionID = competitionID,
       #                                         teamID = teamID,
       #                                         seasonStarting = seasonStarting,
       #                                         singleItem = singleItem)
 
+      # Append the form and results to single row data
+      singleItem$form <- form
+      singleItem$res <- winLoseDraw
+
       # Bind the data frames together into one
       totalData <- rbind(totalData, singleItem)
     }
   }
-  return(totalData)
+
+  # Drop any single valued metrics
+  frameNames <- totalData %>% names
+  FALSE %>% rep(frameNames %>% length) %>% as.list
+  sums <- sapply(totalData, unique) %>% lengths(use.names = FALSE)
+  toDrop <- `<`(sums, 2)
+
+  return(if (toDrop %>% any) totalData %>% subset(select = -c(toDrop %>% which)) else totalData)
 }
