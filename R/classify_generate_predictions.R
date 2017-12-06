@@ -52,12 +52,11 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
 
     # Create the appropriate data structures for the SVM
     predictions <- as.character(sapply(1:2, function(k) {
-      singleTeam <- data.frame(t(as.integer(fixtureAggregate[[k]][[1]])))
+      singleTeam <- fixtureAggregate[[k]][[1]] %>% as.integer %>% t() %>% data.frame()
       names(singleTeam) <- forStatistics
 
       # Map the current form to an integer based on rules in mapForm~
-      singleTeam$form <- footballstats::form_to_int(
-        oldForms = fixtureAggregate[[k]][[2]])
+      singleTeam$form <- fixtureAggregate[[k]][[2]] %>% footballstats::form_to_int()
 
       # Only look at certain combinations if testing is enabled
         for (i in 1:length(subsetItems)) {
@@ -66,7 +65,7 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
           vec  <- findInterval(vec, singleBin) * (-1)
           singleTeam[[subsetItems[i]]] <- vec
         }
-      as.character(stats::predict(SVMfit, singleTeam))
+      stats::predict(SVMfit, singleTeam) %>% as.character
     }))
 
     # Predict scores now
@@ -75,13 +74,15 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
 
     # Rules based on wrong outcomes!
     pHome <- c(pHome, pAway) %>%
-      purrr::when(.[1] == 'D' && .[2] == 'W' ~ 'L',
-                  .[1] == 'D' && .[2] == 'L' ~ 'W',
-                  .[1])
+      purrr::when(
+        .[1] == 'D' && .[2] == 'W' ~ 'L',
+        .[1] == 'D' && .[2] == 'L' ~ 'W',
+        .[1])
     pAway <- c(pAway, pHome) %>%
-      purrr::when(.[1] == 'D' && .[2] == 'L' ~ 'W',
-                  .[1] == 'D' && .[2] == 'W' ~ 'L',
-                  .[1])
+      purrr::when(
+        .[1] == 'D' && .[2] == 'L' ~ 'W',
+        .[1] == 'D' && .[2] == 'W' ~ 'L',
+        .[1])
 
     if (pHome == pAway) {
       pHome <- pAway <- 'D'
@@ -89,36 +90,34 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
     if (testing) {
-      res <- strsplit(singleFixture$ft_score, '')[[1]]
-      res <- as.numeric(strsplit(paste(res[c(-1, -length(res))], collapse = ''), '-')[[1]])
+      res <- (singleFixture$ft_score %>% strsplit(split = ''))[[1]]
+      res <- (res[c(-1, -length(res))] %>% paste(collapse = '') %>%
+        strsplit(split = '-'))[[1]] %>% as.numeric
       actual <- res %>%
-        purrr::when(.[1] == .[2] ~ c('D', 'D'),
-                    .[1] > .[2] ~ c('W', 'L'),
-                    c('L', 'W'))
-      if (actual[1] == pHome && actual[2] == pAway) {
-        correct <- correct + 1
-      }
+        purrr::when(
+          .[1] == .[2] ~ c('D', 'D'),
+          .[1] > .[2] ~ c('W', 'L'),
+          c('L', 'W'))
+      correct <- if (actual[1] == pHome && actual[2] == pAway) correct + 1 else correct
     } else {
       correct <- correct + 1
     }
 
     # Set up emojis from the hash
-    homeEmoji <- emojiHash$find(as.integer(singleFixture$localteam_id)) %>%
-      purrr::when(is.na(.) ~ ':blank-team:', ~ .)
-    awayEmoji <- emojiHash$find(as.integer(singleFixture$visitorteam_id)) %>%
-      purrr::when(is.na(.) ~ ':blank-team:', ~ .)
+    blnk <- function(inp) inp %>% purrr::when(is.na(.) ~ ':blank-team:', ~ .)
+    homeEmoji <- singleFixture$localteam_id %>% as.integer %>% emojiHash$find() %>% blnk()
+    awayEmoji <- singleFixture$visitorteam_id %>% as.integer %>% emojiHash$find() %>% blnk()
 
     # Logs for console and for slack
     txt <- as.character(paste0('[', pHome, '] ', homeName, ' vs. ', awayName, ' [', pAway, ']'))
     txtForSlack <- as.character(paste0(homeEmoji, ' `', txt, '` ', awayEmoji))
     totalTxt <- c(totalTxt, txtForSlack)
-    #cat(paste0(Sys.time(), ' : ', txt, '\n'))
 
     # When making a prediction - store the guess for later
     if (real) {
       rredis::redisHMSet(
         key = paste0('c:', competitionID, ':pred:', singleFixture$id),
-        values = list(home = pHome, away = pAway))
+        values = list(home = pHome, away = pAway, week = singleFixture$week))
     }
     Sys.sleep(1)
   }
