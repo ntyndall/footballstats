@@ -60,13 +60,17 @@ order_matchdata <- function(matchData, limit = 5000) {
 #'
 #' @export
 
-available_commentaries <- function(commentaryKeys, includeNames) {
+available_commentaries <- function(commentaryKeys, includeNames = 'all') {
   allAvailable <- c()
+  getAll <- if (`==`(includeNames %>% length, 1)) TRUE else FALSE
    for (x in 1:length(commentaryKeys)) {
     results <- commentaryKeys[x] %>% rredis::redisHGetAll()
     cNames <- results %>% names
     cValues <- results %>% as.character
     empties <- cValues == ""
+
+    # Default to all
+    if (`==`(x, 1) && getAll) includeNames <- cNames %>% subset(cNames != 'table_id')
 
     # Remove any empty string fields
     cNames <- if (empties %>% any) cNames[-which(empties)] else cNames

@@ -34,10 +34,9 @@ test_that('Calculate SVM from the test match data', {
     bypass = TRUE)
 
   # Check the keyNames from the current list of commentarys.
-  commentaryKeys <- as.character(rredis::redisKeys(
-    pattern = paste0('cmt_commentary:', competitionID, '*')))
-  commentaryNames <- footballstats::available_commentaries(
-    commentaryKeys = commentaryKeys)
+  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+    rredis::redisKeys() %>% as.character
+  commentaryNames <- commentaryKeys %>% footballstats::available_commentaries()
 
   totalData <- footballstats::calculate_svm(
     competitionID = competitionID,
