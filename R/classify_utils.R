@@ -60,11 +60,10 @@ order_matchdata <- function(matchData, limit = 5000) {
 #'
 #' @export
 
-available_commentaries <- function(commentaryKeys, excludeNames = c('table_id')) {
+available_commentaries <- function(commentaryKeys, includeNames) {
   allAvailable <- c()
    for (x in 1:length(commentaryKeys)) {
-    results <- rredis::redisHGetAll(
-      key = commentaryKeys[x])
+    results <- commentaryKeys[x] %>% rredis::redisHGetAll()
     cNames <- results %>% names
     cValues <- results %>% as.character
     empties <- cValues == ""
@@ -73,12 +72,10 @@ available_commentaries <- function(commentaryKeys, excludeNames = c('table_id'))
     cNames <- if (empties %>% any) cNames[-which(empties)] else cNames
 
     # Remove any predefined variables that should never be used
-    intersection <- intersect(cNames, excludeNames)
-    if (!identical(intersection, character(0))) {
-      cNames <- cNames[-match(c(intersection), cNames)]
-    }
+    intersection <- intersect(cNames, includeNames)
 
-    allAvailable <- if (x == 1) cNames else intersect(cNames, allAvailable)
+    if (identical(intersection, character(0))) stop('A complete set of required names does not exist.')
+    allAvailable <- if (x == 1) includeNames else intersect(intersection, allAvailable)
   }
   return(allAvailable)
 }
