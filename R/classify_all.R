@@ -34,7 +34,7 @@ classify_all <- function(competitionID, competitionName, seasonStarting,
                          printToSlack, KEYS) {
 
   # Query Redis and return everything from the competition.
-  print(paste0(Sys.time(), ' : Recreating match data.'))
+  cat(paste0(Sys.time(), ' | Recreating match data.'))
   matchData <- footballstats::recreate_matchdata(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
@@ -42,22 +42,18 @@ classify_all <- function(competitionID, competitionName, seasonStarting,
 
   matchData[ , c('localteam_id', 'localteam_name')]
   # Check the keyNames from the current list of commentarys.
-  commentaryKeys <- as.character(rredis::redisKeys(
-    pattern = paste0('cmt_commentary:', competitionID, '*')))
-  commentaryNames <- footballstats::available_commentaries(
-    commentaryKeys = commentaryKeys)
+  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+    rredis::redisKeys() %>% as.character
+  commentaryNames <- commentaryKeys %>% footballstats::available_commentaries()
 
   # Construct data set for building an SVM
-  print(paste0(Sys.time(), ' : Creating a dataframe from the match data.'))
+  cat(paste0(Sys.time(), ' | Creating a dataframe from the match data.'))
   totalData <- footballstats::calculate_svm(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
     commentaryKeys = commentaryKeys,
     commentaryNames = commentaryNames,
     matchData = matchData)
-
-  # Subset for return Items only
-  totalData <- totalData[ , c(returnItems, 'res', 'form')]
 
   # Get the binning limits
   binList <- totalData %>% footballstats::get_bins()
@@ -76,7 +72,7 @@ classify_all <- function(competitionID, competitionName, seasonStarting,
 
   # Optimize the SVM by looping through all available variables
   matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
-  print(paste0(Sys.time(), ' : Optimizing the SVM Classifier.'))
+  cat(paste0(Sys.time(), ' | Optimizing the SVM Classifier.'))
   SVMDetails <- footballstats::optimize_svm(
     competitionID = competitionID,
     totalData = totalData,
@@ -88,7 +84,7 @@ classify_all <- function(competitionID, competitionName, seasonStarting,
     testing = testing)
 
   # Predict actual future results
-  print(paste0(Sys.time(), ' : Predicting actual upcoming fixtures.'))
+  print(paste0(Sys.time(), ' | Predicting actual upcoming fixtures.'))
   footballstats::predict_matches(
     competitionID = competitionID,
     competitionName = competitionName,

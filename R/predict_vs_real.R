@@ -54,3 +54,44 @@ predict_vs_real <- function(competitionID, readyToAnalyse, matches) {
     }
   }
 }
+
+#' @title Create report
+#' @export
+
+
+report_results <- function() {
+  allPredictions <- '*:pred:*' %>% rredis::redisKeys()
+
+  competitionIDs <- allPredictions %>%
+    strsplit(split = '[:]') %>%
+    purrr::map(2) %>%
+    purrr::flatten_chr() %>%
+    unique
+
+  # Find all unique competition results
+  uniqComps <- sapply(1:(competitionIDs %>% length), function(i) {
+    allPredictions[paste0(':', competitionIDs[i], ':') %>% grepl(x = allPredictions)]
+  })
+
+  print('looking at comp :')
+  # Loop over unique competitions
+  for (i in 1:(uniqComps %>% length)) {
+    singleComp <- uniqComps[[i]]
+    result <- lapply(1:(singleComp %>% length), function(j) {
+      vals <- singleComp[j] %>% rredis::redisHGetAll()
+      return(c(vals$prediction, vals$week))
+    })
+
+    # Create a new list
+    map_res <- function(inp, k) inp %>% purrr::map(k) %>% purrr::flatten_chr()
+    week <- map_res(result, 1); pred <- map_res(result, 2)
+    uniqueWeeks <- week %>% unique %>% as.integer %>% sort %>% as.character
+
+    # Loop over unique weeks
+    for(j in 1:(uniqueWeeks %>% length)) {
+     currentWeek <- week[`==`(uniqueWeeks[j], pred) %>% which]
+     # Either print or send to slack!
+     # Add a sent to slack tag in the redis key>!?!?!
+    }
+  }
+}

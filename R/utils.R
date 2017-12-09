@@ -114,7 +114,7 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
       seconds = timePeriod - 1 )
   } else {
     if (requestCount > requestsAllowed - 100) {
-      print(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for ', timePeriod, ' seconds.'))
+      cat(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for ', timePeriod, ' seconds. \n'))
       rredis::redisSet(
         key = 'requestLimit',
         value = "0" %>% charToRaw())
@@ -122,3 +122,16 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
     }
   }
 }
+
+#' @title Redis Connection
+#'
+#' @export
+
+
+redis_con <- function() { # nocov start
+  rredis::redisConnect(
+    host = 'localhost',
+    port = 6379)
+  rredis::redisSelect(1)
+} # nocov end
+

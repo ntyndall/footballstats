@@ -72,7 +72,6 @@ best_svm <- function(totalData) {
 optimize_svm <- function(competitionID, totalData, seasonStarting, testData, matchData,
                          binList, returnItems, matchFieldNames, testing) {
 
-  print(binList)
   # Optimize classifier by varying all the possible attributes
   bLLength <- length(binList)
   bestResult <- overtake <- 0
@@ -83,11 +82,7 @@ optimize_svm <- function(competitionID, totalData, seasonStarting, testData, mat
       holdData <- totalData
       if (i <= j) {
         remove <- vec[i:j]
-        if (length(remove) > (bLLength - 2)) {
-          next
-        }
-
-        #print(paste0(Sys.time(), ' : Scanning through ', i, ' - ', j, '.'))
+        if (length(remove) > (bLLength - 2)) next
 
         # Delete rows and subset to vary the classification classes
         holdingList[remove] <- NULL
@@ -111,9 +106,9 @@ optimize_svm <- function(competitionID, totalData, seasonStarting, testData, mat
 
         # If the current result is better than assign that to be the new SVM.
         if (currentResult > bestResult) {
-          stri <- paste0(paste(rep(' ', (overtake * 3) + 1), collapse = ''), '|_')
+          stri <- paste0(paste(rep(' ', (overtake * 2) + 1), collapse = ''), '|_')
           overtake <- overtake + 1
-          print(paste0(Sys.time(), ' :', stri, ' New best result - ', currentResult, ' (from ', bestResult, ')'))
+          cat(paste0(Sys.time(), stri, ' New best result - ', currentResult, ' (from ', bestResult, ')'))
           bestResult <- max(currentResult, bestResult)
           bestFactors <- holdingList %>% names
           bestSVM <- SVMfit

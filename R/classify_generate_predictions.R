@@ -84,9 +84,8 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
         .[1] == 'D' && .[2] == 'W' ~ 'L',
         .[1])
 
-    if (pHome == pAway) {
-      pHome <- pAway <- 'D'
-    }
+    # Equal predictions then it is a draw
+    if (pHome == pAway) pHome <- pAway <- 'D'
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
     if (testing) {
@@ -117,7 +116,10 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
     if (real) {
       rredis::redisHMSet(
         key = paste0('c:', competitionID, ':pred:', singleFixture$id),
-        values = list(home = pHome, away = pAway, week = singleFixture$week))
+        values = list(
+          home = pHome, away = pAway,
+          week = singleFixture$week,
+          slack = 'false'))
     }
     Sys.sleep(1)
   }

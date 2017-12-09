@@ -45,7 +45,7 @@ add_all <- function(competitionID, updateData = FALSE,
     seasonStarting = seasonStarting,
     updateData = updateData,
     KEYS = KEYS)
-  print(paste0(Sys.time(), ': Matches complete.'))
+  cat(paste0(Sys.time(), ' | Matches complete. \n'))
 
   # Store predicted vs. real outcomes
   readyToAnalyse <- paste0('c:', competitionID, ':pred:*') %>% rredis::redisKeys()
@@ -65,7 +65,7 @@ add_all <- function(competitionID, updateData = FALSE,
       visitorteam = matches$visitorteam_id,
       KEYS = KEYS)
   }
-  print(paste0(Sys.time(), ': Commentary complete.'))
+  cat(paste0(Sys.time(), ' | Commentary complete. \n'))
 
 
   # Add event information
@@ -75,7 +75,7 @@ add_all <- function(competitionID, updateData = FALSE,
       matchIDs = matches$id,
       matchEvents = matches$events)
   }
-  print(paste0(Sys.time(), ': Events complete.'))
+  cat(paste0(Sys.time(), ' | Events complete. \n'))
 
   # Add team information
   teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
@@ -87,7 +87,7 @@ add_all <- function(competitionID, updateData = FALSE,
       updateData = updateData,
       KEYS = KEYS)
   }
-  print(paste0(Sys.time(), ': Teams complete.'))
+  cat(paste0(Sys.time(), ' | Teams complete. \n'))
 
   # Add player information
   playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
@@ -99,15 +99,15 @@ add_all <- function(competitionID, updateData = FALSE,
       currentSeasonYear = seasonStarting,
       KEYS = KEYS)
   }
-  print(paste0(Sys.time(), ': Players complete.'))
+  cat(paste0(Sys.time(), ' | Players complete. \n'))
 
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
   totalRequests <- uniqueRequests + teamListLength + playerLength
-  print(paste0(Sys.time(), ' : ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*'))
-  print(paste0(Sys.time(), ' : Analysed ', totalRequests, ' unique GET requests.'))
-  print(paste0(Sys.time(), ' : Analysed ', length(matches$events), ' matches/events.'))
-  print(paste0(Sys.time(), ' : Analysed ', teamListLength, ' teams'))
-  print(paste0(Sys.time(), ' : Analysed ', playerLength, ' players.'))
+  cat(paste0(Sys.time(), ' | ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~* \n'))
+  cat(paste0(Sys.time(), ' | Analysed ', totalRequests, ' unique GET requests. \n'))
+  cat(paste0(Sys.time(), ' | Analysed ', length(matches$events), ' matches/events. \n'))
+  cat(paste0(Sys.time(), ' | Analysed ', teamListLength, ' teams. \n'))
+  cat(paste0(Sys.time(), ' | Analysed ', playerLength, ' players. \n'))
   cat('\n')
 } # nocov end

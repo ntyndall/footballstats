@@ -33,21 +33,16 @@
 #' @export
 
 
-main <- function() { # nocov start
+main <- function(printToSlack = TRUE) { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys()
 
   # Make a connection to redis for storing data
-  rredis::redisConnect(
-    host = 'localhost',
-    port = 6379)
-  rredis::redisSelect(1)
+  footballstats::redis_con()
 
   # Load competitions and run the functionality below.
-  competitions <- footballstats::acomp_info(
-    KEYS = KEYS)
-  #comps <- jsonlite::fromJSON(seasonIDs)
+  competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
   subsetCompetitions <- c('1102', '1204', '1205', '1229',
@@ -58,17 +53,16 @@ main <- function() { # nocov start
   for (i in 1:nrow(newCompetitions)) {
 
     # Gather all information to be stored in Redis.
-    print(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (',
-                 newCompetitions$name[i], ' - ', newCompetitions$region[i], ').'))
+    cat(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (',
+               newCompetitions$name[i], ' - ', newCompetitions$region[i], '). \n'))
     footballstats::add_all(
       competitionID = newCompetitions$id[i],
       updateData = FALSE,
       seasonStarting = 2017,
       KEYS = KEYS)
 
-    # Send predicitons guessed correctly to Slack
-    #  evaluatedPredictionsToSlack(competitionID = newCompetitions$id[i],
-    #                              competitionName = newCompetitions$name[i])
+    # Re-establish connection
+    footballstats::redis_con()
 
     # Build a classifier with the current match data
     footballstats::classify_all(
@@ -77,7 +71,6 @@ main <- function() { # nocov start
       seasonStarting = 2017,
       returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
       printToSlack = printToSlack,
-      bypass = TRUE,
       KEYS = KEYS)
   }
 } # nocov end

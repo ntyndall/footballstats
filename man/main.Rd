@@ -4,7 +4,7 @@
 \alias{main}
 \title{Run script to populate Redis.}
 \usage{
-main()
+main(printToSlack = TRUE)
 }
 \details{
 -- Summary of data structures stored in Redis --

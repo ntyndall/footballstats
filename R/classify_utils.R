@@ -106,13 +106,12 @@ homeaway_stats <- function(competitionID, singleFixture, seasonStarting,
   fixtureAggregate <- lapply(1:2, function(j) {
     # Decide to analyse home team and then away team
     teamID <- singleFixture[[localVisitor[j]]]
-    commentary <- as.character(rredis::redisKeys(
-      pattern = paste0('cmt_commentary:', competitionID, ':*', teamID)))
+    commentary <- paste0('cmt_commentary:', competitionID, ':*', teamID) %>%
+      rredis::redisKeys() %>% as.character
 
     # For testing only: Don't include the very last commentary!
-    if (testing) {
-      commentary <- commentary[1:(length(commentary) - 1)]
-    }
+    if (testing) commentary <- commentary[1:(length(commentary) - 1)]
+
 
     # Determine the statistics of a commentary
     currentStats <- footballstats::commentary_stats(
@@ -159,12 +158,12 @@ commentary_stats <- function(commentary, returnItems) {
       returnItems = returnItems))
   })
 
-  if (length(returnItems) == 1) {
-    return(sum(vals)/as.double(length(vals)))
+  if (`==`(returnItems %>% length, 1)) {
+    return(`/`(vals %>% sum, vals %>% length %>% as.double))
   } else {
-    columns <- ncol(vals)
-    return(sapply(1:nrow(vals), function(k) {
-      sum(vals[k, 1:columns])/as.double(columns)
+    columns <- vals %>% ncol
+    return(sapply(1:(vals %>% nrow), function(k) {
+      `/`(vals[k, 1:columns] %>% sum, columns %>% as.double)
     }))
   }
 }
@@ -184,5 +183,5 @@ commentary_from_redis <- function(keyName, returnItems) {
       replacement = "",
       x = results$possesiontime)
   }
-  return(as.double(results))
+  return(results %>% as.double)
 }
