@@ -1,5 +1,4 @@
 #' @title add_all
-#'
 #' @description A function that is called from a shell script to kick off
 #'  the storing of important data and also any machine learning mechanisms
 #'  for prediction.
@@ -52,7 +51,7 @@ add_all <- function(competitionID, updateData = FALSE,
   if (!(readyToAnalyse %>% is.null)) {
     footballstats::predict_vs_real(
       competitionID = competitionID,
-      readyToAnalyseKey = readyToAnalyse,
+      readyToAnalyse = readyToAnalyse,
       matches = matches)
   }
 
