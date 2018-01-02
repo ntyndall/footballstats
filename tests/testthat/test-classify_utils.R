@@ -15,7 +15,7 @@ test_that("Test that match data can be recreated easily.", {
     seasonStarting = 2017,
     matchLimit = 1000)
 
-  expect_that( recreated %>% nrow(), equals(0) )
+  expect_that( recreated %>% nrow, equals(0) )
 
   # Put the test data into Redis
   matchData <- footballstats::amatch_info(
@@ -23,7 +23,6 @@ test_that("Test that match data can be recreated easily.", {
     dateFrom = NULL,
     dateTo = NULL,
     seasonStarting = 2017,
-    updateData = FALSE,
     KEYS = NULL,
     bypass = bypass)
 
@@ -32,9 +31,9 @@ test_that("Test that match data can be recreated easily.", {
     seasonStarting = 2017,
     matchLimit = 1000)
 
-  expect_that( matchData %>% nrow(), equals(recreated %>% nrow()) )
-  expect_that( recreated %>% names(), equals(matchData %>% names() %>% setdiff('events')) )
-  expect_that( matchData$id %>% as.integer() %>% sort(), equals(recreated$id %>% as.integer() %>% sort()) )
+  expect_that( matchData %>% nrow, equals(recreated %>% nrow) )
+  expect_that( recreated %>% names, equals(matchData %>% names %>% setdiff('events')) )
+  expect_that( matchData$id %>% as.integer %>% sort, equals(recreated$id %>% as.integer %>% sort) )
 
 })
 
