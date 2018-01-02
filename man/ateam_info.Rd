@@ -4,7 +4,7 @@
 \alias{ateam_info}
 \title{ateam_info}
 \usage{
-ateam_info(competitionID, teamListLength, updateData, KEYS, bypass = FALSE)
+ateam_info(competitionID, teamListLength, KEYS, bypass = FALSE)
 }
 \arguments{
 \item{competitionID}{An integer defining the competitionID that the
@@ -13,10 +13,6 @@ team belongs to.}
 \item{teamListLength}{An integer value that defines how long the list
 containing teamID's is TeamID's are then popped from the list as they
 are anaylsed.}
-
-\item{updateData}{A boolean that is set to TRUE if team data is to be analysed
-again, i.e. after a match. FALSE to ignore and only analyse new teams. Generally
-set to FALSE for first time run.}
 }
 \value{
 Returns nothing. A Redis hash map is set with the team

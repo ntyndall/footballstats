@@ -4,7 +4,7 @@
 \alias{add_all}
 \title{add_all}
 \usage{
-add_all(competitionID, updateData = FALSE, seasonStarting, KEYS)
+add_all(competitionID, seasonStarting, KEYS)
 }
 \value{
 Returns nothing.

@@ -4,7 +4,7 @@
 \alias{amatch_info}
 \title{amatch_info}
 \usage{
-amatch_info(competitionID, dateFrom, dateTo, seasonStarting, updateData,
+amatch_info(competitionID, dateFrom, dateTo, seasonStarting,
   analysingToday = TRUE, KEYS, bypass = FALSE)
 }
 \arguments{
@@ -16,10 +16,6 @@ the start date for querying the API.}
 
 \item{dateTo}{A POSIXct value converted to dd.mm.yyyy format which denotes
 the end date for querying the API.}
-
-\item{updateData}{A boolean that is set to TRUE if team data is to be analysed
-again, i.e. after a match. FALSE to ignore and only analyse new teams. Generally
-set to FALSE for first time run.}
 
 \item{analysingToday}{A boolean that is set to TRUE if data is being analysing today.
 This is used to figure out if matches have been played during the time of
