@@ -12,6 +12,15 @@ library(footballstats)
 footballstats::main()
 ``` 
 
+#### Deployment
+Edit the `/usr/lib/R/etc/Rprofile.site` file and include the following 3 tokens
+```
+Sys.setenv(FS_HOST = "___")
+Sys.setenv(FS_APIKEY = "Authorization=___")
+Sys.setenv(FS_SLACK = "___")
+```
+
+
 ## Tagging a release
   - Update `DESCRIPTION` file to required version (must be > than most recent `GIT` version).
   - Run `Rscript tag.R {v#}` inside root directory `/footballstats/`.
