@@ -15,25 +15,25 @@ test_that('test the request limitations can be implemented', {
     requestsAllowed = allowedRequests,
     timePeriod = timePeriod)
 
-  timeout <- rredis::redisTTL(key = 'requestLimit') %>%
-    as.character() %>%
-    as.integer()
+  timeout <- 'requestLimit' %>%
+    rredis::redisTTL() %>%
+    as.character %>%
+    as.integer
 
   expect_gt(timeout, (timePeriod/2))
 
   # Remove the key to disable the expiry
-  rredis::redisDelete(
-    key = 'requestLimit')
+  'requestLimit' %>% rredis::redisDelete()
 
   rredis::redisSet(
     key = 'requestLimit',
-    value = 200 %>% as.character() %>% charToRaw())
+    value = 200 %>% as.character %>% charToRaw())
 
   footballstats::request_limit(
     requestsAllowed = 210,
     timePeriod = 1)
 
-  expect_that( rredis::redisGet(key = 'requestLimit') %>% as.character() %>% as.integer(), equals(0) )
+  expect_that( rredis::redisGet(key = 'requestLimit') %>% as.character %>% as.integer, equals(0) )
 
 })
 

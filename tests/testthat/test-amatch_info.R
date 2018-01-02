@@ -13,34 +13,28 @@ test_that("Check the keys are as they should be by adding match data", {
     dateFrom = NULL,
     dateTo = NULL,
     seasonStarting = 2017,
-    updateData = FALSE,
     KEYS = NULL,
     bypass = bypass)
 
   # Check redis for expected output
   matchIDs <- rredis::redisKeys(
     pattern = 'csm:*') %>%
-      strsplit(split = ':') %>%
-        purrr::map(4) %>%
-          purrr::flatten_chr() %>%
-            as.integer() %>%
-              sort()
+    strsplit(split = ':') %>%
+    purrr::map(4) %>%
+    purrr::flatten_chr() %>%
+    as.integer %>%
+    sort
 
-  expect_that(
-    matchData$id %>%
-      as.integer() %>%
-        sort(), equals(matchIDs) )
+  expect_that( matchData$id %>% as.integer %>% sort, equals(matchIDs) )
 
-  teamIDs <- rredis::redisSMembers(
-    set = 'c_teamSetInfo:1204') %>%
-      purrr::flatten_chr() %>%
-        as.integer() %>%
-          sort()
+  teamIDs <- 'c_teamSetInfo:1204' %>%
+    rredis::redisSMembers() %>%
+    purrr::flatten_chr() %>%
+    as.integer %>%
+    sort
 
   expect_that(
     c(matchData$localteam_id, matchData$visitorteam_id) %>%
-     unique() %>%
-       as.integer() %>%
-         sort(), equals(teamIDs) )
+     unique %>% as.integer %>% sort, equals(teamIDs) )
 
 })

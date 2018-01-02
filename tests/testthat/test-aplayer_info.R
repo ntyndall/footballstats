@@ -24,25 +24,23 @@ test_that("Check the keys are as they should be by adding player data", {
     bypass = TRUE)
 
   # Check redis for expected output
-  teamInfo <- rredis::redisHGetAll(
-    key = 'ctps_club:1204:9002:16:2017')
+  teamInfo <- 'ctps_club:1204:9002:16:2017' %>% rredis::redisHGetAll()
 
-  expect_that( teamInfo$name %>% as.character(), equals('Arsenal') )
-  expect_that( teamInfo$id %>% as.integer(),  equals(teamID) )
+  expect_that( teamInfo$name %>% as.character, equals('Arsenal') )
+  expect_that( teamInfo$id %>% as.integer,  equals(teamID) )
 
-  uniqueKeys <- rredis::redisKeys(
-    pattern = '*')
+  uniqueKeys <- '*' %>% rredis::redisKeys()
 
-  expect_that( uniqueKeys %>% length(), equals(5) )
+  expect_that( uniqueKeys %>% length, equals(5) )
 
   uniqueComps <- uniqueKeys %>%
     strsplit(split = ':') %>%
-      purrr::map(1) %>%
-        purrr::flatten_chr() %>%
-          strsplit(split = 'ctps_') %>%
-            purrr::map(2) %>%
-              purrr::flatten_chr() %>%
-                unique()
+    purrr::map(1) %>%
+    purrr::flatten_chr() %>%
+    strsplit(split = 'ctps_') %>%
+    purrr::map(2) %>%
+    purrr::flatten_chr() %>%
+    unique
 
   expect_that( 'club_intl' %in% uniqueComps, is_true() )
   expect_that( 'cups' %in% uniqueComps, is_true() )
