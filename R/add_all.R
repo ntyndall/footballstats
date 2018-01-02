@@ -99,7 +99,6 @@ add_all <- function(competitionID, updateData = FALSE,
       KEYS = KEYS)
   }
   cat(paste0(Sys.time(), ' | Players complete. \n'))
-
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
   totalRequests <- uniqueRequests + teamListLength + playerLength

@@ -40,7 +40,6 @@ classify_all <- function(competitionID, competitionName, seasonStarting,
     seasonStarting = seasonStarting,
     matchLimit = matchLimit)
 
-  matchData[ , c('localteam_id', 'localteam_name')]
   # Check the keyNames from the current list of commentarys.
   commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
     rredis::redisKeys() %>% as.character

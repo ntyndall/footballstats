@@ -30,6 +30,8 @@
 #'  -->  [ctps_[x]]:{comp_id}:{team_id}:{player_id}:{season} - [HASH]
 #'       -->  where x = { club, club_intl, cups, national}
 #'
+#' @importFrom magrittr %>% %<>% %T>% %$%
+#'
 #' @export
 
 
