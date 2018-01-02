@@ -41,7 +41,7 @@ test_that('test the request limitations can be implemented', {
 test_that("Convert a simple date to one used by the API", {
 
   newDate <- as.Date(x = 17476, origin = '1970-01-01')
-  res <- format_dates(standardDateFormat = newDate)
+  res <- footballstats::format_dates(standardDateFormat = newDate)
 
   components <- strsplit(x = res, split = '[.]')[[1]]
 
@@ -51,3 +51,15 @@ test_that("Convert a simple date to one used by the API", {
 
 })
 
+
+test_that("The season starting variable is returned", {
+
+  year <- Sys.Date() %>% format('%Y') %>% as.integer
+  month <- Sys.Date() %>% format('%m') %>% as.integer
+
+  starting <- footballstats::start_season()
+  year <- if (month < 7) year - 1 else year
+
+  expect_that( starting, equals(year) )
+
+})
