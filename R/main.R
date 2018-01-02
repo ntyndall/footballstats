@@ -37,6 +37,9 @@
 
 main <- function(printToSlack = TRUE) { # nocov start
 
+  # Get season starting year
+  seasonStarting <- footballstats::start_season()
+
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys()
 
@@ -60,7 +63,7 @@ main <- function(printToSlack = TRUE) { # nocov start
     footballstats::add_all(
       competitionID = newCompetitions$id[i],
       updateData = FALSE,
-      seasonStarting = 2017,
+      seasonStarting = seasonStarting,
       KEYS = KEYS)
 
     # Re-establish connection
@@ -70,7 +73,7 @@ main <- function(printToSlack = TRUE) { # nocov start
     footballstats::classify_all(
       competitionID = newCompetitions$id[i],
       competitionName = newCompetitions$name[i],
-      seasonStarting = 2017,
+      seasonStarting = seasonStarting,
       returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
       printToSlack = printToSlack,
       KEYS = KEYS)

@@ -81,6 +81,17 @@ format_dates <- function(standardDateFormat) {
   return(paste0(day, '.', month, '.20', year))
 }
 
+#' @title Current Season
+#'
+#' @export
+
+
+start_season <- function() {
+  frm <- function(f) Sys.Date() %>% format(f) %>% as.integer
+  currentSeason <- frm("%Y")
+  return(if (`<`(frm("%m"), 7)) currentSeason - 1 else currentSeason)
+}
+
 #' @title check_request_limit
 #'
 #' @description A function that stores the number of requests made to the

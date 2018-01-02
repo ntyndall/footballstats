@@ -23,7 +23,7 @@ calculate_svm <- function(competitionID, seasonStarting, commentaryKeys,
   for (i in 1:length(commentaryKeys)) {
     # Parse out commentary items and create a single row data frame
     singleCommentary <- commentaryKeys[i]
-    elementsSplit <- strsplit(singleCommentary, ':')[[1]]
+    elementsSplit <- singleCommentary %>% strsplit(split = ':') %>% purrr::flatten_chr()
     matchID <- elementsSplit[3]
     teamID <- elementsSplit[4]
 
