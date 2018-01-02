@@ -142,7 +142,8 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
 redis_con <- function() { # nocov start
   rredis::redisConnect(
     host = 'localhost',
-    port = 6379)
+    port = 6379,
+    nodelay = FALSE)
   rredis::redisSelect(1)
 } # nocov end
 
