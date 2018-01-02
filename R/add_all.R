@@ -20,8 +20,7 @@
 #' @export
 
 
-add_all <- function(competitionID, updateData = FALSE,
-                    seasonStarting, KEYS) { # nocov start
+add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
 
   # Begin finding match information
   dateFrom <- paste0('31.07.', seasonStarting)
@@ -42,7 +41,6 @@ add_all <- function(competitionID, updateData = FALSE,
     dateFrom = dateFrom,
     dateTo = dateTo,
     seasonStarting = seasonStarting,
-    updateData = updateData,
     KEYS = KEYS)
   cat(paste0(Sys.time(), ' | Matches complete. \n'))
 
@@ -80,10 +78,15 @@ add_all <- function(competitionID, updateData = FALSE,
   teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
 
   if (teamListLength > 0) {
+
+    # Remove the keys for the next call to this function
+    if (rredis::redisExists(key = 'c_playerSetInfo')) 'c_playerSetInfo' %>% rredis::redisDelete()
+    if (rredis::redisExists(key = 'analysePlayers')) 'analysePlayers' %>% rredis::redisDelete()
+
+    # Add the team information
     footballstats::ateam_info(
       competitionID = competitionID,
       teamListLength = teamListLength,
-      updateData = updateData,
       KEYS = KEYS)
   }
   cat(paste0(Sys.time(), ' | Teams complete. \n'))

@@ -62,7 +62,6 @@ main <- function(printToSlack = TRUE) { # nocov start
                newCompetitions$name[i], ' - ', newCompetitions$region[i], '). \n'))
     footballstats::add_all(
       competitionID = newCompetitions$id[i],
-      updateData = FALSE,
       seasonStarting = seasonStarting,
       KEYS = KEYS)
 

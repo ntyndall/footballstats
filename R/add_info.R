@@ -213,9 +213,6 @@ aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
 #'  the start date for querying the API.
 #' @param dateTo A POSIXct value converted to dd.mm.yyyy format which denotes
 #'  the end date for querying the API.
-#' @param updateData A boolean that is set to TRUE if team data is to be analysed
-#'  again, i.e. after a match. FALSE to ignore and only analyse new teams. Generally
-#'  set to FALSE for first time run.
 #' @param analysingToday A boolean that is set to TRUE if data is being analysing today.
 #'  This is used to figure out if matches have been played during the time of
 #'  query, if not then wait until todays match has been played.
@@ -227,7 +224,7 @@ aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
 #' @export
 
 
-amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateData,
+amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
                         analysingToday = TRUE, KEYS, bypass = FALSE) {
   valuesToRetain <- c("id", "comp_id", "formatted_date", "season",
                       "week", "venue", "venue_id", "venue_city",
@@ -249,11 +246,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
   if (!is.null(matches)) {
 
     # If getting todays match information, make sure all matches have actually been played.
-    if (analysingToday) {
-      if (any(matches$localteam_score == "")) {
-        return(data.frame(stringsAsFactors = FALSE))
-      }
-    }
+    if (analysingToday) if (any(matches$localteam_score == "")) return(data.frame())
 
     # Loop over all match data
     for (i in 1:nrow(matches)) {
@@ -264,22 +257,20 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
       # Or if it is ready to be updated after another match has been played.
       teamInSet <- rredis::redisSAdd(
         set = paste0('c_teamSetInfo:', competitionID),
-        element = matchItems$localteam_id %>% as.character() %>% charToRaw()) %>%
-          as.integer() %>%
-            as.logical()
+        element = matchItems$localteam_id %>% as.character %>% charToRaw()) %>%
+          as.integer %>% as.logical
 
-      if (teamInSet || updateData) {
+      if (teamInSet) {
         rredis::redisLPush(
           key = 'analyseTeams',
-          value = matchItems$localteam_id %>% as.character() %>% charToRaw())
+          value = matchItems$localteam_id %>% as.character %>% charToRaw())
       }
 
       # Check if match belongs to set
       matchInSet <- rredis::redisSAdd(
         set = paste0('c_matchSetInfo:', competitionID),
-        element = matchItems$id %>% as.character() %>% charToRaw()) %>%
-          as.integer() %>%
-            as.logical()
+        element = matchItems$id %>% as.character %>% charToRaw()) %>%
+          as.integer %>% as.logical
 
       if (matchInSet) {
         matchKey <- paste0(
@@ -294,7 +285,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting, updateD
         if (rredis::redisExists(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
           rredis::redisSAdd(
             set = paste0('c:', competitionID, ':ready'),
-            element = matchItems$id %>% as.character() %>% charToRaw())
+            element = matchItems$id %>% as.character %>% charToRaw())
         }
       }
     }
@@ -331,17 +322,17 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
                       "birthdate", "age", "birthcountry",
                       "birthplace", "position", "height", "weight")
 
-  if (bypass) {
-    playerData <- footballstats::playerData
-  }
+  if (bypass) playerData <- footballstats::playerData
 
+  # Set the progress bar
   progressBar <- utils::txtProgressBar(
     min = 0,
     max = playerLength,
     style = 3)
+
   sapply(1:playerLength, function(i) {
-    playerID <- rredis::redisLPop(
-      key = 'analysePlayers')
+    playerID <- 'analysePlayers' %>% rredis::redisLPop()
+
     if (!bypass) {  # nocov start
       playerData <- footballstats::get_data(
         endpoint = paste0("/player/", playerID, "?"),
@@ -402,9 +393,6 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
 #' @param teamListLength An integer value that defines how long the list
 #'  containing teamID's is TeamID's are then popped from the list as they
 #'  are anaylsed.
-#' @param updateData A boolean that is set to TRUE if team data is to be analysed
-#'  again, i.e. after a match. FALSE to ignore and only analyse new teams. Generally
-#'  set to FALSE for first time run.
 #'
 #' @return Returns nothing. A Redis hash map is set with the team
 #'  information.
@@ -412,21 +400,18 @@ aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
 #' @export
 
 
-ateam_info <- function(competitionID, teamListLength, updateData,
+ateam_info <- function(competitionID, teamListLength,
                        KEYS, bypass = FALSE) {
   valuesToRetain <- c("team_id", "is_national", "name", "country",
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",
                       "venue_capacity", "coach_name", "coach_id")
 
-  if (bypass) {
-    teamData <- footballstats::teamData
-  }
+  if (bypass) teamData <- footballstats::teamData
 
   for (i in 1:teamListLength) {
     if (!bypass) {  # nocov start
-      teamID <- rredis::redisLPop(
-        key = 'analyseTeams')
+      teamID <- 'analyseTeams' %>% rredis::redisLPop()
       teamData <- footballstats::get_data(
         endpoint = paste0( "/team/", teamID, "?"),
         KEYS = KEYS)
@@ -457,10 +442,9 @@ ateam_info <- function(competitionID, teamListLength, updateData,
           newPlayers <- rredis::redisSAdd(
             set = paste0('c_playerSetInfo'),
             element = playerID %>% as.character() %>% charToRaw()) %>%
-              as.integer() %>%
-                as.logical()
+              as.integer %>% as.logical
 
-          if (newPlayers || updateData) {
+          if (newPlayers) {
             rredis::redisLPush(
               key = 'analysePlayers',
               value = playerID %>% as.character() %>% charToRaw())
@@ -472,18 +456,6 @@ ateam_info <- function(competitionID, teamListLength, updateData,
         values = teamData$statistics)
     }
   }
-
-  # Remove the keys for the next call to this function
-  if (rredis::redisExists(key = 'c_playerSetInfo')) {
-    rredis::redisDelete(
-      key = 'c_playerSetInfo')
-  }
-
-  if (rredis::redisExists(key = 'analysePlayers')) {
-    rredis::redisDelete(
-      key = 'analysePlayers')
-  }
-
 }
 
 #' @title Commentary Sub-function
