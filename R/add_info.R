@@ -97,7 +97,7 @@ acomp_info <- function(KEYS, bypass = FALSE) {
         total <- total + 1
       }
     }
-    print(paste0(Sys.time(), ' : Successfully added ', total, ' new competition IDs to Redis.'))
+    cat(paste0(Sys.time(), ' | Successfully added ', total, ' new competition IDs to Redis. \n'))
     return(competitionIDs)
   }
 }

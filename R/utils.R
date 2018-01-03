@@ -16,7 +16,7 @@
 
 
 sensitive_keys <- function() {  # nocov start
-  print(paste0(Sys.time(), ' : Loading global environment variables...'))
+  cat(paste0(Sys.time(), ' | Loading global environment variables...'))
   fsHost <- Sys.getenv("FS_HOST")
   fsApikey <- Sys.getenv("FS_APIKEY")
   fsSlack <- Sys.getenv("FS_SLACK")
@@ -50,26 +50,7 @@ possible_env <- function() {  # nocov start
 
 } # nocov end
 
-#'
-#' @export
-
-
-time_intervals <- function() { # nocov start
-  lastMatchTime <- redis$GET(key = 'match:lastInterval')
-  if (is.null(lastMatchTime)) {
-    lastMatchTime <- Sys.Date() - (365 * 2)
-    # Adjust to make this fall on a Friday.
-    while (weekdays(lastMatchTime) != 'Friday') {
-      lastMatchTime <- lastMatchTime + 1
-    }
-    redis$SET(key = 'match:lastInterval',
-              value = as.integer(lastMatchTime))
-  } else {
-    as.Date(lastMatchTime, origin = "1970-01-01")
-  }
-  return(lastMatchTime)
-} # nocov end
-
+#' @title API Date Formatter
 #'
 #' @export
 
@@ -125,7 +106,7 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
       seconds = timePeriod - 1 )
   } else {
     if (requestCount > requestsAllowed - 100) {
-      cat(paste0(Sys.time(), ' : WARNING - requests getting low. Sleeping for ', timePeriod, ' seconds. \n'))
+      cat(paste0(' { requests low. Sleeping for ', timePeriod, ' seconds. } '))
       rredis::redisSet(
         key = 'requestLimit',
         value = "0" %>% charToRaw())
@@ -140,10 +121,11 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
 
 
 redis_con <- function() { # nocov start
+  cat(paste0(Sys.time(), ' | Redis Connection established. \n'))
   rredis::redisConnect(
     host = 'localhost',
     port = 6379,
     nodelay = FALSE)
-  rredis::redisSelect(1)
+  blnk <- capture.output(rredis::redisSelect(1))
 } # nocov end
 

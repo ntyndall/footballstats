@@ -36,13 +36,14 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
   startingTime <- 'requestLimit' %>% rredis::redisTTL()
 
   # Add match information
+  cat(paste0(Sys.time(), ' | Matches ...'))
   matches <- footballstats::amatch_info(
     competitionID = competitionID,
     dateFrom = dateFrom,
     dateTo = dateTo,
     seasonStarting = seasonStarting,
     KEYS = KEYS)
-  cat(paste0(Sys.time(), ' | Matches complete. \n'))
+  cat(' complete \n')
 
   # Store predicted vs. real outcomes
   readyToAnalyse <- paste0('c:', competitionID, ':pred:*') %>% rredis::redisKeys()
@@ -54,6 +55,7 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
   }
 
   # Add commentary information
+  cat(paste0(Sys.time(), ' | Commentary ...'))
   if (nrow(matches) > 0) {
     footballstats::acommentary_info(
       competitionID = competitionID,
@@ -62,17 +64,17 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
       visitorteam = matches$visitorteam_id,
       KEYS = KEYS)
   }
-  cat(paste0(Sys.time(), ' | Commentary complete. \n'))
-
+  cat(' complete \n')
 
   # Add event information
+  cat(paste0(Sys.time(), ' | Events ...'))
   if (nrow(matches) > 0) {
     footballstats::aevent_info(
       competitionID = competitionID,
       matchIDs = matches$id,
       matchEvents = matches$events)
   }
-  cat(paste0(Sys.time(), ' | Events complete. \n'))
+  cat(' complete \n')
 
   # Add team information
   teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
@@ -93,7 +95,7 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
 
   # Add player information
   playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
-
+  cat(paste0(Sys.time(), ' | Players ...'))
   if (playerLength > 0) {
     footballstats::aplayer_info(
       competitionID = competitionID,
@@ -101,14 +103,15 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
       currentSeasonYear = seasonStarting,
       KEYS = KEYS)
   }
-  cat(paste0(Sys.time(), ' | Players complete. \n'))
+  cat(' complete \n\n')
+
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
   totalRequests <- uniqueRequests + teamListLength + playerLength
-  cat(paste0(Sys.time(), ' | ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~* \n'))
+  cat(paste0(Sys.time(), ' . ----------------{-S-U-M-M-A-R-Y-}------------------ \n'))
   cat(paste0(Sys.time(), ' | Analysed ', totalRequests, ' unique GET requests. \n'))
   cat(paste0(Sys.time(), ' | Analysed ', length(matches$events), ' matches/events. \n'))
   cat(paste0(Sys.time(), ' | Analysed ', teamListLength, ' teams. \n'))
   cat(paste0(Sys.time(), ' | Analysed ', playerLength, ' players. \n'))
-  cat('\n')
+  cat(paste0(Sys.time(), ' ` -------------------------------------------------- \n\n'))
 } # nocov end

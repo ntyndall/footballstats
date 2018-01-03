@@ -58,7 +58,7 @@ main <- function(printToSlack = TRUE) { # nocov start
   for (i in 1:nrow(newCompetitions)) {
 
     # Gather all information to be stored in Redis.
-    cat(paste0('Storing... ' , i, ' / ', nrow(newCompetitions), ' (',
+    cat(paste0(Sys.time(), ' | Storing ' , i, ' / ', nrow(newCompetitions), ' (',
                newCompetitions$name[i], ' - ', newCompetitions$region[i], '). \n'))
     footballstats::add_all(
       competitionID = newCompetitions$id[i],
