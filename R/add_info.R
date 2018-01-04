@@ -305,8 +305,6 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 #' @details Player stats infromation is stored in a hash map as;
 #'     ->   [ctps]:{comp_id}:{team_id}:{player_id}:{season}:[_stats_`statType`_]   ->   [HASH]
 #'
-#' @param competitionID An integer containing the competitionID that the
-#'  teams and match information belong to.
 #' @param playerLength An integer value that defines the number of players to
 #'  analyse for a given list of ID's previously generated.
 #'
@@ -315,8 +313,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 #' @export
 
 
-aplayer_info <- function(competitionID, playerLength, currentSeasonYear,
-                         KEYS, bypass = FALSE) {
+aplayer_info <- function(playerLength, currentSeasonYear, KEYS, bypass = FALSE) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",

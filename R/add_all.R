@@ -78,40 +78,25 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
 
   # Add team information
   teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
+  pLBef <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
 
   if (teamListLength > 0) {
-
-    # Remove the keys for the next call to this function
-    if (rredis::redisExists(key = 'c_playerSetInfo')) 'c_playerSetInfo' %>% rredis::redisDelete()
-    if (rredis::redisExists(key = 'analysePlayers')) 'analysePlayers' %>% rredis::redisDelete()
-
     # Add the team information
     footballstats::ateam_info(
       competitionID = competitionID,
       teamListLength = teamListLength,
       KEYS = KEYS)
   }
-  cat(paste0(Sys.time(), ' | Teams complete. \n'))
-
-  # Add player information
-  playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
-  cat(paste0(Sys.time(), ' | Players ...'))
-  if (playerLength > 0) {
-    footballstats::aplayer_info(
-      competitionID = competitionID,
-      playerLength = playerLength,
-      currentSeasonYear = seasonStarting,
-      KEYS = KEYS)
-  }
-  cat(' complete \n\n')
+  cat(paste0(Sys.time(), ' | Teams complete. \n\n'))
+  pLAft <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
 
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
-  totalRequests <- uniqueRequests + teamListLength + playerLength
+  totalRequests <- uniqueRequests + teamListLength
   cat(paste0(Sys.time(), ' . ----------------{-S-U-M-M-A-R-Y-}------------------ \n'))
   cat(paste0(Sys.time(), ' | Analysed ', totalRequests, ' unique GET requests. \n'))
   cat(paste0(Sys.time(), ' | Analysed ', length(matches$events), ' matches/events. \n'))
   cat(paste0(Sys.time(), ' | Analysed ', teamListLength, ' teams. \n'))
-  cat(paste0(Sys.time(), ' | Analysed ', playerLength, ' players. \n'))
+  cat(paste0(Sys.time(), ' | Players to be analysed : ', plBef, ' -> ', plAft, '. \n'))
   cat(paste0(Sys.time(), ' ` -------------------------------------------------- \n\n'))
 } # nocov end

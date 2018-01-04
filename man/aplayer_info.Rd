@@ -4,13 +4,9 @@
 \alias{aplayer_info}
 \title{aplayer_info}
 \usage{
-aplayer_info(competitionID, playerLength, currentSeasonYear, KEYS,
-  bypass = FALSE)
+aplayer_info(playerLength, currentSeasonYear, KEYS, bypass = FALSE)
 }
 \arguments{
-\item{competitionID}{An integer containing the competitionID that the
-teams and match information belong to.}
-
 \item{playerLength}{An integer value that defines the number of players to
 analyse for a given list of ID's previously generated.}
 }
