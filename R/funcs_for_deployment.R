@@ -99,7 +99,6 @@ analyse_players <- function() { # nocov start
   playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
   if (playerLength > 0) {
     footballstats::aplayer_info(
-      competitionID = competitions$id[i],
       playerLength = playerLength,
       currentSeasonYear = seasonStarting,
       KEYS = KEYS)

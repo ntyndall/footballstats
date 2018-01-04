@@ -17,7 +17,6 @@ test_that("Check the keys are as they should be by adding player data", {
   expect_that( 'analysePlayers' %>% rredis::redisExists(), is_true() )
 
   footballstats::aplayer_info(
-    competitionID = 1204,
     playerLength = 1,
     currentSeasonYear = 2017,
     KEYS = NULL,
