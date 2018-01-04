@@ -25,11 +25,33 @@ Sys.setenv(FS_HOST = "___")
 Sys.setenv(FS_APIKEY = "Authorization=___")
 Sys.setenv(FS_SLACK = "___")
 ```
-  - Set up a cron job by typing `crontab -e` with `0 22 * * 0 Rscript /root/run_weekly.R` and creating the following file called `run_weekly.R`
+  - Set up a cron job by typing `crontab -e` with the following...
 ```
+0 22 * * 0 Rscript /root/collect_and_predict.R
+0 22 * * 1 Rscript /root/collect_players.R
+0 22 1 * * Rscript /root/generate_report.R
+```
+and create the following files in `/root/` : 
+
+```
+# /root/collect_and_predict.R
 library(footballstats)
 
 footballstats::main()
+```
+
+```
+# /root/collect_players.R
+library(footballstats)
+
+footballstats::analyse_players()
+```
+
+```
+# /root/generate_report.R
+library(footballstats)
+
+footballstats::monthly_report()
 ```
 
 ## Tagging a release
