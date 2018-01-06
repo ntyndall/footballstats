@@ -34,7 +34,7 @@
 #' @export
 
 
-main <- function(printToSlack = TRUE) { # nocov start
+collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov start
 
   # Get season starting year
   seasonStarting <- footballstats::start_season()
@@ -49,8 +49,11 @@ main <- function(printToSlack = TRUE) { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  ignoreComps <- c('1005', '1007', '1198', '1199')
-  competitions <- competitions[-c(match(ignoreComps, competitions$id)), ]
+  competitions <- competitions[-c(match(footballstats::ignore_comps(), competitions$id)), ]
+
+  # Create the sink for output
+  if (deployed) 'summary' %>% footballstats::create_sink()
+  cat(' -- Beginning analysis -- \n\n\n')
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {
@@ -131,8 +134,7 @@ analyse_data <- function() { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  ignoreComps <- c('1005', '1007', '1198', '1199')
-  competitions <- competitions[-c(match(ignoreComps, competitions$id)), ]
+  competitions <- competitions[-c(match(footballstats::ignore_comps(), competitions$id)), ]
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {

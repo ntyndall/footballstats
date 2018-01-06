@@ -55,11 +55,16 @@ predict_vs_real <- function(competitionID, readyToAnalyse, matches) {
   }
 }
 
-#' @title Create report
+#' @title Create Monthly Report
+#'
+#' @details This function is triggered via a CRON job,
+#'  and prints the results from a months worth of data
+#'  to the slack channel #reports
+#'
 #' @export
 
 
-report_results <- function() {
+monthly_report <- function() {
   allPredictions <- '*:pred:*' %>% rredis::redisKeys()
 
   competitionIDs <- allPredictions %>%

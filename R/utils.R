@@ -129,3 +129,31 @@ redis_con <- function() { # nocov start
   blnk <- capture.output(rredis::redisSelect(1))
 } # nocov end
 
+#' @title Ignore competitions
+#'
+#' @export
+
+
+ignore_comps <- function() { # nocov start
+  return(c('1005', '1007', '1198', '1199',
+           '1397', '1399', '1428'))
+} # nocov end
+
+
+#' @title Create Sink
+#'
+#' @export
+
+
+create_sink <- function(fName) { # nocov start
+  fName %<>% paste0('_', Sys.Date() %>% format('%d-%m-%y'), '.log')
+
+  # Create the file
+  logFile <- file(
+    description = paste0('/root/logs/', fName),
+    open = "wt")
+
+  # Create the sink
+  sink(
+    file = logFile)
+} # nocov end
