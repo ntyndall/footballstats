@@ -157,3 +157,32 @@ create_sink <- function(fName) { # nocov start
   sink(
     file = logFile)
 } # nocov end
+
+#' @title Create Log Directory
+#'
+#' @export
+
+
+create_log_dir <- function() {
+  # Check the log path global R environment variable
+  cat(' ## Reading log path from global variable ... ')
+  logPath <- Sys.getenv('FS_DEPLOYLOC')
+  if (`==`(logPath, '')) {
+    cat('error. \n')
+    stop('Cannot find `FS_DEPLOYLOC`, \n check : \n\n',
+         paste(footballstats::possible_env(), collapse = '\n '))
+  }
+  cat('complete. \n')
+
+  # Create the log path if it doesn't exist already
+  logPath <- paste0(logPath, 'logs/')
+  if (!dir.exists(logPath)) {
+    cat(paste0(' ## Creating log path @ ', logPath, ' \n'))
+    dir.create(
+      path = logPath,
+      recursive = TRUE,
+      showWarnings = FALSE)
+  } else {
+    cat(paste0(' ## Log path exists already @ ', logPath, ' \n'))
+  }
+}
