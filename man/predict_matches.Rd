@@ -4,19 +4,19 @@
 \alias{predict_matches}
 \title{classify_predict_matches}
 \usage{
-predict_matches(competitionID, competitionName, seasonStarting, returnItems,
-  matchFieldNames, subsetItems, SVMfit, binList, printToSlack, KEYS)
+predict_matches(competitionID, competitionName, dataScales, returnItems,
+  matchFieldNames, subsetItems, SVMfit, printToSlack, KEYS)
 }
 \arguments{
 \item{competitionID}{An integer value denoting the competition ID.}
-
-\item{seasonStarting}{An integer denoting the start year of the season.}
 
 \item{returnItems}{A vector of character values that hold the names of
 fields to be returned for the commentary statistics.}
 
 \item{SVMfit}{An SVM object used as the classifier for predicting future
 matches.}
+
+\item{seasonStarting}{An integer denoting the start year of the season.}
 }
 \value{
 Nothing. Print results to screen.

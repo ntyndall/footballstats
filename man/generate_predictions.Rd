@@ -4,10 +4,9 @@
 \alias{generate_predictions}
 \title{generate_predictions}
 \usage{
-generate_predictions(competitionID, fixtureList, seasonStarting, testing,
-  returnItems, subsetItems, SVMfit, matchFieldNames, competitionName = "",
-  binList = NULL, correct = 0, totalTxt = c(), printToSlack = FALSE,
-  KEYS, real = FALSE)
+generate_predictions(fixtureList, testing, SVMfit, dataScales,
+  competitionName = "", correct = 0, totalTxt = c(),
+  printToSlack = FALSE, KEYS, real = FALSE)
 }
 \arguments{
 \item{fixtureList}{A data frame containing match localteam vs. visitorteam
@@ -16,18 +15,18 @@ information which CAN include actual results if testing == TRUE.}
 \item{testing}{A boolean value which decides whether to read the actual result
 of the match and compare with the classifier.}
 
-\item{returnItems}{A vector of character values that hold the names of
-fields to be returned for the commentary statistics.}
-
 \item{SVMfit}{An SVM object used as the classifier for predicting future
 matches.}
-
-\item{binList}{A list of intervals defined by the min and max of a current
-statistic that can feed into the testing phase to see what variables are important.}
 
 \item{correct}{An integer value that starts at 0 and is incremented for
 every match guessed correctly. Will default to number of matches predicted
 if not in testing phase.}
+
+\item{returnItems}{A vector of character values that hold the names of
+fields to be returned for the commentary statistics.}
+
+\item{binList}{A list of intervals defined by the min and max of a current
+statistic that can feed into the testing phase to see what variables are important.}
 }
 \value{
 The agregated value of `correct`.
