@@ -22,9 +22,13 @@
 #' @export
 
 
-generate_predictions <- function(competitionID, fixtureList, seasonStarting, testing, returnItems, subsetItems, SVMfit,
-                                 matchFieldNames, competitionName = "", binList = NULL, correct = 0, totalTxt = c(),
+generate_predictions <- function(fixtureList, testing, SVMfit, dataScales,
+                                 competitionName = "", correct = 0, totalTxt = c(),
                                  printToSlack = FALSE, KEYS, real = FALSE) {
+
+  # Parse important information
+  competitionID <- footballstats::prs_comp()
+  seasonStarting <- footballstats::prs_season()
 
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
@@ -33,83 +37,69 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
   for (i in 1:nrow(fixtureList)) {
     singleFixture <- fixtureList[i, ]
 
+    # Get team information from fixture data frame
     homeName <- singleFixture$localteam_name
     awayName <- singleFixture$visitorteam_name
+    teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
 
-    # Remove form from the item subsetting
-    forStatistics <- list('form', subsetItems) %>%
-      purrr::when(.[[1]] %in% .[[2]] ~ .[[2]][-c(which(.[[1]] == .[[2]]))], ~ .[[2]])
+    # Get statistics for both teams
+    resList <- c()
+    for (j in 1:2) {
+      bFrame <- data.frame(stringsAsFactors = FALSE)
+      commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
+        rredis::redisKeys() %>% as.character
+      bFrame <- commentaryKeys %>% ord_keys() %>% get_av(commentaryNames = commentaryNames)
+      avg <- apply(bFrame, 2, mean)
 
-    # Get home and away statistics
-    fixtureAggregate <- footballstats::homeaway_stats(
-      competitionID = competitionID,
-      singleFixture = singleFixture,
-      seasonStarting = seasonStarting,
-      localVisitor = c('localteam_id', 'visitorteam_id'),
-      returnItems = forStatistics,
-      matchFieldNames = matchFieldNames,
-      testing = testing)
+      avg %<>% get_frm(teamID = teamIDs[j], matchData = matchData)
+      resList %<>% c(list(avg))
+    }
 
-    # Create the appropriate data structures for the SVM
-    predictions <- as.character(sapply(1:2, function(k) {
-      singleTeam <- fixtureAggregate[[k]][[1]] %>% as.integer %>% t() %>% data.frame()
-      names(singleTeam) <- forStatistics
+    # Make the prediction based on scaled data frame results
+    differ <- `-`(resList[[1]], resList[[2]])
+    scled <- differ %>%
+      as.data.frame %>%
+      t %>%
+      scale(
+        center = dataScales$sMin,
+        scale = dataScales$sMax - dataScales$sMin) %>%
+      as.data.frame
 
-      # Map the current form to an integer based on rules in mapForm~
-      singleTeam$form <- fixtureAggregate[[k]][[2]] %>% footballstats::form_to_int()
+    stats::predict(SVMDetails[[1]], scled)
 
-      # Only look at certain combinations if testing is enabled
-        for (i in 1:length(subsetItems)) {
-          vec <- singleTeam[[subsetItems[i]]]
-          singleBin <- binList[[subsetItems[i]]]
-          vec  <- findInterval(vec, singleBin) * (-1)
-          singleTeam[[subsetItems[i]]] <- vec
-        }
-      stats::predict(SVMfit, singleTeam) %>% as.character
-    }))
-
-    # Predict scores now
-    pHome <- predictions[1]
-    pAway <- predictions[2]
-
-    # Rules based on wrong outcomes!
-    pHome <- c(pHome, pAway) %>%
-      purrr::when(
-        .[1] == 'D' && .[2] == 'W' ~ 'L',
-        .[1] == 'D' && .[2] == 'L' ~ 'W',
-        .[1])
-    pAway <- c(pAway, pHome) %>%
-      purrr::when(
-        .[1] == 'D' && .[2] == 'L' ~ 'W',
-        .[1] == 'D' && .[2] == 'W' ~ 'L',
-        .[1])
-
-    # Equal predictions then it is a draw
-    if (pHome == pAway) pHome <- pAway <- 'D'
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
-    if (testing) {
-      res <- (singleFixture$ft_score %>% strsplit(split = ''))[[1]]
-      res <- (res[c(-1, -length(res))] %>% paste(collapse = '') %>%
-        strsplit(split = '-'))[[1]] %>% as.numeric
+    correct <- if (testing) {
+      res <- singleFixture$ft_score %>%
+        strsplit(split = '') %>%
+        purrr::flatten_chr()
+      res <- res[c(-1, -length(res))] %>%
+        paste(collapse = '') %>%
+        strsplit(split = '-') %>%
+        purrr::flatten_chr() %>%
+        as.numeric
       actual <- res %>%
         purrr::when(
           .[1] == .[2] ~ c('D', 'D'),
           .[1] > .[2] ~ c('W', 'L'),
           c('L', 'W'))
-      correct <- if (actual[1] == pHome && actual[2] == pAway) correct + 1 else correct
+      if (actual[1] == pHome && actual[2] == pAway) correct + 1 else correct
     } else {
-      correct <- correct + 1
+      correct + 1
     }
 
-    # Set up emojis from the hash
-    blnk <- function(inp) inp %>% purrr::when(is.na(.) ~ ':blank-team:', ~ .)
-    homeEmoji <- singleFixture$localteam_id %>% as.integer %>% emojiHash$find() %>% blnk()
-    awayEmoji <- singleFixture$visitorteam_id %>% as.integer %>% emojiHash$find() %>% blnk()
+    # Set up emojis from the hash (feed in correct teamID)
+    blnk <- function(tid) {
+      tid %>%
+        as.integer %>%
+        emojiHash$find() %>%
+        purrr::when(is.na(.) ~ ':blank-team:', ~ .) %>%
+        return()
+    }
 
     # Logs for console and for slack
-    txt <- as.character(paste0('[', pHome, '] ', homeName, ' vs. ', awayName, ' [', pAway, ']'))
-    txtForSlack <- as.character(paste0(homeEmoji, ' `', txt, '` ', awayEmoji))
+    txt <- paste0('[', pHome, '] ', homeName, ' vs. ', awayName, ' [', pAway, ']') %>% as.character
+    txtForSlack <- paste0(teamIDs[1] %>% blnk(), ' `', txt, '` ', teamIDs[2] %>% blnk()) %>% as.character
     totalTxt <- c(totalTxt, txtForSlack)
 
     # When making a prediction - store the guess for later
@@ -117,7 +107,8 @@ generate_predictions <- function(competitionID, fixtureList, seasonStarting, tes
       rredis::redisHMSet(
         key = paste0('c:', competitionID, ':pred:', singleFixture$id),
         values = list(
-          home = pHome, away = pAway,
+          home = pHome,
+          away = pAway,
           week = singleFixture$week,
           slack = 'false'))
     }
