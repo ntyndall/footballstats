@@ -219,7 +219,8 @@ scale_data <- function(mDat, dataScales) {
     scale = dataScales$sMax - dataScales$sMin) %>%
     as.data.frame()
 
-  cbind(scaled.data, res = mDat$res) %>% return()
+  if ('res' %in% mDat %>% colnames) scaled.data %<>% cbind(res = mDat$res)
+  scaled.data %>% return()
 }
 
 #' @title Scale SVM Data
