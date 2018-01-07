@@ -89,7 +89,6 @@ build_model <- function(competitionID, matchID, teamIDs, commentaryNames, matchD
         winLoseDraw <- footballstats::match_result(
           scoreCurrent = singleMatchInfo$localteam_score %>% as.integer,
           scoreOther = singleMatchInfo$visitorteam_score %>% as.integer)
-        print(fRes - results)
 
         # Create single row of information
         singleItem <- data.frame(t(fRes - results), stringsAsFactors = FALSE)
