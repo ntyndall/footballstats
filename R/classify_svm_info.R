@@ -69,53 +69,54 @@ best_svm <- function(totalData) {
 #' @export
 
 
-optimize_svm <- function(competitionID, totalData, seasonStarting, testData, matchData,
-                         binList, returnItems, matchFieldNames, testing) {
+optimize_svm <- function(totalData) {
+
+  # Sample the data sets
+  split <- totalData$res %>% caTools::sample.split(SplitRatio = 0.70)
+  trainData <- totalData %>% subset(`==`(split, TRUE))
+  testData <- totalData %>% subset(`==`(split, FALSE))
+
+  # Initialise features to consider
+  feats <- testData %>% names
+  feats %<>% subset(feats != 'res')
+  len <- feats %>% length
+  bestAcc <- overtake <- 0
 
   # Optimize classifier by varying all the possible attributes
-  bLLength <- length(binList)
-  bestResult <- overtake <- 0
-  vec <- c(1:bLLength)
-  for (i in 1:bLLength) {
-    for (j in 1:bLLength) {
-      holdingList <- binList
-      holdData <- totalData
+  vec <- c(1:len)
+  for (i in 1:len) {
+    for (j in 1:len) {
+      holdFeats <- feats
+      holdData <- trainData
       if (i <= j) {
         remove <- vec[i:j]
-        if (length(remove) > (bLLength - 2)) next
-
-        # Delete rows and subset to vary the classification classes
-        holdingList[remove] <- NULL
-        holdData <- holdData[ ,c(holdingList %>% names, 'res')]
+        if (length(remove) > (len - 2)) next
 
         # Build and tune an SVM
-        SVMfit <- holdData %>% footballstats::best_svm()
-        holdData$res <- NULL
+        SVMfit <- holdData[ ,c(holdFeats[-remove], 'res')] %>%
+          footballstats::best_svm()
+        svmPredictions <- stats::predict(SVMfit, testData)
 
-        # Build and tune an SVM
-        currentResult <- footballstats::generate_predictions(
-          competitionID = competitionID,
-          fixtureList = testData,
-          seasonStarting = seasonStarting,
-          testing = TRUE,
-          returnItems = returnItems,
-          subsetItems = names(holdingList),
-          SVMfit = SVMfit,
-          binList = holdingList,
-          matchFieldNames = matchFieldNames)
+        # Get the accuracy on the confusion matrix
+        myT <- table(testData$res, svmPredictions)
+        confuseMat <- caret::confusionMatrix(data = myT)
+        currentAcc <- confuseMat$overall[1] %>% as.numeric
 
         # If the current result is better than assign that to be the new SVM.
-        if (currentResult > bestResult) {
-          stri <- paste0(paste(rep(' ', (overtake * 2) + 1), collapse = ''), '|_')
-          overtake <- overtake + 1
-          cat(paste0(Sys.time(), stri, ' New best result - ', currentResult, ' (from ', bestResult, ')'))
-          bestResult <- max(currentResult, bestResult)
-          bestFactors <- holdingList %>% names
-          bestSVM <- SVMfit
+        if (currentAcc > bestAcc) {
+          stri <- paste0(paste(rep(' ', (overtake * 2) + 1), collapse = ''), ' |_')
+          currentAcc %<>% round(digits = 2)
+          bestAcc %<>% round(digits = 2)
+          cat(paste0(Sys.time(), stri, ' New best result - ', currentAcc, ' (from ', bestAcc, ') \n'))
+          overtake %<>% `+`(1)
+          bestAcc %<>% max(currentAcc)
+
+          # Store the best results so far
+          returningResults <- list(SVMfit, holdFeats)
         }
       }
     }
   }
-  return(list(bestSVM, bestFactors))
+  returningResults %>% return()
 }
 
