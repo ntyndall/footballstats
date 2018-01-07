@@ -16,40 +16,34 @@
 #' @export
 
 
-predict_matches <- function(competitionID, competitionName, seasonStarting, returnItems,
-                            matchFieldNames, subsetItems, SVMfit, binList, printToSlack, KEYS) {
+predict_matches <- function(competitionID, competitionName, dataScales, returnItems,
+                            matchFieldNames, subsetItems, SVMfit, printToSlack, KEYS) {
 
   # Get from and to dates for future fixtures
   dateFrom <- (Sys.Date() + 1) %>% footballstats::format_dates()
   dateTo <- (Sys.Date()  + 8) %>% footballstats::format_dates()
 
   # Define variable names and keys
-  matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
   matchEndpoint <- paste0("/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&")
 
   # Get fixtures
-  if (KEYS %>% is.null) {
-    fixtureList <- footballstats::matchData[60:70, ]
+  fixtureList <- if (KEYS %>% is.null) {
+    footballstats::matchData[60:70, ]
   } else { # nocov start
-    fixtureList <- footballstats::get_data(
+    cat(paste0(Sys.time(), ' | About to report on results...\n'))
+    footballstats::get_data(
       endpoint = matchEndpoint,
       KEYS = KEYS)
-    cat(paste0(Sys.time(), ' | About to report on results...\n'))
   } # nocov end
 
   # Generate predictions based on actual fixtures!
-  if (!is.null(fixtureList)) {
+  if (!(fixtureList %>% is.null)) {
     numOfPredicted <- footballstats::generate_predictions(
-      competitionID = competitionID,
       fixtureList = fixtureList,
-      seasonStarting = seasonStarting,
       testing = FALSE,
-      returnItems = returnItems,
-      subsetItems = subsetItems,
       SVMfit = SVMfit,
-      matchFieldNames = matchFieldNames,
+      dataScales = dataScales,
       competitionName = competitionName,
-      binList = binList,
       printToSlack = printToSlack,
       KEYS = KEYS,
       real = TRUE)
