@@ -41,59 +41,37 @@ classify_all <- function(competitionID, competitionName, seasonStarting,
     matchLimit = matchLimit)
 
   # Check the keyNames from the current list of commentarys.
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
-    rredis::redisKeys() %>% as.character
-  commentaryNames <- commentaryKeys %>% footballstats::available_commentaries(
+  commentaryNames <- competitionID %>% footballstats::available_commentaries(
     includeNames = returnItems)
 
   # Construct data set for building an SVM
   cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
   totalData <- footballstats::calculate_svm(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    commentaryKeys = commentaryKeys,
     commentaryNames = commentaryNames,
     matchData = matchData)
 
-  # Get the binning limits
-  binList <- totalData %>% footballstats::get_bins()
+  # Create scaled data set
+  dataScales <- totalData %>% footballstats::get_scales()
 
-  # Map current form to an integer value also.
-  totalData$form <- totalData$form %>% footballstats::form_to_int()
-
-  # Map the values from the binList to a number between... -(binNo) <= x <= -1
-  totalData <- footballstats::bin_intervals(
-    dataSet = totalData,
-    binList = binList)
-
-  # Test the last match data...
-  testData <- matchData[(nrow(matchData) - 9):nrow(matchData), ]
-  totalData <- totalData[-c((nrow(totalData) - 18):nrow(totalData)), ]
+  totalData %<>% footballstats::scale_data(
+    dataScales = dataScales)
 
   # Optimize the SVM by looping through all available variables
   matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
   cat(paste0(Sys.time(), ' | Optimizing the SVM Classifier. \n'))
-  SVMDetails <- footballstats::optimize_svm(
-    competitionID = competitionID,
-    totalData = totalData,
-    seasonStarting = seasonStarting,
-    testData = testData,
-    binList = binList,
-    returnItems = commentaryNames,
-    matchFieldNames = matchFieldNames,
-    testing = testing)
+  SVMDetails <- totalData %>%
+    footballstats::optimize_svm()
 
   # Predict actual future results
   cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
   footballstats::predict_matches(
     competitionID = competitionID,
     competitionName = competitionName,
-    seasonStarting = seasonStarting,
+    sdataScales = dataScales,
     returnItems = returnItems,
     matchFieldNames = matchFieldNames,
     subsetItems = SVMDetails[[2]],
     SVMfit = SVMDetails[[1]],
-    binList = binList,
     printToSlack = printToSlack,
     KEYS = KEYS)
 }
