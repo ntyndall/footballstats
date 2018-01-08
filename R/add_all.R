@@ -78,7 +78,7 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
 
   # Add team information
   teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
-  pLBef <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
+  plBef <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
 
   if (teamListLength > 0) {
     # Add the team information
@@ -88,7 +88,7 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
       KEYS = KEYS)
   }
   cat(paste0(Sys.time(), ' | Teams complete. \n\n'))
-  pLAft <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
+  plAft <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
 
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
