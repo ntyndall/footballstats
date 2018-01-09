@@ -2,12 +2,17 @@ language: r
 cache: packages
 sudo: false
 warnings_are_errors: false
-addons:
-   apt:
-     packages:
-       - libgsl0-dev
-       - libxml2-dev
-       - libhiredis-dev
+
+before_install:
+  - sudo apt-get install -y libgsl0-dev libxml2-dev \
+      pkg-config libhiredis-dev libapparmor-dev
+#addons:
+#   apt:
+#     packages:
+#       - libgsl0-dev
+#       - libxml2-dev
+#       - libhiredis-dev
+#       - libapparmor-dev
 services: 
    - redis-server
 #script: 
