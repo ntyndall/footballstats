@@ -10,6 +10,7 @@ addons:
        - libxml2-dev
        - build-essential
        - libssl-dev
+       - pkg-config
        - libsasl2-dev
        - libpcap0.8-dev
        - libcurl4-openssl-dev
