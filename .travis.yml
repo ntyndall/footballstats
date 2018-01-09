@@ -8,9 +8,19 @@ addons:
      packages:
        - libgsl0-dev
        - libxml2-dev
-        - pkg-config
-       - libhiredis-dev0.13
+       - build-essential
+       - libssl-dev
+       - libsasl2-dev
+       - libpcap0.8-dev
+       - libcurl4-openssl-dev
+       - libgomp1
+       - libxt6
+       - libsm6
+       - less
+       - pkg-config
+       - libhiredis-dev
        - libapparmor-dev
+       
 services: 
    - redis-server
 #script: 
