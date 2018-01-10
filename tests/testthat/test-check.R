@@ -2,6 +2,7 @@
 
 print('check')
 
-library(redux)
-rcon <- redux::hiredis()
-rcon$SET(key = 't', value = 1)
+library(RcppRedis)
+redis <- new(RcppRedis::Redis)
+redis$set('t', 1)
+print(redis$get('t')

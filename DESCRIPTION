@@ -21,7 +21,7 @@ Imports:
     shiny,
     tcltk,
     magrittr,
-    redux
+    RcppRedis
 Suggests:
     covr
 RoxygenNote: 6.0.1
