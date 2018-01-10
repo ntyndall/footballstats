@@ -55,16 +55,19 @@ test_that("Test that commentary data is sent to Redis.", {
     localteam = recreated$localteam_id,
     visitorteam = recreated$visitorteam_id,
     KEYS = NULL,
-    bypass = TRUE)
+    bypass = bypass)
 
-  commentaryKeys <- as.character(rredis::redisKeys(
-    pattern = paste0('cmt_commentary:', competitionID, '*')))
+  # Check what keys have been added
+  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+    rredis::redisKeys() %>%
+    as.character
 
+  expect_that( commentaryKeys %>% length, equals(2) )
   # Produces a list of available commentary names, Must be a total intersection
-  commentaryNames <- footballstats::available_commentaries(
-    commentaryKeys = commentaryKeys)
+  commentaryNames <- competitionID %>%
+    footballstats::available_commentaries()
 
-  expect_that( commentaryNames %>% length(), equals(9) )
+  expect_that( commentaryNames %>% length, equals(9) )
   expect_that( 'shots_total' %in% commentaryNames, is_true() )
   expect_that( 'shots_ongoal' %in% commentaryNames, is_true() )
   expect_that( 'fouls' %in% commentaryNames, is_true() )
