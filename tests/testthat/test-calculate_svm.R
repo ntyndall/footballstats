@@ -39,9 +39,6 @@ test_that('Calculate SVM from the test match data', {
   commentaryNames <- commentaryKeys %>% footballstats::available_commentaries()
 
   totalData <- footballstats::calculate_svm(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    commentaryKeys =  commentaryKeys,
     commentaryNames = commentaryNames,
     matchData = matchData)
 
