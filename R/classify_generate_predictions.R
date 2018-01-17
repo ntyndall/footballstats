@@ -107,11 +107,8 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
         purrr::flatten_chr() %>%
         `[`(c(2:3)) %>%
         as.integer %>%
-        purrr::when(
-          .[1] == .[2] ~ c('D', 'D'),
-          .[1] > .[2] ~ c('W', 'L'),
-          c('L', 'W'))
-      if (actual[1] == actualH) correct %<>% `+`(1)
+        purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L')
+      if (result == actualH) correct %<>% `+`(1)
     } else {
       correct %<>% `+`(1)
     }
