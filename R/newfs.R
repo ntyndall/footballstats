@@ -3,7 +3,7 @@
 #' @export
 
 
-ord_keys <-function(commentaryKeys, competitionID) {
+ord_keys <-function(commentaryKeys, competitionID, seasonStarting) {
 
   # Get the dates just incase and make sure they are in order:
   matchIDs <- commentaryKeys %>%

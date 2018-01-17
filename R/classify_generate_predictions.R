@@ -42,7 +42,8 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
         rredis::redisKeys() %>%
         as.character %>%
         footballstats::ord_keys(
-          competitionID = competitionID)
+          competitionID = competitionI,
+          seasonStarting = seasonStarting)
 
       # Get commentary names..
       cNames <- dataScales$sMax %>% names
@@ -133,7 +134,6 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
     txtForSlack <- paste0(teamIDs[1] %>% blnk(), ' `', txt, '` ', teamIDs[2] %>% blnk()) %>% as.character
     totalTxt <- c(totalTxt, txtForSlack)
 
-    print(totalTxt)
     # When making a prediction - store the guess for later
     if (KEYS$LOG_PRED) {
       rredis::redisHMSet(
@@ -170,7 +170,8 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
       username = 'predictions')
   } else {
     # Print results to screen
-
+    print('Reporting on results!')
+    print(totalTxt)
   } # nocov end
   return(correct)
 }
