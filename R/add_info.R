@@ -23,12 +23,11 @@
 acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS,
                              bypass = FALSE) {
 
-  if (bypass) {
-    fullCommentary <- footballstats::fullCommentary
-  }
+  # Load static data set for testing
+  if (KEYS$TEST) fullCommentary <- footballstats::fullCommentary
 
   for (i in 1:length(matchIDs)) {
-    if (bypass) {
+    if (KEYS$TEST) {
       commentary <- fullCommentary[[i]]
     } else {  # nocov start
       commentary <- footballstats::get_data(
@@ -39,12 +38,13 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 
     localAway <- c('localteam', 'visitorteam')
     teamIDs <- c(localteam[i], visitorteam[i])
-    if (!is.null(commentary)) {
+
+    if (commentary %>% is.null %>% `!`()) {
       teamStats <- commentary$match_stats
       if (length(teamStats) == 2) {
         for (j in 1:length(localAway)) {
           singleTeamStats <- teamStats[[localAway[j]]]
-          if (!is.null(singleTeamStats)) {
+          if (singleTeamStats %>% is.null %>% `!`()) {
             footballstats::commentary_sub(
               competitionID = competitionID,
               matchID = matchIDs[i],
@@ -75,9 +75,9 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 #' @export
 
 
-acomp_info <- function(KEYS, bypass = FALSE) {
+acomp_info <- function(KEYS) {
 
-  if (bypass) {
+  if (KEYS$TEST) {
     competitionIDs <- footballstats::compData
   } else {  # nocov start
     competitionIDs <- footballstats::get_data(
@@ -86,16 +86,15 @@ acomp_info <- function(KEYS, bypass = FALSE) {
     footballstats::request_limit()
   }  # nocov end
 
-  if (!is.null(competitionIDs)) {
+  if (competitionIDs %>% is.null %>% `!`()) {
     total <- 0
     for (i in 1:nrow(competitionIDs)) {
       seasonID <- competitionIDs$id[[i]]
       compExists <- rredis::redisSAdd(
         set = 'competition:set',
-        element = seasonID %>% as.character() %>% charToRaw())
-      if (compExists == 1) {
-        total <- total + 1
-      }
+        element = seasonID %>% as.character %>% charToRaw())
+
+      if (compExists == 1) total %<>% `+`(1)
     }
     cat(paste0(Sys.time(), ' | Successfully added ', total, ' new competition IDs to Redis. \n'))
     return(competitionIDs)
@@ -120,9 +119,9 @@ acomp_info <- function(KEYS, bypass = FALSE) {
 #' @export
 
 
-acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
+acomp_standings <- function(competitionID, KEYS) {
 
-  if (bypass) {
+  if (KEYS$TEST) {
     standings <- footballstats::standingData
   } else {  # nocov start
     standings <- footballstats::get_data(
@@ -131,7 +130,7 @@ acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
     footballstats::request_limit()
   }  # nocov end
 
-  if (!is.null(standings)) {
+  if (standings %>% is.null %>% `!`()) {
     for (i in 1:nrow(standings)) {
       singleTable <- standings[i, ]
       standingKey <- paste0(
@@ -169,7 +168,7 @@ acomp_standings <- function(competitionID, KEYS, bypass = FALSE) {
 #' @export
 
 
-aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
+aevent_info <- function(competitionID, matchIDs, matchEvents) {
   for (i in 1:length(matchEvents)) {
     eventsPerMatch <- matchEvents[[i]]
     matchID <- matchIDs[i]
@@ -178,9 +177,9 @@ aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
         event <- eventsPerMatch[j, ]
         inSet <- rredis::redisSAdd(
           set = paste0("c_eventInSet:", competitionID),
-          element = event$id %>% as.character() %>% charToRaw()) %>%
-            as.integer() %>%
-              as.logical()
+          element = event$id %>% as.character %>% charToRaw()) %>%
+            as.integer %>%
+            as.logical
         if (inSet) {
           rredis::redisHMSet(
             key = paste0("cme:", competitionID, ":", matchID, ":", event$id),
@@ -225,7 +224,7 @@ aevent_info <- function(competitionID, matchIDs, matchEvents, bypass = FALSE) {
 
 
 amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
-                        analysingToday = TRUE, KEYS, bypass = FALSE) {
+                        analysingToday = TRUE, KEYS) {
   valuesToRetain <- c("id", "comp_id", "formatted_date", "season",
                       "week", "venue", "venue_id", "venue_city",
                       "status", "timer", "time", "localteam_id",
@@ -233,7 +232,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
                       "visitorteam_name", "visitorteam_score", "ht_score",
                       "ft_score", "et_score", "penalty_local", "penalty_visitor")
 
-  if (bypass) {
+  if (KEYS$TEST) {
     matches <- footballstats::matchData
   } else {  # nocov start
     matches <- footballstats::get_data(
@@ -243,7 +242,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
     footballstats::request_limit()
   }  # nocov end
 
-  if (!is.null(matches)) {
+  if (matches %>% is.null %>% `!`()) {
 
     # If getting todays match information, make sure all matches have actually been played.
     if (analysingToday) if (any(matches$localteam_score == "")) return(data.frame())
@@ -313,13 +312,11 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 #' @export
 
 
-aplayer_info <- function(playerLength, currentSeasonYear, KEYS, bypass = FALSE) {
+aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",
                       "birthplace", "position", "height", "weight")
-
-  if (bypass) playerData <- footballstats::playerData
 
   # Set the progress bar
   progressBar <- utils::txtProgressBar(
@@ -330,14 +327,16 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS, bypass = FALSE) 
   sapply(1:playerLength, function(i) {
     playerID <- 'analysePlayers' %>% rredis::redisLPop()
 
-    if (!bypass) {  # nocov start
+    if (KEYS$TEST) {  # nocov start
+      playerData <- footballstats::playerData
+    } else {
       playerData <- footballstats::get_data(
         endpoint = paste0("/player/", playerID, "?"),
         KEYS = KEYS)
       footballstats::request_limit()
     }  # nocov end
 
-    if (!is.null(playerData)) {
+    if (playerData %>% is.null %>% `!`()) {
       stats <- playerData$player_statistics
       statNames <- names(stats)
       sapply(1:length(statNames), function(j) {
@@ -397,17 +396,16 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS, bypass = FALSE) 
 #' @export
 
 
-ateam_info <- function(competitionID, teamListLength,
-                       KEYS, bypass = FALSE) {
+ateam_info <- function(competitionID, teamListLength, KEYS) {
   valuesToRetain <- c("team_id", "is_national", "name", "country",
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",
                       "venue_capacity", "coach_name", "coach_id")
 
-  if (bypass) teamData <- footballstats::teamData
-
   for (i in 1:teamListLength) {
-    if (!bypass) {  # nocov start
+    if (KEYS$TEST) {  # nocov start
+      teamData <- footballstats::teamData
+    } else {
       teamID <- 'analyseTeams' %>% rredis::redisLPop()
       teamData <- footballstats::get_data(
         endpoint = paste0( "/team/", teamID, "?"),
@@ -415,7 +413,7 @@ ateam_info <- function(competitionID, teamListLength,
       footballstats::request_limit()
     }  # nocov end
 
-    if(!is.null(teamData)) {
+    if (teamData %>% is.null %>% `!`()) {
       basic <- paste0("ct_basic:", competitionID, ":", teamData$team_id)
       stats <- paste0("ct_stats:", competitionID, ":", teamData$team_id)
       squad <- paste0("ctp:", competitionID, ":", teamData$team_id)

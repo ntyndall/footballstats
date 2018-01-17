@@ -4,25 +4,27 @@
 #'  global namespace for use throughout the code.
 #'
 #' @details Set up:
-#'  1) Fill in the appropriate sensitive information.
+#'  1) Fill in the  appropriate sensitive information.
 #'  2) Copy this file to sensitiveInfo.R and rename the
 #'     function to sensitiveInfo()
 #'
-#' @param None
+#' @param printToSlack A boolean
+#' @param testing A boolean
+#' @param storePred A boolean
 #'
 #' @return Returns nothing.
 #'
 #' @export
 
 
-sensitive_keys <- function() {  # nocov start
+sensitive_keys <- function(printToSlack, testing, storePred) {  # nocov start
   cat(paste0(Sys.time(), ' | Loading global environment variables...'))
   fsHost <- Sys.getenv("FS_HOST")
   fsApikey <- Sys.getenv("FS_APIKEY")
   fsSlack <- Sys.getenv("FS_SLACK")
   prof <- footballstats::possible_env()
 
-  if (any(nchar(c(fsHost, fsApikey, fsSlack)) < 1)) {
+  if (c(fsHost, fsApikey, fsSlack) %>% nchar %>% `<`(1) %>% any) {
     stop(paste0('Halting - please set environment variables for `FS_HOST`, `FS_APIKEY`, and `FS_SLACK`.',
                 '\n Possible locations include :: \n ',
                 paste(' -->', prof, collapse = '\n '),
@@ -31,9 +33,14 @@ sensitive_keys <- function() {  # nocov start
                 paste0('FS_APIKEY = ', fsApikey, '\n'),
                 paste0('FS_SLACK = ', fsSlack, '\n')))
   } else {
-    return(list(FS_HOST = fsHost,
-                FS_APIKEY= fsApikey,
-                FS_SLACK = fsSlack))
+    list(
+      FS_HOST = fsHost,
+      FS_APIKEY= fsApikey,
+      FS_SLACK = fsSlack,
+      SLACK_PRNT = printToSlack,
+      TEST = testing,
+      LOG_PRED = storePred) %>%
+    return()
   }
 }  # nocov end
 

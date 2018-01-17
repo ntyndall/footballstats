@@ -219,7 +219,7 @@ scale_data <- function(mDat, dataScales) {
     scale = dataScales$sMax - dataScales$sMin) %>%
     as.data.frame()
 
-  if ('res' %in% mDat %>% colnames) scaled.data %<>% cbind(res = mDat$res)
+  if ('res' %in% (mDat %>% colnames)) scaled.data %<>% cbind(res = mDat$res)
   scaled.data %>% return()
 }
 

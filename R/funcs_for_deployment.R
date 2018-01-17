@@ -40,8 +40,11 @@ collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov
   seasonStarting <- footballstats::start_season()
 
   # Obtain API and sensitive key information
-  KEYS <- footballstats::sensitive_keys()
-
+  KEYS <- footballstats::sensitive_keys(
+    printToSlack = FALSE,
+    testing = TRUE,
+    storePred = FALSE)
+#
   # Make a connection to redis for storing data
   footballstats::redis_con()
 

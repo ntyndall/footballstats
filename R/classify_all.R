@@ -30,8 +30,7 @@
 
 
 classify_all <- function(competitionID, competitionName, seasonStarting,
-                         returnItems, matchLimit = 150, testing = FALSE,
-                         printToSlack, KEYS) {
+                         returnItems, printToSlack = FALSE, KEYS) {
 
   # Query Redis and return everything from the competition.
   cat(paste0(Sys.time(), ' | Recreating match data. \n'))
@@ -57,21 +56,19 @@ classify_all <- function(competitionID, competitionName, seasonStarting,
     dataScales = dataScales)
 
   # Optimize the SVM by looping through all available variables
-  matchFieldNames <- c('formatted_date', 'localteam_score', 'localteam_id', 'visitorteam_score', 'visitorteam_id')
-  cat(paste0(Sys.time(), ' | Optimizing the SVM Classifier. \n'))
-  SVMDetails <- totalData %>%
-    footballstats::optimize_svm()
+  # cat(paste0(Sys.time(), ' | Optimizing the SVM Classifier. \n'))
+  #SVMDetails <- totalData %>%
+  #  footballstats::optimize_svm()
+
+  cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
+  classifyModel <- totalData %>% footballstats::neural_network()
 
   # Predict actual future results
   cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
   footballstats::predict_matches(
     competitionID = competitionID,
     competitionName = competitionName,
-    sdataScales = dataScales,
-    returnItems = returnItems,
-    matchFieldNames = matchFieldNames,
-    subsetItems = SVMDetails[[2]],
-    SVMfit = SVMDetails[[1]],
-    printToSlack = printToSlack,
+    dataScales = dataScales,
+    classifyModel = classifyModel,
     KEYS = KEYS)
 }

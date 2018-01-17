@@ -5,30 +5,22 @@
 #'
 #' @param fixtureList A data frame containing match localteam vs. visitorteam
 #'  information which CAN include actual results if testing == TRUE.
-#' @param testing A boolean value which decides whether to read the actual result
-#'  of the match and compare with the classifier.
-#' @param returnItems A vector of character values that hold the names of
-#'  fields to be returned for the commentary statistics.
-#' @param SVMfit An SVM object used as the classifier for predicting future
-#'  matches.
-#' @param binList A list of intervals defined by the min and max of a current
-#'  statistic that can feed into the testing phase to see what variables are important.
-#' @param correct An integer value that starts at 0 and is incremented for
-#'  every match guessed correctly. Will default to number of matches predicted
-#'  if not in testing phase.
 #'
 #' @return The agregated value of `correct`.
 #'
 #' @export
 
 
-generate_predictions <- function(fixtureList, testing, SVMfit, dataScales,
-                                 competitionName = "", correct = 0, totalTxt = c(),
-                                 printToSlack = FALSE, KEYS, real = FALSE) {
+generate_predictions <- function(fixtureList, classifyModel, dataScales,
+                                 competitionName = "", KEYS) {
+
+  # Initialise arguments
+  correct <- 0
+  totalTxt <- c()
 
   # Parse important information
-  competitionID <- footballstats::prs_comp()
-  seasonStarting <- footballstats::prs_season()
+  competitionID <- fixtureList$comp_id %>% footballstats::prs_comp()
+  seasonStarting <- fixtureList$season %>% footballstats::prs_season()
 
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
@@ -47,16 +39,43 @@ generate_predictions <- function(fixtureList, testing, SVMfit, dataScales,
     for (j in 1:2) {
       bFrame <- data.frame(stringsAsFactors = FALSE)
       commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
-        rredis::redisKeys() %>% as.character
-      bFrame <- commentaryKeys %>% ord_keys() %>% get_av(commentaryNames = commentaryNames)
+        rredis::redisKeys() %>%
+        as.character %>%
+        footballstats::ord_keys()
+
+      # Only calculate average - Can I do something more advanced here like a spline?
+      bFrame <- commentaryKeys %>%
+        footballstats::get_av(
+          commentaryNames = commentaryNames)
       avg <- apply(bFrame, 2, mean)
 
-      avg %<>% get_frm(teamID = teamIDs[j], matchData = matchData)
+      # Get match IDs
+      matchIDs <- commentaryKeys %>%
+        strsplit(split = ':') %>%
+        purrr::map(3) %>%
+        purrr::flatten_chr()
+
+      # Construct matchData like obect
+      csmIDs <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs)
+
+      cLen <- csmIDs %>% length
+      matchData <- data.frame(stringsAsFactors = FALSE)
+      for (k in (cLen - 2):cLen) {
+        matchData %<>% rbind(csmIDs[k] %>%
+          rredis::redisHGetAll() %>%
+          as.data.frame)
+      }
+
+      avg %<>% footballstats::get_frm(
+        teamID = teamIDs[j],
+        matchData = matchData)
+
       resList %<>% c(list(avg))
     }
 
     # Make the prediction based on scaled data frame results
     differ <- `-`(resList[[1]], resList[[2]])
+
     scled <- differ %>%
       as.data.frame %>%
       t %>%
@@ -65,11 +84,18 @@ generate_predictions <- function(fixtureList, testing, SVMfit, dataScales,
         scale = dataScales$sMax - dataScales$sMin) %>%
       as.data.frame
 
-    stats::predict(SVMDetails[[1]], scled)
+    #
+    result <- neuralnet::compute(
+      x = classifyModel,
+      covariate = scled)
 
+    # Get the home team result
+    resultsOrd <- c('D', 'L', 'W')
+    actualH <- resultsOrd[result$net.result[1, ] %>% which.max]
+    actualA <- if (actualH %>% `==`('W')) 'L' else if (actualH %>% `==`('L')) 'W' else 'D'
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
-    correct <- if (testing) {
+    correct <- if (KEYS$TEST) {
       res <- singleFixture$ft_score %>%
         strsplit(split = '') %>%
         purrr::flatten_chr()
@@ -83,7 +109,7 @@ generate_predictions <- function(fixtureList, testing, SVMfit, dataScales,
           .[1] == .[2] ~ c('D', 'D'),
           .[1] > .[2] ~ c('W', 'L'),
           c('L', 'W'))
-      if (actual[1] == pHome && actual[2] == pAway) correct + 1 else correct
+      if (actual[1] == actualH && actual[2] == actualA) correct + 1 else correct
     } else {
       correct + 1
     }
@@ -98,24 +124,25 @@ generate_predictions <- function(fixtureList, testing, SVMfit, dataScales,
     }
 
     # Logs for console and for slack
-    txt <- paste0('[', pHome, '] ', homeName, ' vs. ', awayName, ' [', pAway, ']') %>% as.character
+    txt <- paste0('[', actualH, '] ', homeName, ' vs. ', awayName, ' [', actualA, ']') %>% as.character
     txtForSlack <- paste0(teamIDs[1] %>% blnk(), ' `', txt, '` ', teamIDs[2] %>% blnk()) %>% as.character
     totalTxt <- c(totalTxt, txtForSlack)
 
+    print(totalTxt)
     # When making a prediction - store the guess for later
-    if (real) {
+    if (KEYS$LOG_PRED) {
       rredis::redisHMSet(
         key = paste0('c:', competitionID, ':pred:', singleFixture$id),
         values = list(
-          home = pHome,
-          away = pAway,
+          home = actualH,
+          away = actualA,
           week = singleFixture$week,
           slack = 'false'))
     }
     Sys.sleep(1)
   }
 
-  if (printToSlack && real) { # nocov start
+  if (KEYS$SLACK_PRNT) { # nocov start
     slackr::slackrSetup(
       channel = '#results',
       api_token = KEYS$FS_SLACK)
@@ -136,6 +163,9 @@ generate_predictions <- function(fixtureList, testing, SVMfit, dataScales,
       channel = '#results',
       api_token = KEYS$FS_SLACK,
       username = 'predictions')
+  } else {
+    # Print results to screen
+
   } # nocov end
   return(correct)
 }
