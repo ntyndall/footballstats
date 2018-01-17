@@ -69,7 +69,7 @@ build_model <- function(competitionID, matchID, teamIDs, commentaryNames, matchD
 
     # Check that all the allowed names is a subset of the comentary
     availableNames <- commentaryKey %>% rredis::redisHGetAll() %>% names
-    if (allowedNames %in% availableNames %>% all %>% `!`()) break
+    if (commentaryNames %in% availableNames %>% all %>% `!`()) break
 
     # Get Commentary results from Redis
     results <- footballstats::commentary_from_redis(
