@@ -11,10 +11,10 @@
 #' @export
 
 
-generate_predictions <- function(fixtureList, classifyModel, dataScales,
-                                 competitionName = "", KEYS) {
+generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
   # Initialise arguments
+  dataScales <- footballstats::dataScales
   correct <- 0
   totalTxt <- c()
 
@@ -38,9 +38,14 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
     resList <- c()
     for (j in 1:2) {
       bFrame <- data.frame(stringsAsFactors = FALSE)
+
+      # Check that keys actually exists
       commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
-        rredis::redisKeys() %>%
-        as.character %>%
+        rredis::redisKeys()
+      if (commentaryKeys %>% is.null) break
+
+      # If it does then continue on
+      commentaryKeys %<>% as.character %>%
         footballstats::ord_keys(
           competitionID = competitionID,
           seasonStarting = seasonStarting)
@@ -79,6 +84,9 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
       resList %<>% c(list(avg))
     }
 
+    # Go onto the next feature
+    if (resList %>% length %>% `!=`(2)) next
+
     # Make the prediction based on scaled data frame results
     differ <- `-`(resList[[1]], resList[[2]])
 
@@ -92,7 +100,7 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
 
     #
     result <- neuralnet::compute(
-      x = classifyModel,
+      x = footballstats::nn,
       covariate = scled)
 
     # Get the home team result

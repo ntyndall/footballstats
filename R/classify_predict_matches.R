@@ -31,8 +31,6 @@ predict_matches <- function(competitionID, competitionName, KEYS) {
   if (fixtureList %>% is.null %>% `!`()) {
     numOfPredicted <- footballstats::generate_predictions(
       fixtureList = fixtureList,
-      classifyModel = footballstats::nn,
-      dataScales = footballstats::dataScales,
       competitionName = competitionName,
       KEYS = KEYS)
     cat(paste0(Sys.time(), ' | Predicted a total of ', numOfPredicted, ' matches. \n'))
