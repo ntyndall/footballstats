@@ -5,18 +5,13 @@
 #'  the results.
 #'
 #' @param competitionID An integer value denoting the competition ID.
-#' @param seasonStarting An integer denoting the start year of the season.
-#' @param returnItems A vector of character values that hold the names of
-#'  fields to be returned for the commentary statistics.
-#' @param SVMfit An SVM object used as the classifier for predicting future
-#'  matches.
-#'
+
 #' @return Nothing. Print results to screen.
 #'
 #' @export
 
 
-predict_matches <- function(competitionID, competitionName, dataScales, classifyModel, KEYS) {
+predict_matches <- function(competitionID, competitionName, KEYS) {
 
   # Get from and to dates for future fixtures
   dateFrom <- (Sys.Date() + 1) %>% footballstats::format_dates()
@@ -36,8 +31,8 @@ predict_matches <- function(competitionID, competitionName, dataScales, classify
   if (fixtureList %>% is.null %>% `!`()) {
     numOfPredicted <- footballstats::generate_predictions(
       fixtureList = fixtureList,
-      classifyModel = classifyModel,
-      dataScales = dataScales,
+      classifyModel = footballstats::nn,
+      dataScales = footballstats::dataScales,
       competitionName = competitionName,
       KEYS = KEYS)
     cat(paste0(Sys.time(), ' | Predicted a total of ', numOfPredicted, ' matches. \n'))

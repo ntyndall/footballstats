@@ -52,7 +52,7 @@ collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[-c(match(footballstats::ignore_comps(), competitions$id)), ]
+  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
 
   # Create the sink for output
   if (deployed) 'summary' %>% footballstats::create_sink()
@@ -77,17 +77,8 @@ collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov
     footballstats::predict_matches(
       competitionID = competitions$id[i],
       competitionName = competitions$name[i],
-      dataScales = footballstats::dataScales,
-      classifyModel = footballstats::nn,
       KEYS = KEYS)
 
-    #footballstats::classify_all(
-    #  competitionID = competitions$id[i],
-    #  competitionName = competitions$name[i],
-    #  seasonStarting = seasonStarting,
-    #  returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
-    #  printToSlack = printToSlack,
-    #  KEYS = KEYS)
   }
 } # nocov end
 
@@ -145,7 +136,7 @@ analyse_data <- function() { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[-c(match(footballstats::ignore_comps(), competitions$id)), ]
+  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {

@@ -136,14 +136,17 @@ redis_con <- function() { # nocov start
   blnk <- capture.output(rredis::redisSelect(1))
 } # nocov end
 
-#' @title Ignore competitions
+#' @title Allowed competitions
 #'
 #' @export
 
 
-ignore_comps <- function() { # nocov start
-  return(c('1005', '1007', '1198', '1199',
-           '1397', '1399', '1428'))
+allowed_comps <- function() { # nocov start
+  c('1093', '1102', '1184', '1204',
+   '1205', '1221', '1229', '1232',
+   '1265', '1269', '1322', '1352',
+   '1408', '1425', '1457') %>%
+    return()
 } # nocov end
 
 

@@ -4,7 +4,7 @@
 \alias{calculate_svm}
 \title{calculate_svm}
 \usage{
-calculate_svm(commentaryNames, matchData)
+calculate_svm(matchData)
 }
 \arguments{
 \item{matchData}{A dataframe containing all the match data.}

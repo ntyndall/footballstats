@@ -30,8 +30,6 @@ test_that('Classify all - end to end from adding data to classifying and predict
   footballstats::predict_matches(
     competitionID = competitionID,
     competitionName = 'test-competition',
-    dataScales = footballstats::dataScales,
-    classifyModel = footballstats::nn,
     KEYS = KEYS)
   KEYS$LOG_PRED <- FALSE
 

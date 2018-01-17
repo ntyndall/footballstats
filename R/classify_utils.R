@@ -60,11 +60,16 @@ order_matchdata <- function(matchData, limit = 5000) {
 #'
 #' @export
 
-available_commentaries <- function(competitionID, includeNames = 'all') {
+available_commentaries <- function(competitionID = 'all', includeNames = 'all') {
 
-  # Get commentary Keys first
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
-    rredis::redisKeys() %>% as.character
+  # Single competitionID or all
+  allowedComps <- footballstats::allowed_comps()
+
+  commentaryKeys <- c()
+  for (i in 1:(allowedComps %>% length)) {
+    commentaryKeys %<>% c(paste0('cmt_commentary:', allowedComps[i], '*') %>%
+      rredis::redisKeys() %>% as.character)
+  }
 
   allAvailable <- c()
   getAll <- if (`==`(includeNames %>% length, 1)) TRUE else FALSE
@@ -73,6 +78,7 @@ available_commentaries <- function(competitionID, includeNames = 'all') {
     cNames <- results %>% names
     cValues <- results %>% as.character
     empties <- cValues == ""
+
 
     # Default to all
     if (`==`(x, 1) && getAll) includeNames <- cNames %>% subset(cNames != 'table_id')

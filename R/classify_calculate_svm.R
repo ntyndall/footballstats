@@ -16,34 +16,39 @@
 #' @export
 
 
-calculate_svm <- function(commentaryNames, matchData) {
+calculate_svm <- function(matchData) {
+
+  # Only take these names
+  allowedNames <- dataScales$sMax %>% names %>% `[`(c(1:7))
 
   # Infer competitionID
-  competitionID <- matchData$comp_id %>% footballstats::prs_comp()
+  #competitionID <- matchData$comp_id %>% footballstats::prs_comp()
   seasonStarting <- matchData$season %>% footballstats::prs_season()
   mDat <- data.frame(stringsAsFactors = FALSE)
 
-  for (i in 1:nrow(matchData)) {
-    matchID <- matchData$id[i]
+  for (i in 1:(matchData %>% nrow)) {
+    matchSlice <- matchData[i, ]
+    matchID <- matchSlice$id
+    competitionID <- matchSlice$comp_id
+
     # Get single match information
     singleMatchInfo <- rredis::redisHGetAll(
       key = paste0('csm:', competitionID, ':', seasonStarting, ':', matchID))
-    teamIDs <- c(matchData$localteam_id[i], matchData$visitorteam_id[i])
+    teamIDs <- c(matchSlice$localteam_id, matchSlice$visitorteam_id)
 
+    # Get information
     datSlice <- footballstats::build_model(
       competitionID = competitionID,
       matchID = matchID,
       teamIDs = teamIDs,
-      commentaryNames = commentaryNames,
+      commentaryNames = allowedNames,
       matchData = matchData,
       singleMatchInfo = singleMatchInfo)
 
     mDat %<>% rbind(datSlice)
   }
 
-  mDat %>%
-    footballstats::drop_unique_feats() %>%
-    return()
+  mDat %>% return()
 }
 
 #'
@@ -57,7 +62,13 @@ build_model <- function(competitionID, matchID, teamIDs, commentaryNames, matchD
     commentaryKey <- paste0('cmt_commentary:', competitionID, ':', matchID, ':', teamIDs[j]) %>%
       rredis::redisKeys() %>% as.character
 
+    # Check commentary key exists
     if (identical(commentaryKey, character(0))) break
+
+    # Check that all the allowed names is a subset of the comentary
+    availableNames <- commentaryKey %>% rredis::redisHGetAll() %>% names
+    if (allowedNames %in% availableNames %>% all %>% `!`()) break
+
     # Get Commentary results from Redis
     results <- footballstats::commentary_from_redis(
       keyName = commentaryKey,
@@ -80,7 +91,7 @@ build_model <- function(competitionID, matchID, teamIDs, commentaryNames, matchD
       totalForm = totalForm)
 
     if (is.null(form)) {
-     break
+      break
     } else {
       if (j == 1) {
         fRes <- results

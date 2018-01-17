@@ -1,34 +1,36 @@
 library(footballstats)
+library(magrittr)
 
-# Query Redis and return everything from the competition.
+# Get allowed competitions
+comps <- footballstats::allowed_comps()
+
+# Get all the data first
 cat(paste0(Sys.time(), ' | Recreating match data. \n'))
-matchData <- footballstats::recreate_matchdata(
-  competitionID = competitionID,
-  seasonStarting = seasonStarting,
-  matchLimit = matchLimit)
-
-# Check the keyNames from the current list of commentarys.
-commentaryNames <- competitionID %>% footballstats::available_commentaries(
-  includeNames = returnItems)
+totalData <- data.frame(stringsAsFactors = FALSE)
+for (i in 1:(comps %>% length)) {
+  matchData <- footballstats::recreate_matchdata(
+    competitionID = comps[i],
+    seasonStarting = seasonStarting,
+    matchLimit = 10000)
+  totalData %<>% rbind(matchData)
+}
 
 # Construct data set for building an SVM
 cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
-totalData <- footballstats::calculate_svm(
-  commentaryNames = commentaryNames,
-  matchData = matchData)
+original.data <- totalData %>% footballstats::calculate_data()
+
+# Replace any NA's with zero
+original.data[original.data %>% is.na] <- 0
 
 # Create scaled data set
-dataScales <- totalData %>% footballstats::get_scales()
+dataScales <- original.data %>% footballstats::get_scales()
+save(dataScales, file = getwd() %>% paste0('/data/dataScales.rda'))
 
-totalData %<>% footballstats::scale_data(
-  dataScales = dataScales)
+# Scale the original data set
+original.data %<>% footballstats::scale_data(dataScales = dataScales)
 
-# Optimize the SVM by looping through all available variables
-# cat(paste0(Sys.time(), ' | Optimizing the SVM Classifier. \n'))
-#SVMDetails <- totalData %>%
-#  footballstats::optimize_svm()
-
+# Build the neural network with scaled data
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
-classifyModel <- totalData %>% footballstats::neural_network()
+classifyModel <- original.data %>% footballstats::neural_network()
+save(classifyModel, file = getwd() %>% paste0('/data/classifyModel.rda'))
 
-# Save the model somewhere??
