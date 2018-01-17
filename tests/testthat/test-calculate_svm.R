@@ -8,7 +8,7 @@ rredis::redisConnect(
 rredis::redisSelect(3)
 rredis::redisFlushDB()
 
-test_that('Calculate SVM from the test match data', {
+test_that('Calculate data set built from features', {
 
   matchData <- footballstats::amatch_info(
     competitionID = competitionID,
@@ -31,25 +31,19 @@ test_that('Calculate SVM from the test match data', {
     visitorteam = matchData$visitorteam_id,
     KEYS = KEYS)
 
-  # Check the keyNames from the current list of commentarys.
-  commentaryNames <- competitionID %>%
-    footballstats::available_commentaries()
-
   # Calculate the feature set
-  totalData <- footballstats::calculate_svm(
-    commentaryNames = commentaryNames,
-    matchData = matchData)
+  totalData <- matchData %>% footballstats::calculate_svm()
 
   expect_that( totalData %>% nrow, equals(40) )
-  expect_that( totalData %>% names %>% length, equals(11) )
+  expect_that( totalData %>% names %>% length, equals(9) )
   expect_that( totalData$shots_total %>% range, equals(c(-22, 20)) )
   expect_that( totalData$shots_ongoal %>% range, equals(c(-11, 10)) )
   expect_that( totalData$fouls %>% range, equals(c(-10, 7)) )
   expect_that( totalData$corners %>% range, equals(c(-7, 9)) )
-  expect_that( totalData$offsides %>% range, equals(c(-5, 8)) )
+  #expect_that( totalData$offsides %>% range, equals(c(-5, 8)) )
   expect_that( totalData$possesiontime %>% range, equals(c(-56, 56)) )
   expect_that( totalData$yellowcards %>% range, equals(c(-3, 3)) )
-  expect_that( totalData$redcards %>% range, equals(c(-1, 1)) )
+  #expect_that( totalData$redcards %>% range, equals(c(-1, 1)) )
   expect_that( totalData$saves %>% range, equals(c(-7, 8)) )
 
   uniqueResults <- totalData$res %>% unique

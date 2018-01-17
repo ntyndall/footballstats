@@ -47,6 +47,8 @@ calculate_svm <- function(matchData) {
 
     mDat %<>% rbind(datSlice)
   }
+  # Replace any NA's with zero
+  mDat[mDat %>% is.na] <- 0
 
   mDat %>% return()
 }
