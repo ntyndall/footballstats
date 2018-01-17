@@ -42,7 +42,7 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
         rredis::redisKeys() %>%
         as.character %>%
         footballstats::ord_keys(
-          competitionID = competitionI,
+          competitionID = competitionID,
           seasonStarting = seasonStarting)
 
       # Get commentary names..
@@ -101,23 +101,19 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
     actualA <- if (actualH %>% `==`('W')) 'L' else if (actualH %>% `==`('L')) 'W' else 'D'
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
-    correct <- if (KEYS$TEST) {
-      res <- singleFixture$ft_score %>%
-        strsplit(split = '') %>%
-        purrr::flatten_chr()
-      res <- res[c(-1, -length(res))] %>%
-        paste(collapse = '') %>%
-        strsplit(split = '-') %>%
+    if (KEYS$TEST) {
+      result <- singleFixture$ft_score %>%
+        strsplit(split = '[[:punct:]]') %>%
         purrr::flatten_chr() %>%
-        as.numeric
-      actual <- res %>%
+        `[`(c(2:3)) %>%
+        as.integer %>%
         purrr::when(
           .[1] == .[2] ~ c('D', 'D'),
           .[1] > .[2] ~ c('W', 'L'),
           c('L', 'W'))
-      if (actual[1] == actualH && actual[2] == actualA) correct + 1 else correct
+      if (actual[1] == actualH) correct %<>% `+`(1)
     } else {
-      correct + 1
+      correct %<>% `+`(1)
     }
 
     # Set up emojis from the hash (feed in correct teamID)
