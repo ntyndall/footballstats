@@ -31,6 +31,5 @@ original.data %<>% footballstats::scale_data(dataScales = dataScales)
 
 # Build the neural network with scaled data
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
-classifyModel <- original.data %>% footballstats::neural_network()
-save(classifyModel, file = getwd() %>% paste0('/data/classifyModel.rda'))
-
+nn <- original.data[1:300, ] %>% footballstats::neural_network()
+save(nn, file = getwd() %>% paste0('/data/nn.rda'))
