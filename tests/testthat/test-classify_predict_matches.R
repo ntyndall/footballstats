@@ -26,14 +26,14 @@ test_that('Classify all - end to end from adding data to classifying and predict
     KEYS = KEYS)
 
   # Create the predictions here
-  KEYS$LOG_PRED <<- TRUE
+  KEYS$LOG_PRED <- TRUE
   footballstats::predict_matches(
     competitionID = competitionID,
     competitionName = 'test-competition',
     dataScales = footballstats::dataScales,
     classifyModel = footballstats::nn,
     KEYS = KEYS)
-  KEYS$LOG_PRED <<- FALSE
+  KEYS$LOG_PRED <- FALSE
 
   predictions <- 'c:1204:pred*' %>%
     rredis::redisKeys() %>%

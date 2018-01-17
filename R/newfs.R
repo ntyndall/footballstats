@@ -1,7 +1,9 @@
 #' @title ord keys
 #'
 #' @export
-ord_keys <-function(commentaryKeys) {
+
+
+ord_keys <-function(commentaryKeys, competitionID) {
 
   # Get the dates just incase and make sure they are in order:
   matchIDs <- commentaryKeys %>%
@@ -65,7 +67,7 @@ get_av <- function(orderedKeys, commentaryNames) {
     results <- footballstats::commentary_from_redis(
       keyName = orderedKeys[i],
       returnItems = commentaryNames)
-    print(results)
+
     results %<>% as.data.frame %>% t
     colnames(results) <- commentaryNames
     bFrame %<>% rbind(results)

@@ -22,9 +22,6 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
   competitionID <- fixtureList$comp_id %>% footballstats::prs_comp()
   seasonStarting <- fixtureList$season %>% footballstats::prs_season()
 
-  print('checking in predict...')
-  print(competitionID)
-  print(seasonStarting)
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
 
@@ -44,12 +41,17 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
       commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
         rredis::redisKeys() %>%
         as.character %>%
-        footballstats::ord_keys()
+        footballstats::ord_keys(
+          competitionID = competitionID)
+
+      # Get commentary names..
+      cNames <- dataScales$sMax %>% names
+      cNames <- cNames[c(1:(cNames %>% length %>% `-`(1)))]
 
       # Only calculate average - Can I do something more advanced here like a spline?
       bFrame <- commentaryKeys %>%
         footballstats::get_av(
-          commentaryNames = commentaryNames)
+          commentaryNames = cNames)
       avg <- apply(bFrame, 2, mean)
 
       # Get match IDs

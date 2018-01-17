@@ -189,6 +189,7 @@ commentary_from_redis <- function(keyName, returnItems) {
       replacement = "",
       x = results$possesiontime)
   }
+
   results %>% as.double %>% return()
 }
 
