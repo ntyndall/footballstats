@@ -23,8 +23,7 @@ test_that("Test that match data can be recreated easily.", {
     dateFrom = NULL,
     dateTo = NULL,
     seasonStarting = 2017,
-    KEYS = NULL,
-    bypass = bypass)
+    KEYS = KEYS)
 
   recreated <- footballstats::recreate_matchdata(
     competitionID = competitionID,
@@ -54,17 +53,19 @@ test_that("Test that commentary data is sent to Redis.", {
     matchIDs = recreated$id,
     localteam = recreated$localteam_id,
     visitorteam = recreated$visitorteam_id,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
-  commentaryKeys <- as.character(rredis::redisKeys(
-    pattern = paste0('cmt_commentary:', competitionID, '*')))
+  # Check what keys have been added
+  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+    rredis::redisKeys() %>%
+    as.character
 
+  expect_that( commentaryKeys %>% length, equals(2) )
   # Produces a list of available commentary names, Must be a total intersection
-  commentaryNames <- footballstats::available_commentaries(
-    commentaryKeys = commentaryKeys)
+  commentaryNames <- competitionID %>%
+    footballstats::available_commentaries()
 
-  expect_that( commentaryNames %>% length(), equals(9) )
+  expect_that( commentaryNames %>% length, equals(9) )
   expect_that( 'shots_total' %in% commentaryNames, is_true() )
   expect_that( 'shots_ongoal' %in% commentaryNames, is_true() )
   expect_that( 'fouls' %in% commentaryNames, is_true() )
@@ -87,45 +88,46 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
     strsplit(split = '[:]') %>%
     purrr::map(4) %>%
     purrr::flatten_chr() %>%
-    as.integer() %>%
-    sort()
+    as.integer %>%
+    sort
 
-  keyName <- commentaryKeys[grepl(teamIDs[1], commentaryKeys) %>% which()]
+  keyName <- commentaryKeys[grepl(teamIDs[1], commentaryKeys) %>% which]
   result <- footballstats::commentary_from_redis(
     keyName = keyName,
     returnItems = 'saves')
 
-  expect_that( result %>% length(), equals(1) )
+  expect_that( result %>% length, equals(1) )
   expect_that( result, equals(1) )
 
   result <- footballstats::commentary_from_redis(
     keyName = keyName,
     returnItems = c('yellowcards', 'possesiontime'))
 
-  expect_that( result %>% length(), equals(2) )
-  expect_that( result %>% sort(), equals(c(0, 65)) )
+  expect_that( result %>% length, equals(2) )
+  expect_that( result %>% sort, equals(c(0, 65)) )
 
 })
 
 
 test_that("Check that a list of commentary data can be aggregated correctly", {
 
-  commentaryKeys <- as.character(rredis::redisKeys(
-    pattern = paste0('cmt_commentary:', competitionID, '*')))
+  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+    rredis::redisKeys() %>%
+    as.character
 
   ongoalVec <- c()
   for (i in 1:length(commentaryKeys)) {
     res <- rredis::redisHMGet(key = commentaryKeys[i], fields = 'shots_ongoal')
     ongoalVec <- c(ongoalVec, res)
   }
-  ongoalVec <- ongoalVec %>% as.integer()
+  ongoalVec <- ongoalVec %>% as.integer
 
   averaged <- footballstats::commentary_stats(
     commentary = commentaryKeys,
     returnItems = c('shots_ongoal', 'saves'))
 
-  expect_that( averaged %>% length(), equals(2) )
-  expect_that( averaged %>% sort(), equals(c(5.5, 6.5)) )
+  expect_that( averaged %>% length, equals(2) )
+  expect_that( averaged %>% sort, equals(c(5.5, 6.5)) )
 
   # Put two dummy keys into Redis to calculate average better
   addedOngoal <- c(10, 14)
@@ -136,9 +138,10 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
     value = addedOngoal[i])
   }
 
-  newKeys <- as.character(rredis::redisKeys(
-    pattern = paste0('cmt_commentary:', competitionID, '*')))
-  keyLen <- newKeys %>% length()
+  newKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+    rredis::redisKeys() %>%
+    as.character
+  keyLen <- newKeys %>% length
 
   expect_that( keyLen, equals(4) )
 
@@ -147,7 +150,7 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
     returnItems = 'shots_ongoal')
   totalStats <- c(ongoalVec, addedOngoal)
 
-  expect_that( averaged %>% length(), equals(1) )
+  expect_that( averaged %>% length, equals(1) )
   expect_that( averaged %>% round(digits = 2), equals((totalStats %>% sum)/keyLen %>% round(digits = 2)) )
 
 })

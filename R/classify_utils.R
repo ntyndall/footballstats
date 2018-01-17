@@ -60,7 +60,17 @@ order_matchdata <- function(matchData, limit = 5000) {
 #'
 #' @export
 
-available_commentaries <- function(commentaryKeys, includeNames = 'all') {
+available_commentaries <- function(competitionID = 'all', includeNames = 'all') {
+
+  # Single competitionID or all
+  allowedComps <- footballstats::allowed_comps()
+
+  commentaryKeys <- c()
+  for (i in 1:(allowedComps %>% length)) {
+    commentaryKeys %<>% c(paste0('cmt_commentary:', allowedComps[i], '*') %>%
+      rredis::redisKeys() %>% as.character)
+  }
+
   allAvailable <- c()
   getAll <- if (`==`(includeNames %>% length, 1)) TRUE else FALSE
    for (x in 1:length(commentaryKeys)) {
@@ -68,6 +78,7 @@ available_commentaries <- function(commentaryKeys, includeNames = 'all') {
     cNames <- results %>% names
     cValues <- results %>% as.character
     empties <- cValues == ""
+
 
     # Default to all
     if (`==`(x, 1) && getAll) includeNames <- cNames %>% subset(cNames != 'table_id')
@@ -184,5 +195,48 @@ commentary_from_redis <- function(keyName, returnItems) {
       replacement = "",
       x = results$possesiontime)
   }
-  return(results %>% as.double)
+
+  results %>% as.double %>% return()
+}
+
+#' @title Drop Unique Features
+#' @export
+
+
+drop_unique_feats <- function(mDat) {
+  # Drop any single valued metrics
+  frameNames <- mDat %>% names
+  FALSE %>% rep(frameNames %>% length) %>% as.list
+  sums <- sapply(mDat, unique) %>% lengths(use.names = FALSE)
+  toDrop <- `<`(sums, 2)
+
+  if (toDrop %>% any) mDat %<>% subset(select = -c(toDrop %>% which))
+
+  mDat %>% return()
+}
+
+#' @title Scale SVM Data
+#' @export
+
+
+scale_data <- function(mDat, dataScales) {
+
+  scaled.data <- mDat[ , 1:dataScales$cols] %>% scale(
+    center = dataScales$sMin,
+    scale = dataScales$sMax - dataScales$sMin) %>%
+    as.data.frame()
+
+  if ('res' %in% (mDat %>% colnames)) scaled.data %<>% cbind(res = mDat$res)
+  scaled.data %>% return()
+}
+
+#' @title Scale SVM Data
+#' @export
+
+
+get_scales <- function(mDat) {
+  nc <- `-`(mDat %>% ncol, 1)
+  maxs <- apply(mDat[ , 1:nc], 2, max)
+  mins <- apply(mDat[ , 1:nc], 2, min)
+  list(sMax = maxs, sMin = mins, cols = nc) %>% return()
 }

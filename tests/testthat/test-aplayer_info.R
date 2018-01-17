@@ -19,14 +19,13 @@ test_that("Check the keys are as they should be by adding player data", {
   footballstats::aplayer_info(
     playerLength = 1,
     currentSeasonYear = 2017,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
   # Check redis for expected output
   teamInfo <- 'ctps_club:1204:9002:16:2017' %>% rredis::redisHGetAll()
 
   expect_that( teamInfo$name %>% as.character, equals('Arsenal') )
-  expect_that( teamInfo$id %>% as.integer,  equals(teamID) )
+  expect_that( teamInfo$id %>% as.integer, equals(teamID) )
 
   uniqueKeys <- '*' %>% rredis::redisKeys()
 

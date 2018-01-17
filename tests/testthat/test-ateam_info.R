@@ -18,8 +18,7 @@ test_that("Check the keys are as they should be by adding team data", {
   footballstats::ateam_info(
     competitionID = 1204,
     teamListLength = 1,
-    KEYS = NULL,
-    bypass = bypass)
+    KEYS = KEYS)
 
   # Check redis for expected output
   teamIDs <- 'ctp:*' %>%

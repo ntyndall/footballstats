@@ -13,8 +13,7 @@ test_that("Check the keys are as they should be by adding match data", {
     dateFrom = NULL,
     dateTo = NULL,
     seasonStarting = 2017,
-    KEYS = NULL,
-    bypass = bypass)
+    KEYS = KEYS)
 
   # Check redis for expected output
   matchIDs <- rredis::redisKeys(

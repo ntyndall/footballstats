@@ -4,18 +4,17 @@
 \alias{calculate_svm}
 \title{calculate_svm}
 \usage{
-calculate_svm(competitionID, seasonStarting, commentaryKeys, commentaryNames,
-  matchData, totalData = data.frame(stringsAsFactors = FALSE))
+calculate_svm(matchData)
 }
 \arguments{
+\item{matchData}{A dataframe containing all the match data.}
+
 \item{competitionID}{An integer value denoting the competition ID.}
 
 \item{seasonStarting}{An integer denoting the start year of the season.}
 
 \item{commentaryKeys}{A vector of character values that hold the
 commentary statistic hash maps in redis.}
-
-\item{matchData}{A dataframe containing all the match data.}
 
 \item{totalData}{A null dataframe which initialises the return value.}
 }

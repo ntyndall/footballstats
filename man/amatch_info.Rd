@@ -5,7 +5,7 @@
 \title{amatch_info}
 \usage{
 amatch_info(competitionID, dateFrom, dateTo, seasonStarting,
-  analysingToday = TRUE, KEYS, bypass = FALSE)
+  analysingToday = TRUE, KEYS)
 }
 \arguments{
 \item{competitionID}{An integer containing the competitionID that the

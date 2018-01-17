@@ -40,8 +40,11 @@ collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov
   seasonStarting <- footballstats::start_season()
 
   # Obtain API and sensitive key information
-  KEYS <- footballstats::sensitive_keys()
-
+  KEYS <- footballstats::sensitive_keys(
+    printToSlack = FALSE,
+    testing = TRUE,
+    storePred = FALSE)
+#
   # Make a connection to redis for storing data
   footballstats::redis_con()
 
@@ -49,7 +52,7 @@ collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[-c(match(footballstats::ignore_comps(), competitions$id)), ]
+  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
 
   # Create the sink for output
   if (deployed) 'summary' %>% footballstats::create_sink()
@@ -69,14 +72,13 @@ collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov
     # Re-establish connection
     footballstats::redis_con()
 
-    # Build a classifier with the current match data
-    footballstats::classify_all(
+    # Predict actual future results
+    cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
+    footballstats::predict_matches(
       competitionID = competitions$id[i],
       competitionName = competitions$name[i],
-      seasonStarting = seasonStarting,
-      returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
-      printToSlack = printToSlack,
       KEYS = KEYS)
+
   }
 } # nocov end
 
@@ -134,7 +136,7 @@ analyse_data <- function() { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[-c(match(footballstats::ignore_comps(), competitions$id)), ]
+  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {

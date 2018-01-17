@@ -114,7 +114,12 @@ team_form <- function(matchData, teamID) {
       scoreCurrent = scorers$current,
       scoreOther = scorers$other)
   })
-  return(list(results, as.integer(singleTeam$formatted_date)))
+  results %>% list(
+    singleTeam$formatted_date %>%
+      as.Date('%d.%m.%Y') %>%
+      as.integer
+    ) %>%
+    return()
 }
 
 #' @title Current or Other
@@ -123,7 +128,7 @@ team_form <- function(matchData, teamID) {
 
 current_or_other <- function(singleMatch, teamID) {
   currentTeam <- singleMatch[
-    (singleMatch == teamID %>% as.character()) %>% which()] %>% names()
+    (singleMatch == teamID %>% as.character) %>% which] %>% names
 
   scoreCurrent <- singleMatch[
     currentTeam %>%

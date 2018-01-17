@@ -4,7 +4,7 @@
 \alias{ateam_info}
 \title{ateam_info}
 \usage{
-ateam_info(competitionID, teamListLength, KEYS, bypass = FALSE)
+ateam_info(competitionID, teamListLength, KEYS)
 }
 \arguments{
 \item{competitionID}{An integer defining the competitionID that the

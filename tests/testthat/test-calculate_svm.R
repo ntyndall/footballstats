@@ -8,7 +8,7 @@ rredis::redisConnect(
 rredis::redisSelect(3)
 rredis::redisFlushDB()
 
-test_that('Calculate SVM from the test match data', {
+test_that('Calculate data set built from features', {
 
   matchData <- footballstats::amatch_info(
     competitionID = competitionID,
@@ -16,8 +16,7 @@ test_that('Calculate SVM from the test match data', {
     dateTo = NULL,
     seasonStarting = seasonStarting,
     analysingToday = TRUE,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
   # Need to recreate it as new dates are created
   matchData <- footballstats::recreate_matchdata(
@@ -30,36 +29,27 @@ test_that('Calculate SVM from the test match data', {
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
     visitorteam = matchData$visitorteam_id,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
-  # Check the keyNames from the current list of commentarys.
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
-    rredis::redisKeys() %>% as.character
-  commentaryNames <- commentaryKeys %>% footballstats::available_commentaries()
+  # Calculate the feature set
+  totalData <- matchData %>% footballstats::calculate_svm()
 
-  totalData <- footballstats::calculate_svm(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    commentaryKeys =  commentaryKeys,
-    commentaryNames = commentaryNames,
-    matchData = matchData)
-
-  expect_that( totalData %>% nrow, equals(80) )
-  expect_that( totalData %>% names %>% length, equals(11) )
-  expect_that( totalData$shots_total %>% range, equals(c(1, 30)) )
-  expect_that( totalData$shots_ongoal %>% range, equals(c(0, 14)) )
-  expect_that( totalData$fouls %>% range, equals(c(2, 20)) )
-  expect_that( totalData$corners %>% range, equals(c(0, 11)) )
-  expect_that( totalData$offsides %>% range, equals(c(0, 8)) )
-  expect_that( totalData$possesiontime %>% range, equals(c(22, 78)) )
-  expect_that( totalData$yellowcards %>% range, equals(c(0, 4)) )
-  expect_that( totalData$redcards %>% range, equals(c(0, 1)) )
-  expect_that( totalData$saves %>% range, equals(c(0, 9)) )
+  expect_that( totalData %>% nrow, equals(40) )
+  expect_that( totalData %>% names %>% length, equals(9) )
+  expect_that( totalData$shots_total %>% range, equals(c(-22, 20)) )
+  expect_that( totalData$shots_ongoal %>% range, equals(c(-11, 10)) )
+  expect_that( totalData$fouls %>% range, equals(c(-10, 7)) )
+  expect_that( totalData$corners %>% range, equals(c(-7, 9)) )
+  #expect_that( totalData$offsides %>% range, equals(c(-5, 8)) )
+  expect_that( totalData$possesiontime %>% range, equals(c(-56, 56)) )
+  expect_that( totalData$yellowcards %>% range, equals(c(-3, 3)) )
+  #expect_that( totalData$redcards %>% range, equals(c(-1, 1)) )
+  expect_that( totalData$saves %>% range, equals(c(-7, 8)) )
 
   uniqueResults <- totalData$res %>% unique
 
   expect_that( 'L' %in% uniqueResults, is_true() )
   expect_that( 'D' %in% uniqueResults, is_true() )
   expect_that( 'W' %in% uniqueResults, is_true() )
+
 })

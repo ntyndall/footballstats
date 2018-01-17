@@ -4,10 +4,14 @@
 \alias{sensitive_keys}
 \title{sensitive_keys}
 \usage{
-sensitive_keys()
+sensitive_keys(printToSlack, testing, storePred)
 }
 \arguments{
-\item{None}{}
+\item{printToSlack}{A boolean}
+
+\item{testing}{A boolean}
+
+\item{storePred}{A boolean}
 }
 \value{
 Returns nothing.
@@ -18,7 +22,7 @@ A function that loads all sensitive information into a
 }
 \details{
 Set up:
- 1) Fill in the appropriate sensitive information.
+ 1) Fill in the  appropriate sensitive information.
  2) Copy this file to sensitiveInfo.R and rename the
     function to sensitiveInfo()
 }

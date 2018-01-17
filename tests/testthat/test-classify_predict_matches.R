@@ -16,25 +16,22 @@ test_that('Classify all - end to end from adding data to classifying and predict
     dateTo = NULL,
     seasonStarting = seasonStarting,
     analysingToday = TRUE,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
   footballstats::acommentary_info(
     competitionID = competitionID,
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
     visitorteam = matchData$visitorteam_id,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
-  footballstats::classify_all(
+  # Create the predictions here
+  KEYS$LOG_PRED <- TRUE
+  footballstats::predict_matches(
     competitionID = competitionID,
     competitionName = 'test-competition',
-    seasonStarting = seasonStarting,
-    returnItems = c('shots_total', 'saves'),
-    printToSlack = FALSE,
-    testing = TRUE,
-    KEYS = NULL)
+    KEYS = KEYS)
+  KEYS$LOG_PRED <- FALSE
 
   predictions <- 'c:1204:pred*' %>%
     rredis::redisKeys() %>%

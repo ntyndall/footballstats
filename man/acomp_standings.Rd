@@ -4,7 +4,7 @@
 \alias{acomp_standings}
 \title{acomp_standings}
 \usage{
-acomp_standings(competitionID, KEYS, bypass = FALSE)
+acomp_standings(competitionID, KEYS)
 }
 \arguments{
 \item{competitionID}{An integer containing the competition ID that the
