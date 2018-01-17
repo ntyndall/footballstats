@@ -22,6 +22,9 @@ generate_predictions <- function(fixtureList, classifyModel, dataScales,
   competitionID <- fixtureList$comp_id %>% footballstats::prs_comp()
   seasonStarting <- fixtureList$season %>% footballstats::prs_season()
 
+  print('checking in predict...')
+  print(competitionID)
+  print(seasonStarting)
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
 
