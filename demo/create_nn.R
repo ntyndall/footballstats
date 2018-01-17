@@ -19,9 +19,6 @@ for (i in 1:(comps %>% length)) {
 cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
 original.data <- totalData %>% footballstats::calculate_data()
 
-# Replace any NA's with zero
-original.data[original.data %>% is.na] <- 0
-
 # Create scaled data set
 dataScales <- original.data %>% footballstats::get_scales()
 save(dataScales, file = getwd() %>% paste0('/data/dataScales.rda'))
