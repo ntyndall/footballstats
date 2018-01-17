@@ -4,8 +4,6 @@ library(covr)
 library(purrr)
 library(rredis)
 
-#test_check("footballstats")
-
 # Set global variable to bypass the API calls
 bypass <<- TRUE
 
@@ -13,6 +11,12 @@ rredis::redisConnect(
   host = 'localhost',
   port = 6379)
 rredis::redisSelect(3)
+
+# Set up enough keys for testing
+KEYS <<- list(
+  SLACK_PRNT = FALSE,
+  TEST = TRUE,
+  LOG_PRED = FALSE)
 
 results <- testthat::test_dir(
   path = "testthat",
@@ -42,13 +46,16 @@ for(i in 1:length(results)) {
   }
 }
 
+# Calculate code status from running tests
 codeStatus <- ifelse(
   test = totalError > 0,
   yes = 1,
   no = 0)
 
-quit(save = 'no',
-     status = codeStatus,
-     runLast = FALSE)
+# If successful, quit gracefully
+quit(
+  save = 'no',
+  status = codeStatus,
+  runLast = FALSE)
 
 

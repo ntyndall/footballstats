@@ -2,14 +2,14 @@ context('test-classify_form_info.R')
 
 test_that('Calculate score based on vector of forms', {
 
-  expect_that( footballstats::form_to_int(oldForms = 'LLL'), equals(0) )
-  expect_that( footballstats::form_to_int(oldForms = 'DDD'), equals(3) )
-  expect_that( footballstats::form_to_int(oldForms = 'WWW'), equals(6) )
-  expect_that( footballstats::form_to_int(oldForms = 'WDL'), equals(3) )
-  expect_that( footballstats::form_to_int(oldForms = 'LDW'), equals(3) )
-  expect_that( footballstats::form_to_int(oldForms = 'W'), equals(2) )
-  expect_that( footballstats::form_to_int(oldForms = 'D'), equals(1) )
-  expect_that( footballstats::form_to_int(oldForms = 'L'), equals(0) )
+  expect_that( 'LLL' %>% footballstats::form_to_int(), equals(0) )
+  expect_that( 'DDD' %>% footballstats::form_to_int(), equals(3) )
+  expect_that( 'WWW' %>% footballstats::form_to_int(), equals(6) )
+  expect_that( 'WDL' %>% footballstats::form_to_int(), equals(3) )
+  expect_that( 'LDW' %>% footballstats::form_to_int(), equals(3) )
+  expect_that( 'W' %>% footballstats::form_to_int(), equals(2) )
+  expect_that( 'D' %>% footballstats::form_to_int(), equals(1) )
+  expect_that( 'L' %>% footballstats::form_to_int(), equals(0) )
 
 })
 
@@ -24,20 +24,20 @@ test_that("Send in a single commentary to see it is stored correctly", {
     singleMatch = singleMatch,
     teamID = singleMatch$localteam_id)
 
-  expect_that( singleMatch$localteam_score %>% as.integer(),
-               equals(scoreResults$current %>% as.integer()) )
-  expect_that( singleMatch$visitorteam_score %>% as.integer(),
-               equals(scoreResults$other %>% as.integer()) )
+  expect_that( singleMatch$localteam_score %>% as.integer,
+               equals(scoreResults$current %>% as.integer) )
+  expect_that( singleMatch$visitorteam_score %>% as.integer,
+               equals(scoreResults$other %>% as.integer) )
 
   # The away team as the teamID
   scoreResults <- footballstats::current_or_other(
     singleMatch = singleMatch,
     teamID = singleMatch$visitorteam_id)
 
-  expect_that( singleMatch$visitorteam_score %>% as.integer(),
-               equals(scoreResults$current %>% as.integer()) )
-  expect_that( singleMatch$localteam_score %>% as.integer(),
-               equals(scoreResults$other %>% as.integer()) )
+  expect_that( singleMatch$visitorteam_score %>% as.integer,
+               equals(scoreResults$current %>% as.integer) )
+  expect_that( singleMatch$localteam_score %>% as.integer,
+               equals(scoreResults$other %>% as.integer) )
 
 })
 
@@ -64,14 +64,14 @@ test_that("Create team form.", {
     matchData = matchData,
     teamID = teamID)
 
-  numMatches <- sum(matchData[matchData$localteam_id == teamID, ] %>% nrow(),
-      matchData[matchData$visitorteam_id == teamID, ] %>% nrow())
+  numMatches <- sum(matchData[matchData$localteam_id == teamID, ] %>% nrow,
+      matchData[matchData$visitorteam_id == teamID, ] %>% nrow)
 
-  expect_that( numMatches, equals(formList[[1]] %>% length()) )
-  expect_that( numMatches, equals(formList[[2]] %>% length()) )
+  expect_that( numMatches, equals(formList[[1]] %>% length) )
+  expect_that( numMatches, equals(formList[[2]] %>% length) )
   expect_that( formList[[1]] %>% paste(collapse = ''), equals('WDWWLWW') )
 
-  sortedDates <- formList[[2]] %>% sort()
+  sortedDates <- formList[[2]] %>% sort
 
   expect_that( sortedDates[1], equals(17418) )
   expect_that( sortedDates[numMatches], equals(17467) )

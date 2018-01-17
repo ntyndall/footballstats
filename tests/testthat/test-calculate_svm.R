@@ -16,8 +16,7 @@ test_that('Calculate SVM from the test match data', {
     dateTo = NULL,
     seasonStarting = seasonStarting,
     analysingToday = TRUE,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
   # Need to recreate it as new dates are created
   matchData <- footballstats::recreate_matchdata(
@@ -30,8 +29,7 @@ test_that('Calculate SVM from the test match data', {
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
     visitorteam = matchData$visitorteam_id,
-    KEYS = NULL,
-    bypass = TRUE)
+    KEYS = KEYS)
 
   # Check the keyNames from the current list of commentarys.
   commentaryNames <- competitionID %>%

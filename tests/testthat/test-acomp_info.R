@@ -8,28 +8,26 @@ rredis::redisFlushDB()
 
 test_that("Save competition IDs from /competitions/ into a set", {
 
-  newDate <- as.Date(x = 17476, origin = '1970-01-01')
-  res <- format_dates(standardDateFormat = newDate)
+  res <- 17476L %>%
+    as.Date(origin = '1970-01-01') %>%
+    footballstats::format_dates()
 
-  newCompetitions <- footballstats::acomp_info(
-    KEYS = NULL,
-    bypass = TRUE)
+  newCompetitions <- KEYS %>% footballstats::acomp_info()
 
   expect_that( newCompetitions, is_a('data.frame') )
-  expect_that( nrow(newCompetitions), equals(22) )
-  expect_that( newCompetitions %>% names(), equals(c('id', 'name', 'region')) )
+  expect_that( newCompetitions %>% nrow, equals(22) )
+  expect_that( newCompetitions %>% names, equals(c('id', 'name', 'region')) )
 
-  uniqueComps <- rredis::redisSMembers(
-    set = 'competition:set')
+  uniqueComps <- 'competition:set' %>% rredis::redisSMembers()
 
   sortedComps <- uniqueComps %>%
     purrr::flatten_chr() %>%
-    as.integer() %>%
-    sort()
+    as.integer %>%
+    sort
 
   sortedData <- newCompetitions$id %>%
-    as.integer() %>%
-    sort()
+    as.integer %>%
+    sort
 
   expect_that( sortedData, equals(sortedComps) )
 
