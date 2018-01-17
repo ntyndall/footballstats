@@ -20,7 +20,8 @@ Imports:
     hashmap,
     shiny,
     tcltk,
-    magrittr
+    magrittr,
+    neuralnet
 Suggests:
     covr
 RoxygenNote: 6.0.1
