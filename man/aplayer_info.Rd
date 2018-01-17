@@ -4,7 +4,7 @@
 \alias{aplayer_info}
 \title{aplayer_info}
 \usage{
-aplayer_info(playerLength, currentSeasonYear, KEYS, bypass = FALSE)
+aplayer_info(playerLength, currentSeasonYear, KEYS)
 }
 \arguments{
 \item{playerLength}{An integer value that defines the number of players to

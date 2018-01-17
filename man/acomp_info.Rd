@@ -4,7 +4,7 @@
 \alias{acomp_info}
 \title{acomp_info}
 \usage{
-acomp_info(KEYS, bypass = FALSE)
+acomp_info(KEYS)
 }
 \arguments{
 \item{production}{A boolean to indicate whether production (default)
