@@ -72,14 +72,22 @@ collect_and_predict <- function(printToSlack = TRUE, deployed = FALSE) { # nocov
     # Re-establish connection
     footballstats::redis_con()
 
-    # Build a classifier with the current match data
-    footballstats::classify_all(
+    # Predict actual future results
+    cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
+    footballstats::predict_matches(
       competitionID = competitions$id[i],
       competitionName = competitions$name[i],
-      seasonStarting = seasonStarting,
-      returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
-      printToSlack = printToSlack,
+      dataScales = footballstats::dataScales,
+      classifyModel = footballstats::nn,
       KEYS = KEYS)
+
+    #footballstats::classify_all(
+    #  competitionID = competitions$id[i],
+    #  competitionName = competitions$name[i],
+    #  seasonStarting = seasonStarting,
+    #  returnItems = c('shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'),
+    #  printToSlack = printToSlack,
+    #  KEYS = KEYS)
   }
 } # nocov end
 
