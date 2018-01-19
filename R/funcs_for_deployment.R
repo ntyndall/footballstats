@@ -43,7 +43,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
-    storePred = FALSE)
+    storePred = TRUE)
 
   # Get dates for querying fixutres now
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
@@ -59,7 +59,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
 
   # Create the sink for output
-  if (deployed) 'summary' %>% footballstats::create_sink()
+  if (deployed) 'summary_pred' %>% footballstats::create_sink()
   cat(' -- Beginning analysis -- \n\n\n')
 
   # Loop over all competitions being analysed
@@ -93,7 +93,7 @@ analyse_players <- function() { # nocov start
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
-    storePred = FALSE)
+    storePred = TRUE)
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -120,7 +120,7 @@ analyse_players <- function() { # nocov start
 #' @export
 
 
-analyse_data <- function() { # nocov start
+analyse_data <- function(deployed = FALSE) { # nocov start
   # Get season starting year
   seasonStarting <- footballstats::start_season()
 
@@ -128,7 +128,7 @@ analyse_data <- function() { # nocov start
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
-    storePred = FALSE)
+    storePred = TRUE)
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -138,6 +138,8 @@ analyse_data <- function() { # nocov start
 
   # Subset the available competitions
   competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
+
+  if (deployed) 'summary_adding' %>% footballstats::create_sink()
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {

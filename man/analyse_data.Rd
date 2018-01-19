@@ -4,7 +4,7 @@
 \alias{analyse_data}
 \title{Analyse Match and Event}
 \usage{
-analyse_data()
+analyse_data(deployed = FALSE)
 }
 \description{
 A function that analyses matches and events only,
