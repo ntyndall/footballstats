@@ -4,8 +4,7 @@
 \alias{generate_predictions}
 \title{generate_predictions}
 \usage{
-generate_predictions(fixtureList, classifyModel, dataScales,
-  competitionName = "", KEYS)
+generate_predictions(fixtureList, competitionName = "", KEYS)
 }
 \arguments{
 \item{fixtureList}{A data frame containing match localteam vs. visitorteam

@@ -25,8 +25,15 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
 
+  # Set up progress bar
+  progressBar <- utils::txtProgressBar(
+    min = 0,
+    max = nrow(fixtureList),
+    style = 3)
+
   # Loop over each fixture
   for (i in 1:nrow(fixtureList)) {
+    utils::setTxtProgressBar(progressBar, i)
     singleFixture <- fixtureList[i, ]
 
     # Get team information from fixture data frame
@@ -58,6 +65,12 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       bFrame <- commentaryKeys %>%
         footballstats::get_av(
           commentaryNames = cNames)
+
+      # Can I still continue?
+      naCount <- sapply(bFrame, function(x) x %>% is.na %>% sum) %>% as.integer
+      thresh <- bFrame %>% nrow %>% `/`(4)
+      if (`>`(naCount, thresh) %>% any) next
+      bFrame[bFrame %>% is.na] <- 0
       avg <- apply(bFrame, 2, mean)
 
       # Get match IDs
@@ -109,8 +122,9 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     actualA <- if (actualH %>% `==`('W')) 'L' else if (actualH %>% `==`('L')) 'W' else 'D'
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
-    if (KEYS$TEST) {
-      result <- singleFixture$ft_score %>%
+    fTime <- singleFixture$ft_score
+    if (KEYS$TEST || fTime %>% `==`('[-]')) {
+      result <- fTime %>%
         strsplit(split = '[[:punct:]]') %>%
         purrr::flatten_chr() %>%
         `[`(c(2:3)) %>%
@@ -145,10 +159,13 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
           week = singleFixture$week,
           slack = 'false'))
     }
-    Sys.sleep(1)
+    Sys.sleep(0.5)
   }
 
-  if (KEYS$SLACK_PRNT) { # nocov start
+  # Close the progress bar
+  close(progressBar)
+
+  if (KEYS$SLACK_PRNT && `!`(totalTxt %>% is.null)) { # nocov start
     slackr::slackrSetup(
       channel = '#results',
       api_token = KEYS$FS_SLACK)
@@ -171,7 +188,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       username = 'predictions')
   } else {
     # Print results to screen
-    print('Reporting on results!')
+    cat('Reporting on results! \n')
     print(totalTxt)
   } # nocov end
   return(correct)

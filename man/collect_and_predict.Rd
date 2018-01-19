@@ -4,7 +4,7 @@
 \alias{collect_and_predict}
 \title{Run script to populate Redis.}
 \usage{
-collect_and_predict(printToSlack = TRUE, deployed = FALSE)
+collect_and_predict(deployed = FALSE)
 }
 \details{
 -- Summary of data structures stored in Redis --

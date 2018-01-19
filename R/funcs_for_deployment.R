@@ -45,6 +45,10 @@ collect_and_predict <- function(deployed = FALSE) { # nocov start
     testing = FALSE,
     storePred = TRUE)
 
+  # Get dates for querying fixutres now
+  KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
+  KEYS$DATE_TO <- Sys.Date() %>% `+`(8) %>% footballstats::format_dates()
+
   # Make a connection to redis for storing data
   footballstats::redis_con()
 
@@ -64,10 +68,6 @@ collect_and_predict <- function(deployed = FALSE) { # nocov start
     # Gather all information to be stored in Redis.
     cat(paste0(Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
                competitions$name[i], ' - ', competitions$region[i], '). \n'))
-    footballstats::add_all(
-      competitionID = competitions$id[i],
-      seasonStarting = seasonStarting,
-      KEYS = KEYS)
 
     # Re-establish connection
     footballstats::redis_con()
@@ -95,7 +95,10 @@ analyse_players <- function() { # nocov start
   seasonStarting <- footballstats::start_season()
 
   # Obtain API and sensitive key information
-  KEYS <- footballstats::sensitive_keys()
+  KEYS <- footballstats::sensitive_keys(
+    printToSlack = TRUE,
+    testing = FALSE,
+    storePred = TRUE)
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -127,7 +130,10 @@ analyse_data <- function() { # nocov start
   seasonStarting <- footballstats::start_season()
 
   # Obtain API and sensitive key information
-  KEYS <- footballstats::sensitive_keys()
+  KEYS <- footballstats::sensitive_keys(
+    printToSlack = TRUE,
+    testing = FALSE,
+    storePred = TRUE)
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -140,7 +146,6 @@ analyse_data <- function() { # nocov start
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {
-    # Gather all information to be stored in Redis.
     cat(paste0('Storing... ' , i, ' / ', nrow(competitions), ' (',
                competitions$name[i], ' - ', competitions$region[i], '). \n'))
 

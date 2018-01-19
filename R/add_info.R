@@ -363,7 +363,7 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
         }
       })
     }
-    setTxtProgressBar(progressBar, i)
+    utils::setTxtProgressBar(progressBar, i)
   })
   close(progressBar)
 }
