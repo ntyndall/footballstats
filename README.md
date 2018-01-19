@@ -27,31 +27,17 @@ Sys.setenv(FS_SLACK = "___")
 ```
   - Set up a cron job by typing `crontab -e` with the following...
 ```
-0 22 * * 0 Rscript /root/collect_and_predict.R
-0 22 * * 1 Rscript /root/collect_players.R
-0 22 1 * * Rscript /root/generate_report.R
-```
-and create the following files in `/root/` : 
+# Collect football information - such as match / team / commentary information
+50 23 * * 0 Rscript -e 'library(footballstats); footballstats::analyse_data(deployed = TRUE)'
 
-```
-# /root/collect_and_predict.R
-library(footballstats)
+# Make predictions on upcoing fixtures
+0 22 * * 0 Rscript -e 'library(footballstats); footballstats::predict_fixtures(deployed = TRUE)'
 
-footballstats::main()
-```
+# After information has been gathered - update player status etc (COSTLY operation!)
+0 22 * * 1 Rscript -e 'library(footballstats); footballstats::analyse_players()'
 
-```
-# /root/collect_players.R
-library(footballstats)
-
-footballstats::analyse_players()
-```
-
-```
-# /root/generate_report.R
-library(footballstats)
-
-footballstats::monthly_report()
+# Generate report
+# ...
 ```
 
 ## Tagging a release
