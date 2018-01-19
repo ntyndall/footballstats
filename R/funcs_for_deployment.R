@@ -34,7 +34,7 @@
 #' @export
 
 
-collect_and_predict <- function(deployed = FALSE) { # nocov start
+predict_fixtures <- function(deployed = FALSE) { # nocov start
 
   # Get season starting year
   seasonStarting <- footballstats::start_season()
@@ -43,7 +43,7 @@ collect_and_predict <- function(deployed = FALSE) { # nocov start
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
-    storePred = TRUE)
+    storePred = FALSE)
 
   # Get dates for querying fixutres now
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
@@ -64,13 +64,8 @@ collect_and_predict <- function(deployed = FALSE) { # nocov start
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {
-
-    # Gather all information to be stored in Redis.
     cat(paste0(Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
                competitions$name[i], ' - ', competitions$region[i], '). \n'))
-
-    # Re-establish connection
-    footballstats::redis_con()
 
     # Predict actual future results
     cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
@@ -98,7 +93,7 @@ analyse_players <- function() { # nocov start
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
-    storePred = TRUE)
+    storePred = FALSE)
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -133,7 +128,7 @@ analyse_data <- function() { # nocov start
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
-    storePred = TRUE)
+    storePred = FALSE)
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
