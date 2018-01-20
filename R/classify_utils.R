@@ -146,22 +146,6 @@ commentary_from_redis <- function(keyName, returnItems) {
   results %>% as.double %>% return()
 }
 
-#' @title Drop Unique Features
-#' @export
-
-
-drop_unique_feats <- function(mDat) {
-  # Drop any single valued metrics
-  frameNames <- mDat %>% names
-  FALSE %>% rep(frameNames %>% length) %>% as.list
-  sums <- sapply(mDat, unique) %>% lengths(use.names = FALSE)
-  toDrop <- `<`(sums, 2)
-
-  if (toDrop %>% any) mDat %<>% subset(select = -c(toDrop %>% which))
-
-  mDat %>% return()
-}
-
 #' @title Scale SVM Data
 #' @export
 
