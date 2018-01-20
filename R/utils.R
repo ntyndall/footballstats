@@ -173,7 +173,7 @@ create_sink <- function(fName) { # nocov start
 #' @export
 
 
-create_log_dir <- function() {
+create_log_dir <- function() { # nocov start
   # Check the log path global R environment variable
   cat(' ## Reading log path from global variable ... ')
   logPath <- Sys.getenv('FS_DEPLOYLOC')
@@ -195,4 +195,4 @@ create_log_dir <- function() {
   } else {
     cat(paste0(' ## Log path exists already @ ', logPath, ' \n'))
   }
-}
+} # nocov end
