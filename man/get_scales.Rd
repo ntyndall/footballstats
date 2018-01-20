@@ -6,3 +6,23 @@
 \usage{
 get_scales(mDat)
 }
+\arguments{
+\item{mDat}{A data frame with multiple columns, each one
+containing a feature, and a final row with labelled results
+i.e. 'W / D / L'.}
+}
+\value{
+A list value with the following names :
+\itemize{
+ \item{sMax : maximum values per feature}
+ \item{sMin : minimum values per feature}
+ \item{cols : an integer defining the number of columns
+  of sMax and sMin}
+ }
+}
+\details{
+We subtract 1 from the data frame as the data set
+ MUST always have a leading column that contains labelled
+ match data with 'W / D / L' etc. Also, one feature is not
+ permitted, so mDat must therefore have 3 or more columns.
+}
