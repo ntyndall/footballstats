@@ -95,59 +95,6 @@ available_commentaries <- function(competitionID = 'all', includeNames = 'all') 
   return(allAvailable)
 }
 
-
-#' @title classify_homeaway_stats
-#'
-#' @description A function to set up a match performance of two teams which returns
-#'  their current statistics and their form.
-#'
-#' @param singleFixture A single row data frame containing match localteam vs.
-#'  visitorteam information which CAN include actual results if testing == TRUE.
-#' @param localVisitor A character vector which contains one of
-#'  c('localteam_id', 'visitorteam_id').
-#' @param testing A boolean value which decides whether to read the actual result
-#'  of the match and compare with the classifier.
-#'
-#' @return A list of the current stats in key 1 and form in key 2.
-#'
-#' @export
-
-
-homeaway_stats <- function(competitionID, singleFixture, seasonStarting,
-                           localVisitor, returnItems, matchFieldNames, testing) {
-  fixtureAggregate <- lapply(1:2, function(j) {
-    # Decide to analyse home team and then away team
-    teamID <- singleFixture[[localVisitor[j]]]
-    commentary <- paste0('cmt_commentary:', competitionID, ':*', teamID) %>%
-      rredis::redisKeys() %>% as.character
-
-    # For testing only: Don't include the very last commentary!
-    if (testing) commentary <- commentary[1:(length(commentary) - 1)]
-
-
-    # Determine the statistics of a commentary
-    currentStats <- footballstats::commentary_stats(
-      commentary = commentary,
-      returnItems = returnItems)
-
-    # Also get the match ID's
-    matchIDs <- sapply(1:length(commentary), function(k) {
-      strsplit(x = commentary[[k]], split = ':')[[1]][3]
-    })
-
-    # Determine forms from a vector of matches
-    form <- footballstats::form_from_match(
-      competitionID = competitionID,
-      matchIDs = matchIDs,
-      seasonStarting = seasonStarting,
-      matchFieldNames = matchFieldNames,
-      teamID = teamID)
-    list(currentStats, form)
-  })
-  return(fixtureAggregate)
-}
-
-
 #' @title commentary_stats
 #'
 #' @description A function that takes the commentary values stored in redis and

@@ -22,41 +22,7 @@ form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0)
   return(newForms)
 }
 
-
-#' @title Caclulate Form from Match
-#' @export
-
-
-form_from_match <- function(competitionID, matchIDs, seasonStarting, matchFieldNames,
-                            teamID, formLimit = 3) {
-  formList <- lapply(1:length(matchIDs), function(k) {
-    redisKey <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs[k])
-    singleMatch <- rredis::redisHMGet(
-      key = redisKey,
-      fields = matchFieldNames)
-
-    # Need to choose which current team is being analysed for each match.
-    scorers <- footballstats::current_or_other(
-      singleMatch = singleMatch,
-      teamID = teamID)
-
-    # Determine the result of the match for the current team
-    singleResult <- footballstats::match_result(
-      scoreCurrent = scorers$current,
-      scoreOther = scorers$other)
-    list(singleMatch$formatted_date, singleResult)
-  })
-
-  totalForm <- data.frame(
-    date = sapply(1:length(formList), function(k) formList[[k]][[1]] ),
-    form = sapply(1:length(formList), function(k) formList[[k]][[2]] ),
-    stringsAsFactors = FALSE)
-
-  totalForm <- totalForm[sort.int(totalForm$date, decreasing = FALSE, index.return = TRUE)$ix, ]
-  return(paste(as.character(na.omit(totalForm$form[1:formLimit])), collapse = ''))
-}
-
-#'
+#' @title Relative Form
 #' @export
 
 relative_form <- function(matchInfo, totalForm) {
