@@ -27,10 +27,18 @@ form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0)
 
 relative_form <- function(matchInfo, totalForm) {
   # Determine current match date
-  currentDate <- as.integer(as.Date(matchInfo$formatted_date, '%d.%m.%Y'))
+  currentDate <- matchInfo$formatted_date %>%
+    as.Date('%d.%m.%Y') %>%
+    as.integer
 
   # Determine total data frame of forms ordered highest to lowest
-  totalForm <- totalForm[sort.int(totalForm$date, decreasing = TRUE, index.return = TRUE)$ix, ]
+  totalForm <- totalForm[
+    sort.int(
+      x = totalForm$date,
+      decreasing = TRUE,
+      index.return = TRUE
+    )$ix,
+  ]
 
   # Calculate the relative form
   formsHaveNotOccured <- sum(currentDate <= totalForm$date)
