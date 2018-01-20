@@ -1,4 +1,4 @@
-context('test-classify_calculate_svm.R')
+context('test-classify_claculate_data.R')
 
 competitionID <- 1204
 seasonStarting <- 2017
@@ -32,7 +32,7 @@ test_that('Calculate data set built from features', {
     KEYS = KEYS)
 
   # Calculate the feature set
-  totalData <- matchData %>% footballstats::calculate_svm()
+  totalData <- matchData %>% footballstats::calculate_data()
 
   expect_that( totalData %>% nrow, equals(40) )
   expect_that( totalData %>% names %>% length, equals(9) )

@@ -1,14 +1,9 @@
-#' @title calculate_svm
+#' @title Calculate Data Set
 #'
 #' @description A function that takes current statistical data and combines
 #'  it into a dataframe to be passed later to an SVM classifier.
 #'
-#' @param competitionID An integer value denoting the competition ID.
-#' @param seasonStarting An integer denoting the start year of the season.
-#' @param commentaryKeys A vector of character values that hold the
-#'  commentary statistic hash maps in redis.
 #' @param matchData A dataframe containing all the match data.
-#' @param totalData A null dataframe which initialises the return value.
 #'
 #' @return Returns a dataframe containing the column names of 'returnItems'
 #'  plus a few other metrics.
@@ -16,13 +11,12 @@
 #' @export
 
 
-calculate_svm <- function(matchData) {
+calculate_data <- function(matchData) {
 
   # Only take these names
   allowedNames <- dataScales$sMax %>% names %>% `[`(c(1:7))
 
-  # Infer competitionID
-  #competitionID <- matchData$comp_id %>% footballstats::prs_comp()
+  # Infer the season
   seasonStarting <- matchData$season %>% footballstats::prs_season()
   mDat <- data.frame(stringsAsFactors = FALSE)
 
