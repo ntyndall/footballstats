@@ -37,6 +37,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     singleFixture <- fixtureList[i, ]
 
     # Get team information from fixture data frame
+    matchID <- singleFixture$id
     homeName <- singleFixture$localteam_name
     awayName <- singleFixture$visitorteam_name
     teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
