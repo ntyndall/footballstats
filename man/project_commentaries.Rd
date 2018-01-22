@@ -4,5 +4,5 @@
 \alias{project_commentaries}
 \title{Commentary Projection}
 \usage{
-project_commentaries(competitionID, teamIDs)
+project_commentaries(competitionID, seasonStarting, teamIDs)
 }

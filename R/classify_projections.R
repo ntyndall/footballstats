@@ -2,7 +2,7 @@
 #' @export
 
 
-project_commentaries <- function(competitionID, teamIDs) {
+project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
 
   resList <- c()
   for (j in 1:2) {
@@ -113,6 +113,8 @@ project_form <- function(competitionID, seasonStarting, teamIDs) {
   dF %>% return()
 }
 
+#' @title convince
+#' @export
 
 project_convince <- function(competitionID, seasonStarting, teamIDs) {
 

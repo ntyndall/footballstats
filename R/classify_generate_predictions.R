@@ -52,6 +52,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     matchMetrics %<>% cbind(
       project_commentaries(
         competitionID = competitionID,
+        seasonStarting = seasonStarting,
         teamIDs = teamIDs
       )
     )
