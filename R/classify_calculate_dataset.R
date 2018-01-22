@@ -76,9 +76,11 @@ calculate_data <- function(matchData) {
     convince <- conv[1] - conv[2]
     datSlice$convince <- convince
 
+    res <- if (convince > 0) 'W' else if (convince == 0) 'D' else 'L'
+
     datSlice %<>% cbind(
       data.frame(
-        res = if (convince > 0) 'W' else if (convince == 0) 'D' else 'L',
+        res = res,
         stringsAsFactors = FALSE)
     )
 
