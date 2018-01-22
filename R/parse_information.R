@@ -21,4 +21,21 @@ prs_comp <- function(mComps) {
     return()
 }
 
+#' @title Parse Full Time score
+#'
+#' @param ftScore A character string of the form
+#'  '[2-0]', and will be parsed as an integer vector of
+#'  2 0.
+#'
+#' @export
+
+
+prs_ftscore <- function(ftScore) {
+  conv <- ftScore %>%
+    strsplit(split = '[[:punct:]]') %>%
+    purrr::flatten_chr() %>%
+    `[`(c(2:3)) %>%
+    as.integer %>%
+    return()
+}
 

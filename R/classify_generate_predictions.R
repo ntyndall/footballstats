@@ -41,77 +41,49 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     awayName <- singleFixture$visitorteam_name
     teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
 
-    # Get statistics for both teams
-    resList <- c()
-    for (j in 1:2) {
-      bFrame <- data.frame(stringsAsFactors = FALSE)
+    # Need a non-null frame to start with
+    matchMetrics <- data.frame(
+      matchID = matchID,
+      stringsAsFactors = FALSE
+    )
 
-      # Check that keys actually exists
-      commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
-        rredis::redisKeys()
-      if (commentaryKeys %>% is.null) break
+    # Bind the commentaries together
+    matchMetrics %<>% cbind(
+      project_commentaries(
+        competitionID = competitionID,
+        teamIDs = teamIDs
+      )
+    )
 
-      # If it does then continue on
-      commentaryKeys %<>% as.character %>%
-        footballstats::ord_keys(
-          competitionID = competitionID,
-          seasonStarting = seasonStarting)
+    # Bind the form
+    matchMetrics %<>% cbind(
+      footballstats::project_form(
+        competitionID = competitionID,
+        seasonStarting = seasonStarting,
+        teamIDs = teamIDs
+      )
+    )
 
-      # Get commentary names..
-      cNames <- dataScales$sMax %>% names
-      cNames <- cNames[c(1:(cNames %>% length %>% `-`(1)))]
+    # Need to get a projection of convince-ability too....
+    matchMetrics %<>% cbind(
+      footballstats::project_convince(
+        competitionID = competitionID,
+        seasonStarting = seasonStarting,
+        teamIDs = teamIDs
+      )
+    )
 
-      # Only calculate average - Can I do something more advanced here like a spline?
-      bFrame <- commentaryKeys %>%
-        footballstats::get_av(
-          commentaryNames = cNames)
+    # Go onto the next feature if any features arent present
+    if (matchMetrics %>% is.na %>% any) next else matchMetrics$matchID <- NULL
 
-      # Can I still continue?
-      naCount <- sapply(bFrame, function(x) x %>% is.na %>% sum) %>% as.integer
-      thresh <- bFrame %>% nrow %>% `/`(4)
-      if (`>`(naCount, thresh) %>% any) next
-      bFrame[bFrame %>% is.na] <- 0
-      avg <- apply(bFrame, 2, mean)
-
-      # Get match IDs
-      matchIDs <- commentaryKeys %>%
-        strsplit(split = ':') %>%
-        purrr::map(3) %>%
-        purrr::flatten_chr()
-
-      # Construct matchData like obect
-      csmIDs <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs)
-
-      cLen <- csmIDs %>% length
-      matchData <- data.frame(stringsAsFactors = FALSE)
-      for (k in (cLen - 2):cLen) {
-        matchData %<>% rbind(csmIDs[k] %>%
-          rredis::redisHGetAll() %>%
-          as.data.frame)
-      }
-
-      avg %<>% footballstats::get_frm(
-        teamID = teamIDs[j],
-        matchData = matchData)
-
-      resList %<>% c(list(avg))
-    }
-
-    # Go onto the next feature
-    if (resList %>% length %>% `!=`(2)) next
-
-    # Make the prediction based on scaled data frame results
-    differ <- `-`(resList[[1]], resList[[2]])
-
-    scled <- differ %>%
-      as.data.frame %>%
-      t %>%
+    # Scale the data as required
+    scled <- matchMetrics %>%
       scale(
         center = dataScales$sMin,
         scale = dataScales$sMax - dataScales$sMin) %>%
       as.data.frame
 
-    #
+    # Make the prediction
     result <- neuralnet::compute(
       x = footballstats::nn,
       covariate = scled)
@@ -125,10 +97,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     fTime <- singleFixture$ft_score
     if (KEYS$TEST || fTime %>% `==`('[-]')) {
       result <- fTime %>%
-        strsplit(split = '[[:punct:]]') %>%
-        purrr::flatten_chr() %>%
-        `[`(c(2:3)) %>%
-        as.integer %>%
+        footballstats::prs_ftscore() %>%
         purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L')
       if (result == actualH) correct %<>% `+`(1)
     } else {

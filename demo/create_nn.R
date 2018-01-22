@@ -19,6 +19,23 @@ for (i in 1:(comps %>% length)) {
 cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
 original.data <- totalData %>% footballstats::calculate_data()
 
+# Calculate relative position
+subD <- totalData[totalData$comp_id == '1204', ]
+
+# Just make sure the data set is in date order
+subD <- subD[subD$formatted_date %>%
+               as.integer %>%
+               order, ]
+
+# Get the feature sets
+original.data <- subD %>% footballstats::calculate_data()
+
+# Only look at complete rows!
+original.data %<>% subset(original.data %>% stats::complete.cases())
+
+original.data <- original.data[ , 2:(original.data %>% ncol)]
+
+
 # Create scaled data set
 dataScales <- original.data %>% footballstats::get_scales()
 save(dataScales, file = getwd() %>% paste0('/data/dataScales.rda'))
@@ -28,5 +45,5 @@ original.data %<>% footballstats::scale_data(dataScales = dataScales)
 
 # Build the neural network with scaled data
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
-nn <- original.data[1:300, ] %>% footballstats::neural_network()
+nn <- original.data[1:160, ] %>% footballstats::neural_network()
 save(nn, file = getwd() %>% paste0('/data/nn.rda'))

@@ -132,18 +132,37 @@ commentary_stats <- function(commentary, returnItems) {
 
 
 commentary_from_redis <- function(keyName, returnItems) {
-  results <- rredis::redisHMGet(
-    key = keyName,
-    fields = returnItems)
+  # Get all commentary items
+  results <- keyName %>% rredis::redisHMGet(
+    fields = returnItems
+  )
+  hashNames <- results %>% names
+  hashLen <- hashNames %>% length
 
-  if ("possesiontime" %in% returnItems) {
-    results$possesiontime <- gsub(
-      pattern = "%",
-      replacement = "",
-      x = results$possesiontime)
+  # Make sure something exists in the requested fields
+  vec <- c()
+  for (j in 1:hashLen) {
+    single <- results[[hashNames[j]]]
+    vec %<>% c(if (hashNames[j] %>% `==`('possesiontime')) {
+      single %>% gsub(
+        pattern = "%",
+        replacement = "") %>%
+        as.double
+    } else if (single %>% is.null) {
+      NA
+    } else  if (single %>% is.na) {
+      NA
+    } else {
+      single %>% as.double
+    })
   }
 
-  results %>% as.double %>% return()
+  # Make sure the items returned is the same length as requested
+  if (vec %>% na.omit %>% as.double %>% length %>% `==`(hashLen)) {
+    vec %>% return()
+  } else {
+    NULL %>% return()
+  }
 }
 
 #' @title Scale SVM Data

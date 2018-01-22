@@ -39,7 +39,7 @@ ord_keys <-function(commentaryKeys, competitionID, seasonStarting) {
 
 
 get_frm <- function(df, teamID, matchData) {
-  formResults <- team_form(
+  formResults <- footballstats::team_form(
     matchData = matchData,
     teamID = teamID)
 
