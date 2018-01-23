@@ -180,7 +180,7 @@ project_convince <- function(competitionID, seasonStarting, teamIDs) {
     resList[[1]] %>% `-`(resList[[2]]) %>% t
   }
 
-  dF <- form %>% data.frame(stringsAsFactors = FALSE)
+  dF <- convince %>% data.frame(stringsAsFactors = FALSE)
   names(dF) <- 'convince'
   dF %>% return()
 }
