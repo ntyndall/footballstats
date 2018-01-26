@@ -56,8 +56,7 @@ calculate_data <- function(matchData) {
         competitionID = competitionID,
         matchID = matchID,
         teamIDs = teamIDs,
-        commentaryNames = allowedNames,
-        currentDate = matchSlice$formatted_date %>% as.integer,
+        commentaryNames = allowedNames
       )
     )
 
@@ -147,7 +146,7 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 #' @export
 
 
-feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames, currentDate) {
+feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) {
 
   cResults <- c()
   for (j in 1:2) {
@@ -165,17 +164,6 @@ feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames, 
       keyName = commentaryKey,
       returnItems = commentaryNames
     )
-
-    # Get current date
-    startDate <- 'c_startDate:1204' %>% rredis::redisGet() %>% as.integer
-    weekNum <- currentDate %>% `-`(startDate) %>% `/`(7) %>% floor %>% `+`(1)
-
-    # Get the positions from the week being investigated
-    positions <- paste0('cw_pl:1204:', weekNum) %>% rredis::redisHGetAll()
-    position <- positions[[teamIDs[j]]] %>% as.integer
-
-    len <- positions %>% length
-
 
     # Get Commentary results from Redis
     cResults %<>% c(

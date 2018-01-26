@@ -4,5 +4,5 @@
 \alias{feat_commentaries}
 \title{Commentary Feature}
 \usage{
-feat_commentaries(competitionID, matchID, teamIDs, commentaryNames, currentDate)
+feat_commentaries(competitionID, matchID, teamIDs, commentaryNames)
 }
