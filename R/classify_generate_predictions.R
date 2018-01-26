@@ -25,6 +25,11 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
 
+  # Just query for the standings here!
+  # Need a condition for testing case!
+  #
+  #
+
   # Set up progress bar
   progressBar <- utils::txtProgressBar(
     min = 0,
