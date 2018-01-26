@@ -4,7 +4,10 @@
 
 project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
 
-  resList <- c()
+  # Get start date
+  startDate <- 'c_startDate:1204' %>% rredis::redisGet() %>% as.integer
+
+  resSds <- resList <- weights <- c()
   for (j in 1:2) {
     commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
@@ -27,13 +30,9 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
     if (`>`(naCount, thresh) %>% any) next
     bFrame[bFrame %>% is.na] <- 0
 
-    # Need to get the weights from matchID probably
-    #matchWeights <- commentaryKeys %>% footballstats::match_weights()
-    # Multiply each row of bFrame with matchWeights
-
     # Calculate the average (and possible the standard deviation?)
     resList %<>% c(apply(bFrame, 2, mean) %>% list)
-    #sds <- apply(bFrame, 2, sd) %>% `/`(3)
+    resSds %<>% c(apply(bFrame, 2, sd) %>% `/`(3))
   }
 
   #
@@ -47,8 +46,6 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
   names(dF) <- dataScales$commentaries
   dF %>% return()
 }
-
-
 
 
 #' @title Commentary Projection
@@ -183,4 +180,56 @@ project_convince <- function(competitionID, seasonStarting, teamIDs) {
   dF <- convince %>% data.frame(stringsAsFactors = FALSE)
   names(dF) <- 'convince'
   dF %>% return()
+}
+
+
+#' @title Project Position
+#' @export
+
+
+project_position <- function() {
+  # Date from matchID
+  matchIDs <- commentaryKeys %>%
+    strsplit(split = ':') %>%
+    purrr::map(3) %>%
+    purrr::flatten_chr()
+
+  # Get general match info i.e. the date
+  # get_dates()
+  subWeight <- c()
+  for (k in 1:(matchIDs %>% length)) {
+    matchInfo <- paste0('csm:1204:2017:', matchIDs[k]) %>%
+      rredis::redisHMGet(
+        fields = c('formatted_date', 'visitorteam_id', 'localteam_id')
+      ) %>%
+      as.character
+
+    # Pick the other ID!
+    truth <- matchInfo == teamIDs[j]
+    otherID <- matchInfo[c(FALSE, !truth[c(2:3)])]
+
+    # Get the current date
+    currentDate <- matchInfo[1] %>%
+      as.Date(format = '%d.%m.%Y') %>%
+      as.integer
+    weekNum <- currentDate %>% `-`(startDate) %>% `/`(7) %>% floor %>% `+`(1)
+
+    # Get the positions from the week being investigated
+    positions <- paste0('cw_pl:1204:', weekNum) %>% rredis::redisHGetAll()
+    #if (positions %>% is.null) next
+    position <- positions[[teamIDs[j]]] %>% as.integer
+    positionAgainst <- positions[[otherID]] %>% as.i
+    nteger
+
+    # The league size
+    if (k == 1) lSize <- positions %>% length
+
+    # If less then lower to normalize!
+    subWeight %<>% c( if (position > positionAgainst) {
+      1 %>% `-`(position %>% `-`(positionAgainst) %>% min(10) %>% `/`(20))
+    } else {
+      positionAgainst %>% `-`(position) %>% min(10) %>% `/`(20) %>% `+`(1)
+    })
+  }
+  weights %<>% c(subWeight %>% list)
 }
