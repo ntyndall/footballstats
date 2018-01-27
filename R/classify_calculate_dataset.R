@@ -11,7 +11,7 @@
 #' @export
 
 
-calculate_data <- function(matchData) {
+calculate_data <- function(matchData, logger = FALSE) {
 
   # Only take these names
   allowedNames <- dataScales$sMax %>% names %>% `[`(c(1:7))
@@ -22,6 +22,7 @@ calculate_data <- function(matchData) {
 
   # Data rows
   rowData <- matchData %>% nrow
+  res <- c()
 
   # Set up progress bar
   progressBar <- utils::txtProgressBar(
@@ -36,7 +37,7 @@ calculate_data <- function(matchData) {
 
     # Take a single slice of match data at a time
     matchSlice <- matchData[i, ]
-    matchID <- matchSlice$id
+    matchID <- matchSlice$id %>% as.integer
     competitionID <- matchSlice$comp_id
     teamIDs <- c(matchSlice$localteam_id, matchSlice$visitorteam_id)
 
@@ -50,6 +51,8 @@ calculate_data <- function(matchData) {
       stringsAsFactors = FALSE
     )
 
+    if (logger) print(datSlice)
+
     # 1) Get commentary information (Initialise datSlice)
     datSlice %<>% cbind(
       footballstats::feat_commentaries(
@@ -60,6 +63,8 @@ calculate_data <- function(matchData) {
       )
     )
 
+    if (logger) print(datSlice)
+
     # 2) Get form information
     datSlice %<>% cbind(
       footballstats::feat_form(
@@ -69,23 +74,34 @@ calculate_data <- function(matchData) {
       )
     )
 
+    if (logger) print(datSlice)
+
     # Finally, find out how convincing the match was for the home team
-    # and therefore W / D / L
     conv <- matchSlice$ft_score %>%
       footballstats::prs_ftscore()
     convince <- conv[1] - conv[2]
     datSlice$convince <- convince
 
-    res <- if (convince > 0) 'W' else if (convince == 0) 'D' else 'L'
+    # From convince, find out result as W / L / D
+    res %<>% c(if (convince > 0) 'W' else if (convince == 0) 'D' else 'L')
 
+    # Get relative position
     datSlice %<>% cbind(
-      data.frame(
-        res = res,
-        stringsAsFactors = FALSE)
+      footballstats::feat_position(
+        competitionID = competitionID,
+        seasonStarting = seasonStarting,
+        matchID = matchID,
+        teamIDs = teamIDs
+      )
     )
+
+    if (logger) print(datSlice)
 
     mDat %<>% rbind(datSlice)
   }
+
+  # Results are collected as a vector, column bind it onto the full dataframe
+  mDat$res <- res
 
   # Close the progress bar
   close(progressBar)
@@ -186,3 +202,42 @@ feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) 
   dF %>% return()
 
 }
+
+#' @title Relative Position Feature
+#' @export
+
+
+feat_position <- function(competitionID, seasonStarting, matchID, teamIDs) {
+
+  # Get the start date
+  startDate <- paste0('c_startDate:', competitionID, ':', seasonStarting) %>%
+    rredis::redisGet() %>%
+    as.integer
+
+  # Get the current date
+  currentDate <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchID) %>%
+    rredis::redisHGet(field = 'formatted_date') %>%
+    as.character %>%
+    as.Date(format = '%d.%m.%Y') %>%
+    as.integer
+
+  # Convert to week number
+  weekNum <- currentDate %>%
+    `-`(startDate) %>%
+    `/`(7) %>%
+    floor %>%
+    `+`(1)
+
+  # Get the positions from the week being investigated
+  positions <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':', weekNum) %>%
+    rredis::redisHGetAll() %>%
+    lapply(as.integer)
+
+  # Determine & Return relative position as a data.frame
+  data.frame(
+    relativePos = positions[[teamIDs[1]]] - positions[[teamIDs[2]]],
+    stringsAsFactors = FALSE
+  ) %>% return()
+
+}
+
