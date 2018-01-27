@@ -13,6 +13,12 @@
 
 generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
+  # Order the fixture list dataframe
+  fixtureList <- fixtureList[fixtureList$formatted_date %>%
+    as.Date(format = '%d.%m.%Y') %>%
+    as.integer %>%
+    order, ]
+
   # Initialise arguments
   dataScales <- footballstats::dataScales
   correct <- 0
@@ -27,7 +33,12 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
   # Just query for the standings here!
   # Need a condition for testing case!
-  #
+  standings <- if (!KEYS$TEST) {
+    paste0('/standings/', competitionID, '?') %>%
+      footballstats::get_data(KEYS = KEYS)
+  } else {
+    footballstats::standings
+  }
   #
 
   # Set up progress bar
@@ -42,7 +53,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     singleFixture <- fixtureList[i, ]
 
     # Get team information from fixture data frame
-    matchID <- singleFixture$id
+    matchID <- singleFixture$id %>% as.integer
     homeName <- singleFixture$localteam_name
     awayName <- singleFixture$visitorteam_name
     teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
@@ -55,7 +66,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
     # Bind the commentaries together
     matchMetrics %<>% cbind(
-      project_commentaries(
+      footballstats::project_commentaries(
         competitionID = competitionID,
         seasonStarting = seasonStarting,
         teamIDs = teamIDs
@@ -77,6 +88,16 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         competitionID = competitionID,
         seasonStarting = seasonStarting,
         teamIDs = teamIDs
+      )
+    )
+
+    # Figure out the standings
+    positions <- standings$position[teamIDs %>% match(standings$team_id)] %>%
+      as.integer
+    matchMetrics %<>% cbind(
+      data.frame(
+        relativePos = positions[1] - positions[2],
+        stringsAsFactors = FALSE
       )
     )
 
