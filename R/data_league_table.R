@@ -7,19 +7,36 @@
 
 create_table <- function(matchData) {
 
-  competitionID <- 1204
+  # Get the competitionID first
+  competitionID <- matchData$comp_id %>%
+    unique
 
-  # Match data should be ordered
-  # IMPORTANT - SET THE FIRST DATE AT SOME POINT!!
-  rredis::redisSet('c_startDate:1204', subD[1, ]$formatted_date %>% as.integer %>% as.character %>% charToRaw())
+  # Get the unique season
+  seasonStarting <- matchData$season %>%
+    unique %>%
+    strsplit(split = '/') %>%
+    purrr::map(1) %>%
+    purrr::flatten_chr()
+
+  # SET the very first date if it doesn't exist!
+  firstDate <- paste0('c_startDate:', competitionID, ':', seasonStarting)
+  if (firstDate %>% rredis::redisExists() %>% `!`()) {
+    firstElement <- matchData[1, ]$formatted_date %>%
+      as.integer %>%
+      as.character %>%
+      charToRaw()
+    firstDate %>% rredis::redisSet(value = firstElement)
+  }
+
+  # GET the starting date
+  startDate <- firstDate %>%
+    rredis::redisGet() %>%
+    as.integer
 
   # Loop over all match data
   for (i in 1:(matchData %>% nrow)) {
 
-    print(i)
-    # Get the starting date
-    startDate <- 'c_startDate:1204' %>% rredis::redisGet() %>% as.integer
-
+    # Break match data down to individual slices
     slice <- matchData[i, ]
     matchID <- slice$id
     currentDate <- slice$formatted_date %>% as.integer
@@ -41,10 +58,12 @@ create_table <- function(matchData) {
     }
 
     for (j in 1:2) {
-      redisKey <- paste0('cwt_l:1204:', weekNum, ':', teamIDs[j])
+      redisKey <- paste0('cwt_l:', competitionID, ':', seasonStarting, ':', weekNum, ':', teamIDs[j])
 
       pointsToAdd <- 'leagueMatchSet' %>% rredis::redisSAdd(
-         element = paste0(matchID, ':', teamIDs[j]) %>% charToRaw()) %>% as.integer %>% as.logical
+         element = paste0(matchID, ':', teamIDs[j]) %>% charToRaw()) %>%
+        as.integer %>%
+        as.logical
 
       # Create the key if it doesnt exist
       if (pointsToAdd && `!`(redisKey %>% rredis::redisExists())) {
@@ -53,8 +72,10 @@ create_table <- function(matchData) {
           keepTrying <- TRUE
           starter <- 1
           while (keepTrying) {
-            prevKey <- paste0('cwt_l:1204:', weekNum - starter, ':', teamIDs[j])
-            pRes <- prevKey %>% rredis::redisHGetAll() %>% lapply(as.integer)
+            prevKey <- paste0('cwt_l:', competitionID, ':', seasonStarting, ':', weekNum - starter, ':', teamIDs[j])
+            pRes <- prevKey %>%
+              rredis::redisHGetAll() %>%
+              lapply(as.integer)
             if (pRes %>% length %>% `>`(0)) {
               keepTrying <- FALSE
             } else {
@@ -86,16 +107,16 @@ create_table <- function(matchData) {
 #' @title Weekly Positions
 #' @export
 
-weekly_positions <- function(competitionID) {
+weekly_positions <- function(competitionID, seasonStarting) {
 
   # Get all possible keys
-  redisKeys <- paste0('cwt_l:', competitionID, '*') %>%
+  redisKeys <- paste0('cwt_l:', competitionID, ':', seasonStarting, '*') %>%
     rredis::redisKeys()
 
   # Get the unique weeks to loop over
   weeks <- redisKeys %>%
     strsplit(split = ':') %>%
-    purrr::map(3) %>%
+    purrr::map(4) %>%
     purrr::flatten_chr() %>%
     as.integer
 
@@ -120,7 +141,7 @@ weekly_positions <- function(competitionID) {
     # Get the teamIDs
     teamIDs <- subKeys %>%
       strsplit(split = ':') %>%
-      purrr::map(4) %>%
+      purrr::map(5) %>%
       purrr::flatten_chr()
 
     subKeyLen <- subKeys %>% length
@@ -152,20 +173,9 @@ weekly_positions <- function(competitionID) {
     names(position) <- singleWeek$teamID
 
     # Push list of positions to the cw_pl hashmap ...
-    paste0('cw_pl:', competitionID, ':', uniqKeys[i]) %>%
+    paste0('cw_pl:', competitionID, ':', seasonStarting, ':', uniqKeys[i]) %>%
       rredis::redisHMSet(values = position)
-
   }
 
 }
 
-#' @title del keys
-#' @export
-
-del_keys <- function() {
-  rKeys <- 'cwt_l*' %>%  rredis::redisKeys()
-
-  for (i in 1:(rKeys %>% length)) {
-    rKeys %>% rredis::redisDelete()
-  }
-}
