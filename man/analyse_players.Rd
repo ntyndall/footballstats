@@ -4,7 +4,7 @@
 \alias{analyse_players}
 \title{Analyse Players}
 \usage{
-analyse_players()
+analyse_players(deployed = FALSE)
 }
 \description{
 A function that analyses players only,
