@@ -1,9 +1,6 @@
 context("test-add_info.R")
 
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
 
 test_that("Send in a single commentary to see it is stored correctly", {
@@ -16,7 +13,7 @@ test_that("Send in a single commentary to see it is stored correctly", {
   matchID <- commentaryData$match_id
 
   footballstats::acommentary_info(
-    competitionID = '1204',
+    competitionID = competitionID,
     matchIDs = matchID,
     localteam = localteam,
     visitorteam = visitorteam,
@@ -34,7 +31,7 @@ test_that("Send in a single commentary to see it is stored correctly", {
   expect_that( singleMatch %>% length, equals(1) )
 
   checkPlayerExists <- rredis::redisHMGet(
-    key = paste0('cmp:1204:', matchID, ':153493'),
+    key = paste0('cmp:', competitionID, ':', matchID, ':153493'),
     fields = 'name')
 
   expect_that( checkPlayerExists$name %>% as.character %>% tolower, equals('mohamed elneny') )

@@ -19,8 +19,7 @@ predict_matches <- function(competitionID, competitionName, KEYS) {
     footballstats::matchData[60:70, ]
   } else { # nocov start
     paste0("/matches?comp_id=", competitionID, "&from_date=", KEYS$DATE_FROM, "&to_date=", KEYS$DATE_TO, "&") %>%
-      footballstats::get_data(
-        KEYS = KEYS)
+      footballstats::get_data(KEYS = KEYS)
   } # nocov end
 
   # Generate predictions based on actual fixtures!
@@ -28,7 +27,8 @@ predict_matches <- function(competitionID, competitionName, KEYS) {
     numOfPredicted <- footballstats::generate_predictions(
       fixtureList = fixtureList,
       competitionName = competitionName,
-      KEYS = KEYS)
+      KEYS = KEYS
+    )
     cat(paste0(Sys.time(), ' | Predicted a total of ', numOfPredicted, ' matches. \n'))
   } else {
     cat(paste0(Sys.time(), ' | No upcoming fixture in the next week! \n'))

@@ -1,9 +1,6 @@
 context("test-ateam_info.R")
 
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
 
 test_that("Check the keys are as they should be by adding team data", {
@@ -16,7 +13,7 @@ test_that("Check the keys are as they should be by adding team data", {
   expect_that( 'analyseTeams' %>% rredis::redisExists(), is_true() )
 
   footballstats::ateam_info(
-    competitionID = 1204,
+    competitionID = competitionID,
     teamListLength = 1,
     KEYS = KEYS)
 

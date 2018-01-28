@@ -254,12 +254,12 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 
       # Check if team has been added to the set for analysis later.
       # Or if it is ready to be updated after another match has been played.
-      teamInSet <- rredis::redisSAdd(
-        set = paste0('c_teamSetInfo:', competitionID),
-        element = matchItems$localteam_id %>% as.character %>% charToRaw()) %>%
-          as.integer %>% as.logical
+      #teamInSet <- rredis::redisSAdd(
+      #  set = paste0('c_teamSetInfo:', competitionID),
+      #  element = matchItems$localteam_id %>% as.character %>% charToRaw()) %>%
+      #    as.integer %>% as.logical
 
-      if (teamInSet) {
+      if (TRUE) {
         rredis::redisLPush(
           key = 'analyseTeams',
           value = matchItems$localteam_id %>% as.character %>% charToRaw())

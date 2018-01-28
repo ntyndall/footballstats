@@ -4,7 +4,7 @@
 
 project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
 
-  resList <- c()
+  resSds <- resList <- weights <- c()
   for (j in 1:2) {
     commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
@@ -27,13 +27,9 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
     if (`>`(naCount, thresh) %>% any) next
     bFrame[bFrame %>% is.na] <- 0
 
-    # Need to get the weights from matchID probably
-    #matchWeights <- commentaryKeys %>% footballstats::match_weights()
-    # Multiply each row of bFrame with matchWeights
-
     # Calculate the average (and possible the standard deviation?)
     resList %<>% c(apply(bFrame, 2, mean) %>% list)
-    #sds <- apply(bFrame, 2, sd) %>% `/`(3)
+    resSds %<>% c(apply(bFrame, 2, sd) %>% `/`(3))
   }
 
   #
@@ -47,8 +43,6 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
   names(dF) <- dataScales$commentaries
   dF %>% return()
 }
-
-
 
 
 #' @title Commentary Projection

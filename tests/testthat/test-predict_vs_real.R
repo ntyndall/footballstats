@@ -1,11 +1,7 @@
 context("test-predict_vs_real.R")
 
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
-competitionID <- 1204
 
 test_that("Test a predicted result can be recorded as true or false.", {
 

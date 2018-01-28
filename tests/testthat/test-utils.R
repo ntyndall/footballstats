@@ -1,9 +1,6 @@
 context("test-utils.R")
 
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
 
 test_that('test the request limitations can be implemented', {

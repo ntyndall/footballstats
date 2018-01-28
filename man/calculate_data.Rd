@@ -4,7 +4,7 @@
 \alias{calculate_data}
 \title{Calculate Data Set}
 \usage{
-calculate_data(matchData)
+calculate_data(matchData, logger = FALSE)
 }
 \arguments{
 \item{matchData}{A dataframe containing all the match data.}

@@ -13,9 +13,15 @@
 
 generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
+  # Order the fixture list dataframe
+  fixtureList <- fixtureList[fixtureList$formatted_date %>%
+    as.Date(format = '%d.%m.%Y') %>%
+    as.integer %>%
+    order, ]
+
   # Initialise arguments
   dataScales <- footballstats::dataScales
-  correct <- 0
+  correct <- todaysDate <- 0
   totalTxt <- c()
 
   # Parse important information
@@ -24,6 +30,14 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
+
+  # Just query for the standings here!
+  standings <- if (!KEYS$TEST) {
+    paste0('/standings/', competitionID, '?') %>%
+      footballstats::get_data(KEYS = KEYS)
+  } else {
+    footballstats::standings
+  }
 
   # Set up progress bar
   progressBar <- utils::txtProgressBar(
@@ -37,7 +51,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     singleFixture <- fixtureList[i, ]
 
     # Get team information from fixture data frame
-    matchID <- singleFixture$id
+    matchID <- singleFixture$id %>% as.integer
     homeName <- singleFixture$localteam_name
     awayName <- singleFixture$visitorteam_name
     teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
@@ -50,7 +64,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
     # Bind the commentaries together
     matchMetrics %<>% cbind(
-      project_commentaries(
+      footballstats::project_commentaries(
         competitionID = competitionID,
         seasonStarting = seasonStarting,
         teamIDs = teamIDs
@@ -72,6 +86,16 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         competitionID = competitionID,
         seasonStarting = seasonStarting,
         teamIDs = teamIDs
+      )
+    )
+
+    # Figure out the standings
+    positions <- standings$position[teamIDs %>% match(standings$team_id)] %>%
+      as.integer
+    matchMetrics %<>% cbind(
+      data.frame(
+        relativePos = positions[1] - positions[2],
+        stringsAsFactors = FALSE
       )
     )
 
@@ -115,10 +139,17 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         return()
     }
 
+    # Print out a new group of dates?
+    cDate <- singleFixture$formatted_date
+    if (todaysDate %>% `!=`(cDate)) {
+      todaysDate <- cDate
+      totalTxt %<>% c(paste0(' ... _', todaysDate, '_'))
+    }
+
     # Logs for console and for slack
     txt <- paste0('[', actualH, '] ', homeName, ' vs. ', awayName, ' [', actualA, ']') %>% as.character
     txtForSlack <- paste0(teamIDs[1] %>% blnk(), ' `', txt, '` ', teamIDs[2] %>% blnk()) %>% as.character
-    totalTxt <- c(totalTxt, txtForSlack)
+    totalTxt %<>% c(txtForSlack)
 
     # When making a prediction - store the guess for later
     if (KEYS$LOG_PRED) {
@@ -130,7 +161,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
           week = singleFixture$week,
           slack = 'false'))
     }
-    Sys.sleep(0.5)
+    Sys.sleep(0.2)
   }
 
   # Close the progress bar

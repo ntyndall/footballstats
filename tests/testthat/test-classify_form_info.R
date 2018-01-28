@@ -1,5 +1,8 @@
 context('test-classify_form_info.R')
 
+# Reset DB
+rredis::redisFlushDB()
+
 test_that('Calculate score based on vector of forms', {
 
   expect_that( 'LLL' %>% footballstats::form_to_int(), equals(0) )
