@@ -142,6 +142,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
   # Subset the available competitions
   competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
 
+  # Create the sink for adding data
   if (deployed) 'summary_adding' %>% footballstats::create_sink()
 
   # Loop over all competitions being analysed
