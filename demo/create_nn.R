@@ -33,13 +33,13 @@ for (i in 1:(comps %>% length)) {
   # Store positions on a weekly basis
   footballstats::weekly_positions(
     competitionID = competitionID,
-    seasonStarting = 2017
+    seasonStarting = seasonStarting
   )
 
 }
 
 # Only select one competition
-totalData <- totalDate[totalData$comp_id == '1204', ]
+totalData <- totalData[totalData$comp_id == '1204', ]
 
 # Construct data set for building an SVM
 cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
