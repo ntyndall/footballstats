@@ -1,6 +1,18 @@
 library(footballstats)
 library(magrittr)
 
+#
+# This is a static script - and should be built interactively
+# depending on how the model should be set up
+#
+
+# Define the season when building the model
+seasonStarting <- 2017
+
+# Define a single competitionID if only one is to be used
+competitionID <- 1204
+
+
 # Get allowed competitions
 comps <- footballstats::allowed_comps()
 
@@ -14,38 +26,30 @@ for (i in 1:(comps %>% length)) {
     seasonStarting = seasonStarting,
     matchLimit = 10000)
   totalData %<>% rbind(matchData)
+
+  # Build league table
+  totalData %>% footballstats::create_table()
+
+  # Store positions on a weekly basis
+  footballstats::weekly_positions(
+    competitionID = competitionID,
+    seasonStarting = 2017
+  )
+
 }
 
-# Build league table
-totalData %>% footballstats::create_table()
-
-# Store positions on a weekly basis
-footballstats::weekly_positions(
-  competitionID = competitionID,
-  seasonStarting = 2017
-)
+# Only select one competition
+totalData <- totalDate[totalData$comp_id == '1204', ]
 
 # Construct data set for building an SVM
 cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
 original.data <- totalData %>% footballstats::calculate_data()
-
-# Calculate relative position
-#subD <- totalData[totalData$comp_id == '1204', ]
-
-# Just make sure the data set is in date order
-#subD <- subD[subD$formatted_date %>%
-#               as.integer %>%
-#               order, ]
-
-# Get the feature sets
-original.data <- subD %>% footballstats::calculate_data()
 
 # Only look at complete rows!
 original.data %<>% subset(original.data %>% stats::complete.cases())
 
 # Drop the match IDs
 original.data <- original.data[ , 2:(original.data %>% ncol)]
-
 
 # Create scaled data set
 dataScales <- original.data %>% footballstats::get_scales()
