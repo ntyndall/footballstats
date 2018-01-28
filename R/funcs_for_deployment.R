@@ -85,7 +85,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 #' @export
 
 
-analyse_players <- function() { # nocov start
+analyse_players <- function(deployed = FALSE) { # nocov start
   # Get season starting year
   seasonStarting <- footballstats::start_season()
 
@@ -97,6 +97,9 @@ analyse_players <- function() { # nocov start
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
+
+  # Create the sink for output
+  if (deployed) 'summary_players' %>% footballstats::create_sink()
 
   # Add player information
   playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
