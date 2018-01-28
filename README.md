@@ -4,18 +4,28 @@
 
 ## Installing and running this package
 ```
+# Run this as a script
+
+# Install football stats from github
+cat(' ## Installing footballstats \n ## ')
+
 library(devtools)
-install_github("niallbenj/footballstats")
+
+devtools::install_github(
+  repo = "niallbenj/footballstats")
+
 library(footballstats)
 
-# To run the script run
-footballstats::main()
+cat(' ## Install Complete. \n\n')
+
+# Set up log directory
+footballstats::create_log_dir()
 ``` 
 
 #### Deployment
   - Download and install [redis](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-redis) then from the command line start it by typing
 ```
-cd utils
+cd redis-stable/utils
 sudo ./install_server.sh
 ```
 To start and stop the redis server type `sudo service redis_6379 start / stop`
@@ -24,7 +34,9 @@ To start and stop the redis server type `sudo service redis_6379 start / stop`
 Sys.setenv(FS_HOST = "___")
 Sys.setenv(FS_APIKEY = "Authorization=___")
 Sys.setenv(FS_SLACK = "___")
+Sys.setenv(FS_DEPLOYLOC = "___")
 ```
+where the last token is the root path of where the above script is run from, e.g. `/root/`.
   - Set up a cron job by typing `crontab -e` with the following...
 ```
 # Collect football information - such as match / team / commentary information
@@ -34,7 +46,7 @@ Sys.setenv(FS_SLACK = "___")
 0 22 * * 0 Rscript -e 'library(footballstats); footballstats::predict_fixtures(deployed = TRUE)'
 
 # After information has been gathered - update player status etc (COSTLY operation!)
-0 22 * * 1 Rscript -e 'library(footballstats); footballstats::analyse_players()'
+0 22 * * 1 Rscript -e 'library(footballstats); footballstats::analyse_players(deployed = TRUE)'
 
 # Generate report
 # ...
