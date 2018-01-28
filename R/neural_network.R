@@ -36,7 +36,7 @@ neural_network <- function(totalData) {
   f <- paste0(
     newLabels %>% paste(collapse = ' + '), ' ~',
     paste(features, collapse = ' + ')) %>%
-    as.formula
+    stats::as.formula()
 
   # Calculate number of neurons
   neurons <- features %>%
