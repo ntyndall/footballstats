@@ -143,7 +143,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     cDate <- singleFixture$formatted_date
     if (todaysDate %>% `!=`(cDate)) {
       todaysDate <- cDate
-      totalTxt %<>% c(paste0(' ... _', todaysDate, '_'))
+      totalTxt %<>% c(paste0(' -- *', todaysDate, '* --'))
     }
 
     # Logs for console and for slack
