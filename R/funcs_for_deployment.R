@@ -40,7 +40,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   seasonStarting <- footballstats::start_season()
 
   # Obtain API and sensitive key information
-  KEYS <- footballstats::sensitive_keys(
+  KEYS <<- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
     storePred = TRUE)
