@@ -22,6 +22,7 @@ current <- 'git tag' %>%
     gsub(
       pattern = 'v',
       replacement = '')
+current <- current[current %>% length]
 
 # Split version in description
 verSplit <- ver %>%
@@ -29,7 +30,7 @@ verSplit <- ver %>%
   purrr::flatten_chr()
 
 # Split current git tag
-currentSplit <- current[current %>% length] %>%
+currentSplit <- current %>%
   strsplit(split = '[.]') %>%
   purrr::flatten_chr()
 
