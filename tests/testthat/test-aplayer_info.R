@@ -1,9 +1,6 @@
 context("test-aplayer_info.R")
 
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
 
 test_that("Check the keys are as they should be by adding player data", {
@@ -18,7 +15,7 @@ test_that("Check the keys are as they should be by adding player data", {
 
   footballstats::aplayer_info(
     playerLength = 1,
-    currentSeasonYear = 2017,
+    currentSeasonYear = seasonStarting,
     KEYS = KEYS)
 
   # Check redis for expected output

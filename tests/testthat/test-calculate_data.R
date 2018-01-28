@@ -1,11 +1,6 @@
 context('test-classify_claculate_data.R')
 
-competitionID <- 1204
-seasonStarting <- 2017
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
 
 test_that('Calculate data set built from features', {
@@ -25,7 +20,7 @@ test_that('Calculate data set built from features', {
     matchLimit = 1000)
 
   footballstats::acommentary_info(
-    competitionID = 1204,
+    competitionID = competitionID,
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
     visitorteam = matchData$visitorteam_id,
@@ -37,7 +32,7 @@ test_that('Calculate data set built from features', {
   # Store positions on a weekly basis
   footballstats::weekly_positions(
     competitionID = competitionID,
-    seasonStarting = 2017
+    seasonStarting = seasonStarting
   )
 
   # Calculate the feature set

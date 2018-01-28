@@ -1,9 +1,6 @@
 context("test-acomp_info.R")
 
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
 
 test_that("Save competition IDs from /competitions/ into a set", {

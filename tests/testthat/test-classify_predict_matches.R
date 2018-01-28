@@ -1,11 +1,6 @@
 context('test-classify_all.R')
 
-competitionID <- 1204
-seasonStarting <- 2017
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
 
 test_that('Classify all - end to end from adding data to classifying and predicting.', {

@@ -1,18 +1,14 @@
 context("test-classify_utils.R")
 
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379)
-rredis::redisSelect(3)
+# Reset DB
 rredis::redisFlushDB()
-competitionID <- 1204
 
 test_that("Test that match data can be recreated easily.", {
 
   # Test no data returns a null data frame
   recreated <- footballstats::recreate_matchdata(
     competitionID = competitionID,
-    seasonStarting = 2017,
+    seasonStarting = seasonStarting,
     matchLimit = 1000)
 
   expect_that( recreated %>% nrow, equals(0) )
@@ -22,12 +18,12 @@ test_that("Test that match data can be recreated easily.", {
     competitionID = competitionID,
     dateFrom = NULL,
     dateTo = NULL,
-    seasonStarting = 2017,
+    seasonStarting = seasonStarting,
     KEYS = KEYS)
 
   recreated <- footballstats::recreate_matchdata(
     competitionID = competitionID,
-    seasonStarting = 2017,
+    seasonStarting = seasonStarting,
     matchLimit = 1000)
 
   expect_that( matchData %>% nrow, equals(recreated %>% nrow) )
@@ -42,7 +38,7 @@ test_that("Test that commentary data is sent to Redis.", {
   # Recreate the match data that is in redis
   recreated <- footballstats::recreate_matchdata(
     competitionID = competitionID,
-    seasonStarting = 2017,
+    seasonStarting = seasonStarting,
     matchLimit = 1000)
 
   # Choose the right match ID to analyse

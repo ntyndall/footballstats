@@ -4,13 +4,15 @@ library(covr)
 library(purrr)
 library(rredis)
 
-# Set global variable to bypass the API calls
-bypass <<- TRUE
-
+# Connect to DB 3 (away from production)
 rredis::redisConnect(
   host = 'localhost',
   port = 6379)
 rredis::redisSelect(3)
+
+# Initialise used and common variables
+competitionID <- 1204
+seasonStarting <- 2017
 
 # Set up enough keys for testing
 KEYS <<- list(
