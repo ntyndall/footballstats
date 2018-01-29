@@ -153,7 +153,7 @@ commentary_from_redis <- function(keyName, returnItems) {
     } else  if (single %>% is.na) {
       NA
     } else {
-      single %>% as.double
+      if (single %>% `==`('')) 0 else single %>% as.double
     })
   }
 
