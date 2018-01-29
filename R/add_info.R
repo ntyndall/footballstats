@@ -244,26 +244,18 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 
   if (matches %>% is.null %>% `!`()) {
 
-    # If getting todays match information, make sure all matches have actually been played.
-    if (analysingToday) if (any(matches$localteam_score == "")) return(data.frame())
+    # If getting match info - make sure all matches have actually ended and been played!
+    matches %<>% subset(matches$status %>% `==`('FT'))
 
     # Loop over all match data
     for (i in 1:nrow(matches)) {
       single <- matches[i, ]
       matchItems <- single[ ,valuesToRetain]
 
-      # Check if team has been added to the set for analysis later.
-      # Or if it is ready to be updated after another match has been played.
-      #teamInSet <- rredis::redisSAdd(
-      #  set = paste0('c_teamSetInfo:', competitionID),
-      #  element = matchItems$localteam_id %>% as.character %>% charToRaw()) %>%
-      #    as.integer %>% as.logical
-
-      if (TRUE) {
-        rredis::redisLPush(
-          key = 'analyseTeams',
-          value = matchItems$localteam_id %>% as.character %>% charToRaw())
-      }
+      # Push teamID to List to analyse later
+      rredis::redisLPush(
+        key = 'analyseTeams',
+        value = matchItems$localteam_id %>% as.character %>% charToRaw())
 
       # Check if match belongs to set
       matchInSet <- rredis::redisSAdd(
