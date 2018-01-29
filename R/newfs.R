@@ -63,10 +63,11 @@ get_av <- function(orderedKeys, commentaryNames) {
   bFrame <- data.frame(stringsAsFactors = FALSE)
   ln <- length(orderedKeys)
   for (i in 1:ln) {
-    rredis::redisHGetAll(key = orderedKeys[i])
     results <- footballstats::commentary_from_redis(
       keyName = orderedKeys[i],
       returnItems = commentaryNames)
+
+    if (results %>% is.null) next
 
     results %<>% as.data.frame %>% t
     colnames(results) <- commentaryNames
