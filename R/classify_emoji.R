@@ -1,6 +1,6 @@
 #' @title Emoji's for Slack
+#'
 #' @export
-
 
 classify_emoji <- function() { # nocov start
 
@@ -77,9 +77,28 @@ classify_emoji <- function() { # nocov start
                   16994, 17029, 17057, 16980, 17053, 17002, 17097,
                   17027, 16981, 17060, 17068)
 
+
+
+  # France details
+  france <- c(
+    'bor', 'cae', 'dij',
+    'lil', 'lyo', 'mar', 'mon',
+    'nic', 'psg', 'ren', 'sai','tou',
+    'tro'
+  )
+  france <- paste0(':france-', france, ':')
+
+  franceIds <- c(
+    9826, 10031, 10033,
+    10061, 10122, 10018, 9831,
+    10134, 10124, 9973, 10042, 10061,
+    9909
+  )
+
   myHash <- hashmap::hashmap(
-    keys = as.integer(c(englandOneIds, englandTwoIds, belgiumIds,
-                        greeceIds, portugalIds, germanyIds, russiaIds, turkeyIds)),
-    values = c(englandOne, englandTwo, belgium, greece, portugal, germany, russia, turkey))
+    keys = c(englandOneIds, englandTwoIds, belgiumIds,
+             greeceIds, portugalIds, germanyIds, russiaIds, turkeyIds,
+             franceIds) %>% as.integer,
+    values = c(englandOne, englandTwo, belgium, greece, portugal, germany, russia, turkey, france))
   return(myHash)
 } # nocov end
