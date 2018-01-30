@@ -153,13 +153,25 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
     # When making a prediction - store the guess for later
     if (KEYS$LOG_PRED) {
+      month <- cDate %>%
+        as.Date(format = '%d.%m.%Y') %>%
+        as.character %>%
+        strsplit(split = '-') %>%
+        purrr::map(2) %>%
+        purrr::flatten_chr() %>%
+        as.integer
+
+
       rredis::redisHMSet(
-        key = paste0('c:', competitionID, ':pred:', singleFixture$id),
+        key = paste0('csdm_pred:', competitionID, ':', seasonStarting, ':', month, ':', singleFixture$id),
         values = list(
           home = actualH,
           away = actualA,
-          week = singleFixture$week,
-          slack = 'false'))
+          week = cDate,
+          prediction = '-',
+          slack = 'false'
+        )
+      )
     }
     Sys.sleep(0.2)
   }

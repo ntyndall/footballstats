@@ -46,10 +46,11 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
   cat(' complete \n')
 
   # Store predicted vs. real outcomes
-  readyToAnalyse <- paste0('c:', competitionID, ':pred:*') %>% rredis::redisKeys()
+  readyToAnalyse <- paste0('csdm_pred:', competitionID, ':', seasonStarting, ':*') %>% rredis::redisKeys()
   if (!(readyToAnalyse %>% is.null)) {
     footballstats::predict_vs_real(
       competitionID = competitionID,
+      seasonStarting = seasonStarting,
       readyToAnalyse = readyToAnalyse,
       matches = matches)
   }

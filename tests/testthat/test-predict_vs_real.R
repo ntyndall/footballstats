@@ -6,20 +6,22 @@ rredis::redisFlushDB()
 test_that("Test a predicted result can be recorded as true or false.", {
 
   matchData <- footballstats::matchData[1, ]
-  keyType <-  paste0('c:', competitionID, ':pred:')
+  keyType <-  paste0('csdm_pred:', competitionID, ':2017:')
 
+  actualKey <- paste0(keyType, '1:', matchData$id)
   rredis::redisHMSet(
-    key = paste0(keyType, matchData$id),
-    values = list(home = 'W', away = 'L'))
+    key = actualKey,
+    values = list(home = 'W', away = 'L', prediction = '-'))
 
-  readyToAnalyse <- paste0(keyType, '*') %>% rredis::redisKeys()
+  readyToAnalyse <- actualKey %>% rredis::redisKeys()
   footballstats::predict_vs_real(
     competitionID = competitionID,
+    seasonStarting = seasonStarting,
     readyToAnalyse = readyToAnalyse,
     matches = matchData)
 
   result <- rredis::redisHGet(
-    key = paste0(keyType, matchData$id),
+    key = actualKey,
     field = 'prediction') %>% as.character
 
   expect_that( result, equals('T') )
