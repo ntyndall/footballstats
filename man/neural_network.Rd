@@ -6,3 +6,7 @@
 \usage{
 neural_network(totalData)
 }
+\arguments{
+\item{totalData}{A data set that contains scaled data
+and a vector of results as a column in the data frame.}
+}

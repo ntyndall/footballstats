@@ -57,6 +57,7 @@ order_matchdata <- function(matchData, limit = 5000) {
   return(matchData[1:limit, ])
 }
 
+#' @title Available Commentaries
 #'
 #' @export
 
@@ -95,7 +96,7 @@ available_commentaries <- function(competitionID = 'all', includeNames = 'all') 
   return(allAvailable)
 }
 
-#' @title commentary_stats
+#' @title Commentary Statistics
 #'
 #' @description A function that takes the commentary values stored in redis and
 #'  calculates an average value for the list of variables in the key for that team.
@@ -127,7 +128,7 @@ commentary_stats <- function(commentary, returnItems) {
   }
 }
 
-#'
+#' @title Commentary From Redis
 #' @export
 
 

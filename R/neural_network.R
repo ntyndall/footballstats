@@ -1,6 +1,8 @@
 #' @title Generate Artifical Neural Network
 #'
-#' @param trainingData
+#' @param totalData A data set that contains scaled data
+#'  and a vector of results as a column in the data frame.
+#'
 #' @export
 
 

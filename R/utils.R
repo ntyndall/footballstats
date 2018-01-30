@@ -4,9 +4,11 @@
 #'  global namespace for use throughout the code.
 #'
 #' @details Set up:
-#'  1) Fill in the  appropriate sensitive information.
-#'  2) Copy this file to sensitiveInfo.R and rename the
-#'     function to sensitiveInfo()
+#'  \itemize{
+#'  \item Fill in the  appropriate sensitive information.
+#'   \item Copy this file to sensitiveInfo.R and rename the
+#'     function to sensitiveInfo
+#' }
 #'
 #' @param printToSlack A boolean
 #' @param testing A boolean
@@ -44,7 +46,7 @@ sensitive_keys <- function(printToSlack, testing, storePred) {  # nocov start
   }
 }  # nocov end
 
-#'
+#' @title Possible Environment
 #' @export
 
 

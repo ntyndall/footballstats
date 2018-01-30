@@ -2,7 +2,7 @@
 % Please edit documentation in R/classify_utils.R
 \name{commentary_stats}
 \alias{commentary_stats}
-\title{commentary_stats}
+\title{Commentary Statistics}
 \usage{
 commentary_stats(commentary, returnItems)
 }

@@ -22,7 +22,9 @@ A function that loads all sensitive information into a
 }
 \details{
 Set up:
- 1) Fill in the  appropriate sensitive information.
- 2) Copy this file to sensitiveInfo.R and rename the
-    function to sensitiveInfo()
+ \itemize{
+ \item Fill in the  appropriate sensitive information.
+  \item Copy this file to sensitiveInfo.R and rename the
+    function to sensitiveInfo
+}
 }
