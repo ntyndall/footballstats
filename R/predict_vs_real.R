@@ -6,7 +6,7 @@ predict_vs_real <- function(competitionID, seasonStarting, readyToAnalyse, match
 
   readyToAnalyse <- readyToAnalyse %>%
     strsplit(split = '[:]') %>%
-    purrr::map(4) %>%
+    purrr::map(5) %>%
     purrr::flatten_chr()
 
   readyToAnalyse <- intersect(matches$id, readyToAnalyse)
