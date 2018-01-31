@@ -31,7 +31,7 @@ test_that('Classify all - end to end from adding data to classifying and predict
   predictions <- 'csdm_pred:1204:*' %>%
     rredis::redisKeys() %>%
     strsplit(split = '[:]') %>%
-    purrr::map(4) %>%
+    purrr::map(5) %>%
     purrr::flatten_chr() %>%
     as.integer %>%
     sort
