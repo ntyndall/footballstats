@@ -104,10 +104,14 @@ analyse_players <- function(deployed = FALSE) { # nocov start
   # Add player information
   playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
   if (playerLength > 0) {
+    cat(paste(' ## Analysing a total of ', playerLength, ' unique players. \n'))
+    tNow <- Sys.time()
     footballstats::aplayer_info(
       playerLength = playerLength,
       currentSeasonYear = seasonStarting,
       KEYS = KEYS)
+    cat(' ## Players analysed with a \n')
+    cat(paste(' ## ', Sys.time() - tNow))
   }
 
   # Only complete - delete the analysePlayers key (if it exists..)
