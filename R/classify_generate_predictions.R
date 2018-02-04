@@ -80,15 +80,6 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       )
     )
 
-    # Need to get a projection of convince-ability too....
-    matchMetrics %<>% cbind(
-      footballstats::project_convince(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting,
-        teamIDs = teamIDs
-      )
-    )
-
     # Figure out the standings
     positions <- standings$position[teamIDs %>% match(standings$team_id)] %>%
       as.integer

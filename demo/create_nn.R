@@ -12,7 +12,6 @@ seasonStarting <- 2017
 # Define a single competitionID if only one is to be used
 competitionID <- 1204
 
-
 # Get allowed competitions
 comps <- footballstats::allowed_comps()
 
@@ -35,7 +34,6 @@ for (i in 1:(comps %>% length)) {
     competitionID = competitionID,
     seasonStarting = seasonStarting
   )
-
 }
 
 # Only select one competition

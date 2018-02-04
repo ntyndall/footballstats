@@ -80,7 +80,6 @@ calculate_data <- function(matchData, logger = FALSE) {
     conv <- matchSlice$ft_score %>%
       footballstats::prs_ftscore()
     convince <- conv[1] - conv[2]
-    datSlice$convince <- convince
 
     # From convince, find out result as W / L / D
     res %<>% c(if (convince > 0) 'W' else if (convince == 0) 'D' else 'L')
@@ -105,9 +104,6 @@ calculate_data <- function(matchData, logger = FALSE) {
 
   # Close the progress bar
   close(progressBar)
-  # Replace any NA's with zero
-  # (NOT YET)
-  #mDat[mDat %>% is.na] <- 0
 
   mDat %>% return()
 }
