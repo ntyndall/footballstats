@@ -14,7 +14,9 @@
 calculate_data <- function(matchData, logger = FALSE) {
 
   # Only take these names
-  allowedNames <- dataScales$commentaries
+  allowedNames <- c(
+    'shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'
+  )
 
   # Infer the season
   seasonStarting <- matchData$season %>% footballstats::prs_season()

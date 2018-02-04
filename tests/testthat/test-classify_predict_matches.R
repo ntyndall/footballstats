@@ -11,21 +11,24 @@ test_that('Classify all - end to end from adding data to classifying and predict
     dateTo = NULL,
     seasonStarting = seasonStarting,
     analysingToday = TRUE,
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
 
   footballstats::acommentary_info(
     competitionID = competitionID,
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
     visitorteam = matchData$visitorteam_id,
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
 
   # Create the predictions here
   KEYS$LOG_PRED <- TRUE
   footballstats::predict_matches(
     competitionID = competitionID,
     competitionName = 'test-competition',
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
   KEYS$LOG_PRED <- FALSE
 
   predictions <- 'csdm_pred:1204:*' %>%
@@ -36,6 +39,6 @@ test_that('Classify all - end to end from adding data to classifying and predict
     as.integer %>%
     sort
 
-  expect_that( predictions %>% length, equals(11) )
-  expect_that( predictions[1], equals(2212967) )
+  expect_equal( predictions %>% length, 11 )
+  expect_equal( predictions[1], 2212967 )
 })

@@ -23,7 +23,8 @@ for (i in 1:(comps %>% length)) {
   matchData <- footballstats::recreate_matchdata(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
-    matchLimit = 10000)
+    matchLimit = 10000
+  )
   totalData %<>% rbind(matchData)
 
   # Build league table

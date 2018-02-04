@@ -57,32 +57,34 @@ neural_network <- function(totalData) {
     act.fct = "tanh",
     linear.output = FALSE,
     lifesign = 'minimal',
-    stepmax = 10000000)
+    stepmax = 10000000
+  )
 
   # Compute Predictions off Test Set
   predictions <- neuralnet::compute(
     x = nn,
-    covariate = test.data[(newLabels %>% length + 1):ncol(test.data)])
+    covariate = test.data[(newLabels %>% length + 1):ncol(test.data)]
+  )
 
   # Create vectors to measure accuracy
   realVec <- predVec <- 0 %>% rep(test.data %>% nrow)
   tot <- 0
   for (i in 1:(newLabels %>% length)) {
     current <- test.data[[newLabels[i]]]
-    realVec[current %>% `==`(1) %>% which] <- i
+    realVec[current %>% `==`(1) %>% which] <- newLabels[i]
   }
 
   # Check the max values per row for the predictions
   netRes <- predictions$net.result
-  for (j in 1:(netRes %>% nrow)) predVec[j] <- netRes[j, ] %>% which.max
+  for (j in 1:(netRes %>% nrow)) predVec[j] <- newLabels[netRes[j, ] %>% which.max]
+
+  Actual.score <- realVec %>% factor(levels = newLabels)
+  Predicted.score <- predVec %>% factor(levels = newLabels)
 
   # Build a table of results
-  myT <- table(realVec, predVec)
-  if (myT %>% dim %>% unique %>% length %>% `>`(1)) stop(' ## Dimensions dont match.')
-
-  # Print the confusion matrix of results
+  resultTable <- table(Actual.score, Predicted.score)
   print(' ## Confusion matrix ##')
-  cat(caret::confusionMatrix(data = myT))
+  print(caret::confusionMatrix(data = resultTable))
 
   # Return the neural network
   return(nn)
