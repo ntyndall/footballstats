@@ -14,7 +14,7 @@
 calculate_data <- function(matchData, logger = FALSE) {
 
   # Only take these names
-  allowedNames <- dataScales$sMax %>% names %>% `[`(c(1:7))
+  allowedNames <- dataScales$commentaries
 
   # Infer the season
   seasonStarting <- matchData$season %>% footballstats::prs_season()

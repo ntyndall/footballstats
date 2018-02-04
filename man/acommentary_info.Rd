@@ -4,8 +4,7 @@
 \alias{acommentary_info}
 \title{acommentary_info}
 \usage{
-acommentary_info(competitionID, matchIDs, localteam, visitorteam, KEYS,
-  bypass = FALSE)
+acommentary_info(competitionID, matchIDs, localteam, visitorteam, KEYS)
 }
 \arguments{
 \item{competitionID}{An integer defining the competitionID that the

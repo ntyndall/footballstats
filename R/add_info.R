@@ -20,8 +20,7 @@
 #' @export
 
 
-acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS,
-                             bypass = FALSE) {
+acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS) {
 
   # Load static data set for testing
   if (KEYS$TEST) fullCommentary <- footballstats::fullCommentary

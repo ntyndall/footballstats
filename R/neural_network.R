@@ -82,7 +82,7 @@ neural_network <- function(totalData) {
 
   # Print the confusion matrix of results
   print(' ## Confusion matrix ##')
-  print(caret::confusionMatrix(data = myT))
+  cat(caret::confusionMatrix(data = myT))
 
   # Return the neural network
   return(nn)

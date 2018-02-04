@@ -7,7 +7,9 @@ library(rredis)
 # Connect to DB 3 (away from production)
 rredis::redisConnect(
   host = 'localhost',
-  port = 6379)
+  port = 6379,
+  nodelay = FALSE
+)
 rredis::redisSelect(3)
 
 # Initialise used and common variables
@@ -18,11 +20,13 @@ seasonStarting <- 2017
 KEYS <<- list(
   SLACK_PRNT = FALSE,
   TEST = TRUE,
-  LOG_PRED = FALSE)
+  LOG_PRED = FALSE
+)
 
 results <- testthat::test_dir(
   path = "testthat",
-  reporter = "summary")
+  reporter = "summary"
+)
 
 totalError <- 0
 for(i in 1:length(results)) {
@@ -58,6 +62,5 @@ codeStatus <- ifelse(
 quit(
   save = 'no',
   status = codeStatus,
-  runLast = FALSE)
-
-
+  runLast = FALSE
+)

@@ -10,21 +10,23 @@ test_that('Calculate data set built from features', {
     dateFrom = NULL,
     dateTo = NULL,
     seasonStarting = seasonStarting,
-    analysingToday = TRUE,
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
 
   # Need to recreate it as new dates are created
   matchData <- footballstats::recreate_matchdata(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
-    matchLimit = 1000)
+    matchLimit = 1000
+  )
 
   footballstats::acommentary_info(
     competitionID = competitionID,
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
     visitorteam = matchData$visitorteam_id,
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
 
   # Build league table
   matchData %>% footballstats::create_table()
@@ -39,18 +41,17 @@ test_that('Calculate data set built from features', {
   totalData <- matchData %>% footballstats::calculate_data()
   totalData <- totalData[totalData %>% is.na %>% rowSums %>% `==`(0), ]
 
-  expect_that( totalData %>% nrow, equals(40) )
-  expect_that( totalData %>% names %>% length, equals(12) )
-  expect_that( totalData$shots_total %>% range, equals(c(-22, 20)) )
-  expect_that( totalData$shots_ongoal %>% range, equals(c(-11, 10)) )
-  expect_that( totalData$fouls %>% range, equals(c(-10, 7)) )
-  expect_that( totalData$corners %>% range, equals(c(-7, 9)) )
-  expect_that( totalData$possesiontime %>% range, equals(c(-56, 56)) )
-  expect_that( totalData$yellowcards %>% range, equals(c(-3, 3)) )
-  expect_that( totalData$saves %>% range, equals(c(-7, 8)) )
-  expect_that( totalData$form %>% range, equals(c(-4, 5)) )
-  expect_that( totalData$convince %>% range, equals(c(-4, 5)) )
-  expect_that( totalData$relativePos %>% range, equals(c(-18, 19)) )
+  expect_equal( totalData %>% nrow, 40 )
+  expect_equal( totalData %>% names %>% length, 11 )
+  expect_equal( totalData$shots_total %>% range, c(-22, 20) )
+  expect_equal( totalData$shots_ongoal %>% range, c(-11, 10) )
+  expect_equal( totalData$fouls %>% range, c(-10, 7) )
+  expect_equal( totalData$corners %>% range, c(-7, 9) )
+  expect_equal( totalData$possesiontime %>% range, c(-56, 56) )
+  expect_equal( totalData$yellowcards %>% range, c(-3, 3) )
+  expect_equal( totalData$saves %>% range, c(-7, 8) )
+  expect_equal( totalData$form %>% range, c(-4, 5) )
+  expect_equal( totalData$relativePos %>% range, c(-18, 19) )
 
   uniqueResults <- totalData$res %>% unique
 
