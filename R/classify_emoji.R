@@ -65,13 +65,15 @@ classify_emoji <- function() { # nocov start
   # Portugal details
   portugal <-  c(
     'bel', 'ben', 'bfc', 'bra', 'mar', 'pac', 'por',
-    'rio', 'vitgui', 'vitset', 'est'
+    'rio', 'vit', 'vitset', 'est', 'des', 'ton', 'pmo',
+    'cha', 'spo', 'fei', 'mor'
   )
   portugal <- paste0(':portugal-', portugal, ':')
 
   portugalIds <- c(
     14265, 14267, 14270, 14446, 14378, 14399, 14408,
-    14414, 14473, 14474, 14317
+    14414, 14473, 14474, 14317, 14310, 14294, 14407,
+    14311, 14448, 14339, 14387
   )
 
   # Germany details
@@ -134,19 +136,19 @@ classify_emoji <- function() { # nocov start
 
   # France details
   france <- c(
-    'bor', 'cae', 'dij',
-    'lil', 'lyo', 'mar', 'mon',
-    'nic', 'psg', 'ren', 'sai','tou',
+    'ami', 'ang', 'bor', 'cae', 'dij', 'gui',
+    'lil', 'lyo', 'mac', 'mar', 'met', 'mon',
+    'nic', 'nnt', 'psg', 'ren', 'sai', 'str', 'tou',
     'tro'
   )
   france <- paste0(':france-', france, ':')
 
   # France IDs
   franceIds <- c(
-    9826, 10031, 10033,
-    10061, 10122, 10018, 9831,
-    10134, 10124, 9973, 10042, 10061,
-    9909
+    9826, 9831, 9875, 9883, 9909, 9973,
+    10004, 10040, 10020, 10042, 10018, 10024,
+    10033, 10031, 10061, 10122, 10085, 10124, 10134,
+    10140
   )
 
   # Set up keynames as the IDs
