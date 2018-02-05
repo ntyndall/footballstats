@@ -21,7 +21,10 @@ Imports:
     shiny,
     tcltk,
     magrittr,
-    neuralnet
+    neuralnet,
+    nnet,
+    caTools,
+    caret
 Suggests:
     covr
 RoxygenNote: 6.0.1
