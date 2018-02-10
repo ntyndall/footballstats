@@ -156,6 +156,8 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       rredis::redisHMSet(
         key = paste0('csdm_pred:', competitionID, ':', seasonStarting, ':', month, ':', singleFixture$id),
         values = list(
+          localteam = homeName,
+          visitorteam = awayName,
           home = actualH,
           away = actualA,
           week = cDate,
