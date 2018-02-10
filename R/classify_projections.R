@@ -14,18 +14,24 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
     commentaryKeys %<>% as.character %>%
       footballstats::ord_keys(
         competitionID = competitionID,
-        seasonStarting = seasonStarting)
+        seasonStarting = seasonStarting
+      ) %>% rev
 
     # Get data frame of commentary metrics
     bFrame <- commentaryKeys %>%
       footballstats::get_av(
-        commentaryNames = dataScales$commentaries)
+        commentaryNames = dataScales$commentaries
+      )
 
     # Check the commentary feature NA list (as database will not always have complete set)
     naCount <- sapply(bFrame, function(x) x %>% is.na %>% sum) %>% as.integer
     thresh <- bFrame %>% nrow %>% `/`(4)
     if (`>`(naCount, thresh) %>% any) next
     bFrame[bFrame %>% is.na] <- 0
+
+    # Only take the average of the last 4 matches!
+    if (bFrame %>% nrow %>% `<`(4)) next
+    bFrame <- bFrame[1:4, ]
 
     # Calculate the average (and possible the standard deviation?)
     resList %<>% c(apply(bFrame, 2, mean) %>% list)
