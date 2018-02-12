@@ -36,9 +36,11 @@ test_that("Really simple check that a report can be generated", {
     values = list(prediction = 'T')
   )
 
-  KEYS %>% footballstats::monthly_report(
+  res <- KEYS %>% footballstats::monthly_report(
     month = 2,
     year = 2017
   )
+
+  expect_equal( res, NULL )
 
 })
