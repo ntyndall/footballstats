@@ -118,7 +118,8 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
       cat(paste0(' { requests low. Sleeping for ', timePeriod, ' seconds. } '))
       rredis::redisSet(
         key = 'requestLimit',
-        value = "0" %>% charToRaw())
+        value = "0" %>% charToRaw()
+      )
       Sys.sleep(timePeriod)
     }
   }
@@ -130,12 +131,17 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
 
 
 redis_con <- function() { # nocov start
-  cat(paste0(Sys.time(), ' | Redis Connection established. \n'))
-  rredis::redisConnect(
-    host = 'localhost',
-    port = 6379,
-    nodelay = FALSE)
-  blnk <- capture.output(rredis::redisSelect(1))
+  tryCatch({
+    rredis::redisCmd('PING')
+  }, error = function(e) {
+    rredis::redisConnect(
+      host = 'localhost',
+      port = 6379,
+      nodelay = FALSE
+    )
+    blnk <- capture.output(rredis::redisSelect(1))
+    cat(paste0(Sys.time(), ' | Redis Connection established. \n'))
+  })
 } # nocov end
 
 #' @title Allowed competitions

@@ -34,6 +34,9 @@ calculate_data <- function(matchData, logger = FALSE) {
 
   for (i in 1:rowData) {
 
+    # Try to reconnect with redis
+    footballstats::redis_con()
+
     # Track progress
     utils::setTxtProgressBar(progressBar, i)
 
@@ -141,16 +144,16 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 
   # Calculate the difference in forms
   form <- if (forms %>% length %>% `!=`(2)) {
-    NA
+    c(NA, NA)
   } else {
-    differ <- footballstats::form_to_int(oldForms = forms)
-    differ[1] - differ[2]
+    footballstats::form_to_int(oldForms = forms)
   }
 
   # Return the data frame with form as the only column
   return(
     data.frame(
-      form = form,
+      `form.h` = form[1],
+      `form.a` = form[2],
       stringsAsFactors = FALSE
     )
   )
@@ -189,14 +192,14 @@ feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) 
   }
 
   commentary <- if (cResults %>% length %>% `!=`(2)) {
-    NA %>% rep(commentaryNames %>% length) %>% t
+    NA %>% rep(commentaryNames %>% length %>% `*`(2)) %>% t
   } else {
-    cResults[[1]] %>% `-`(cResults[[2]]) %>% t
+    cResults %>% purrr::flatten_dbl() %>% t
   }
 
   # Return the data frame with form as the only column
   dF <- commentary %>% data.frame(stringsAsFactors = FALSE)
-  names(dF) <- commentaryNames
+  names(dF) <- c(commentaryNames %>% paste0('.h'), commentaryNames %>% paste0('.a'))
   dF %>% return()
 
 }
@@ -233,7 +236,8 @@ feat_position <- function(competitionID, seasonStarting, matchID, teamIDs) {
 
   # Determine & Return relative position as a data.frame
   data.frame(
-    relativePos = positions[[teamIDs[1]]] - positions[[teamIDs[2]]],
+    `position.h` = positions[[teamIDs[1]]],
+    `position.a` = positions[[teamIDs[2]]],
     stringsAsFactors = FALSE
   ) %>% return()
 

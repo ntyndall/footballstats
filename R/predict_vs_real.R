@@ -12,7 +12,7 @@ predict_vs_real <- function(competitionID, seasonStarting, readyToAnalyse, match
   readyToAnalyse <- intersect(matches$id, readyToAnalyse)
   if (!identical(readyToAnalyse, character(0))) {
     readyLen <- readyToAnalyse %>% length
-    print(paste0(' Checking off ', readyLen, ' already predicted matches.'))
+    cat(paste0(Sys.time(), ' | Checking off ', readyLen, ' already predicted matches. \n'))
 
     for (i in 1:readyLen) {
       matchID <- readyToAnalyse[i]
@@ -33,10 +33,13 @@ predict_vs_real <- function(competitionID, seasonStarting, readyToAnalyse, match
         aw <- actual$visitorteam_score %>% as.integer
 
         cond <- function(h, a) {
-         return(ifelse(
-           test = home == h && away == a,
-           yes = TRUE,
-           no = FALSE))
+         return(
+           ifelse(
+             test = home == h && away == a,
+             yes = TRUE,
+             no = FALSE
+            )
+          )
         }
 
         # Was the prediction correct?
@@ -52,7 +55,8 @@ predict_vs_real <- function(competitionID, seasonStarting, readyToAnalyse, match
         rredis::redisHSet(
           key = resultKey,
           field = 'prediction',
-          value =  ifelse(test = correct, yes = 'T', no = 'F') %>% charToRaw())
+          value =  ifelse(test = correct, yes = 'T', no = 'F') %>% charToRaw()
+        )
       }
     }
   }

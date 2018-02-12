@@ -43,7 +43,8 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
   progressBar <- utils::txtProgressBar(
     min = 0,
     max = nrow(fixtureList),
-    style = 3)
+    style = 3
+  )
 
   # Loop over each fixture
   for (i in 1:nrow(fixtureList)) {
@@ -85,7 +86,8 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       as.integer
     matchMetrics %<>% cbind(
       data.frame(
-        relativePos = positions[1] - positions[2],
+        `position.h` = positions[1],
+        `position.a` = positions[2],
         stringsAsFactors = FALSE
       )
     )
@@ -166,7 +168,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         )
       )
     }
-    Sys.sleep(0.2)
+    Sys.sleep(0.1)
   }
 
   # Close the progress bar

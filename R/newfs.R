@@ -65,7 +65,8 @@ get_av <- function(orderedKeys, commentaryNames) {
   for (i in 1:ln) {
     results <- footballstats::commentary_from_redis(
       keyName = orderedKeys[i],
-      returnItems = commentaryNames)
+      returnItems = commentaryNames
+    )
 
     if (results %>% is.null) next
 

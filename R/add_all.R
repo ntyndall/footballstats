@@ -42,7 +42,8 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
     dateFrom = dateFrom,
     dateTo = dateTo,
     seasonStarting = seasonStarting,
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
   cat(' complete \n')
 
   # Store predicted vs. real outcomes
@@ -52,18 +53,20 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
       competitionID = competitionID,
       seasonStarting = seasonStarting,
       readyToAnalyse = readyToAnalyse,
-      matches = matches)
+      matches = matches
+    )
   }
 
   # Add commentary information
   cat(paste0(Sys.time(), ' | Commentary ...'))
-  if (nrow(matches) > 0) {
+  if (matches %>% nrow %>% `>`(0)) {
     footballstats::acommentary_info(
       competitionID = competitionID,
       matchIDs = matches$id,
       localteam = matches$localteam_id,
       visitorteam = matches$visitorteam_id,
-      KEYS = KEYS)
+      KEYS = KEYS
+    )
   }
   cat(' complete \n')
 
@@ -73,7 +76,8 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
     footballstats::aevent_info(
       competitionID = competitionID,
       matchIDs = matches$id,
-      matchEvents = matches$events)
+      matchEvents = matches$events
+    )
   }
   cat(' complete \n')
 
@@ -81,13 +85,14 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
   teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
   plBef <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
 
-  cat(paste0(Sys.time(), ' | Teams ...'))
+  cat(paste0(Sys.time(), ' | Teams ... \n'))
   # Add the team information
   if (teamListLength > 0) {
     footballstats::ateam_info(
       competitionID = competitionID,
       teamListLength = teamListLength,
-      KEYS = KEYS)
+      KEYS = KEYS
+    )
   }
   cat(' complete. \n\n')
   plAft <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer

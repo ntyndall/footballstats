@@ -20,7 +20,7 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
     # Get data frame of commentary metrics
     bFrame <- commentaryKeys %>%
       footballstats::get_av(
-        commentaryNames = dataScales$commentaries
+        commentaryNames = dataScales$commentaries %>% strsplit(split = '[.]') %>% purrr::map(1) %>% purrr::flatten_chr() %>% unique
       )
 
     # Check the commentary feature NA list (as database will not always have complete set)
@@ -42,7 +42,7 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
   commentary <- if (resList %>% length %>% `!=`(2)) {
     NA %>% rep(dataScales$commentaries %>% length) %>% t
   } else {
-    resList[[1]] %>% `-`(resList[[2]]) %>% t
+    resList %>% purrr::flatten_dbl() %>% t
   }
 
   dF <- commentary %>% data.frame(stringsAsFactors = FALSE)
@@ -103,12 +103,12 @@ project_form <- function(competitionID, seasonStarting, teamIDs) {
 
   #
   form <- if (resList %>% length %>% `!=`(2)) {
-    NA  %>% t
+    c(NA, NA) %>% t
   } else {
-    resList[[1]] %>% `-`(resList[[2]]) %>% t
+    resList %>% purrr::flatten_dbl() %>% t
   }
 
   dF <- form %>% data.frame(stringsAsFactors = FALSE)
-  names(dF) <- 'form'
+  names(dF) <- c('form.h', 'form.a')
   dF %>% return()
 }

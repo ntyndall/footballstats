@@ -22,16 +22,27 @@
 
 acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS) {
 
+  # Can I check if both match IDs are actually in the DB here?
+  #
+  #
+
   # Load static data set for testing
   if (KEYS$TEST) fullCommentary <- footballstats::fullCommentary
 
   for (i in 1:length(matchIDs)) {
+
+    # Check if I can skip here
+    rKeys <- paste0("cmt_commentary:", competitionID, ":", matchIDs[i], ":*") %>%
+      rredis::redisKeys()
+    if (rKeys %>% length %>% `==`(2)) next
+
     if (KEYS$TEST) {
       commentary <- fullCommentary[[i]]
     } else {  # nocov start
       commentary <- footballstats::get_data(
         endpoint = paste0("/commentaries/", matchIDs[i], "?"),
-        KEYS = KEYS)
+        KEYS = KEYS
+      )
       footballstats::request_limit()
     }  # nocov end
 
@@ -44,12 +55,16 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
         for (j in 1:length(localAway)) {
           singleTeamStats <- teamStats[[localAway[j]]]
           if (singleTeamStats %>% is.null %>% `!`()) {
-            footballstats::commentary_sub(
-              competitionID = competitionID,
-              matchID = matchIDs[i],
-              teamInfo = teamIDs[j],
-              teamStats = singleTeamStats,
-              commentary = commentary$player_stats[[localAway[j]]])
+            rKey <- paste0("cmt_commentary:", competitionID, ":", matchIDs[i], ":", teamIDs[j])
+            if (rKey %>% rredis::redisExists() %>% `!`()) {
+              footballstats::commentary_sub(
+                competitionID = competitionID,
+                matchID = matchIDs[i],
+                teamInfo = teamIDs[j],
+                teamStats = singleTeamStats,
+                commentary = commentary$player_stats[[localAway[j]]]
+              )
+            }
           }
         }
       }
@@ -182,7 +197,8 @@ aevent_info <- function(competitionID, matchIDs, matchEvents) {
         if (inSet) {
           rredis::redisHMSet(
             key = paste0("cme:", competitionID, ":", matchID, ":", event$id),
-            values = event)
+            values = event
+          )
         }
       }
     }
@@ -246,36 +262,45 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
     # If getting match info - make sure all matches have actually ended and been played!
     matches %<>% subset(matches$status %>% `==`('FT'))
 
+    uniqueTeams <- c(matches$localteam_id, matches$visitorteam_id) %>% unique
+    for (i in 1:(uniqueTeams %>% length)) {
+      # Push teamID to List to analyse later
+      rredis::redisLPush(
+        key = 'analyseTeams',
+        value = uniqueTeams[i] %>% as.character %>% charToRaw()
+      )
+    }
+
     # Loop over all match data
     for (i in 1:nrow(matches)) {
       single <- matches[i, ]
       matchItems <- single[ ,valuesToRetain]
 
-      # Push teamID to List to analyse later
-      rredis::redisLPush(
-        key = 'analyseTeams',
-        value = matchItems$localteam_id %>% as.character %>% charToRaw())
-
       # Check if match belongs to set
       matchInSet <- rredis::redisSAdd(
         set = paste0('c_matchSetInfo:', competitionID),
-        element = matchItems$id %>% as.character %>% charToRaw()) %>%
-          as.integer %>% as.logical
+        element = matchItems$id %>% as.character %>% charToRaw()
+      ) %>%
+        as.integer %>%
+        as.logical
 
       if (matchInSet) {
         matchKey <- paste0(
           "csm:", matchItems$comp_id, ":",
-          seasonStarting, ":", matchItems$id)
+          seasonStarting, ":", matchItems$id
+        )
 
         rredis::redisHMSet(
           key = matchKey,
-          values = matchItems)
+          values = matchItems
+        )
 
         # Push matches that have already been predicted to a set
         if (rredis::redisExists(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
           rredis::redisSAdd(
             set = paste0('c:', competitionID, ':ready'),
-            element = matchItems$id %>% as.character %>% charToRaw())
+            element = matchItems$id %>% as.character %>% charToRaw()
+          )
         }
       }
     }
@@ -313,7 +338,8 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
   progressBar <- utils::txtProgressBar(
     min = 0,
     max = playerLength,
-    style = 3)
+    style = 3
+  )
 
   sapply(1:playerLength, function(i) {
     playerID <- 'analysePlayers' %>% rredis::redisLPop()
@@ -340,15 +366,18 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
             seasonInt <- ifelse(
               test = nchar(season) == 4,
               yes = season %>% as.integer(),
-              no = 0)
+              no = 0
+            )
 
             if (seasonInt == currentSeasonYear) {
               statKeyName <- paste0(
                 'ctps_', statNames[j], ':', currentStat$league_id, ':',
-                currentStat$id, ':', playerData$id, ':', season)
+                currentStat$id, ':', playerData$id, ':', season
+              )
               rredis::redisHMSet(
                 key = statKeyName,
-                values = currentStat)
+                values = currentStat
+              )
             }
           })
         }
@@ -393,7 +422,15 @@ ateam_info <- function(competitionID, teamListLength, KEYS) {
                       "venue_surface", "venue_address", "venue_city",
                       "venue_capacity", "coach_name", "coach_id")
 
+  # Set the progress bar
+  progressBar <- utils::txtProgressBar(
+    min = 0,
+    max = teamListLength,
+    style = 3
+  )
+
   for (i in 1:teamListLength) {
+    utils::setTxtProgressBar(progressBar, i)
     if (KEYS$TEST) {  # nocov start
       teamData <- footballstats::teamData
     } else {
@@ -412,7 +449,8 @@ ateam_info <- function(competitionID, teamListLength, KEYS) {
       basicData <- teamData[valuesToRetain]
       rredis::redisHMSet(
         key = basic,
-        values = basicData)
+        values = basicData
+      )
 
       squadInfo <- teamData$squad
       if (length(squadInfo) > 0) {
@@ -421,27 +459,35 @@ ateam_info <- function(competitionID, teamListLength, KEYS) {
           squadPlayer <- paste0(squad, ":", playerID)
           rredis::redisHMSet(
             key = squadPlayer,
-            values = squadInfo[k, ])
+            values = squadInfo[k, ]
+          )
 
           # Check if player has been added to the set for analysis later.
           # Or if it is ready to be updated after another match has been played.
           newPlayers <- rredis::redisSAdd(
             set = paste0('c_playerSetInfo'),
-            element = playerID %>% as.character() %>% charToRaw()) %>%
-              as.integer %>% as.logical
+            element = playerID %>% as.character() %>% charToRaw()
+          ) %>%
+            as.integer %>%
+            as.logical
 
           if (newPlayers) {
             rredis::redisLPush(
               key = 'analysePlayers',
-              value = playerID %>% as.character() %>% charToRaw())
+              value = playerID %>% as.character() %>% charToRaw()
+            )
           }
         }
       }
       rredis::redisHMSet(
         key = stats,
-        values = teamData$statistics)
+        values = teamData$statistics
+      )
     }
   }
+
+  close(progressBar)
+
 }
 
 #' @title Commentary Sub-function
@@ -451,14 +497,16 @@ ateam_info <- function(competitionID, teamListLength, KEYS) {
 commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
   rredis::redisHMSet(
     key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamInfo),
-    values = teamStats)
+    values = teamStats
+  )
   playerStats <- commentary$player %>%
     purrr::when(is.null(.) ~ data.frame(), ~ .)
   if (nrow(playerStats) > 0) {
     for (j in 1:nrow(playerStats)) {
       rredis::redisHMSet(
         key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
-        values = playerStats[j, ])
+        values = playerStats[j, ]
+      )
     }
   }
 }

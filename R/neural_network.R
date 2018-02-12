@@ -53,8 +53,8 @@ neural_network <- function(totalData) {
   nn <- neuralnet::neuralnet(
     formula = f,
     data = train.data,
-    hidden = neurons %>% rep(1),
-    act.fct = "tanh",
+    hidden = neurons %>% rep(4),
+    act.fct = "logistic",
     linear.output = FALSE,
     lifesign = 'minimal',
     stepmax = 10000000
@@ -73,6 +73,7 @@ neural_network <- function(totalData) {
     current <- test.data[[newLabels[i]]]
     realVec[current %>% `==`(1) %>% which] <- newLabels[i]
   }
+
 
   # Check the max values per row for the predictions
   netRes <- predictions$net.result
