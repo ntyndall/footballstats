@@ -154,7 +154,6 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         purrr::flatten_chr() %>%
         as.integer
 
-
       rredis::redisHMSet(
         key = paste0('csdm_pred:', competitionID, ':', seasonStarting, ':', month, ':', singleFixture$id),
         values = list(
@@ -177,7 +176,8 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
   if (KEYS$SLACK_PRNT && `!`(totalTxt %>% is.null)) { # nocov start
     slackr::slackrSetup(
       channel = '#results',
-      api_token = KEYS$FS_SLACK)
+      api_token = KEYS$FS_SLACK
+    )
 
     firstMsg <- paste0(
       ':soccer: _Reporting on results for week ',
@@ -188,13 +188,15 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       txt = firstMsg,
       channel = '#results',
       api_token = KEYS$FS_SLACK,
-      username = 'predictions')
+      username = 'predictions'
+    )
 
     slackr::slackr_msg(
       txt = totalTxt,
       channel = '#results',
       api_token = KEYS$FS_SLACK,
-      username = 'predictions')
+      username = 'predictions'
+    )
   } else {
     # Print results to screen
     cat('Reporting on results! \n')

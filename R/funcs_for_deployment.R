@@ -165,3 +165,24 @@ analyse_data <- function(deployed = FALSE) { # nocov start
     )
   }
 } # nocov end
+
+#' @title Send Report
+#'
+#' @description A function to send a monthly report
+#'
+#' @export
+
+
+send_report <- function() { # nocov start
+
+  # Re-establish redis if necessary
+  footballstats::redis_con()
+
+  # Not sure I can properly get the year...
+
+  # Get the month and year for LAST month (i.e. the report to be created)
+  month <- Sys.Date() %>% `-`(30) %>% format('%m') %>% as.integer
+  Sys.Date %>% footballstats::prs_season()
+  #year <- Sys.Date() %>% `-`(30) %>% format('%Y') %>% as.integer
+
+} # nocov end

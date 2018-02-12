@@ -71,39 +71,84 @@ predict_vs_real <- function(competitionID, seasonStarting, readyToAnalyse, match
 #' @export
 
 
-monthly_report <- function() {
-  allPredictions <- '*:pred:*' %>% rredis::redisKeys()
+monthly_report <- function(KEYS, month, year) {
+  # Initialise totalTxt
+  totalTxt <- c()
 
-  competitionIDs <- allPredictions %>%
-    strsplit(split = '[:]') %>%
-    purrr::map(2) %>%
-    purrr::flatten_chr() %>%
-    unique
+  # Get all predictions
+  allPredictions <- paste0('csdm*:', year, ':', month, ':*') %>% rredis::redisKeys()
 
-  # Find all unique competition results
-  uniqComps <- sapply(1:(competitionIDs %>% length), function(i) {
-    allPredictions[paste0(':', competitionIDs[i], ':') %>% grepl(x = allPredictions)]
-  })
+  if (allPredictions %>% is.null %>% `!`()) {
 
-  print('looking at comp :')
-  # Loop over unique competitions
-  for (i in 1:(uniqComps %>% length)) {
-    singleComp <- uniqComps[[i]]
-    result <- lapply(1:(singleComp %>% length), function(j) {
-      vals <- singleComp[j] %>% rredis::redisHGetAll()
-      return(c(vals$prediction, vals$week))
+    totalTxt %<>% paste(c('*Looking at predictions for', month.abb[month], '*'), collapse = '')
+    # Get all unique competitionIDs
+    competitionIDs <- allPredictions %>%
+      strsplit(split = '[:]') %>%
+      purrr::map(2) %>%
+      purrr::flatten_chr() %>%
+      unique
+
+    # Load competition info
+    compInfo <- footballstats::compInfo
+
+    # Create a list of each competition
+    uniqComps <- sapply(1:(competitionIDs %>% length), function(i) {
+      allPredictions[paste0(':', competitionIDs[i], ':') %>% grepl(x = allPredictions)]
     })
 
-    # Create a new list
-    map_res <- function(inp, k) inp %>% purrr::map(k) %>% purrr::flatten_chr()
-    week <- map_res(result, 1); pred <- map_res(result, 2)
-    uniqueWeeks <- week %>% unique %>% as.integer %>% sort %>% as.character
+    # Loop over unique competitions
+    for (i in 1:(uniqComps %>% length)) {
+      # Set the list as singleComp
+      singleComp <- uniqComps[[i]]
 
-    # Loop over unique weeks
-    for(j in 1:(uniqueWeeks %>% length)) {
-     currentWeek <- week[`==`(uniqueWeeks[j], pred) %>% which]
-     # Either print or send to slack!
-     # Add a sent to slack tag in the redis key>!?!?!
+      # Get name and region
+      info <- competitionIDs[i] %>%
+        `==`(compInfo$id) %>%
+        which
+
+      # Save header details
+      cInfo <- paste0('_', compInfo$region[info], ' - ', compInfo$name[info], '_ :: ')
+
+      # Get the results
+      result <- lapply(1:(singleComp %>% length), function(j) {
+        vals <- singleComp[j] %>% rredis::redisHGetAll()
+        return(vals$prediction %>% as.character)
+      }) %>% purrr::flatten_chr()
+
+      # Subset for complete results only!
+      result %<>% subset(result %>% `!=`('-'))
+
+      # Add to vector for slack
+      totalTxt %<>% c(
+        if (result %>% identical(character(0))) {
+          paste0(cInfo, ' None')
+        } else {
+         per <- result %>%
+           `==`('T') %>%
+           sum %>%
+           `/`(result %>% length) %>%
+           scales::percent()
+         paste0(cInfo, per)
+        }
+      )
+    }
+
+    # If True send to slack, if not just print out!
+    if (KEYS$SLACK_PRNT) {
+      slackr::slackrSetup(
+        channel = '#general',
+        api_token = KEYS$FS_SLACK
+      )
+
+      slackr::slackr_msg(
+        txt = totalTxt,
+        channel = '#general',
+        api_token = KEYS$FS_SLACK,
+        username = 'report'
+      )
+
+    } else {
+      cat(totalTxt %>% paste(collapse = '\n'))
     }
   }
 }

@@ -24,7 +24,8 @@ Imports:
     neuralnet,
     nnet,
     caTools,
-    caret
+    caret,
+    scales
 Suggests:
     covr
 RoxygenNote: 6.0.1

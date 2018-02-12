@@ -4,7 +4,7 @@
 \alias{monthly_report}
 \title{Create Monthly Report}
 \usage{
-monthly_report()
+monthly_report(KEYS, month, year)
 }
 \details{
 This function is triggered via a CRON job,
