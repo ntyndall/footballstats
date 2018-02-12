@@ -24,7 +24,8 @@ neural_network <- function(totalData) {
   dSet <- cbind(trafficType, unlabel)
 
   # Relabel the data set with the required classes
-  names(dSet) <- newLabels %>% c(dSet[4:ncol(dSet)] %>% names)
+  labColSpace <- newLabels %>% length %>% `+`(1)
+  names(dSet) <- newLabels %>% c(dSet[labColSpace:ncol(dSet)] %>% names)
 
   # Create Split (any column is fine)
   split.data <- dSet$W %>% caTools::sample.split(SplitRatio = 0.70)
@@ -73,7 +74,6 @@ neural_network <- function(totalData) {
     current <- test.data[[newLabels[i]]]
     realVec[current %>% `==`(1) %>% which] <- newLabels[i]
   }
-
 
   # Check the max values per row for the predictions
   netRes <- predictions$net.result
