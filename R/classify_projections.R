@@ -20,7 +20,11 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
     # Get data frame of commentary metrics
     bFrame <- commentaryKeys %>%
       footballstats::get_av(
-        commentaryNames = dataScales$commentaries %>% strsplit(split = '[.]') %>% purrr::map(1) %>% purrr::flatten_chr() %>% unique
+        commentaryNames = dataScales$commentaries %>%
+          strsplit(split = '[.]') %>%
+          purrr::map(1) %>%
+          purrr::flatten_chr() %>%
+          unique
       )
 
     # Check the commentary feature NA list (as database will not always have complete set)
@@ -38,16 +42,10 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
     resSds %<>% c(apply(bFrame, 2, sd) %>% `/`(3))
   }
 
-  #
-  commentary <- if (resList %>% length %>% `!=`(2)) {
-    NA %>% rep(dataScales$commentaries %>% length) %>% t
-  } else {
-    resList %>% purrr::flatten_dbl() %>% t
-  }
-
-  dF <- commentary %>% data.frame(stringsAsFactors = FALSE)
-  names(dF) <- dataScales$commentaries
-  dF %>% return()
+  # Return a mini frame containing commentary information
+  dataScales$commentaries %>%
+    handle_projections(resList = resList) %>%
+    return()
 }
 
 
@@ -64,10 +62,12 @@ project_form <- function(competitionID, seasonStarting, teamIDs) {
     if (commentaryKeys %>% is.null) break
 
     # If it does then continue on
-    commentaryKeys %<>% as.character %>%
+    commentaryKeys %<>%
+      as.character %>%
       footballstats::ord_keys(
         competitionID = competitionID,
-        seasonStarting = seasonStarting)
+        seasonStarting = seasonStarting
+      )
 
     # Get match IDs
     matchIDs <- commentaryKeys %>%
@@ -95,20 +95,32 @@ project_form <- function(competitionID, seasonStarting, teamIDs) {
     # Get average and append form on
     forms %<>% footballstats::get_frm(
       teamID = teamIDs[j],
-      matchData = matchData)
+      matchData = matchData
+    )
 
     # Calculate the currentForm metric
     resList %<>% c(forms %>% list)
   }
 
-  #
-  form <- if (resList %>% length %>% `!=`(2)) {
-    c(NA, NA) %>% t
+  # Return a mini frame containing form information
+  c('form.h', 'form.a') %>%
+    handle_projections(resList = resList) %>%
+    return()
+}
+
+#' @title Handle Projections
+#'
+#' @export
+
+
+handle_projections <- function(frameNames, resList) {
+  toFrame <- if (resList %>% length %>% `!=`(2)) {
+    NA %>% rep(frameNames %>% length) %>% t
   } else {
     resList %>% purrr::flatten_dbl() %>% t
   }
 
-  dF <- form %>% data.frame(stringsAsFactors = FALSE)
-  names(dF) <- c('form.h', 'form.a')
+  dF <- toFrame %>% data.frame(stringsAsFactors = FALSE)
+  names(dF) <- frameNames
   dF %>% return()
 }

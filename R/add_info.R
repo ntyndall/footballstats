@@ -253,7 +253,8 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
     matches <- footballstats::get_data(
       endpoint = paste0(
         "/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&"),
-      KEYS = KEYS)
+      KEYS = KEYS
+    )
     footballstats::request_limit()
   }  # nocov end
 
@@ -349,7 +350,8 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
     } else {
       playerData <- footballstats::get_data(
         endpoint = paste0("/player/", playerID, "?"),
-        KEYS = KEYS)
+        KEYS = KEYS
+      )
       footballstats::request_limit()
     }  # nocov end
 
@@ -437,7 +439,8 @@ ateam_info <- function(competitionID, teamListLength, KEYS) {
       teamID <- 'analyseTeams' %>% rredis::redisLPop()
       teamData <- footballstats::get_data(
         endpoint = paste0( "/team/", teamID, "?"),
-        KEYS = KEYS)
+        KEYS = KEYS
+      )
       footballstats::request_limit()
     }  # nocov end
 
