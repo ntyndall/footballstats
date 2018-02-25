@@ -5,10 +5,10 @@ rredis::redisFlushDB()
 
 test_that('Calculate data set built from features', {
 
+  KEYS$DATE_FROM <- KEYS$DATE_TO <- NULL
+
   matchData <- footballstats::amatch_info(
     competitionID = competitionID,
-    dateFrom = NULL,
-    dateTo = NULL,
     seasonStarting = seasonStarting,
     KEYS = KEYS
   )

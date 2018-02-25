@@ -7,11 +7,20 @@
 acommentary_info(competitionID, matchIDs, localteam, visitorteam, KEYS)
 }
 \arguments{
-\item{competitionID}{An integer defining the competitionID that the
-team belongs to.}
+\item{competitionID}{An integer defining the competitionID that is
+under investigation.}
 
 \item{matchIDs}{A character vector of matchIDs that match
 the matchEvents.}
+
+\item{localteam}{An integer ID value representing the home team
+as defined by the API.}
+
+\item{visitorteam}{An integer ID value representing the away team
+as defined by the API.}
+
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 }
 \value{
 Returns nothing, a redis hash map is set with the
@@ -23,8 +32,9 @@ A function that takes a competitionID and matchID's, and
  team
 }
 \details{
-EventID's are checked if they have been analysed already;
-    ->   [c_eventInSet]:{comp_id}   ->   [SET]
- The actual event information is stored as a hash map as;
-    ->   [cme]:{comp_id}:{match_id}:{event_id}  ->   [HASH]
+Redis keys used;
+  \itemize{
+    \item{\strong{[SET]} :: \code{c_eventInSet:{comp_id}}}
+    \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
+  }
 }

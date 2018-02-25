@@ -141,6 +141,10 @@ analyse_data <- function(deployed = FALSE) { # nocov start
     storePred = TRUE
   )
 
+  # Query all data
+  KEYS$DATE_FROM <- paste0('31.07.', seasonStarting)
+  KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
+
   # Make a connection to redis for storing data
   footballstats::redis_con()
 

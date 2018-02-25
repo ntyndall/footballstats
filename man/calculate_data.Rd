@@ -8,6 +8,9 @@ calculate_data(matchData, logger = FALSE)
 }
 \arguments{
 \item{matchData}{A dataframe containing all the match data.}
+
+\item{logger}{A boolean value to indicate whether to print useful
+log information to screen.}
 }
 \value{
 Returns a dataframe containing the column names of 'returnItems'
@@ -16,4 +19,10 @@ Returns a dataframe containing the column names of 'returnItems'
 \description{
 A function that takes current statistical data and combines
  it into a dataframe to be passed later to an SVM classifier.
+}
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+  }
 }

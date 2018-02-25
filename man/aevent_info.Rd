@@ -26,8 +26,9 @@ A function that takes a competitionID, matchID's, and
  added to redis as single events.
 }
 \details{
-EventID's are checked if they have been analysed already;
-    ->   [c_eventInSet]:{comp_id}   ->   [SET]
- The actual event information is stored as a hash map as;
-    ->   [cme]:{comp_id}:{match_id}:{event_id}  ->   [HASH]
+Redis Keys used;
+  \itemize{
+    \item{\strong{[SET]} :: \code{c_eventInSet:{comp_id}}}
+    \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
+  }
 }

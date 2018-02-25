@@ -6,3 +6,11 @@
 \usage{
 feat_form(matchData, teamIDs, singleMatchInfo)
 }
+\arguments{
+\item{matchData}{A data frame...}
+
+\item{teamIDs}{An integer vector that contains c(home_id, away_id).}
+
+\item{singleMatchInfo}{A data frame with one row that contains
+important match information between two teams.}
+}

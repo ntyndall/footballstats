@@ -2,9 +2,18 @@
 % Please edit documentation in R/add_all.R
 \name{add_all}
 \alias{add_all}
-\title{add_all}
+\title{Add All Information}
 \usage{
 add_all(competitionID, seasonStarting, KEYS)
+}
+\arguments{
+\item{competitionID}{An integer ID of the competition defined by the API.}
+
+\item{seasonStarting}{An integer of _Y_ format that defines the start of the
+season.}
+
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 }
 \value{
 Returns nothing.
@@ -16,14 +25,19 @@ A function that is called from a shell script to kick off
 }
 \details{
 This main function is split into 3 main important components
- 1) All libraries, global variables are loaded. Storing mechanisms
-    that incorporate new ID keys are generated to store all useful
-    information for classification / algorithms.
- 2) Statistical models are built on the stored data and redis, future
-    fixtures are obtained and built into the models.
- 3) Predictions are made based on the current data and models and
-    anything useful is sent via slack for easy analysis.
- Example queries carried out:
-    ->   matches?comp_id=1204&from_date=01.01.2016&to_date=20.06.2016
-    ->   team/9092
+ \itemize{
+   \item{
+     All libraries, global variables are loaded. Storing mechanisms
+     that incorporate new ID keys are generated to store all useful
+     information for classification / algorithms.
+   }
+   \item{
+     Statistical models are built on the stored data and redis, future
+     fixtures are obtained and built into the models.
+   }
+   \item{
+     Predictions are made based on the current data and models and
+     anything useful is sent via slack for easy analysis.
+   }
+ }
 }

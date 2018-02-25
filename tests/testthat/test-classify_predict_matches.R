@@ -5,12 +5,11 @@ rredis::redisFlushDB()
 
 test_that('Classify all - end to end from adding data to classifying and predicting.', {
 
+  KEYS$DATE_FROM <- KEYS$DATE_TO <- NULL
+
   matchData <- footballstats::amatch_info(
     competitionID = competitionID,
-    dateFrom = NULL,
-    dateTo = NULL,
     seasonStarting = seasonStarting,
-    analysingToday = TRUE,
     KEYS = KEYS
   )
 

@@ -3,7 +3,14 @@
 #' @description A function that takes current statistical data and combines
 #'  it into a dataframe to be passed later to an SVM classifier.
 #'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+#'   }
+#'
 #' @param matchData A dataframe containing all the match data.
+#' @param logger A boolean value to indicate whether to print useful
+#'  log information to screen.
 #'
 #' @return Returns a dataframe containing the column names of 'returnItems'
 #'  plus a few other metrics.
@@ -30,7 +37,8 @@ calculate_data <- function(matchData, logger = FALSE) {
   progressBar <- utils::txtProgressBar(
     min = 0,
     max = rowData,
-    style = 3)
+    style = 3
+  )
 
   for (i in 1:rowData) {
 
@@ -47,8 +55,8 @@ calculate_data <- function(matchData, logger = FALSE) {
     teamIDs <- c(matchSlice$localteam_id, matchSlice$visitorteam_id)
 
     # Get single match information
-    singleMatchInfo <- rredis::redisHGetAll(
-      key = paste0('csm:', competitionID, ':', seasonStarting, ':', matchID))
+    singleMatchInfo <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchID) %>%
+      rredis::redisHGetAll()
 
     # 0) datSlice contains the match ID from the start
     datSlice <- data.frame(
@@ -114,6 +122,12 @@ calculate_data <- function(matchData, logger = FALSE) {
 }
 
 #' @title Relative Form Feature
+#'
+#' @param matchData A data frame...
+#' @param teamIDs An integer vector that contains c(home_id, away_id).
+#' @param singleMatchInfo A data frame with one row that contains
+#'  important match information between two teams.
+#'
 #' @export
 
 
@@ -160,6 +174,7 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 }
 
 #' @title Commentary Feature
+#'
 #' @export
 
 
@@ -191,17 +206,10 @@ feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) 
     )
   }
 
-  commentary <- if (cResults %>% length %>% `!=`(2)) {
-    NA %>% rep(commentaryNames %>% length %>% `*`(2)) %>% t
-  } else {
-    cResults %>% purrr::flatten_dbl() %>% t
-  }
-
-  # Return the data frame with form as the only column
-  dF <- commentary %>% data.frame(stringsAsFactors = FALSE)
-  names(dF) <- c(commentaryNames %>% paste0('.h'), commentaryNames %>% paste0('.a'))
-  dF %>% return()
-
+  # Return a mini frame containing form information
+  c(commentaryNames %>% paste0('.h'), commentaryNames %>% paste0('.a')) %>%
+    footballstats::handle_projections(resList = cResults) %>%
+    return()
 }
 
 #' @title Relative Position Feature
@@ -240,6 +248,4 @@ feat_position <- function(competitionID, seasonStarting, matchID, teamIDs) {
     `position.a` = positions[[teamIDs[2]]],
     stringsAsFactors = FALSE
   ) %>% return()
-
 }
-

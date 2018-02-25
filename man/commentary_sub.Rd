@@ -4,5 +4,33 @@
 \alias{commentary_sub}
 \title{Commentary Sub-function}
 \usage{
-commentary_sub(competitionID, matchID, teamInfo, teamStats, commentary)
+commentary_sub(competitionID, matchID, teamID, teamStats, commentary)
+}
+\arguments{
+\item{competitionID}{An integer defining the competitionID that is
+under investigation.}
+
+\item{matchID}{An integer ID representing a single match
+as defined by the API.}
+
+\item{teamID}{An integer ID value representing a single team
+as defined by the API.}
+
+\item{teamStats}{A list object that contains the teams commentary
+statistics.}
+
+\item{commentary}{A list object that contains multiple items, including
+the player information.}
+}
+\description{
+A function that is an abstraction from \code{acommentary_info} that
+ handles adding player statistics and general commentary information from a
+ commentary list.
+}
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+    \item{\strong{[HASH]} :: \code{cmp:{comp_id}:{match_id}:{player_id}}}
+  }
 }

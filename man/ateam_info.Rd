@@ -13,6 +13,9 @@ team belongs to.}
 \item{teamListLength}{An integer value that defines how long the list
 containing teamID's is TeamID's are then popped from the list as they
 are anaylsed.}
+
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 }
 \value{
 Returns nothing. A Redis hash map is set with the team
@@ -25,11 +28,18 @@ A function that takes a competitionID and integer value
  stored.
 }
 \details{
-A number of information is stored.
- The basic information is stored as;
-    ->   [ct_basic]:{comp_id}:{team_id}   ->   [HASH]
- The team statistics is stored as;
-    ->   [ct_stats]:{comp_id}:{team_id}   ->   [HASH]
- Player information relevent to the team is stored as;
-    ->   [ctp]:{comp_id}:{team_id}:{player_id}   ->   [HASH]
+API endpoints;
+  \itemize{
+    \item{\emph{"/team/{team_id}?Authorization={auth_id}"}}
+  }
+
+ Redis Keys used;
+  \itemize{
+    \item{\strong{[SET]} :: \code{c_playerSetInfo}}
+    \item{\strong{[LIST]} :: \code{analyseTeams}}
+    \item{\strong{[LIST]} :: \code{analysePlayers}}
+    \item{\strong{[HASH]} :: \code{ct_basics:{comp_id}:{team_id}}}
+    \item{\strong{[HASH]} :: \code{ct_stats:{comp_id}:{team_id}}}
+    \item{\strong{[HASH]} :: \code{ctp:{comp_id}:{team_id}:{player_id}}}
+  }
 }

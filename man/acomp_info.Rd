@@ -7,10 +7,8 @@
 acomp_info(KEYS)
 }
 \arguments{
-\item{production}{A boolean to indicate whether production (default)
-runs are performed or testing carried out.}
-
-\item{seasonIDs}{A list containing seasonIDs...}
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 }
 \value{
 returns competitionIDs, a redis hash is set with season IDs, and a
@@ -20,4 +18,15 @@ returns competitionIDs, a redis hash is set with season IDs, and a
 A function that checks a unique competition has been
  obtained and is added to a hashMap of the form ....
  -> competitions:set
+}
+\details{
+API endpoints;
+  \itemize{
+    \item{\emph{"/competitions?Authorization={auth_id}"}}
+  }
+
+ Redis Keys used;
+  \itemize{
+    \item{\strong{[SET]} :: \code{competition:set}}
+  }
 }

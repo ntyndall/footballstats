@@ -9,26 +9,29 @@ test_that("Test that match data can be recreated easily.", {
   recreated <- footballstats::recreate_matchdata(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
-    matchLimit = 1000)
+    matchLimit = 1000
+  )
 
-  expect_that( recreated %>% nrow, equals(0) )
+  expect_equal( recreated %>% nrow, 0 )
+
+  KEYS$DATE_FROM <- KEYS$DATE_TO <- NULL
 
   # Put the test data into Redis
   matchData <- footballstats::amatch_info(
     competitionID = competitionID,
-    dateFrom = NULL,
-    dateTo = NULL,
     seasonStarting = seasonStarting,
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
 
   recreated <- footballstats::recreate_matchdata(
     competitionID = competitionID,
     seasonStarting = seasonStarting,
-    matchLimit = 1000)
+    matchLimit = 1000
+  )
 
-  expect_that( matchData %>% nrow, equals(recreated %>% nrow) )
-  expect_that( recreated %>% names, equals(matchData %>% names %>% setdiff('events')) )
-  expect_that( matchData$id %>% as.integer %>% sort, equals(recreated$id %>% as.integer %>% sort) )
+  expect_equal( matchData %>% nrow, recreated %>% nrow )
+  expect_equal( recreated %>% names, matchData %>% names %>% setdiff('events') )
+  expect_equal( matchData$id %>% as.integer %>% sort, recreated$id %>% as.integer %>% sort )
 
 })
 
