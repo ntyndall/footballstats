@@ -302,7 +302,7 @@ amatch_info <- function(KEYS) {
       if (matchInSet) {
         matchKey <- paste0(
           "csm:", matchItems$comp_id, ":",
-          seasonStarting, ":", matchItems$id
+          KEYS$SEASON, ":", matchItems$id
         )
 
         rredis::redisHMSet(
