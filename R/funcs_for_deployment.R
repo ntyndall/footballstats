@@ -131,9 +131,6 @@ analyse_players <- function(deployed = FALSE) { # nocov start
 
 
 analyse_data <- function(deployed = FALSE) { # nocov start
-  # Get season starting year
-  seasonStarting <- footballstats::start_season()
-
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
@@ -142,6 +139,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
   )
 
   # Query all data
+  KEYS$SEASON <- footballstats::start_season()
   KEYS$DATE_FROM <- paste0('31.07.', seasonStarting)
   KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
 
@@ -159,14 +157,13 @@ analyse_data <- function(deployed = FALSE) { # nocov start
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {
-    cat(paste0(' ## Storing... ' , i, ' / ', nrow(competitions), ' (',
-               competitions$name[i], ' - ', competitions$region[i], '). \n'))
-
-    footballstats::add_all(
-      competitionID = competitions$id[i],
-      seasonStarting = seasonStarting,
-      KEYS = KEYS
+    cat(
+      ' ## Storing ::' , i, '/', nrow(competitions), '(',
+      competitions$name[i], '-', competitions$region[i], '). \n'
     )
+
+    KEYS$COMP <- competitions$id[i]
+    KEYS %>% footballstats::add_all()
   }
 } # nocov end
 

@@ -4,25 +4,22 @@
 \alias{ateam_info}
 \title{ateam_info}
 \usage{
-ateam_info(competitionID, teamListLength, KEYS)
+ateam_info(KEYS, teamListLength)
 }
 \arguments{
-\item{competitionID}{An integer defining the competitionID that the
-team belongs to.}
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 
 \item{teamListLength}{An integer value that defines how long the list
 containing teamID's is TeamID's are then popped from the list as they
 are anaylsed.}
-
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
 }
 \value{
 Returns nothing. A Redis hash map is set with the team
  information.
 }
 \description{
-A function that takes a competitionID and integer value
+A function that takes a KEYS$COMP and integer value
  with details of the teamID list for analysis. Each team is
  queried by the API for relevant information and statistics are
  stored.

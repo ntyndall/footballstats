@@ -4,11 +4,11 @@
 \alias{acommentary_info}
 \title{acommentary_info}
 \usage{
-acommentary_info(competitionID, matchIDs, localteam, visitorteam, KEYS)
+acommentary_info(KEYS, matchIDs, localteam, visitorteam)
 }
 \arguments{
-\item{competitionID}{An integer defining the competitionID that is
-under investigation.}
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 
 \item{matchIDs}{A character vector of matchIDs that match
 the matchEvents.}
@@ -18,16 +18,13 @@ as defined by the API.}
 
 \item{visitorteam}{An integer ID value representing the away team
 as defined by the API.}
-
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
 }
 \value{
 Returns nothing, a redis hash map is set with the
  commentary information and IDs are stored as a redis set.
 }
 \description{
-A function that takes a competitionID and matchID's, and
+A function that takes a KEYS$COMP and matchID's, and
  determines general match statistics for both local team and visitor
  team
 }

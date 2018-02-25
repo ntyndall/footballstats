@@ -9,24 +9,24 @@ test_that("Check the keys are as they should be by adding player data", {
   playerID <- 16
   rredis::redisLPush(
     key = 'analysePlayers',
-    value = playerID)
+    value = playerID
+  )
 
-  expect_that( 'analysePlayers' %>% rredis::redisExists(), is_true() )
+  expect_true( 'analysePlayers' %>% rredis::redisExists() )
 
-  footballstats::aplayer_info(
-    playerLength = 1,
-    currentSeasonYear = seasonStarting,
-    KEYS = KEYS)
+  KEYS %>% footballstats::aplayer_info(
+    playerLength = 1
+  )
 
   # Check redis for expected output
   teamInfo <- 'ctps_club:1204:9002:16:2017' %>% rredis::redisHGetAll()
 
-  expect_that( teamInfo$name %>% as.character, equals('Arsenal') )
-  expect_that( teamInfo$id %>% as.integer, equals(teamID) )
+  expect_equal( teamInfo$name %>% as.character, 'Arsenal' )
+  expect_equal( teamInfo$id %>% as.integer, teamID )
 
   uniqueKeys <- '*' %>% rredis::redisKeys()
 
-  expect_that( uniqueKeys %>% length, equals(5) )
+  expect_equal( uniqueKeys %>% length, 5 )
 
   uniqueComps <- uniqueKeys %>%
     strsplit(split = ':') %>%
@@ -37,8 +37,8 @@ test_that("Check the keys are as they should be by adding player data", {
     purrr::flatten_chr() %>%
     unique
 
-  expect_that( 'club_intl' %in% uniqueComps, is_true() )
-  expect_that( 'cups' %in% uniqueComps, is_true() )
-  expect_that( 'club' %in% uniqueComps, is_true() )
+  expect_true( 'club_intl' %in% uniqueComps )
+  expect_true( 'cups' %in% uniqueComps )
+  expect_true( 'club' %in% uniqueComps )
 
 })

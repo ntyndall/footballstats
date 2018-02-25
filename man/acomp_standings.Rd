@@ -4,12 +4,9 @@
 \alias{acomp_standings}
 \title{acomp_standings}
 \usage{
-acomp_standings(competitionID, KEYS)
+acomp_standings(KEYS)
 }
 \arguments{
-\item{competitionID}{An integer containing the competition ID that the
-teams and match information belong to.}
-
 \item{KEYS}{A list containing options such as testing / prediction
 options and also the API query information such as url.}
 }
@@ -18,7 +15,7 @@ Returns nothing, a redis hash map is set with the competition
  standing information.
 }
 \description{
-A function that takes a competitionID and returns the current
+A function that takes a KEYS$COMP and returns the current
  table information.
 }
 \details{

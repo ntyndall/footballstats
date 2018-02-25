@@ -31,6 +31,9 @@ get_data <- function(endpoint, KEYS) { # nocov start
     list(status_code = 600)
   })
 
+  # Increment the request limit
+  footballstats::request_limit()
+
   return(
     rawContent$status_code %>% purrr::when(
       . == 200 ~ rawContent$content %>%

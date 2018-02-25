@@ -2,7 +2,7 @@
 #' @export
 
 
-predict_vs_real <- function(competitionID, seasonStarting, readyToAnalyse, matches) {
+predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 
   readyToAnalyse <- readyToAnalyse %>%
     strsplit(split = '[:]') %>%
@@ -16,7 +16,7 @@ predict_vs_real <- function(competitionID, seasonStarting, readyToAnalyse, match
 
     for (i in 1:readyLen) {
       matchID <- readyToAnalyse[i]
-      resultKey <- paste0('csdm_pred:', competitionID, ':', seasonStarting, ':*:', matchID)
+      resultKey <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchID)
       resultKey %<>% rredis::redisKeys()
       predicted <- resultKey %>% rredis::redisHGetAll()
       pre <- predicted$prediction %>% as.character

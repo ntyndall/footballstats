@@ -4,15 +4,9 @@
 \alias{amatch_info}
 \title{amatch_info}
 \usage{
-amatch_info(competitionID, seasonStarting, KEYS)
+amatch_info(KEYS)
 }
 \arguments{
-\item{competitionID}{An integer containing the competitionID that the
-teams and match information belong to.}
-
-\item{seasonStarting}{An integer containing the year that the season
-started.}
-
 \item{KEYS}{A list containing options such as testing / prediction
 options and also the API query information such as url.}
 }
@@ -23,7 +17,7 @@ Returns a match dataframe containing all match information to update
 Returns a NULL dataframe if no matches are found.
 }
 \description{
-A function that takes a competitionID and season year to query
+A function that takes a KEYS$COMP and season year to query
  for all the matches in a particular season and saves new teams to a set for
  later analysis.
 }

@@ -5,13 +5,7 @@ rredis::redisFlushDB()
 
 test_that('Calculate data set built from features', {
 
-  KEYS$DATE_FROM <- KEYS$DATE_TO <- NULL
-
-  matchData <- footballstats::amatch_info(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    KEYS = KEYS
-  )
+  KEYS %>% matchData <- footballstats::amatch_info()
 
   # Need to recreate it as new dates are created
   matchData <- footballstats::recreate_matchdata(
@@ -20,12 +14,10 @@ test_that('Calculate data set built from features', {
     matchLimit = 1000
   )
 
-  footballstats::acommentary_info(
-    competitionID = competitionID,
+  KEYS %>% footballstats::acommentary_info(
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
-    visitorteam = matchData$visitorteam_id,
-    KEYS = KEYS
+    visitorteam = matchData$visitorteam_id
   )
 
   # Build league table
@@ -68,8 +60,8 @@ test_that('Calculate data set built from features', {
 
   uniqueResults <- totalData$res %>% unique
 
-  expect_that( 'L' %in% uniqueResults, is_true() )
-  expect_that( 'D' %in% uniqueResults, is_true() )
-  expect_that( 'W' %in% uniqueResults, is_true() )
+  expect_true( 'L' %in% uniqueResults )
+  expect_true( 'D' %in% uniqueResults )
+  expect_true( 'W' %in% uniqueResults )
 
 })

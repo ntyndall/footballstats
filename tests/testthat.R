@@ -2,6 +2,7 @@ library(testthat)
 library(footballstats)
 library(covr)
 library(purrr)
+library(utils)
 library(rredis)
 
 # Connect to DB 3 (away from production)
@@ -12,12 +13,12 @@ rredis::redisConnect(
 )
 rredis::redisSelect(3)
 
-# Initialise used and common variables
-competitionID <- 1204
-seasonStarting <- 2017
-
 # Set up enough keys for testing
 KEYS <<- list(
+  COMP= 1204,
+  SEASON = 2017,
+  DATE_FROM = NULL,
+  DATE_TO = NULL,
   SLACK_PRNT = FALSE,
   TEST = TRUE,
   LOG_PRED = FALSE
@@ -35,9 +36,9 @@ for(i in 1:length(results)) {
   failures <- 0
 
   for (j in 1:length(testResults)) {
-    check <- capture.output(testResults[[j]])
+    check <- utils::capture.output(testResults[[j]])
     if (check[1] != "As expected ") {
-      failures <- failures + 1
+      failures %<>% `+`(1)
     }
   }
 
@@ -45,7 +46,7 @@ for(i in 1:length(results)) {
   unitTest <- singleTest$test[1]
 
   if (failures > 0) {
-    totalError <- totalError + 1
+    totalError %<>% `+`(1)
     cat(paste0(Sys.time(), " : Failure in { ", fileName, " } --> ( ", unitTest, " ) \n"))
   } else {
     cat(paste0(Sys.time(), " : Success in { ", fileName, " } --> ( ", unitTest, " ) \n"))
@@ -56,7 +57,8 @@ for(i in 1:length(results)) {
 codeStatus <- ifelse(
   test = totalError > 0,
   yes = 1,
-  no = 0)
+  no = 0
+)
 
 # If successful, quit gracefully
 quit(
