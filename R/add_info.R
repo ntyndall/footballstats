@@ -114,7 +114,7 @@ acomp_info <- function(KEYS) {
   if (competitionIDs %>% is.null %>% `!`()) {
     total <- 0
     for (i in 1:nrow(competitionIDs)) {
-      seasonID <- KEYS$COMPs$id[[i]]
+      seasonID <- competitionIDs$id[[i]]
       compExists <- rredis::redisSAdd(
         set = 'competition:set',
         element = seasonID %>% as.character %>% charToRaw()

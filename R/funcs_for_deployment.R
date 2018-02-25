@@ -87,15 +87,15 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
 
 analyse_players <- function(deployed = FALSE) { # nocov start
-  # Get season starting year
-  seasonStarting <- footballstats::start_season()
-
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     testing = FALSE,
     storePred = TRUE
   )
+
+  # Store additional KEY information
+  KEYS$SEASON <- footballstats::start_season()
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -108,10 +108,8 @@ analyse_players <- function(deployed = FALSE) { # nocov start
   if (playerLength > 0) {
     cat(paste(' ## Analysing a total of ', playerLength, ' unique players. \n'))
     tNow <- Sys.time()
-    footballstats::aplayer_info(
-      playerLength = playerLength,
-      currentSeasonYear = seasonStarting,
-      KEYS = KEYS
+    KEYS %>% footballstats::aplayer_info(
+      playerLength = playerLength
     )
     cat(' ## Players analysed with a \n')
     cat(paste(' ## ', Sys.time() - tNow))
@@ -138,7 +136,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
     storePred = TRUE
   )
 
-  # Query all data
+  # Set up additional keys required for the main flow
   KEYS$SEASON <- footballstats::start_season()
   KEYS$DATE_FROM <- paste0('31.07.', seasonStarting)
   KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
