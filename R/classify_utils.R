@@ -61,6 +61,7 @@ order_matchdata <- function(matchData, limit = 5000) {
 #'
 #' @export
 
+
 available_commentaries <- function(competitionID = 'all', includeNames = 'all') {
 
   # Single competitionID or all
@@ -79,7 +80,6 @@ available_commentaries <- function(competitionID = 'all', includeNames = 'all') 
     cNames <- results %>% names
     cValues <- results %>% as.character
     empties <- cValues == ""
-
 
     # Default to all
     if (`==`(x, 1) && getAll) includeNames <- cNames %>% subset(cNames != 'table_id')
@@ -147,8 +147,8 @@ commentary_from_redis <- function(keyName, returnItems) {
     vec %<>% c(if (hashNames[j] %>% `==`('possesiontime')) {
       single %>% gsub(
         pattern = "%",
-        replacement = "") %>%
-        as.double
+        replacement = ""
+      ) %>% as.double
     } else if (single %>% is.null) {
       NA
     } else  if (single %>% is.na) {
@@ -159,11 +159,9 @@ commentary_from_redis <- function(keyName, returnItems) {
   }
 
   # Make sure the items returned is the same length as requested
-  if (vec %>% na.omit %>% as.double %>% length %>% `==`(hashLen)) {
-    vec %>% return()
-  } else {
-    NULL %>% return()
-  }
+  return(
+    if (vec %>% stats::na.omit() %>% as.double %>% length %>% `==`(hashLen)) vec else NULL
+  )
 }
 
 #' @title Scale SVM Data

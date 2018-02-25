@@ -5,12 +5,13 @@ rredis::redisFlushDB()
 
 test_that("Check the keys are as they should be by adding match data", {
 
+  KEYS$DATE_FROM <- KEYS$DATE_TO <- NULL
+
   newMatchData <- footballstats::amatch_info(
     competitionID = competitionID,
-    dateFrom = NULL,
-    dateTo = NULL,
     seasonStarting = seasonStarting,
-    KEYS = KEYS)
+    KEYS = KEYS
+  )
 
   # Check redis for expected output
   matchIDs <- rredis::redisKeys(
@@ -21,6 +22,6 @@ test_that("Check the keys are as they should be by adding match data", {
     as.integer %>%
     sort
 
-  expect_that( matchData$id %>% as.integer %>% sort, equals(matchIDs) )
+  expect_equal( matchData$id %>% as.integer %>% sort, matchIDs )
 
 })

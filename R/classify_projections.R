@@ -20,7 +20,7 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
     # Get data frame of commentary metrics
     bFrame <- commentaryKeys %>%
       footballstats::get_av(
-        commentaryNames = dataScales$commentaries %>%
+        commentaryNames = footballstats::dataScales$commentaries %>%
           strsplit(split = '[.]') %>%
           purrr::map(1) %>%
           purrr::flatten_chr() %>%
@@ -39,7 +39,7 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
 
     # Calculate the average (and possible the standard deviation?)
     resList %<>% c(apply(bFrame, 2, mean) %>% list)
-    resSds %<>% c(apply(bFrame, 2, sd) %>% `/`(3))
+    resSds %<>% c(apply(bFrame, 2, stats::sd) %>% `/`(3))
   }
 
   # Return a mini frame containing commentary information
