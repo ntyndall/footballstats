@@ -4,16 +4,16 @@
 \alias{add_all}
 \title{Add All Information}
 \usage{
-add_all(competitionID, seasonStarting, KEYS)
+add_all(KEYS)
 }
 \arguments{
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
+
 \item{competitionID}{An integer ID of the competition defined by the API.}
 
 \item{seasonStarting}{An integer of _Y_ format that defines the start of the
 season.}
-
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
 }
 \value{
 Returns nothing.

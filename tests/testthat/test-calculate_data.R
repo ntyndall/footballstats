@@ -9,8 +9,8 @@ test_that('Calculate data set built from features', {
 
   # Need to recreate it as new dates are created
   matchData <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
+    competitionID = KEYS$COMP,
+    seasonStarting = KEYS$SEASON,
     matchLimit = 1000
   )
 
@@ -25,8 +25,8 @@ test_that('Calculate data set built from features', {
 
   # Store positions on a weekly basis
   footballstats::weekly_positions(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting
+    competitionID = KEYS$COMP,
+    seasonStarting = KEYS$SEASON
   )
 
   # Calculate the feature set

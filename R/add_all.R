@@ -61,7 +61,7 @@ add_all <- function(KEYS) { # nocov start
     KEYS %>% footballstats::acommentary_info(
       matchIDs = matches$id,
       localteam = matches$localteam_id,
-      visitorteam = matches$visitorteam_id,
+      visitorteam = matches$visitorteam_id
     )
   }
   cat(' complete \n')

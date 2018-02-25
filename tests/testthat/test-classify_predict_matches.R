@@ -16,7 +16,7 @@ test_that('Classify all - end to end from adding data to classifying and predict
   # Create the predictions here
   KEYS$LOG_PRED <- TRUE
   footballstats::predict_matches(
-    competitionID = competitionID,
+    competitionID = KEYS$COMP,
     competitionName = 'test-competition',
     KEYS = KEYS
   )

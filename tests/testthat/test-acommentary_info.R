@@ -30,7 +30,7 @@ test_that("Send in a single commentary to see it is stored correctly", {
   expect_equal( singleMatch %>% length, 1 )
 
   checkPlayerExists <- rredis::redisHMGet(
-    key = paste0('cmp:', competitionID, ':', matchID, ':153493'),
+    key = paste0('cmp:', KEYS$COMP, ':', matchID, ':153493'),
     fields = 'name'
   )
 

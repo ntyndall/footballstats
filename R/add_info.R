@@ -111,9 +111,9 @@ acomp_info <- function(KEYS) {
     )
   }  # nocov end
 
-  if (KEYS$COMPs %>% is.null %>% `!`()) {
+  if (competitionIDs %>% is.null %>% `!`()) {
     total <- 0
-    for (i in 1:nrow(KEYS$COMPs)) {
+    for (i in 1:nrow(competitionIDs)) {
       seasonID <- KEYS$COMPs$id[[i]]
       compExists <- rredis::redisSAdd(
         set = 'competition:set',

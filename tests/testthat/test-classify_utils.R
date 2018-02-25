@@ -7,8 +7,8 @@ test_that("Test that match data can be recreated easily.", {
 
   # Test no data returns a null data frame
   recreated <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
+    competitionID = KEYS$COMP,
+    seasonStarting = KEYS$SEASON,
     matchLimit = 1000
   )
 
@@ -18,8 +18,8 @@ test_that("Test that match data can be recreated easily.", {
   matchData <- KEYS %>% footballstats::amatch_info()
 
   recreated <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
+    competitionID = KEYS$COMP,
+    seasonStarting = KEYS$SEASON,
     matchLimit = 1000
   )
 
@@ -34,8 +34,8 @@ test_that("Test that commentary data is sent to Redis.", {
 
   # Recreate the match data that is in redis
   recreated <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
+    competitionID = KEYS$COMP,
+    seasonStarting = KEYS$SEASON,
     matchLimit = 1000
   )
 
@@ -49,13 +49,13 @@ test_that("Test that commentary data is sent to Redis.", {
   )
 
   # Check what keys have been added
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
     rredis::redisKeys() %>%
     as.character
 
   expect_equal( commentaryKeys %>% length, 2 )
   # Produces a list of available commentary names, Must be a total intersection
-  commentaryNames <- competitionID %>%
+  commentaryNames <- KEYS$COMP %>%
     footballstats::available_commentaries()
 
   expect_equal( commentaryNames %>% length, 9 )
@@ -73,7 +73,7 @@ test_that("Test that commentary data is sent to Redis.", {
 
 test_that("Check that the commentaries can be retrieved from redis as a double vector", {
 
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
     rredis::redisKeys() %>%
     as.character
 
@@ -107,7 +107,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
 
 test_that("Check that a list of commentary data can be aggregated correctly", {
 
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
     rredis::redisKeys() %>%
     as.character
 
@@ -134,13 +134,13 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
   addedOngoal <- c(10, 14)
   for (i in 1:length(addedOngoal)) {
     rredis::redisHSet(
-      key = paste0('cmt_commentary:', competitionID, ':1:', i),
+      key = paste0('cmt_commentary:', KEYS$COMP, ':1:', i),
       field = 'shots_ongoal',
       value = addedOngoal[i]
     )
   }
 
-  newKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+  newKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
     rredis::redisKeys() %>%
     as.character
   keyLen <- newKeys %>% length
