@@ -15,7 +15,7 @@ test_that("Test a predicted result can be recorded as true or false.", {
   )
 
   readyToAnalyse <- actualKey %>% rredis::redisKeys()
-  keys %>% footballstats::predict_vs_real(
+  KEYS %>% footballstats::predict_vs_real(
     readyToAnalyse = readyToAnalyse,
     matches = matchData
   )
