@@ -20,22 +20,18 @@ cat(paste0(Sys.time(), ' | Recreating match data. \n'))
 totalData <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:(comps %>% length)) {
 
-  competitionID <- comps[i]
-  matchData <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    matchLimit = 10000
-  )
+  # Define the keys for each recreation
+  KEYS$COMP <- comps[i]
+  KEYS$SEASON <- seasonStarting
+
+  matchData <- KEYS %>% footballstats::recreate_matchdata()
   totalData %<>% rbind(matchData)
 
   # Build league table
   matchData %>% footballstats::create_table()
 
   # Store positions on a weekly basis
-  footballstats::weekly_positions(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting
-  )
+  KEYS %>% footballstats::weekly_positions()
 }
 
 # Only select one competition
@@ -64,9 +60,12 @@ original.data <- original.data[ , 2:(original.data %>% ncol)]
 # Create scaled data set
 dataScales <- original.data %>% footballstats::get_scales()
 commentaries <-  c(
-  'shots_total', 'shots_ongoal', 'fouls', 'corners', 'possesiontime', 'yellowcards', 'saves'
+  'shots_total', 'shots_ongoal', 'fouls', 'corners',
+  'possesiontime', 'yellowcards', 'saves'
 )
 dataScales$commentaries <- c(commentaries %>% paste0('.h'), commentaries %>% paste0('.a'))
+
+# Save the scaled data set
 save(dataScales, file = getwd() %>% paste0('/data/dataScales.rda'))
 
 # Scale the original data set
@@ -76,6 +75,5 @@ original.data %<>% footballstats::scale_data(dataScales = dataScales)
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
 nn <- original.data %>% footballstats::neural_network()
 
-
-
+# Save the neural network
 save(nn, file = getwd() %>% paste0('/data/nn.rda'))

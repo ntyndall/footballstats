@@ -6,22 +6,14 @@ rredis::redisFlushDB()
 test_that("Test that match data can be recreated easily.", {
 
   # Test no data returns a null data frame
-  recreated <- footballstats::recreate_matchdata(
-    competitionID = KEYS$COMP,
-    seasonStarting = KEYS$SEASON,
-    matchLimit = 1000
-  )
+  recreated <- KEYS %>% footballstats::recreate_matchdata()
 
   expect_equal( recreated %>% nrow, 0 )
 
   # Put the test data into Redis
   matchData <- KEYS %>% footballstats::amatch_info()
 
-  recreated <- footballstats::recreate_matchdata(
-    competitionID = KEYS$COMP,
-    seasonStarting = KEYS$SEASON,
-    matchLimit = 1000
-  )
+  recreated <- KEYS %>% footballstats::recreate_matchdata()
 
   expect_equal( matchData %>% nrow, recreated %>% nrow )
   expect_equal( recreated %>% names, matchData %>% names %>% setdiff('events') )
@@ -33,11 +25,7 @@ test_that("Test that match data can be recreated easily.", {
 test_that("Test that commentary data is sent to Redis.", {
 
   # Recreate the match data that is in redis
-  recreated <- footballstats::recreate_matchdata(
-    competitionID = KEYS$COMP,
-    seasonStarting = KEYS$SEASON,
-    matchLimit = 1000
-  )
+  recreated <- KEYS %>% footballstats::recreate_matchdata()
 
   # Choose the right match ID to analyse
   recreated <- recreated[recreated$id == '2212950', ]

@@ -4,5 +4,5 @@
 \alias{weekly_positions}
 \title{Weekly Positions}
 \usage{
-weekly_positions(competitionID, seasonStarting)
+weekly_positions(KEYS)
 }

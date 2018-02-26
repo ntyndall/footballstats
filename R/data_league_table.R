@@ -61,9 +61,8 @@ create_table <- function(matchData) {
       redisKey <- paste0('cwt_l:', competitionID, ':', seasonStarting, ':', weekNum, ':', teamIDs[j])
 
       pointsToAdd <- 'leagueMatchSet' %>% rredis::redisSAdd(
-         element = paste0(matchID, ':', teamIDs[j]) %>% charToRaw()) %>%
-        as.integer %>%
-        as.logical
+         element = paste0(matchID, ':', teamIDs[j]) %>% charToRaw()
+        ) %>% as.integer %>% as.logical
 
       # Create the key if it doesnt exist
       if (pointsToAdd && `!`(redisKey %>% rredis::redisExists())) {
@@ -91,13 +90,17 @@ create_table <- function(matchData) {
             values = list(
               PTS = pRes$PTS %>% `+`(hPts) %>% as.character %>% charToRaw(),
               GF = pRes$GF %>% `+`(teamScore[1]) %>% as.character %>% charToRaw(),
-              GD = pRes$GD %>% `+`(scoreDiff) %>% as.character %>% charToRaw()))
+              GD = pRes$GD %>% `+`(scoreDiff) %>% as.character %>% charToRaw()
+            )
+          )
         } else {
           redisKey %>% rredis::redisHMSet(
             values = list(
               PTS = pRes$PTS %>% `+`(aPts) %>% as.character %>% charToRaw(),
               GF = pRes$GF %>% `+`(teamScore[2]) %>% as.character %>% charToRaw(),
-              GD = pRes$GD %>% `+`(-scoreDiff) %>% as.character %>% charToRaw()))
+              GD = pRes$GD %>% `+`(-scoreDiff) %>% as.character %>% charToRaw()
+            )
+          )
         }
       }
     }
@@ -107,10 +110,10 @@ create_table <- function(matchData) {
 #' @title Weekly Positions
 #' @export
 
-weekly_positions <- function(competitionID, seasonStarting) {
+weekly_positions <- function(KEYS) {
 
   # Get all possible keys
-  redisKeys <- paste0('cwt_l:', competitionID, ':', seasonStarting, '*') %>%
+  redisKeys <- paste0('cwt_l:', KEYS$COMP, ':', KEYS$SEASON, '*') %>%
     rredis::redisKeys()
 
   # Get the unique weeks to loop over
@@ -130,10 +133,7 @@ weekly_positions <- function(competitionID, seasonStarting) {
 
     # Get subkeys
     subKeys <- redisKeys %>%
-      subset(
-        paste0(':', uniqKeys[i], ':') %>%
-          grepl(redisKeys)
-        )
+      subset(paste0(':', uniqKeys[i], ':') %>% grepl(redisKeys))
 
     # There could be non-zero weeks..
     if (subKeys %>% identical(character(0))) next
@@ -174,8 +174,9 @@ weekly_positions <- function(competitionID, seasonStarting) {
 
     # Push list of positions to the cw_pl hashmap ...
     paste0('cw_pl:', competitionID, ':', seasonStarting, ':', uniqKeys[i]) %>%
-      rredis::redisHMSet(values = position)
+      rredis::redisHMSet(
+        values = position
+      )
   }
-
 }
 

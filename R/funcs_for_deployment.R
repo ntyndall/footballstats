@@ -181,7 +181,7 @@ send_report <- function() { # nocov start
 
   # Get the month and year for LAST month (i.e. the report to be created)
   month <- Sys.Date() %>% `-`(30) %>% format('%m') %>% as.integer
-  Sys.Date %>% footballstats::prs_season()
+  Sys.Date() %>% footballstats::prs_season()
   #year <- Sys.Date() %>% `-`(30) %>% format('%Y') %>% as.integer
 
 } # nocov end
