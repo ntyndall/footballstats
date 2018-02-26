@@ -173,7 +173,7 @@ weekly_positions <- function(KEYS) {
     names(position) <- singleWeek$teamID
 
     # Push list of positions to the cw_pl hashmap ...
-    paste0('cw_pl:', competitionID, ':', seasonStarting, ':', uniqKeys[i]) %>%
+    paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>%
       rredis::redisHMSet(
         values = position
       )

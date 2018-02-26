@@ -112,7 +112,8 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
   if (requestCount == 1) {
     rredis::redisExpire(
       key = "requestLimit",
-      seconds = timePeriod - 1 )
+      seconds = timePeriod - 1
+    )
   } else {
     if (requestCount > requestsAllowed - 100) {
       cat(paste0(' { requests low. Sleeping for ', timePeriod, ' seconds. } '))
