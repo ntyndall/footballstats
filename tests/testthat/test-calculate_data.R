@@ -5,7 +5,7 @@ rredis::redisFlushDB()
 
 test_that('Calculate data set built from features', {
 
-  KEYS %>% matchData <- footballstats::amatch_info()
+  matchData <- KEYS %>% footballstats::amatch_info()
 
   # Need to recreate it as new dates are created
   matchData <- footballstats::recreate_matchdata(
