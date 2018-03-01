@@ -36,7 +36,6 @@ create_table <- function(matchData) {
   # Loop over all match data
   for (i in 1:(matchData %>% nrow)) {
 
-    print(i)
     # Break match data down to individual slices
     slice <- matchData[i, ]
     matchID <- slice$id
@@ -164,7 +163,10 @@ weekly_positions <- function(KEYS) {
                 abs %>% which.min
             )
         subFrame <- prevWeek %>%
-          rredis::redisHGetAll() %>%
+          rredis::redisHGetAll()
+
+        subFrame$TEAM <- NULL
+        subFrame %<>%
           lapply(as.integer) %>%
           data.frame(stringsAsFactors = FALSE)
         subFrame$teamID <- teamIDs[j]
