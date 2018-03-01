@@ -5,6 +5,7 @@ rredis::redisFlushDB()
 
 test_that('Calculate data set built from features', {
 
+  # Add the match data to redis
   matchData <- KEYS %>% footballstats::amatch_info()
 
   # Need to recreate it as new dates are created

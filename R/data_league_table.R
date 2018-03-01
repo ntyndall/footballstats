@@ -123,7 +123,7 @@ weekly_positions <- function(KEYS) {
     unique
 
   # Get the unique weeks to loop over
-  weeks <- redisKeys %>% get_weeks()
+  weeks <- redisKeys %>% footballstats::get_weeks()
 
   # Determine unique weeks and other boundaries
   uniqKeys <- weeks %>% unique %>% sort
@@ -179,7 +179,10 @@ weekly_positions <- function(KEYS) {
     for (j in 1:subKeyLen) {
       # At this point I need to order them by something!
       subFrame <- subKeys[j] %>%
-        rredis::redisHGetAll() %>%
+        rredis::redisHGetAll()
+
+      subFrame$TEAM <- NULL
+      subFrame %<>%
         lapply(as.integer) %>%
         data.frame(stringsAsFactors = FALSE)
 
