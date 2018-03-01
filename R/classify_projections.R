@@ -17,6 +17,22 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs) {
         seasonStarting = seasonStarting
       ) %>% rev
 
+    # --- WIP
+    #matchIDs <- commentaryKeys %>% strsplit(split = ':') %>% purrr::map(3) %>% purrr::flatten_chr()
+    #for (k in 1:(commentaryKeys %>% length)) {
+    #  matchIDs[1]
+    #  positions <- footballstats::feat_position(
+    #    competitionID = competitionID,
+    #    seasonStarting = seasonStarting,
+    #    matchID = matchIDs[k],
+    #    teamIDs = teamIDs
+    #  )
+#
+ #     print(positions)
+#
+ #   }
+    # --- WIP
+
     # Get data frame of commentary metrics
     bFrame <- commentaryKeys %>%
       footballstats::get_av(
