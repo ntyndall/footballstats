@@ -4,5 +4,5 @@
 \alias{handle_projections}
 \title{Handle Projections}
 \usage{
-handle_projections(frameNames, resList)
+handle_projections(frameNames, resList, adjust = NULL)
 }
