@@ -69,7 +69,8 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         competitionID = competitionID,
         seasonStarting = seasonStarting,
         teamIDs = teamIDs,
-        matchDate = singleFixture$formatted_date
+        matchDate = singleFixture$formatted_date,
+        KEYS = KEYS
       )
     )
 
@@ -115,7 +116,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
     fTime <- singleFixture$ft_score
-    if (KEYS$TEST || fTime %>% `==`('[-]')) {
+    if (KEYS$TEST || fTime %>% `!=`('[-]')) {
       result <- fTime %>%
         footballstats::prs_ftscore() %>%
         purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L')
@@ -198,10 +199,13 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       api_token = KEYS$FS_SLACK,
       username = 'predictions'
     )
-  } else {
-    # Print results to screen
+  }
+
+  # Print results to screen
+  if (KEYS$LOGGING) {
     cat('Reporting on results! \n')
     print(totalTxt)
   } # nocov end
+
   return(correct)
 }

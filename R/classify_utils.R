@@ -51,7 +51,7 @@ recreate_matchdata <- function(KEYS, matchLimit = 10000) {
 
 
 order_matchdata <- function(matchData, limit = 5000) {
-  matchData$formatted_date <- matchData$formatted_date %>% as.Date('%d.%m.%Y')
+  matchData$formatted_date %<>% as.Date('%d.%m.%Y')
   matchData <- matchData[matchData$formatted_date %>% order, ]
   limit %<>% min(matchData %>% nrow)
   return(matchData[1:limit, ])

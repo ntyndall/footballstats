@@ -2,7 +2,9 @@
 #' @export
 
 
-project_commentaries <- function(competitionID, seasonStarting, teamIDs, matchDate) {
+project_commentaries <- function(competitionID, seasonStarting, teamIDs, matchDate, KEYS) {
+
+  sVar <- if (KEYS$STAND %>% is.null) 0.3 else KEYS$STAND
 
   resSds <- resList <- weights <- c()
   for (j in 1:2) {
@@ -63,7 +65,7 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs, matchDa
 
     # Adjust bFrame
     tNew <- data.frame(stringsAsFactors = FALSE)
-    facts <- totalPositions$position.h %>% `/`(totalPositions$position.a) %>% `^`(1/3)
+    facts <- totalPositions$position.h %>% `/`(totalPositions$position.a) %>% `^`(sVar)
 
     for (k in 1:(bFrame %>% nrow)) {
       new <- bFrame[k, ] %>% `*`(facts[k]) %>% as.numeric
@@ -116,7 +118,8 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs, matchDa
     home = positions[[teamIDs[1]]],
     away = positions[[teamIDs[2]]],
     min = minss,
-    max = maxss
+    max = maxss,
+    sVar = sVar
   )
   #####
   # Return a mini frame containing commentary information
@@ -200,9 +203,9 @@ handle_projections <- function(frameNames, resList, adjust = NULL) {
     NA %>% rep(frameNames %>% length) %>% t
   } else {
     if (adjust %>% is.null %>% `!`()) {
-      adj <- adjust$home %>% `/`(adjust$away) %>% `^`(1/3)
+      adj <- adjust$home %>% `/`(adjust$away) %>% `^`(adjust$sVar)
       resList[[1]] %<>% as.numeric %>% `*`(adj) %>% pmax(minss) %>% pmin(maxss)
-      adj <- adjust$away %>% `/`(adjust$home) %>% `^`(1/3)
+      adj <- adjust$away %>% `/`(adjust$home) %>% `^`(adjust$sVar)
       resList[[2]] %<>% as.numeric %>% `*`(adj) %>% pmax(minss) %>% pmin(maxss)
     }
     resList %>% purrr::flatten_dbl() %>% t
