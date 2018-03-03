@@ -37,12 +37,16 @@ for (i in 1:(comps %>% length)) {
 # Only select one competition
 totalData <- totalData[totalData$comp_id == '1204', ]
 
+# Remove any matches that can't be found by the API (i.e. no FT score)!
+totalData %<>% subset(totalData$ft_score %>% `!=`('[-]'))
+
 # Construct data set for building a classifier (for some reason this is very slow.. and can hang)
 cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
 groups <- 100
 loops <- totalData %>% nrow %>% `/`(groups) %>% ceiling
 original.data <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:loops) {
+  print(paste0(' Looping ', i, ' / ', loops))
   upper <- if (i %>% `==`(loops)) {
     totalData %>% nrow %>% mod(groups) %>% `+`(groups %>% `*`(loops - 1))
   } else {
@@ -51,6 +55,7 @@ for (i in 1:loops) {
   lower <- groups %>% `*`(i - 1) %>% `+`(1)
   original.data %<>% rbind(totalData[lower:upper, ] %>% footballstats::calculate_data())
 }
+
 # Only look at complete rows!
 original.data %<>% subset(original.data %>% stats::complete.cases())
 
