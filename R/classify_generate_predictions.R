@@ -68,7 +68,8 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       footballstats::project_commentaries(
         competitionID = competitionID,
         seasonStarting = seasonStarting,
-        teamIDs = teamIDs
+        teamIDs = teamIDs,
+        matchDate = singleFixture$formatted_date
       )
     )
 
