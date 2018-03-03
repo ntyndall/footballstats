@@ -46,6 +46,17 @@ add_all <- function(KEYS) { # nocov start
   matches <- KEYS %>% footballstats::amatch_info()
   cat(' complete \n')
 
+  # Convert formatted date...
+  matches %<>% footballstats::order_matchdata()
+
+  # Build league table
+  cat(paste0(Sys.time(), ' | Creating the league table ... \n'))
+  matches %>% footballstats::create_table()
+
+  # Store positions on a weekly basis
+  cat(paste0(Sys.time(), ' | Storing weekly positions ... \n'))
+  KEYS %>% footballstats::weekly_positions()
+
   # Store predicted vs. real outcomes
   readyToAnalyse <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*') %>% rredis::redisKeys()
   if (!(readyToAnalyse %>% is.null)) {
@@ -84,7 +95,7 @@ add_all <- function(KEYS) { # nocov start
   # Add the team information
   if (teamListLength > 0) {
     KEYS %>% footballstats::ateam_info(
-      teamListLength = teamListLength,
+      teamListLength = teamListLength
     )
   }
   cat(' complete. \n\n')
