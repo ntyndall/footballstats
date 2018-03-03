@@ -43,6 +43,8 @@ create_table <- function(matchData) {
     teamIDs <- c(slice$localteam_id, slice$visitorteam_id)
     teamNames <- c(slice$localteam_name, slice$visitorteam_name)
     teamScore <- slice$ft_score %>% footballstats::prs_ftscore()
+
+    if (teamScore %>% is.na %>% any) next
     scoreDiff <- teamScore[1] - teamScore[2]
 
     # Calculate the `on the fly` week number based on date away from first game!
@@ -65,10 +67,12 @@ create_table <- function(matchData) {
 
       # Create the key if it doesnt exist
       if (pointsToAdd) {
-        if (weekNum %>% `!=`(1)) {
+
+        prevKey <- paste0('cwt_l:', competitionID, ':', seasonStarting, ':*:', teamIDs[j]) %>%
+          rredis::redisKeys()
+
+        if (weekNum %>% `!=`(1) && prevKey %>% is.null %>% `!`()) {
           # Get last match info
-          prevKey <- paste0('cwt_l:', competitionID, ':', seasonStarting, ':*:', teamIDs[j]) %>%
-            rredis::redisKeys()
           oneTeamWeeks <- prevKey %>% footballstats::get_weeks()
           prevWeek <- prevKey %>%
             `[`(weekNum %>%
@@ -140,6 +144,9 @@ weekly_positions <- function(KEYS) {
     # There could be non-zero weeks..
     if (subKeys %>% identical(character(0))) next
 
+    # If the keys already exist
+    if (paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>% rredis::redisExists()) next
+
     # Get the teamIDs
     teamIDs <- subKeys %>%
       strsplit(split = ':') %>%
@@ -169,7 +176,7 @@ weekly_positions <- function(KEYS) {
         subFrame %<>%
           lapply(as.integer) %>%
           data.frame(stringsAsFactors = FALSE)
-        subFrame$teamID <- teamIDs[j]
+        subFrame$teamID <- lookPrevious[j]
         singleWeek %<>% rbind(subFrame)
       }
     }
@@ -205,10 +212,10 @@ weekly_positions <- function(KEYS) {
     names(position) <- singleWeek$teamID
 
     # Push list of positions to the cw_pl hashmap ...
-      paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>%
-      rredis::redisHMSet(
-        values = position
-      )
+    paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>%
+    rredis::redisHMSet(
+      values = position
+    )
   }
 }
 
