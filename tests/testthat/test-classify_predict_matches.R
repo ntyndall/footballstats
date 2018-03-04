@@ -13,6 +13,11 @@ test_that('Classify all - end to end from adding data to classifying and predict
     visitorteam = matchData$visitorteam_id
   )
 
+  # Set up league information for predictions
+  matchData %<>% footballstats::order_matchdata()
+  matchData %>% footballstats::create_table()
+  KEYS %>% footballstats::weekly_positions()
+  
   # Create the predictions here
   KEYS$LOG_PRED <- TRUE
   footballstats::predict_matches(
