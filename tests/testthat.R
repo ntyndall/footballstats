@@ -22,7 +22,8 @@ KEYS <<- list(
   DATE_TO = NULL,
   SLACK_PRNT = FALSE,
   TEST = TRUE,
-  LOG_PRED = FALSE
+  LOG_PRED = FALSE,
+  LOGGING = FALSE
 )
 
 results <- testthat::test_dir(

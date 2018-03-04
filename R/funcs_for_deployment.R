@@ -42,6 +42,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   # Obtain API and sensitive key information
   KEYS <<- footballstats::sensitive_keys(
     printToSlack = TRUE,
+    printToScreen = FALSE,
     testing = FALSE,
     storePred = TRUE
   )
@@ -90,6 +91,7 @@ analyse_players <- function(deployed = FALSE) { # nocov start
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
+    printToScreen = FALSE,
     testing = FALSE,
     storePred = TRUE
   )
@@ -132,6 +134,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
+    printToScreen = FALSE,
     testing = FALSE,
     storePred = TRUE
   )

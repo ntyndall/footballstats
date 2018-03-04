@@ -1,5 +1,6 @@
 library(testthat)
 library(purrr)
+library(magrittr)
 library(footballstats)
 library(rredis)
 
@@ -11,15 +12,16 @@ rredis::redisConnect(
 )
 rredis::redisSelect(3)
 
-# Initialise used and common variables
-competitionID <- 1204
-seasonStarting <- 2017
-
 # Set up enough keys for testing
 KEYS <<- list(
+  COMP= 1204,
+  SEASON = 2017,
+  DATE_FROM = NULL,
+  DATE_TO = NULL,
   SLACK_PRNT = FALSE,
   TEST = TRUE,
-  LOG_PRED = FALSE
+  LOG_PRED = FALSE,
+  LOGGING = FALSE
 )
 
 # Run the tests!

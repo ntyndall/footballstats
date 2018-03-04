@@ -202,9 +202,9 @@ handle_projections <- function(frameNames, resList, adjust = NULL) {
   } else {
     if (adjust %>% is.null %>% `!`()) {
       adj <- adjust$home %>% `/`(adjust$away) %>% `^`(adjust$sVar)
-      resList[[1]] %<>% as.numeric %>% `*`(adj) %>% pmax(minss) %>% pmin(maxss)
+      resList[[1]] %<>% as.numeric %>% `*`(adj) %>% pmax(adjust$min) %>% pmin(adjust$max)
       adj <- adjust$away %>% `/`(adjust$home) %>% `^`(adjust$sVar)
-      resList[[2]] %<>% as.numeric %>% `*`(adj) %>% pmax(minss) %>% pmin(maxss)
+      resList[[2]] %<>% as.numeric %>% `*`(adj) %>% pmax(adjust$min) %>% pmin(adjust$max)
     }
     resList %>% purrr::flatten_dbl() %>% t
   }
