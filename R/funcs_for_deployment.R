@@ -141,7 +141,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
 
   # Set up additional keys required for the main flow
   KEYS$SEASON <- footballstats::start_season()
-  KEYS$DATE_FROM <- paste0('31.07.', seasonStarting)
+  KEYS$DATE_FROM <- paste0('31.07.', KEYS$SEASON)
   KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
 
   # Make a connection to redis for storing data
