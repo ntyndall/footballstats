@@ -5,27 +5,23 @@ rredis::redisFlushDB()
 
 test_that('Classify all - end to end from adding data to classifying and predicting.', {
 
-  matchData <- footballstats::amatch_info(
-    competitionID = competitionID,
-    dateFrom = NULL,
-    dateTo = NULL,
-    seasonStarting = seasonStarting,
-    analysingToday = TRUE,
-    KEYS = KEYS
-  )
+  matchData <- KEYS %>% footballstats::amatch_info()
 
-  footballstats::acommentary_info(
-    competitionID = competitionID,
+  KEYS %>% footballstats::acommentary_info(
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
-    visitorteam = matchData$visitorteam_id,
-    KEYS = KEYS
+    visitorteam = matchData$visitorteam_id
   )
 
+  # Set up league information for predictions
+  matchData %<>% footballstats::order_matchdata()
+  matchData %>% footballstats::create_table()
+  KEYS %>% footballstats::weekly_positions()
+  
   # Create the predictions here
   KEYS$LOG_PRED <- TRUE
   footballstats::predict_matches(
-    competitionID = competitionID,
+    competitionID = KEYS$COMP,
     competitionName = 'test-competition',
     KEYS = KEYS
   )

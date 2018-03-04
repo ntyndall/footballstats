@@ -12,8 +12,8 @@ test_that("Save competition IDs from /competitions/ into a set", {
   newCompetitions <- KEYS %>% footballstats::acomp_info()
 
   expect_that( newCompetitions, is_a('data.frame') )
-  expect_that( newCompetitions %>% nrow, equals(22) )
-  expect_that( newCompetitions %>% names, equals(c('id', 'name', 'region')) )
+  expect_equal( newCompetitions %>% nrow, 22 )
+  expect_equal( newCompetitions %>% names, c('id', 'name', 'region') )
 
   uniqueComps <- 'competition:set' %>% rredis::redisSMembers()
 
@@ -26,6 +26,6 @@ test_that("Save competition IDs from /competitions/ into a set", {
     as.integer %>%
     sort
 
-  expect_that( sortedData, equals(sortedComps) )
+  expect_equal( sortedData, sortedComps )
 
 })

@@ -4,22 +4,11 @@
 \alias{amatch_info}
 \title{amatch_info}
 \usage{
-amatch_info(competitionID, dateFrom, dateTo, seasonStarting,
-  analysingToday = TRUE, KEYS)
+amatch_info(KEYS)
 }
 \arguments{
-\item{competitionID}{An integer containing the competitionID that the
-teams and match information belong to.}
-
-\item{dateFrom}{A POSIXct value converted to dd.mm.yyyy format which denotes
-the start date for querying the API.}
-
-\item{dateTo}{A POSIXct value converted to dd.mm.yyyy format which denotes
-the end date for querying the API.}
-
-\item{analysingToday}{A boolean that is set to TRUE if data is being analysing today.
-This is used to figure out if matches have been played during the time of
-query, if not then wait until todays match has been played.}
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 }
 \value{
 Returns a match dataframe containing all match information to update
@@ -28,17 +17,22 @@ Returns a match dataframe containing all match information to update
 Returns a NULL dataframe if no matches are found.
 }
 \description{
-A function that takes a competitionID and season year to query
+A function that takes a KEYS$COMP and season year to query
  for all the matches in a particular season and saves new teams to a set for
  later analysis.
 }
 \details{
-Match information is stored in a hash map as;
-    ->   [csm]:{comp_id}:{season}:{match_id}   ->   [HASH]
- The matches involved are first checked to see if they already exist
- in redis by checking the set;
-    ->   [c_matchSetInfo]:{comp_id}   ->   [SET]
- The teams involved in the match are checked to see if they are new,
- by checking the set in redis;
-    ->   [c_teamSetInfo]:{comp_id}   ->   [SET]
+API endpoints;
+  \itemize{
+    \item{\emph{"/matches?comp_id={comp_id}&from_date={dd.mm.yyyy}&to_date={dd.mm.yyyy}&Authorization={auth_id}"}}
+  }
+
+ Redis Keys used;
+  \itemize{
+    \item{\strong{[LIST]} :: \code{analyseTeams}}
+    \item{\strong{[SET]} :: \code{c_matchSetInfo:{comp_id}}}
+    \item{\strong{[SET]} :: \code{c:{comp_id}:ready}}
+    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+    \item{\strong{[HASH]} :: \code{c:{comp_id}:pred:{match_id}}}
+  }
 }

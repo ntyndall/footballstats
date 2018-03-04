@@ -4,7 +4,7 @@
 \alias{sensitive_keys}
 \title{sensitive_keys}
 \usage{
-sensitive_keys(printToSlack, testing, storePred)
+sensitive_keys(printToSlack, printToScreen, testing, storePred)
 }
 \arguments{
 \item{printToSlack}{A boolean}

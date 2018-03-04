@@ -25,13 +25,17 @@ get_data <- function(endpoint, KEYS) { # nocov start
       url = getUrl,
       times = 3,
       httr::config(timeout = 30)
-    )}, error = function(e) {
-      cat(paste0(' ## WARNING : Could not resolve ', getUrl))
-      list(status_code = 600)
-    })
+    )
+  }, error = function(e) {
+    cat(paste0(' ## WARNING : Could not resolve ', getUrl))
+    list(status_code = 600)
+  })
 
-  return(rawContent$status_code %>%
-    purrr::when(
+  # Increment the request limit
+  footballstats::request_limit()
+
+  return(
+    rawContent$status_code %>% purrr::when(
       . == 200 ~ rawContent$content %>%
         rawToChar() %>%
         jsonlite::fromJSON(),

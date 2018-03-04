@@ -42,6 +42,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   # Obtain API and sensitive key information
   KEYS <<- footballstats::sensitive_keys(
     printToSlack = TRUE,
+    printToScreen = FALSE,
     testing = FALSE,
     storePred = TRUE
   )
@@ -87,15 +88,16 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
 
 analyse_players <- function(deployed = FALSE) { # nocov start
-  # Get season starting year
-  seasonStarting <- footballstats::start_season()
-
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
+    printToScreen = FALSE,
     testing = FALSE,
     storePred = TRUE
   )
+
+  # Store additional KEY information
+  KEYS$SEASON <- footballstats::start_season()
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -108,10 +110,8 @@ analyse_players <- function(deployed = FALSE) { # nocov start
   if (playerLength > 0) {
     cat(paste(' ## Analysing a total of ', playerLength, ' unique players. \n'))
     tNow <- Sys.time()
-    footballstats::aplayer_info(
-      playerLength = playerLength,
-      currentSeasonYear = seasonStarting,
-      KEYS = KEYS
+    KEYS %>% footballstats::aplayer_info(
+      playerLength = playerLength
     )
     cat(' ## Players analysed with a \n')
     cat(paste(' ## ', Sys.time() - tNow))
@@ -131,15 +131,18 @@ analyse_players <- function(deployed = FALSE) { # nocov start
 
 
 analyse_data <- function(deployed = FALSE) { # nocov start
-  # Get season starting year
-  seasonStarting <- footballstats::start_season()
-
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
+    printToScreen = FALSE,
     testing = FALSE,
     storePred = TRUE
   )
+
+  # Set up additional keys required for the main flow
+  KEYS$SEASON <- footballstats::start_season()
+  KEYS$DATE_FROM <- paste0('31.07.', seasonStarting)
+  KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -155,14 +158,13 @@ analyse_data <- function(deployed = FALSE) { # nocov start
 
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {
-    cat(paste0(' ## Storing... ' , i, ' / ', nrow(competitions), ' (',
-               competitions$name[i], ' - ', competitions$region[i], '). \n'))
-
-    footballstats::add_all(
-      competitionID = competitions$id[i],
-      seasonStarting = seasonStarting,
-      KEYS = KEYS
+    cat(
+      ' ## Storing ::' , i, '/', nrow(competitions), '(',
+      competitions$name[i], '-', competitions$region[i], '). \n'
     )
+
+    KEYS$COMP <- competitions$id[i]
+    KEYS %>% footballstats::add_all()
   }
 } # nocov end
 
@@ -182,7 +184,7 @@ send_report <- function() { # nocov start
 
   # Get the month and year for LAST month (i.e. the report to be created)
   month <- Sys.Date() %>% `-`(30) %>% format('%m') %>% as.integer
-  Sys.Date %>% footballstats::prs_season()
+  Sys.Date() %>% footballstats::prs_season()
   #year <- Sys.Date() %>% `-`(30) %>% format('%Y') %>% as.integer
 
 } # nocov end

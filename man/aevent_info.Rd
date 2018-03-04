@@ -4,11 +4,11 @@
 \alias{aevent_info}
 \title{aevent_info}
 \usage{
-aevent_info(competitionID, matchIDs, matchEvents)
+aevent_info(KEYS, matchIDs, matchEvents)
 }
 \arguments{
-\item{competitionID}{An integer defining the competitionID that the
-team belongs to.}
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
 
 \item{matchIDs}{An integer character vector of matchIDs that match
 the matchEvents.}
@@ -21,13 +21,14 @@ Returns nothing, a redis hash map is set with the event information
  and IDs are stored as a redis set.
 }
 \description{
-A function that takes a competitionID, matchID's, and
+A function that takes a KEYS$COMP, matchID's, and
  a data frame containing match event information to be split up and
  added to redis as single events.
 }
 \details{
-EventID's are checked if they have been analysed already;
-    ->   [c_eventInSet]:{comp_id}   ->   [SET]
- The actual event information is stored as a hash map as;
-    ->   [cme]:{comp_id}:{match_id}:{event_id}  ->   [HASH]
+Redis Keys used;
+  \itemize{
+    \item{\strong{[SET]} :: \code{c_eventInSet:{comp_id}}}
+    \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
+  }
 }

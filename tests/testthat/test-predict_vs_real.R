@@ -6,7 +6,7 @@ rredis::redisFlushDB()
 test_that("Test a predicted result can be recorded as true or false.", {
 
   matchData <- footballstats::matchData[1, ]
-  keyType <-  paste0('csdm_pred:', competitionID, ':2017:')
+  keyType <-  paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':')
 
   actualKey <- paste0(keyType, '1:', matchData$id)
   rredis::redisHMSet(
@@ -15,18 +15,17 @@ test_that("Test a predicted result can be recorded as true or false.", {
   )
 
   readyToAnalyse <- actualKey %>% rredis::redisKeys()
-  footballstats::predict_vs_real(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
+  KEYS %>% footballstats::predict_vs_real(
     readyToAnalyse = readyToAnalyse,
     matches = matchData
   )
 
   result <- rredis::redisHGet(
     key = actualKey,
-    field = 'prediction') %>% as.character
+    field = 'prediction'
+  ) %>% as.character
 
-  expect_that( result, equals('T') )
+  expect_equal( result, 'T' )
 
 })
 
@@ -39,7 +38,7 @@ test_that("Really simple check that a report can be generated", {
 
   res <- KEYS %>% footballstats::monthly_report(
     month = 2,
-    year = 2017
+    year = KEYS$SEASON
   )
 
   expect_equal( res, NULL )

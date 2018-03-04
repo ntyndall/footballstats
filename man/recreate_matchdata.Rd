@@ -4,13 +4,10 @@
 \alias{recreate_matchdata}
 \title{Recreate Match Data}
 \usage{
-recreate_matchdata(competitionID, seasonStarting, matchLimit)
+recreate_matchdata(KEYS, matchLimit = 10000)
 }
 \arguments{
-\item{competitionID}{An integer containing the competitionID that the
-teams and match information belong to.}
-
-\item{seasonStarting}{An integer defining the lower year for details on a season.}
+\item{KEYS}{keys list...}
 
 \item{redisData}{An environment that defines the redis configuration where data is
 to be searched for.}

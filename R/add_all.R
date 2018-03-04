@@ -1,35 +1,41 @@
-#' @title add_all
+#' @title Add All Information
+#'
 #' @description A function that is called from a shell script to kick off
 #'  the storing of important data and also any machine learning mechanisms
 #'  for prediction.
 #'
 #' @details This main function is split into 3 main important components
-#'  1) All libraries, global variables are loaded. Storing mechanisms
-#'     that incorporate new ID keys are generated to store all useful
-#'     information for classification / algorithms.
-#'  2) Statistical models are built on the stored data and redis, future
-#'     fixtures are obtained and built into the models.
-#'  3) Predictions are made based on the current data and models and
-#'     anything useful is sent via slack for easy analysis.
-#'  Example queries carried out:
-#'     ->   matches?comp_id=1204&from_date=01.01.2016&to_date=20.06.2016
-#'     ->   team/9092
+#'  \itemize{
+#'    \item{
+#'      All libraries, global variables are loaded. Storing mechanisms
+#'      that incorporate new ID keys are generated to store all useful
+#'      information for classification / algorithms.
+#'    }
+#'    \item{
+#'      Statistical models are built on the stored data and redis, future
+#'      fixtures are obtained and built into the models.
+#'    }
+#'    \item{
+#'      Predictions are made based on the current data and models and
+#'      anything useful is sent via slack for easy analysis.
+#'    }
+#'  }
+#'
+#' @param competitionID An integer ID of the competition defined by the API.
+#' @param seasonStarting An integer of _Y_ format that defines the start of the
+#'  season.
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #'
 #' @return Returns nothing.
 #'
 #' @export
 
 
-add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
-
-  # Begin finding match information
-  dateFrom <- paste0('31.07.', seasonStarting)
-  dateTo <- (Sys.Date() - 1) %>% footballstats::format_dates()
+add_all <- function(KEYS) { # nocov start
 
   # Add competition standing
-  footballstats::acomp_standings(
-    competition = competitionID,
-    KEYS = KEYS)
+  KEYS%>% footballstats::acomp_standings()
 
   # Lookup request timings
   startingRequests <- 'requestLimit' %>% rredis::redisGet() %>% as.integer
@@ -37,21 +43,24 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
 
   # Add match information
   cat(paste0(Sys.time(), ' | Matches ...'))
-  matches <- footballstats::amatch_info(
-    competitionID = competitionID,
-    dateFrom = dateFrom,
-    dateTo = dateTo,
-    seasonStarting = seasonStarting,
-    KEYS = KEYS
-  )
+  matches <- KEYS %>% footballstats::amatch_info()
   cat(' complete \n')
 
+  # Convert formatted date...
+  matches %<>% footballstats::order_matchdata()
+
+  # Build league table
+  cat(paste0(Sys.time(), ' | Creating the league table ... \n'))
+  matches %>% footballstats::create_table()
+
+  # Store positions on a weekly basis
+  cat(paste0(Sys.time(), ' | Storing weekly positions ... \n'))
+  KEYS %>% footballstats::weekly_positions()
+
   # Store predicted vs. real outcomes
-  readyToAnalyse <- paste0('csdm_pred:', competitionID, ':', seasonStarting, ':*') %>% rredis::redisKeys()
+  readyToAnalyse <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*') %>% rredis::redisKeys()
   if (!(readyToAnalyse %>% is.null)) {
-    footballstats::predict_vs_real(
-      competitionID = competitionID,
-      seasonStarting = seasonStarting,
+    KEYS %>% footballstats::predict_vs_real(
       readyToAnalyse = readyToAnalyse,
       matches = matches
     )
@@ -60,21 +69,18 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
   # Add commentary information
   cat(paste0(Sys.time(), ' | Commentary ...'))
   if (matches %>% nrow %>% `>`(0)) {
-    footballstats::acommentary_info(
-      competitionID = competitionID,
+    KEYS %>% footballstats::acommentary_info(
       matchIDs = matches$id,
       localteam = matches$localteam_id,
-      visitorteam = matches$visitorteam_id,
-      KEYS = KEYS
+      visitorteam = matches$visitorteam_id
     )
   }
   cat(' complete \n')
 
   # Add event information
   cat(paste0(Sys.time(), ' | Events ...'))
-  if (nrow(matches) > 0) {
-    footballstats::aevent_info(
-      competitionID = competitionID,
+  if (matches %>% nrow %>% `>`(0)) {
+    KEYS %>% footballstats::aevent_info(
       matchIDs = matches$id,
       matchEvents = matches$events
     )
@@ -88,10 +94,8 @@ add_all <- function(competitionID, seasonStarting, KEYS) { # nocov start
   cat(paste0(Sys.time(), ' | Teams ... \n'))
   # Add the team information
   if (teamListLength > 0) {
-    footballstats::ateam_info(
-      competitionID = competitionID,
-      teamListLength = teamListLength,
-      KEYS = KEYS
+    KEYS %>% footballstats::ateam_info(
+      teamListLength = teamListLength
     )
   }
   cat(' complete. \n\n')

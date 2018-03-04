@@ -6,9 +6,7 @@
 #' @details A search for all matches in a particular subset is made in Redis, a data frame
 #'  is then constructed to rebuild the original API query and ordered by date.
 #'
-#' @param competitionID An integer containing the competitionID that the
-#'  teams and match information belong to.
-#' @param seasonStarting An integer defining the lower year for details on a season.
+#' @param KEYS keys list...
 #' @param redisData An environment that defines the redis configuration where data is
 #'  to be searched for.
 #'
@@ -17,20 +15,22 @@
 #' @export
 
 
-recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
-  allMatches <- rredis::redisKeys(
-    pattern = paste0('csm:', competitionID, ':', seasonStarting, '*'))
+recreate_matchdata <- function(KEYS, matchLimit = 10000) {
+  allMatches <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, '*') %>% rredis::redisKeys()
   matchData <- data.frame(stringsAsFactors = FALSE)
   if (!is.null(allMatches)) {
     for (i in 1:length(allMatches)) {
       singleMatch <- rredis::redisHGetAll(
-        key = allMatches[i])
+        key = allMatches[i]
+      )
 
-      matchID <- data.frame(singleMatch %>% as.character() %>% t(),
-                            stringsAsFactors = FALSE)
+      matchID <- data.frame(
+        singleMatch %>% as.character %>% t,
+        stringsAsFactors = FALSE
+      )
       matchIDName <- singleMatch[c(TRUE, FALSE)]
       names(matchID) <- names(singleMatch)
-      matchData <- rbind(matchData, matchID)
+      matchData %<>% rbind(matchID)
     }
   }
 
@@ -39,9 +39,9 @@ recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
     print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
   } else {
     # Re-order the dataframe by date.
-    matchData <- footballstats::order_matchdata(
-      matchData = matchData,
-      limit = matchLimit)
+    matchData %<>% footballstats::order_matchdata(
+      limit = matchLimit
+    )
   }
   return(matchData)
 }
@@ -51,15 +51,16 @@ recreate_matchdata <- function(competitionID, seasonStarting, matchLimit) {
 
 
 order_matchdata <- function(matchData, limit = 5000) {
-  matchData$formatted_date <- matchData$formatted_date %>% as.Date('%d.%m.%Y')
-  matchData <- matchData[matchData$formatted_date %>% order(), ]
-  limit <- min(limit, matchData %>% nrow())
+  matchData$formatted_date %<>% as.Date('%d.%m.%Y')
+  matchData <- matchData[matchData$formatted_date %>% order, ]
+  limit %<>% min(matchData %>% nrow)
   return(matchData[1:limit, ])
 }
 
 #' @title Available Commentaries
 #'
 #' @export
+
 
 available_commentaries <- function(competitionID = 'all', includeNames = 'all') {
 
@@ -79,7 +80,6 @@ available_commentaries <- function(competitionID = 'all', includeNames = 'all') 
     cNames <- results %>% names
     cValues <- results %>% as.character
     empties <- cValues == ""
-
 
     # Default to all
     if (`==`(x, 1) && getAll) includeNames <- cNames %>% subset(cNames != 'table_id')
@@ -113,9 +113,12 @@ available_commentaries <- function(competitionID = 'all', includeNames = 'all') 
 
 commentary_stats <- function(commentary, returnItems) {
   vals <- sapply(1:length(commentary), function(j) {
-    return(footballstats::commentary_from_redis(
-      keyName = commentary[j],
-      returnItems = returnItems))
+    return(
+      footballstats::commentary_from_redis(
+        keyName = commentary[j],
+        returnItems = returnItems
+      )
+    )
   })
 
   if (`==`(returnItems %>% length, 1)) {
@@ -144,26 +147,26 @@ commentary_from_redis <- function(keyName, returnItems) {
   vec <- c()
   for (j in 1:hashLen) {
     single <- results[[hashNames[j]]]
-    vec %<>% c(if (hashNames[j] %>% `==`('possesiontime')) {
-      single %>% gsub(
-        pattern = "%",
-        replacement = "") %>%
-        as.double
-    } else if (single %>% is.null) {
-      NA
-    } else  if (single %>% is.na) {
-      NA
-    } else {
-      if (single %>% `==`('')) 0 else single %>% as.double
-    })
+    vec %<>% c(
+      if (hashNames[j] %>% `==`('possesiontime')) {
+        single %>% gsub(
+          pattern = "%",
+          replacement = ""
+        ) %>% as.double
+      } else if (single %>% is.null) {
+        NA
+      } else  if (single %>% is.na) {
+        NA
+      } else {
+        if (single %>% `==`('')) 0 else single %>% as.double
+      }
+    )
   }
 
   # Make sure the items returned is the same length as requested
-  if (vec %>% na.omit %>% as.double %>% length %>% `==`(hashLen)) {
-    vec %>% return()
-  } else {
-    NULL %>% return()
-  }
+  return(
+    if (vec %>% stats::na.omit() %>% as.double %>% length %>% `==`(hashLen)) vec else NULL
+  )
 }
 
 #' @title Scale SVM Data
@@ -174,8 +177,8 @@ scale_data <- function(mDat, dataScales) {
 
   scaled.data <- mDat[ , 1:dataScales$cols] %>% scale(
     center = dataScales$sMin,
-    scale = dataScales$sMax - dataScales$sMin) %>%
-    as.data.frame()
+    scale = dataScales$sMax - dataScales$sMin
+  ) %>% as.data.frame
 
   if ('res' %in% (mDat %>% colnames)) scaled.data %<>% cbind(res = mDat$res)
   scaled.data %>% return()

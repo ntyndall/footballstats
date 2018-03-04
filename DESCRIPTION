@@ -27,5 +27,8 @@ Imports:
     caret,
     scales
 Suggests:
+    knitr,
+    rmarkdown,
     covr
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

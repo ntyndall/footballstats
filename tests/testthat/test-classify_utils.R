@@ -6,29 +6,18 @@ rredis::redisFlushDB()
 test_that("Test that match data can be recreated easily.", {
 
   # Test no data returns a null data frame
-  recreated <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    matchLimit = 1000)
+  recreated <- KEYS %>% footballstats::recreate_matchdata()
 
-  expect_that( recreated %>% nrow, equals(0) )
+  expect_equal( recreated %>% nrow, 0 )
 
   # Put the test data into Redis
-  matchData <- footballstats::amatch_info(
-    competitionID = competitionID,
-    dateFrom = NULL,
-    dateTo = NULL,
-    seasonStarting = seasonStarting,
-    KEYS = KEYS)
+  matchData <- KEYS %>% footballstats::amatch_info()
 
-  recreated <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    matchLimit = 1000)
+  recreated <- KEYS %>% footballstats::recreate_matchdata()
 
-  expect_that( matchData %>% nrow, equals(recreated %>% nrow) )
-  expect_that( recreated %>% names, equals(matchData %>% names %>% setdiff('events')) )
-  expect_that( matchData$id %>% as.integer %>% sort, equals(recreated$id %>% as.integer %>% sort) )
+  expect_equal( matchData %>% nrow, recreated %>% nrow )
+  expect_equal( recreated %>% names, matchData %>% names %>% setdiff('events') )
+  expect_equal( matchData$id %>% as.integer %>% sort, recreated$id %>% as.integer %>% sort )
 
 })
 
@@ -36,48 +25,45 @@ test_that("Test that match data can be recreated easily.", {
 test_that("Test that commentary data is sent to Redis.", {
 
   # Recreate the match data that is in redis
-  recreated <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    matchLimit = 1000)
+  recreated <- KEYS %>% footballstats::recreate_matchdata()
 
   # Choose the right match ID to analyse
   recreated <- recreated[recreated$id == '2212950', ]
 
-  footballstats::acommentary_info(
-    competitionID = competitionID,
+  KEYS %>% footballstats::acommentary_info(
     matchIDs = recreated$id,
     localteam = recreated$localteam_id,
-    visitorteam = recreated$visitorteam_id,
-    KEYS = KEYS)
+    visitorteam = recreated$visitorteam_id
+  )
 
   # Check what keys have been added
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
     rredis::redisKeys() %>%
     as.character
 
-  expect_that( commentaryKeys %>% length, equals(2) )
+  expect_equal( commentaryKeys %>% length, 2 )
   # Produces a list of available commentary names, Must be a total intersection
-  commentaryNames <- competitionID %>%
+  commentaryNames <- KEYS$COMP %>%
     footballstats::available_commentaries()
 
-  expect_that( commentaryNames %>% length, equals(9) )
-  expect_that( 'shots_total' %in% commentaryNames, is_true() )
-  expect_that( 'shots_ongoal' %in% commentaryNames, is_true() )
-  expect_that( 'fouls' %in% commentaryNames, is_true() )
-  expect_that( 'corners' %in% commentaryNames, is_true() )
-  expect_that( 'offsides' %in% commentaryNames, is_true() )
-  expect_that( 'possesiontime' %in% commentaryNames, is_true() )
-  expect_that( 'yellowcards' %in% commentaryNames, is_true() )
-  expect_that( 'redcards' %in% commentaryNames, is_true() )
-  expect_that( 'saves' %in% commentaryNames, is_true() )
+  expect_equal( commentaryNames %>% length, 9 )
+  expect_true( 'shots_total' %in% commentaryNames )
+  expect_true( 'shots_ongoal' %in% commentaryNames )
+  expect_true( 'fouls' %in% commentaryNames )
+  expect_true( 'corners' %in% commentaryNames )
+  expect_true( 'offsides' %in% commentaryNames )
+  expect_true( 'possesiontime' %in% commentaryNames )
+  expect_true( 'yellowcards' %in% commentaryNames )
+  expect_true( 'redcards' %in% commentaryNames )
+  expect_true( 'saves' %in% commentaryNames )
 
 })
 
 test_that("Check that the commentaries can be retrieved from redis as a double vector", {
 
-  commentaryKeys <- as.character(rredis::redisKeys(
-    pattern = paste0('cmt_commentary:', competitionID, '*')))
+  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
+    rredis::redisKeys() %>%
+    as.character
 
   # Make sure to pick the right commentary for testing
   teamIDs <- commentaryKeys %>%
@@ -90,64 +76,73 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
   keyName <- commentaryKeys[grepl(teamIDs[1], commentaryKeys) %>% which]
   result <- footballstats::commentary_from_redis(
     keyName = keyName,
-    returnItems = 'saves')
+    returnItems = 'saves'
+  )
 
-  expect_that( result %>% length, equals(1) )
-  expect_that( result, equals(1) )
+  expect_equal( result %>% length, 1 )
+  expect_equal( result, 1 )
 
   result <- footballstats::commentary_from_redis(
     keyName = keyName,
-    returnItems = c('yellowcards', 'possesiontime'))
+    returnItems = c('yellowcards', 'possesiontime')
+  )
 
-  expect_that( result %>% length, equals(2) )
-  expect_that( result %>% sort, equals(c(0, 65)) )
+  expect_equal( result %>% length, 2 )
+  expect_equal( result %>% sort, c(0, 65) )
 
 })
 
 
 test_that("Check that a list of commentary data can be aggregated correctly", {
 
-  commentaryKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
     rredis::redisKeys() %>%
     as.character
 
   ongoalVec <- c()
   for (i in 1:length(commentaryKeys)) {
-    res <- rredis::redisHMGet(key = commentaryKeys[i], fields = 'shots_ongoal')
-    ongoalVec <- c(ongoalVec, res)
+    ongoalVec %<>% c(
+      rredis::redisHMGet(
+        key = commentaryKeys[i],
+        fields = 'shots_ongoal'
+      )
+    )
   }
-  ongoalVec <- ongoalVec %>% as.integer
+  ongoalVec %<>% as.integer
 
   averaged <- footballstats::commentary_stats(
     commentary = commentaryKeys,
-    returnItems = c('shots_ongoal', 'saves'))
+    returnItems = c('shots_ongoal', 'saves')
+  )
 
-  expect_that( averaged %>% length, equals(2) )
-  expect_that( averaged %>% sort, equals(c(5.5, 6.5)) )
+  expect_equal( averaged %>% length, 2 )
+  expect_equal( averaged %>% sort, c(5.5, 6.5) )
 
   # Put two dummy keys into Redis to calculate average better
   addedOngoal <- c(10, 14)
   for (i in 1:length(addedOngoal)) {
-  rredis::redisHSet(
-    key = paste0('cmt_commentary:', competitionID, ':1:', i),
-    field = 'shots_ongoal',
-    value = addedOngoal[i])
+    rredis::redisHSet(
+      key = paste0('cmt_commentary:', KEYS$COMP, ':1:', i),
+      field = 'shots_ongoal',
+      value = addedOngoal[i]
+    )
   }
 
-  newKeys <- paste0('cmt_commentary:', competitionID, '*') %>%
+  newKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
     rredis::redisKeys() %>%
     as.character
   keyLen <- newKeys %>% length
 
-  expect_that( keyLen, equals(4) )
+  expect_equal( keyLen, 4 )
 
   averaged <- footballstats::commentary_stats(
     commentary = newKeys,
-    returnItems = 'shots_ongoal')
+    returnItems = 'shots_ongoal'
+  )
   totalStats <- c(ongoalVec, addedOngoal)
 
-  expect_that( averaged %>% length, equals(1) )
-  expect_that( averaged %>% round(digits = 2), equals((totalStats %>% sum)/keyLen %>% round(digits = 2)) )
+  expect_equal( averaged %>% length, 1 )
+  expect_equal( averaged %>% round(digits = 2), totalStats %>% sum %>% `/`(keyLen) %>% round(digits = 2) )
 
 })
 
@@ -165,17 +160,18 @@ test_that("Scale something at random", {
   result <- testData %>% footballstats::get_scales()
 
   expect_that( result, is_a('list') )
-  expect_that( result$sMax %>% length, equals(2) )
-  expect_that( result$sMin %>% length, equals(2) )
-  expect_that( result$cols, equals(2) )
+  expect_equal( result$sMax %>% length, 2 )
+  expect_equal( result$sMin %>% length, 2 )
+  expect_equal( result$cols, 2 )
 
   # Scale the testData with the resultant scalers
   testScaled <- footballstats::scale_data(
     mDat = testData,
-    dataScales = result)
+    dataScales = result
+  )
 
   expect_that( testScaled, is_a('data.frame') )
-  expect_that( testScaled %>% nrow, equals(3) )
-  expect_that( testScaled %>% ncol, equals(2) )
+  expect_equal( testScaled %>% nrow, 3 )
+  expect_equal( testScaled %>% ncol, 2 )
 
 })

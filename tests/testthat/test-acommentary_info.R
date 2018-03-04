@@ -12,15 +12,14 @@ test_that("Send in a single commentary to see it is stored correctly", {
   visitorteam <- matches$visitorteam_id[1]
   matchID <- commentaryData$match_id
 
-  footballstats::acommentary_info(
-    competitionID = competitionID,
+  KEYS %>% footballstats::acommentary_info(
     matchIDs = matchID,
     localteam = localteam,
-    visitorteam = visitorteam,
-    KEYS = KEYS)
+    visitorteam = visitorteam
+  )
 
   playerInfo <- 'cmp:*' %>% rredis::redisKeys()
-  expect_that( playerInfo %>% length, equals(33) )
+  expect_equal( playerInfo %>% length, 33 )
 
   singleMatch <- playerInfo %>%
     strsplit(split = ':') %>%
@@ -28,17 +27,17 @@ test_that("Send in a single commentary to see it is stored correctly", {
     purrr::flatten_chr() %>%
     unique
 
-  expect_that( singleMatch %>% length, equals(1) )
+  expect_equal( singleMatch %>% length, 1 )
 
   checkPlayerExists <- rredis::redisHMGet(
-    key = paste0('cmp:', competitionID, ':', matchID, ':153493'),
-    fields = 'name')
+    key = paste0('cmp:', KEYS$COMP, ':', matchID, ':153493'),
+    fields = 'name'
+  )
 
-  expect_that( checkPlayerExists$name %>% as.character %>% tolower, equals('mohamed elneny') )
+  expect_equal( checkPlayerExists$name %>% as.character %>% tolower, 'mohamed elneny' )
 
   # Get the general match commentaries
-  teamCommentaries <- rredis::redisKeys(
-    pattern = 'cmt_commentary:*')
+  teamCommentaries <- 'cmt_commentary:*' %>% rredis::redisKeys()
 
   teamIDs <- teamCommentaries %>%
     strsplit(split = ':') %>%
@@ -47,15 +46,14 @@ test_that("Send in a single commentary to see it is stored correctly", {
     as.integer %>%
     sort
 
-  expect_that( teamIDs, equals(c(visitorteam, localteam) %>% as.integer %>% sort) )
+  expect_equal( teamIDs, c(visitorteam, localteam) %>% as.integer %>% sort )
 
-  index <- which(grepl(teamIDs[1], teamCommentaries))
-  teamDetails <- rredis::redisHGetAll(
-    key = teamCommentaries[index])
+  index <- grepl(teamIDs[1], teamCommentaries) %>% which
+  teamDetails <-  teamCommentaries[index] %>% rredis::redisHGetAll()
 
-  expect_that( teamDetails$shots_total %>% as.character %>% as.integer, equals(25) )
-  expect_that( teamDetails$shots_ongoal %>% as.character %>% as.integer, equals(12) )
-  expect_that( teamDetails$fouls %>% as.character %>% as.integer, equals(7) )
-  expect_that( teamDetails$corners %>% as.character %>% as.integer, equals(6) )
+  expect_equal( teamDetails$shots_total %>% as.character %>% as.integer, 25 )
+  expect_equal( teamDetails$shots_ongoal %>% as.character %>% as.integer, 12 )
+  expect_equal( teamDetails$fouls %>% as.character %>% as.integer, 7 )
+  expect_equal( teamDetails$corners %>% as.character %>% as.integer, 6 )
 
 })

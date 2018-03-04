@@ -4,9 +4,12 @@
 \alias{aplayer_info}
 \title{aplayer_info}
 \usage{
-aplayer_info(playerLength, currentSeasonYear, KEYS)
+aplayer_info(KEYS, playerLength)
 }
 \arguments{
+\item{KEYS}{A list containing options such as testing / prediction
+options and also the API query information such as url.}
+
 \item{playerLength}{An integer value that defines the number of players to
 analyse for a given list of ID's previously generated.}
 }
@@ -14,11 +17,19 @@ analyse for a given list of ID's previously generated.}
 Returns nothing. Redis is updated with player information
 }
 \description{
-A function that takes a competitionID and length of players to
+A function that takes a KEYS$COMP and length of players to
  analyse. The playerID's are popped from a Redis list and queried. The player
  stats are then stored in appropriate redis keys as necessary.
 }
 \details{
-Player stats infromation is stored in a hash map as;
-    ->   [ctps]:{comp_id}:{team_id}:{player_id}:{season}:[_stats_`statType`_]   ->   [HASH]
+API endpoints;
+  \itemize{
+    \item{\emph{"/player/{player_id}?Authorization={auth_id}"}}
+  }
+
+ Redis Keys used;
+  \itemize{
+    \item{\strong{[LIST]} :: \code{analysePlayers}}
+    \item{\strong{[HASH]} :: \code{ctps_**:{comp_id}:{team_id}:{player_id}:{season}}}
+  }
 }

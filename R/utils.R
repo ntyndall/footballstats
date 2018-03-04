@@ -19,7 +19,7 @@
 #' @export
 
 
-sensitive_keys <- function(printToSlack, testing, storePred) {  # nocov start
+sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  # nocov start
   cat(paste0(Sys.time(), ' | Loading global environment variables...'))
   fsHost <- Sys.getenv("FS_HOST")
   fsApikey <- Sys.getenv("FS_APIKEY")
@@ -41,7 +41,9 @@ sensitive_keys <- function(printToSlack, testing, storePred) {  # nocov start
       FS_SLACK = fsSlack,
       SLACK_PRNT = printToSlack,
       TEST = testing,
-      LOG_PRED = storePred) %>%
+      LOGGING = printToScreen,
+      LOG_PRED = storePred
+    ) %>%
     return()
   }
 }  # nocov end
@@ -112,7 +114,8 @@ request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
   if (requestCount == 1) {
     rredis::redisExpire(
       key = "requestLimit",
-      seconds = timePeriod - 1 )
+      seconds = timePeriod - 1
+    )
   } else {
     if (requestCount > requestsAllowed - 100) {
       cat(paste0(' { requests low. Sleeping for ', timePeriod, ' seconds. } '))
@@ -139,7 +142,7 @@ redis_con <- function() { # nocov start
       port = 6379,
       nodelay = FALSE
     )
-    blnk <- capture.output(rredis::redisSelect(1))
+    blnk <- utils::capture.output(rredis::redisSelect(1))
     cat(paste0(Sys.time(), ' | Redis Connection established. \n'))
   })
 } # nocov end
@@ -166,11 +169,11 @@ create_sink <- function(fName) { # nocov start
   # Create the file
   logFile <- file(
     description = paste0('/root/logs/', fName),
-    open = "wt")
+    open = "wt"
+  )
 
   # Create the sink
-  sink(
-    file = logFile)
+  logFile %>% sink()
 } # nocov end
 
 #' @title Create Log Directory
@@ -182,10 +185,12 @@ create_log_dir <- function() { # nocov start
   # Check the log path global R environment variable
   cat(' ## Reading log path from global variable ... ')
   logPath <- Sys.getenv('FS_DEPLOYLOC')
-  if (`==`(logPath, '')) {
+  if (logPath %>% `==`('')) {
     cat('error. \n')
-    stop('Cannot find `FS_DEPLOYLOC`, \n check : \n\n',
-         paste(footballstats::possible_env(), collapse = '\n '))
+    stop(
+      'Cannot find `FS_DEPLOYLOC`, \n check : \n\n',
+      paste(footballstats::possible_env(), collapse = '\n ')
+    )
   }
   cat('complete. \n')
 
@@ -196,7 +201,8 @@ create_log_dir <- function() { # nocov start
     dir.create(
       path = logPath,
       recursive = TRUE,
-      showWarnings = FALSE)
+      showWarnings = FALSE
+    )
   } else {
     cat(paste0(' ## Log path exists already @ ', logPath, ' \n'))
   }

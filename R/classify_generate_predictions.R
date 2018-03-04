@@ -32,12 +32,12 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
   emojiHash <- footballstats::classify_emoji()
 
   # Just query for the standings here!
-  standings <- if (!KEYS$TEST) {
-    paste0('/standings/', competitionID, '?') %>%
-      footballstats::get_data(KEYS = KEYS)
-  } else {
-    footballstats::standings
-  }
+  #standings <- if (!KEYS$TEST) {
+  #  paste0('/standings/', competitionID, '?') %>%
+  #    footballstats::get_data(KEYS = KEYS)
+  #} else {
+  #  footballstats::standings
+  #}
 
   # Set up progress bar
   progressBar <- utils::txtProgressBar(
@@ -68,7 +68,9 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       footballstats::project_commentaries(
         competitionID = competitionID,
         seasonStarting = seasonStarting,
-        teamIDs = teamIDs
+        teamIDs = teamIDs,
+        matchDate = singleFixture$formatted_date,
+        KEYS = KEYS
       )
     )
 
@@ -81,13 +83,44 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       )
     )
 
+
+
     # Figure out the standings
-    positions <- standings$position[teamIDs %>% match(standings$team_id)] %>%
+    startDate <- paste0('c_startDate:', competitionID, ':', seasonStarting) %>%
+      rredis::redisGet() %>%
       as.integer
+
+    # Get the current date
+    currentDate <- singleFixture$formatted_date %>%
+      as.Date(format = '%d.%m.%Y') %>%
+      as.integer
+
+    # Convert to week number
+    weekNum <- currentDate %>%
+      `-`(startDate) %>%
+      `/`(7) %>%
+      floor %>%
+      `+`(1)
+
+    # Get the last known position of the two teams
+    weekKeys <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':*') %>%
+      rredis::redisKeys() %>%
+      footballstats::get_weeks()
+
+    prevWeek <- weekKeys %>%
+      `[`(weekNum %>%
+            `-`(weekKeys) %>%
+            abs %>% which.min
+      )
+
+    positions <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':', prevWeek) %>%
+      rredis::redisHGetAll() %>%
+      lapply(as.integer)
+
     matchMetrics %<>% cbind(
       data.frame(
-        `position.h` = positions[1],
-        `position.a` = positions[2],
+        `position.h` = positions[[teamIDs[1]]],
+        `position.a` = positions[[teamIDs[2]]],
         stringsAsFactors = FALSE
       )
     )
@@ -114,7 +147,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
     fTime <- singleFixture$ft_score
-    if (KEYS$TEST || fTime %>% `==`('[-]')) {
+    if (KEYS$TEST || fTime %>% `!=`('[-]')) {
       result <- fTime %>%
         footballstats::prs_ftscore() %>%
         purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L')
@@ -197,10 +230,13 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
       api_token = KEYS$FS_SLACK,
       username = 'predictions'
     )
-  } else {
-    # Print results to screen
+  }
+
+  # Print results to screen
+  if (KEYS$LOGGING) {
     cat('Reporting on results! \n')
     print(totalTxt)
   } # nocov end
+
   return(correct)
 }

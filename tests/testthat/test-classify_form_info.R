@@ -5,14 +5,14 @@ rredis::redisFlushDB()
 
 test_that('Calculate score based on vector of forms', {
 
-  expect_that( 'LLL' %>% footballstats::form_to_int(), equals(0) )
-  expect_that( 'DDD' %>% footballstats::form_to_int(), equals(3) )
-  expect_that( 'WWW' %>% footballstats::form_to_int(), equals(6) )
-  expect_that( 'WDL' %>% footballstats::form_to_int(), equals(3) )
-  expect_that( 'LDW' %>% footballstats::form_to_int(), equals(3) )
-  expect_that( 'W' %>% footballstats::form_to_int(), equals(2) )
-  expect_that( 'D' %>% footballstats::form_to_int(), equals(1) )
-  expect_that( 'L' %>% footballstats::form_to_int(), equals(0) )
+  expect_equal( 'LLL' %>% footballstats::form_to_int(), 0 )
+  expect_equal( 'DDD' %>% footballstats::form_to_int(), 3 )
+  expect_equal( 'WWW' %>% footballstats::form_to_int(), 6 )
+  expect_equal( 'WDL' %>% footballstats::form_to_int(), 3 )
+  expect_equal( 'LDW' %>% footballstats::form_to_int(), 3 )
+  expect_equal( 'W' %>% footballstats::form_to_int(), 2 )
+  expect_equal( 'D' %>% footballstats::form_to_int(), 1 )
+  expect_equal( 'L' %>% footballstats::form_to_int(), 0 )
 
 })
 
@@ -20,27 +20,25 @@ test_that('Calculate score based on vector of forms', {
 test_that("Send in a single commentary to see it is stored correctly", {
 
   # Get the match info coupled to the commentary
-  singleMatch <- footballstats::matchData[1, ]
+  sing <- footballstats::matchData[1, ]
 
   # The home team as the teamID
-  scoreResults <- footballstats::current_or_other(
-    singleMatch = singleMatch,
-    teamID = singleMatch$localteam_id)
+  res <- footballstats::current_or_other(
+    singleMatch = sing,
+    teamID = sing$localteam_id
+  )
 
-  expect_that( singleMatch$localteam_score %>% as.integer,
-               equals(scoreResults$current %>% as.integer) )
-  expect_that( singleMatch$visitorteam_score %>% as.integer,
-               equals(scoreResults$other %>% as.integer) )
+  expect_equal( sing$localteam_score %>% as.integer, res$current %>% as.integer )
+  expect_equal( sing$visitorteam_score %>% as.integer, res$other %>% as.integer )
 
   # The away team as the teamID
-  scoreResults <- footballstats::current_or_other(
-    singleMatch = singleMatch,
-    teamID = singleMatch$visitorteam_id)
+  res <- footballstats::current_or_other(
+    singleMatch = sing,
+    teamID = sing$visitorteam_id
+  )
 
-  expect_that( singleMatch$visitorteam_score %>% as.integer,
-               equals(scoreResults$current %>% as.integer) )
-  expect_that( singleMatch$localteam_score %>% as.integer,
-               equals(scoreResults$other %>% as.integer) )
+  expect_equal( sing$visitorteam_score %>% as.integer, res$current %>% as.integer )
+  expect_equal( sing$localteam_score %>% as.integer, res$other %>% as.integer )
 
 })
 
@@ -49,9 +47,9 @@ test_that("Does the list return a character result of 'W' / 'L' / 'D' ", {
 
   subFunc <- function(c, o) footballstats::match_result(scoreCurrent = c, scoreOther = o)
 
-  expect_that( subFunc(c = 2, o = 1), equals('W') )
-  expect_that( subFunc(c = 1, o = 1), equals('D') )
-  expect_that( subFunc(c = 0, o = 1), equals('L') )
+  expect_equal( subFunc(c = 2, o = 1), 'W' )
+  expect_equal( subFunc(c = 1, o = 1), 'D' )
+  expect_equal( subFunc(c = 0, o = 1), 'L' )
 
 })
 
@@ -65,19 +63,20 @@ test_that("Create team form.", {
 
   formList <- footballstats::team_form(
     matchData = matchData,
-    teamID = teamID)
+    teamID = teamID
+  )
 
   numMatches <- sum(matchData[matchData$localteam_id == teamID, ] %>% nrow,
       matchData[matchData$visitorteam_id == teamID, ] %>% nrow)
 
-  expect_that( numMatches, equals(formList[[1]] %>% length) )
-  expect_that( numMatches, equals(formList[[2]] %>% length) )
-  expect_that( formList[[1]] %>% paste(collapse = ''), equals('WDWWLWW') )
+  expect_equal( numMatches, formList[[1]] %>% length )
+  expect_equal( numMatches, formList[[2]] %>% length )
+  expect_equal( formList[[1]] %>% paste(collapse = ''), 'WDWWLWW' )
 
   sortedDates <- formList[[2]] %>% sort
 
-  expect_that( sortedDates[1], equals(17418) )
-  expect_that( sortedDates[numMatches], equals(17467) )
+  expect_equal( sortedDates[1], 17418 )
+  expect_equal( sortedDates[numMatches], 17467 )
 
 })
 

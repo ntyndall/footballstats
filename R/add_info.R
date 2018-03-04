@@ -1,18 +1,23 @@
 #' @title acommentary_info
 #'
-#' @description A function that takes a competitionID and matchID's, and
+#' @description A function that takes a KEYS$COMP and matchID's, and
 #'  determines general match statistics for both local team and visitor
 #'  team
 #'
-#' @details EventID's are checked if they have been analysed already;
-#'     ->   [c_eventInSet]:{comp_id}   ->   [SET]
-#'  The actual event information is stored as a hash map as;
-#'     ->   [cme]:{comp_id}:{match_id}:{event_id}  ->   [HASH]
+#' @details Redis keys used;
+#'   \itemize{
+#'     \item{\strong{[SET]} :: \code{c_eventInSet:{comp_id}}}
+#'     \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
+#'   }
 #'
-#' @param competitionID An integer defining the competitionID that the
-#'  team belongs to.
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #' @param matchIDs A character vector of matchIDs that match
 #'  the matchEvents.
+#' @param localteam An integer ID value representing the home team
+#'  as defined by the API.
+#' @param visitorteam An integer ID value representing the away team
+#'  as defined by the API.
 #'
 #' @return Returns nothing, a redis hash map is set with the
 #'  commentary information and IDs are stored as a redis set.
@@ -20,54 +25,51 @@
 #' @export
 
 
-acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KEYS) {
-
-  # Can I check if both match IDs are actually in the DB here?
-  #
-  #
+acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
 
   # Load static data set for testing
   if (KEYS$TEST) fullCommentary <- footballstats::fullCommentary
 
   for (i in 1:length(matchIDs)) {
 
-    # Check if I can skip here
-    rKeys <- paste0("cmt_commentary:", competitionID, ":", matchIDs[i], ":*") %>%
+    # Check if the commentary already exists for both teams
+    rKeys <- paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs[i], ":*") %>%
       rredis::redisKeys()
     if (rKeys %>% length %>% `==`(2)) next
 
-    if (KEYS$TEST) {
-      commentary <- fullCommentary[[i]]
+    commentary <- if (KEYS$TEST) {
+      fullCommentary[[i]]
     } else {  # nocov start
-      commentary <- footballstats::get_data(
+      footballstats::get_data(
         endpoint = paste0("/commentaries/", matchIDs[i], "?"),
         KEYS = KEYS
       )
-      footballstats::request_limit()
     }  # nocov end
 
     localAway <- c('localteam', 'visitorteam')
     teamIDs <- c(localteam[i], visitorteam[i])
 
-    if (commentary %>% is.null %>% `!`()) {
-      teamStats <- commentary$match_stats
-      if (length(teamStats) == 2) {
-        for (j in 1:length(localAway)) {
-          singleTeamStats <- teamStats[[localAway[j]]]
-          if (singleTeamStats %>% is.null %>% `!`()) {
-            rKey <- paste0("cmt_commentary:", competitionID, ":", matchIDs[i], ":", teamIDs[j])
-            if (rKey %>% rredis::redisExists() %>% `!`()) {
-              footballstats::commentary_sub(
-                competitionID = competitionID,
-                matchID = matchIDs[i],
-                teamInfo = teamIDs[j],
-                teamStats = singleTeamStats,
-                commentary = commentary$player_stats[[localAway[j]]]
-              )
-            }
-          }
-        }
-      }
+    # Make sure commentary exists
+    if (commentary %>% is.null) next
+
+    teamStats <- commentary$match_stats
+    if (teamStats %>% length %>% `!=`(2)) next
+
+    for (j in 1:length(localAway)) {
+      singleTeamStats <- teamStats[[localAway[j]]]
+      if (singleTeamStats %>% is.null) next
+
+      rKey <- paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs[i], ":", teamIDs[j])
+      if (rKey %>% rredis::redisExists()) next
+
+      # Add the commentary information
+      footballstats::commentary_sub(
+        competitionID = KEYS$COMP,
+        matchID = matchIDs[i],
+        teamID = teamIDs[j],
+        teamStats = singleTeamStats,
+        commentary = commentary$player_stats[[localAway[j]]]
+      )
     }
   }
 }
@@ -79,9 +81,18 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 #'  obtained and is added to a hashMap of the form ....
 #'  -> competitions:set
 #'
-#' @param production A boolean to indicate whether production (default)
-#'  runs are performed or testing carried out.
-#' @param seasonIDs A list containing seasonIDs...
+#' @details API endpoints;
+#'   \itemize{
+#'     \item{\emph{"/competitions?Authorization={auth_id}"}}
+#'   }
+#'
+#'  Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[SET]} :: \code{competition:set}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #'
 #' @return returns competitionIDs, a redis hash is set with season IDs, and a
 #'  redis set is created to store the current seasonIDs.
@@ -91,13 +102,13 @@ acommentary_info <- function(competitionID, matchIDs, localteam, visitorteam, KE
 
 acomp_info <- function(KEYS) {
 
-  if (KEYS$TEST) {
-    competitionIDs <- footballstats::compData
+  competitionIDs <- if (KEYS$TEST) {
+    footballstats::compData
   } else {  # nocov start
-    competitionIDs <- footballstats::get_data(
+    footballstats::get_data(
       endpoint = "/competitions?",
-      KEYS = KEYS)
-    footballstats::request_limit()
+      KEYS = KEYS
+    )
   }  # nocov end
 
   if (competitionIDs %>% is.null %>% `!`()) {
@@ -106,7 +117,8 @@ acomp_info <- function(KEYS) {
       seasonID <- competitionIDs$id[[i]]
       compExists <- rredis::redisSAdd(
         set = 'competition:set',
-        element = seasonID %>% as.character %>% charToRaw())
+        element = seasonID %>% as.character %>% charToRaw()
+      )
 
       if (compExists == 1) total %<>% `+`(1)
     }
@@ -118,14 +130,21 @@ acomp_info <- function(KEYS) {
 
 #' @title acomp_standings
 #'
-#' @description A function that takes a competitionID and returns the current
+#' @description A function that takes a KEYS$COMP and returns the current
 #'  table information.
 #'
-#' @details Competition table information is stored in the following redis hash
-#'    ->   comp:season:_standing_:{comp_id}:{season}
+#' @details API endpoints;
+#'   \itemize{
+#'     \item{\emph{"/standings/{comp_id}?Authorization={auth_id}"}}
+#'   }
 #'
-#' @param competitionID An integer containing the competition ID that the
-#'  teams and match information belong to.
+#'  Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{comp:season:_standing_:{comp_id}:{season}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #'
 #' @return Returns nothing, a redis hash map is set with the competition
 #'  standing information.
@@ -133,22 +152,21 @@ acomp_info <- function(KEYS) {
 #' @export
 
 
-acomp_standings <- function(competitionID, KEYS) {
+acomp_standings <- function(KEYS) {
 
-  if (KEYS$TEST) {
-    standings <- footballstats::standingData
+  standings <- if (KEYS$TEST) {
+    footballstats::standingData
   } else {  # nocov start
-    standings <- footballstats::get_data(
-      endpoint = paste0("/standings/", competitionID, "?"),
-      KEYS = KEYS)
-    footballstats::request_limit()
+    footballstats::get_data(
+      endpoint = paste0("/standings/", KEYS$COMP, "?"),
+      KEYS = KEYS
+    )
   }  # nocov end
 
   if (standings %>% is.null %>% `!`()) {
     for (i in 1:nrow(standings)) {
       singleTable <- standings[i, ]
-      standingKey <- paste0(
-        "comp:season:_standing_:", competitionID, singleTable$season)
+      standingKey <- paste0("comp:season:_standing_:", KEYS$COMP, singleTable$season)
       rredis::redisHMSet(
         key = standingKey,
         values = singleTable
@@ -160,17 +178,18 @@ acomp_standings <- function(competitionID, KEYS) {
 
 #' @title aevent_info
 #'
-#' @description A function that takes a competitionID, matchID's, and
+#' @description A function that takes a KEYS$COMP, matchID's, and
 #'  a data frame containing match event information to be split up and
 #'  added to redis as single events.
 #'
-#' @details EventID's are checked if they have been analysed already;
-#'     ->   [c_eventInSet]:{comp_id}   ->   [SET]
-#'  The actual event information is stored as a hash map as;
-#'     ->   [cme]:{comp_id}:{match_id}:{event_id}  ->   [HASH]
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[SET]} :: \code{c_eventInSet:{comp_id}}}
+#'     \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
+#'   }
 #'
-#' @param competitionID An integer defining the competitionID that the
-#'  team belongs to.
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #' @param matchIDs An integer character vector of matchIDs that match
 #'  the matchEvents.
 #' @param matchEvents A list of data frames containing individual events
@@ -182,25 +201,26 @@ acomp_standings <- function(competitionID, KEYS) {
 #' @export
 
 
-aevent_info <- function(competitionID, matchIDs, matchEvents) {
+aevent_info <- function(KEYS, matchIDs, matchEvents) {
   for (i in 1:length(matchEvents)) {
     eventsPerMatch <- matchEvents[[i]]
     matchID <- matchIDs[i]
-    if (length(eventsPerMatch) > 0) {
-      for (j in 1:nrow(eventsPerMatch)) {
-        event <- eventsPerMatch[j, ]
-        inSet <- rredis::redisSAdd(
-          set = paste0("c_eventInSet:", competitionID),
-          element = event$id %>% as.character %>% charToRaw()) %>%
-            as.integer %>%
-            as.logical
-        if (inSet) {
-          rredis::redisHMSet(
-            key = paste0("cme:", competitionID, ":", matchID, ":", event$id),
-            values = event
-          )
-        }
-      }
+
+    # Check there are events in a match
+    if (eventsPerMatch %>% length %>% `<`(1)) next
+    for (j in 1:nrow(eventsPerMatch)) {
+      event <- eventsPerMatch[j, ]
+      inSet <- rredis::redisSAdd(
+        set = paste0("c_eventInSet:", KEYS$COMP),
+        element = event$id %>% as.character %>% charToRaw()
+      ) %>% as.integer %>% as.logical
+
+      # Make sure the event is new
+      if (inSet %>% `!`()) next
+      rredis::redisHMSet(
+        key = paste0("cme:", KEYS$COMP, ":", matchID, ":", event$id),
+        values = event
+      )
     }
   }
 }
@@ -208,28 +228,26 @@ aevent_info <- function(competitionID, matchIDs, matchEvents) {
 
 #' @title amatch_info
 #'
-#' @description A function that takes a competitionID and season year to query
+#' @description A function that takes a KEYS$COMP and season year to query
 #'  for all the matches in a particular season and saves new teams to a set for
 #'  later analysis.
 #'
-#' @details Match information is stored in a hash map as;
-#'     ->   [csm]:{comp_id}:{season}:{match_id}   ->   [HASH]
-#'  The matches involved are first checked to see if they already exist
-#'  in redis by checking the set;
-#'     ->   [c_matchSetInfo]:{comp_id}   ->   [SET]
-#'  The teams involved in the match are checked to see if they are new,
-#'  by checking the set in redis;
-#'     ->   [c_teamSetInfo]:{comp_id}   ->   [SET]
+#' @details API endpoints;
+#'   \itemize{
+#'     \item{\emph{"/matches?comp_id={comp_id}&from_date={dd.mm.yyyy}&to_date={dd.mm.yyyy}&Authorization={auth_id}"}}
+#'   }
 #'
-#' @param competitionID An integer containing the competitionID that the
-#'  teams and match information belong to.
-#' @param dateFrom A POSIXct value converted to dd.mm.yyyy format which denotes
-#'  the start date for querying the API.
-#' @param dateTo A POSIXct value converted to dd.mm.yyyy format which denotes
-#'  the end date for querying the API.
-#' @param analysingToday A boolean that is set to TRUE if data is being analysing today.
-#'  This is used to figure out if matches have been played during the time of
-#'  query, if not then wait until todays match has been played.
+#'  Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[LIST]} :: \code{analyseTeams}}
+#'     \item{\strong{[SET]} :: \code{c_matchSetInfo:{comp_id}}}
+#'     \item{\strong{[SET]} :: \code{c:{comp_id}:ready}}
+#'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+#'     \item{\strong{[HASH]} :: \code{c:{comp_id}:pred:{match_id}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #'
 #' @return Returns a match dataframe containing all match information to update
 #'  events in a particular match. Redis is updated with match information.
@@ -238,8 +256,7 @@ aevent_info <- function(competitionID, matchIDs, matchEvents) {
 #' @export
 
 
-amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
-                        analysingToday = TRUE, KEYS) {
+amatch_info <- function(KEYS) {
   valuesToRetain <- c("id", "comp_id", "formatted_date", "season",
                       "week", "venue", "venue_id", "venue_city",
                       "status", "timer", "time", "localteam_id",
@@ -247,15 +264,14 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
                       "visitorteam_name", "visitorteam_score", "ht_score",
                       "ft_score", "et_score", "penalty_local", "penalty_visitor")
 
-  if (KEYS$TEST) {
-    matches <- footballstats::matchData
+  matches <-if (KEYS$TEST) {
+    footballstats::matchData
   } else {  # nocov start
-    matches <- footballstats::get_data(
+    footballstats::get_data(
       endpoint = paste0(
-        "/matches?comp_id=", competitionID, "&from_date=", dateFrom, "&to_date=", dateTo, "&"),
+        "/matches?comp_id=", KEYS$COMP, "&from_date=", KEYS$DATE_FROM, "&to_date=", KEYS$DATE_TO, "&"),
       KEYS = KEYS
     )
-    footballstats::request_limit()
   }  # nocov end
 
   if (matches %>% is.null %>% `!`()) {
@@ -279,16 +295,14 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 
       # Check if match belongs to set
       matchInSet <- rredis::redisSAdd(
-        set = paste0('c_matchSetInfo:', competitionID),
+        set = paste0('c_matchSetInfo:', KEYS$COMP),
         element = matchItems$id %>% as.character %>% charToRaw()
-      ) %>%
-        as.integer %>%
-        as.logical
+      ) %>% as.integer %>% as.logical
 
       if (matchInSet) {
         matchKey <- paste0(
           "csm:", matchItems$comp_id, ":",
-          seasonStarting, ":", matchItems$id
+          KEYS$SEASON, ":", matchItems$id
         )
 
         rredis::redisHMSet(
@@ -297,9 +311,9 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
         )
 
         # Push matches that have already been predicted to a set
-        if (rredis::redisExists(key = paste0('c:', competitionID, ':pred:', matchItems$id))) {
+        if (paste0('c:', KEYS$COMP, ':pred:', matchItems$id) %>% rredis::redisExists()) {
           rredis::redisSAdd(
-            set = paste0('c:', competitionID, ':ready'),
+            set = paste0('c:', KEYS$COMP, ':ready'),
             element = matchItems$id %>% as.character %>% charToRaw()
           )
         }
@@ -314,13 +328,23 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 
 #' @title aplayer_info
 #'
-#' @description A function that takes a competitionID and length of players to
+#' @description A function that takes a KEYS$COMP and length of players to
 #'  analyse. The playerID's are popped from a Redis list and queried. The player
 #'  stats are then stored in appropriate redis keys as necessary.
 #'
-#' @details Player stats infromation is stored in a hash map as;
-#'     ->   [ctps]:{comp_id}:{team_id}:{player_id}:{season}:[_stats_`statType`_]   ->   [HASH]
+#' @details API endpoints;
+#'   \itemize{
+#'     \item{\emph{"/player/{player_id}?Authorization={auth_id}"}}
+#'   }
 #'
+#'  Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[LIST]} :: \code{analysePlayers}}
+#'     \item{\strong{[HASH]} :: \code{ctps_**:{comp_id}:{team_id}:{player_id}:{season}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #' @param playerLength An integer value that defines the number of players to
 #'  analyse for a given list of ID's previously generated.
 #'
@@ -329,7 +353,7 @@ amatch_info <- function(competitionID, dateFrom, dateTo, seasonStarting,
 #' @export
 
 
-aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
+aplayer_info <- function(KEYS, playerLength) {
   valuesToRetain <- c("id", "common_name", "name", "firstname",
                       "lastname", "team", "teamid", "nationality",
                       "birthdate", "age", "birthcountry",
@@ -345,14 +369,13 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
   sapply(1:playerLength, function(i) {
     playerID <- 'analysePlayers' %>% rredis::redisLPop()
 
-    if (KEYS$TEST) {  # nocov start
-      playerData <- footballstats::playerData
+    playerData <- if (KEYS$TEST) {  # nocov start
+      footballstats::playerData
     } else {
-      playerData <- footballstats::get_data(
+      footballstats::get_data(
         endpoint = paste0("/player/", playerID, "?"),
         KEYS = KEYS
       )
-      footballstats::request_limit()
     }  # nocov end
 
     if (playerData %>% is.null %>% `!`()) {
@@ -366,12 +389,12 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
             season <- substr(currentStat$season, 1, 4)
 
             seasonInt <- ifelse(
-              test = nchar(season) == 4,
-              yes = season %>% as.integer(),
+              test = season %>% nchar %>% `==`(4),
+              yes = season %>% as.integer,
               no = 0
             )
 
-            if (seasonInt == currentSeasonYear) {
+            if (seasonInt == KEYS$SEASON) {
               statKeyName <- paste0(
                 'ctps_', statNames[j], ':', currentStat$league_id, ':',
                 currentStat$id, ':', playerData$id, ':', season
@@ -393,21 +416,28 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
 
 #' @title ateam_info
 #'
-#' @description A function that takes a competitionID and integer value
+#' @description A function that takes a KEYS$COMP and integer value
 #'  with details of the teamID list for analysis. Each team is
 #'  queried by the API for relevant information and statistics are
 #'  stored.
 #'
-#' @details A number of information is stored.
-#'  The basic information is stored as;
-#'     ->   [ct_basic]:{comp_id}:{team_id}   ->   [HASH]
-#'  The team statistics is stored as;
-#'     ->   [ct_stats]:{comp_id}:{team_id}   ->   [HASH]
-#'  Player information relevent to the team is stored as;
-#'     ->   [ctp]:{comp_id}:{team_id}:{player_id}   ->   [HASH]
+#' @details API endpoints;
+#'   \itemize{
+#'     \item{\emph{"/team/{team_id}?Authorization={auth_id}"}}
+#'   }
 #'
-#' @param competitionID An integer defining the competitionID that the
-#'  team belongs to.
+#'  Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[SET]} :: \code{c_playerSetInfo}}
+#'     \item{\strong{[LIST]} :: \code{analyseTeams}}
+#'     \item{\strong{[LIST]} :: \code{analysePlayers}}
+#'     \item{\strong{[HASH]} :: \code{ct_basics:{comp_id}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{ct_stats:{comp_id}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{ctp:{comp_id}:{team_id}:{player_id}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction
+#'  options and also the API query information such as url.
 #' @param teamListLength An integer value that defines how long the list
 #'  containing teamID's is TeamID's are then popped from the list as they
 #'  are anaylsed.
@@ -418,7 +448,7 @@ aplayer_info <- function(playerLength, currentSeasonYear, KEYS) {
 #' @export
 
 
-ateam_info <- function(competitionID, teamListLength, KEYS) {
+ateam_info <- function(KEYS, teamListLength) {
   valuesToRetain <- c("team_id", "is_national", "name", "country",
                       "founded", "leagues", "venue_name", "venue_id",
                       "venue_surface", "venue_address", "venue_city",
@@ -433,79 +463,102 @@ ateam_info <- function(competitionID, teamListLength, KEYS) {
 
   for (i in 1:teamListLength) {
     utils::setTxtProgressBar(progressBar, i)
-    if (KEYS$TEST) {  # nocov start
-      teamData <- footballstats::teamData
+
+    teamID <- 'analyseTeams' %>% rredis::redisLPop()
+
+    teamData <- if (KEYS$TEST) {  # nocov start
+      footballstats::teamData
     } else {
-      teamID <- 'analyseTeams' %>% rredis::redisLPop()
-      teamData <- footballstats::get_data(
-        endpoint = paste0( "/team/", teamID, "?"),
+      footballstats::get_data(
+        endpoint = paste0("/team/", teamID, "?"),
         KEYS = KEYS
       )
-      footballstats::request_limit()
     }  # nocov end
 
-    if (teamData %>% is.null %>% `!`()) {
-      basic <- paste0("ct_basic:", competitionID, ":", teamData$team_id)
-      stats <- paste0("ct_stats:", competitionID, ":", teamData$team_id)
-      squad <- paste0("ctp:", competitionID, ":", teamData$team_id)
+    if (teamData %>% is.null) next
 
-      basicData <- teamData[valuesToRetain]
+    basic <- paste0("ct_basic:", KEYS$COMP, ":", teamData$team_id)
+    stats <- paste0("ct_stats:", KEYS$COMP, ":", teamData$team_id)
+    squad <- paste0("ctp:", KEYS$COMP, ":", teamData$team_id)
+
+    basicData <- teamData[valuesToRetain]
+    rredis::redisHMSet(
+      key = basic,
+      values = basicData
+    )
+
+    squadInfo <- teamData$squad
+    if (squadInfo %>% length %>% `<`(1)) next
+
+    for (k in 1:nrow(squadInfo)) {
+      playerID <- squadInfo$id[k]
+      squadPlayer <- paste0(squad, ":", playerID)
       rredis::redisHMSet(
-        key = basic,
-        values = basicData
+        key = squadPlayer,
+        values = squadInfo[k, ]
       )
 
-      squadInfo <- teamData$squad
-      if (length(squadInfo) > 0) {
-        for (k in 1:nrow(squadInfo)) {
-          playerID <- squadInfo$id[k]
-          squadPlayer <- paste0(squad, ":", playerID)
-          rredis::redisHMSet(
-            key = squadPlayer,
-            values = squadInfo[k, ]
-          )
+      # Check if player has been added to the set for analysis later.
+      # Or if it is ready to be updated after another match has been played.
+      newPlayers <- rredis::redisSAdd(
+        set = paste0('c_playerSetInfo'),
+        element = playerID %>% as.character() %>% charToRaw()
+      ) %>% as.integer %>% as.logical
 
-          # Check if player has been added to the set for analysis later.
-          # Or if it is ready to be updated after another match has been played.
-          newPlayers <- rredis::redisSAdd(
-            set = paste0('c_playerSetInfo'),
-            element = playerID %>% as.character() %>% charToRaw()
-          ) %>%
-            as.integer %>%
-            as.logical
-
-          if (newPlayers) {
-            rredis::redisLPush(
-              key = 'analysePlayers',
-              value = playerID %>% as.character() %>% charToRaw()
-            )
-          }
-        }
+      if (newPlayers) {
+        rredis::redisLPush(
+          key = 'analysePlayers',
+          value = playerID %>% as.character() %>% charToRaw()
+        )
       }
-      rredis::redisHMSet(
-        key = stats,
-        values = teamData$statistics
-      )
     }
+
+    rredis::redisHMSet(
+      key = stats,
+      values = teamData$statistics
+    )
+
   }
-
   close(progressBar)
-
 }
 
 #' @title Commentary Sub-function
+#'
+#' @description A function that is an abstraction from \code{acommentary_info} that
+#'  handles adding player statistics and general commentary information from a
+#'  commentary list.
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{cmp:{comp_id}:{match_id}:{player_id}}}
+#'   }
+#'
+#' @param matchID An integer ID representing a single match
+#'  as defined by the API.
+#' @param teamID An integer ID value representing a single team
+#'  as defined by the API.
+#' @param teamStats A list object that contains the teams commentary
+#'  statistics.
+#' @param commentary A list object that contains multiple items, including
+#'  the player information.
+#'
 #' @export
 
 
-commentary_sub <- function(competitionID, matchID, teamInfo, teamStats, commentary) {
+commentary_sub <- function(competitionID, matchID, teamID, teamStats, commentary) {
   rredis::redisHMSet(
-    key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamInfo),
+    key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamID),
     values = teamStats
   )
-  playerStats <- commentary$player %>%
-    purrr::when(is.null(.) ~ data.frame(), ~ .)
-  if (nrow(playerStats) > 0) {
-    for (j in 1:nrow(playerStats)) {
+  playerStats <- commentary$player %>% purrr::when(
+    is.null(.) ~ data.frame(), ~ .
+  )
+
+  # If any player stats exists then analyse them
+  pRow <- playerStats %>% nrow
+  if (pRow > 0) {
+    for (j in 1:pRow) {
       rredis::redisHMSet(
         key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
         values = playerStats[j, ]

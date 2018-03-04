@@ -5,37 +5,23 @@ rredis::redisFlushDB()
 
 test_that('Calculate data set built from features', {
 
-  matchData <- footballstats::amatch_info(
-    competitionID = competitionID,
-    dateFrom = NULL,
-    dateTo = NULL,
-    seasonStarting = seasonStarting,
-    KEYS = KEYS
-  )
+  # Add the match data to redis
+  matchData <- KEYS %>% footballstats::amatch_info()
 
   # Need to recreate it as new dates are created
-  matchData <- footballstats::recreate_matchdata(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting,
-    matchLimit = 1000
-  )
+  matchData <- KEYS %>% footballstats::recreate_matchdata()
 
-  footballstats::acommentary_info(
-    competitionID = competitionID,
+  KEYS %>% footballstats::acommentary_info(
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
-    visitorteam = matchData$visitorteam_id,
-    KEYS = KEYS
+    visitorteam = matchData$visitorteam_id
   )
 
   # Build league table
   matchData %>% footballstats::create_table()
 
   # Store positions on a weekly basis
-  footballstats::weekly_positions(
-    competitionID = competitionID,
-    seasonStarting = seasonStarting
-  )
+  KEYS %>% footballstats::weekly_positions()
 
   # Calculate the feature set
   totalData <- matchData %>% footballstats::calculate_data()
@@ -68,8 +54,8 @@ test_that('Calculate data set built from features', {
 
   uniqueResults <- totalData$res %>% unique
 
-  expect_that( 'L' %in% uniqueResults, is_true() )
-  expect_that( 'D' %in% uniqueResults, is_true() )
-  expect_that( 'W' %in% uniqueResults, is_true() )
+  expect_true( 'L' %in% uniqueResults )
+  expect_true( 'D' %in% uniqueResults )
+  expect_true( 'W' %in% uniqueResults )
 
 })
