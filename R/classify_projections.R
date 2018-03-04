@@ -97,9 +97,7 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs, matchDa
     floor %>%
     `+`(1)
 
-
   # Get the last known position of the two teams
-
   weekKeys <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':*') %>%
     rredis::redisKeys() %>%
     footballstats::get_weeks()
