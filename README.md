@@ -12,7 +12,8 @@ cat(' ## Installing footballstats \n ## ')
 library(devtools)
 
 devtools::install_github(
-  repo = "niallbenj/footballstats")
+  repo = "niallbenj/footballstats"
+)
 
 library(footballstats)
 
@@ -56,3 +57,11 @@ where the last token is the root path of where the above script is run from, e.g
   - Update `DESCRIPTION` file to required version (must be > than most recent `GIT` version).
   - Run `Rscript tag.R {v#}` inside root directory `/footballstats/`.
   - Update Github with the newest tag and binary that is produced from step 2.
+
+
+## Scripts
+There are a number of useful scripts for testing and building models. Make sure that `redis` is running on port `6379`.
+
+  - In order to run the tests on a local machine, run from the root directory;
+    - `Rscript demo/run_tests.R`
+  - To rebuild one of the data models with updated information in redis, run from the root directory;    - `Rscript demo/create_nn.R`
