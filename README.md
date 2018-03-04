@@ -64,4 +64,5 @@ There are a number of useful scripts for testing and building models. Make sure 
 
   - In order to run the tests on a local machine, run from the root directory;
     - `Rscript demo/run_tests.R`
-  - To rebuild one of the data models with updated information in redis, run from the root directory;    - `Rscript demo/create_nn.R`
+  - To rebuild one of the data models with updated information in redis, run from the root directory
+    - `Rscript demo/create_nn.R`
