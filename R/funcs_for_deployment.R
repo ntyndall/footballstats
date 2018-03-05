@@ -58,7 +58,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
+  competitions %>% subset(competitions$id %in% footballstats::allowed_comps())
 
   # Create the sink for output
   if (deployed) 'summary_pred' %>% footballstats::create_sink()
@@ -151,7 +151,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
+  competitions %>% subset(competitions$id %in% footballstats::allowed_comps())
 
   # Create the sink for adding data
   if (deployed) 'summary_adding' %>% footballstats::create_sink()
