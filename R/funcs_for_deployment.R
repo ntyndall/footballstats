@@ -49,7 +49,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
   # Get dates for querying fixutres now
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
-  KEYS$DATE_TO <- Sys.Date() %>% `+`(8) %>% footballstats::format_dates()
+  KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
