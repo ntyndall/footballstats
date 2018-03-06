@@ -25,6 +25,7 @@ form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0)
 #' @title Relative Form
 #' @export
 
+
 relative_form <- function(matchInfo, totalForm) {
   # Determine current match date
   currentDate <- matchInfo$formatted_date %>%
