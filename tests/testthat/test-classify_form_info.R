@@ -20,25 +20,23 @@ test_that('Calculate score based on vector of forms', {
 test_that("Send in a single commentary to see it is stored correctly", {
 
   # Get the match info coupled to the commentary
-  sing <- footballstats::matchData[1, ]
+  singleMatch <- footballstats::matchData[1, ]
 
   # The home team as the teamID
-  res <- footballstats::current_or_other(
-    singleMatch = sing,
+  res <- singleMatch %>% footballstats::current_or_other(
     teamID = sing$localteam_id
   )
 
-  expect_equal( sing$localteam_score %>% as.integer, res$current %>% as.integer )
-  expect_equal( sing$visitorteam_score %>% as.integer, res$other %>% as.integer )
+  expect_equal( singleMatch$localteam_score %>% as.integer, res$current )
+  expect_equal( singleMatch$visitorteam_score %>% as.integer, res$other )
 
   # The away team as the teamID
-  res <- footballstats::current_or_other(
-    singleMatch = sing,
+  res <- singleMatch %>% footballstats::current_or_other(
     teamID = sing$visitorteam_id
   )
 
-  expect_equal( sing$visitorteam_score %>% as.integer, res$current %>% as.integer )
-  expect_equal( sing$localteam_score %>% as.integer, res$other %>% as.integer )
+  expect_equal( singleMatch$visitorteam_score %>% as.integer, res$current )
+  expect_equal( singleMatch$localteam_score %>% as.integer, res$other )
 
 })
 
@@ -58,16 +56,17 @@ test_that("Create team form.", {
 
   matchData <- footballstats::matchData %>% footballstats::order_matchdata()
 
-  # Choose the first team from the ordered data set
+  # Choose a team from the ordered data set, this one is Arsenal.
   teamID <- matchData$localteam_id[2]
 
-  formList <- footballstats::team_form(
-    matchData = matchData,
+  formList <- matchData %>% footballstats::team_form(
     teamID = teamID
   )
 
-  numMatches <- sum(matchData[matchData$localteam_id == teamID, ] %>% nrow,
-      matchData[matchData$visitorteam_id == teamID, ] %>% nrow)
+  # Calculate the number of matches this team ID has played
+  numMatches <- matchData[c('localteam_id', 'visitorteam_id')] %>%
+    `==`(teamID) %>%
+    sum
 
   expect_equal( numMatches, formList[[1]] %>% length )
   expect_equal( numMatches, formList[[2]] %>% length )

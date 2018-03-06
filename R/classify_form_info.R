@@ -98,8 +98,8 @@ team_form <- function(matchData, teamID) {
 
     # Determine the result of the match for the current team
     footballstats::match_result(
-      scoreCurrent = scorers$current,
-      scoreOther = scorers$other
+      scoreHome = scorers$home,
+      scoreAway = scorers$away
     )
   })
   results %>% list(
@@ -110,41 +110,49 @@ team_form <- function(matchData, teamID) {
     return()
 }
 
-#' @title Current or Other
+#' @title Current Or Other
+#'
+#' @description Take a single slice of match data and a teamID
+#'  and work out whether the ID belongs to the home team or the away
+#'  team and return a list of the current teamIDs score and the other
+#'  teamIDs score (don't need to know this ID).
+#'
+#' @param singleMatch A list / data frame object that is a single slice
+#'  of a matchData data frame that contains information such as
+#'  localteam_id, localteam_score (plus visitorteam information and
+#'  scorelines etc).
+#' @param teamID An integer value that represents the team ID which
+#'  we want to determine the scoreline from.
+#'
+#' @return A named list object with \code{home} and \code{away} values,
+#'  which is inferred from the teamID.
+#'
+#' @examples
+#'  singleMatch <- list(localteam_id = '1000', localteam_score = '2')
+#'  result <- singleMatch %>% footballstats::current_or_other(teamID = 1000)
+#'  :: result == list(current = 2, other = ...)
+#'
 #' @export
 
 
 current_or_other <- function(singleMatch, teamID) {
-  currentTeam <- singleMatch[
-    (singleMatch == teamID %>% as.character) %>% which] %>% names
 
-  scoreCurrent <- singleMatch[
-    currentTeam %>%
-      purrr::when(
-        . == 'localteam_id' ~ 'localteam_score',
-        ~ 'visitorteam_score')] %>%
-    as.integer
+  # Assume localteam first, if not, then reverse the vector
+  order <- c('localteam_score', 'visitorteam_score')
+  if (singleMatch$visitorteam_id %>% as.integer %>% `==`(teamID)) order %<>% rev
 
-  scoreOther <- singleMatch[
-    currentTeam %>%
-      purrr::when(
-        . == 'localteam_id' ~ 'visitorteam_score',
-        ~ 'localteam_score')] %>%
-    as.integer
-
-  return(list(current = scoreCurrent, other = scoreOther))
+  # Return the score id's of the match slice as  integers
+  homeaway <- singleMatch[order] %>% as.integer
+  return(list(current = homeaway[1], other = homeaway[2]))
 }
 
-#' @title classify_match_result
+#' @title Match Result
 #'
 #' @description A function that returns a single character value of
 #'  'W' / 'L' / 'D' depending on the scores and which team scored them.
 #'
-#' @param scoreHome An integer value denoting the home team score.
-#' @param scoreAway An integer value denoting the away team score.
-#' @param homeOrAway A character vector which is either 'localteam_id'
-#'  or 'visitorteam_id', to conduct the correct operation on the two
-#'  score parameters.
+#' @param scoreCurrent An integer value denoting the home team score.
+#' @param scoreOther An integer value denoting the away team score.
 #'
 #' @return Returns one of 'W' / 'L' / 'D'.
 #'

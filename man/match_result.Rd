@@ -2,18 +2,14 @@
 % Please edit documentation in R/classify_form_info.R
 \name{match_result}
 \alias{match_result}
-\title{classify_match_result}
+\title{Match Result}
 \usage{
 match_result(scoreCurrent, scoreOther)
 }
 \arguments{
-\item{scoreHome}{An integer value denoting the home team score.}
+\item{scoreCurrent}{An integer value denoting the home team score.}
 
-\item{scoreAway}{An integer value denoting the away team score.}
-
-\item{homeOrAway}{A character vector which is either 'localteam_id'
-or 'visitorteam_id', to conduct the correct operation on the two
-score parameters.}
+\item{scoreOther}{An integer value denoting the away team score.}
 }
 \value{
 Returns one of 'W' / 'L' / 'D'.
