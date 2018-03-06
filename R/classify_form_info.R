@@ -1,12 +1,16 @@
-#' @title classify_form_to_int
+#' @title From Vector To Integer
 #'
 #' @description A function that converts a form vector e.g. 'WLD' into an integer
 #'  value defined by the function default values for win / lose / draw.
 #'
-#' @param oldForms A character string which contains either `W`, `L`, or `D`.
+#' @param oldForms A character string which contains either `W`, `L`, or `D`
+#'  of arbitrary length
 #' @param winPoints An integer defining the points accredited for a win.
 #' @param drawPoints Same as above for a draw.
 #' @param losePoints Same as above for a loss.
+#'
+#' @examples
+#'  'WLDW' %>% footballstats::form_to_int()
 #'
 #' @return An integer value defining the value of a teams form
 #'
@@ -14,15 +18,24 @@
 
 
 form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0) {
-  oldForms <- strsplit(oldForms, '')
-  newForms <- sapply(1:length(oldForms), function(x) {
-    wld <- oldForms[[x]]
-    as.integer((sum(wld == "W")*winPoints) + (sum(wld == "D")*drawPoints) + (sum(wld == "L")*losePoints))
-  })
-  return(newForms)
+  # Create a character vector of W / L / D
+  oldForms %<>% strsplit(split = '') %>% purrr::flatten_chr()
+
+  # Set up function to sum each of W / L / D
+  sumPts <- function(x) oldForms %>% `==`(x) %>% sum %>% return()
+
+  # Sum up all the available points
+  return(
+    'W' %>% sumPts() %>% `*`(winPoints) %>%
+      `+`('D' %>% sumPts() %>% `*`(drawPoints)) %>%
+      `+`('L' %>% sumPts() %>% `*`(losePoints))
+  )
 }
 
 #' @title Relative Form
+#'
+#' @description A function that ....
+#'
 #' @export
 
 

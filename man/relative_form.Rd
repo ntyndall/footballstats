@@ -6,3 +6,6 @@
 \usage{
 relative_form(matchInfo, totalForm)
 }
+\description{
+A function that ....
+}
