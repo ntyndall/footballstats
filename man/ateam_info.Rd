@@ -7,8 +7,8 @@
 ateam_info(KEYS, teamListLength)
 }
 \arguments{
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 
 \item{teamListLength}{An integer value that defines how long the list
 containing teamID's is TeamID's are then popped from the list as they

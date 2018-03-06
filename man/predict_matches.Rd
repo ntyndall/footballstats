@@ -7,7 +7,8 @@
 predict_matches(KEYS)
 }
 \arguments{
-\item{competitionID}{An integer value denoting the competition ID.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 }
 \value{
 Nothing. Print results to screen.

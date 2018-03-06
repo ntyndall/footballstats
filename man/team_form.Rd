@@ -12,9 +12,6 @@ be subsetting easily during the vectorized function.}
 
 \item{teamID}{A character string that denotes the current team being
 analysed.}
-
-\item{whichTeam}{A vector to denote either home / away team used in
-both subsetting and generating result of the matches.}
 }
 \value{
 Returns two lists nested inside one list.

@@ -63,8 +63,6 @@ relative_form <- function(matchInfo, totalForm) {
 #'  be subsetting easily during the vectorized function.
 #' @param teamID A character string that denotes the current team being
 #'  analysed.
-#' @param whichTeam A vector to denote either home / away team used in
-#'  both subsetting and generating result of the matches.
 #'
 #' @return Returns two lists nested inside one list.
 #'
@@ -72,7 +70,7 @@ relative_form <- function(matchInfo, totalForm) {
 
 
 team_form <- function(matchData, teamID) {
-  teamID <- teamID %>% as.integer()
+  teamID <- teamID %>% as.integer
   teamsResult <- dateOfMatch <- c()
   singleTeam <- matchData[matchData$localteam_id == teamID | matchData$visitorteam_id == teamID, ]
 
@@ -80,13 +78,15 @@ team_form <- function(matchData, teamID) {
   results <- sapply(1:nrow(singleTeam), function(x) {
     # Need to choose which current team is being analysed for each match.
     scorers <- footballstats::current_or_other(
-      singleMatch = singleTeam[x, ] %>% as.list(),
-      teamID = teamID)
+      singleMatch = singleTeam[x, ] %>% as.list,
+      teamID = teamID
+    )
 
     # Determine the result of the match for the current team
     footballstats::match_result(
       scoreCurrent = scorers$current,
-      scoreOther = scorers$other)
+      scoreOther = scorers$other
+    )
   })
   results %>% list(
     singleTeam$formatted_date %>%
@@ -109,14 +109,14 @@ current_or_other <- function(singleMatch, teamID) {
       purrr::when(
         . == 'localteam_id' ~ 'localteam_score',
         ~ 'visitorteam_score')] %>%
-    as.integer()
+    as.integer
 
   scoreOther <- singleMatch[
     currentTeam %>%
       purrr::when(
         . == 'localteam_id' ~ 'visitorteam_score',
         ~ 'localteam_score')] %>%
-    as.integer()
+    as.integer
 
   return(list(current = scoreCurrent, other = scoreOther))
 }
@@ -138,9 +138,8 @@ current_or_other <- function(singleMatch, teamID) {
 
 
 match_result <- function(scoreCurrent, scoreOther) {
-  return(c(scoreCurrent, scoreOther) %>%
-           purrr::when(
-             .[1] == .[2] ~ 'D',
-             .[1] > .[2] ~ 'W',
-             'L'))
+  return(
+    c(scoreCurrent, scoreOther) %>%
+      purrr::when(.[1] == .[2] ~ 'D', .[1] > .[2] ~ 'W', 'L')
+   )
 }

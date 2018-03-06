@@ -6,9 +6,8 @@
 #' @details A search for all matches in a particular subset is made in Redis, a data frame
 #'  is then constructed to rebuild the original API query and ordered by date.
 #'
-#' @param KEYS keys list...
-#' @param redisData An environment that defines the redis configuration where data is
-#'  to be searched for.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #'
 #' @return matchData. A data frame containing all the matches in a particular season.
 #'

@@ -1,4 +1,8 @@
 #' @title Predictions vs Actual Results
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
 #' @export
 
 
@@ -67,6 +71,9 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 #' @details This function is triggered via a CRON job,
 #'  and prints the results from a months worth of data
 #'  to the slack channel #reports
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #'
 #' @export
 

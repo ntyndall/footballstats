@@ -110,6 +110,10 @@ create_table <- function(matchData) {
 }
 
 #' @title Weekly Positions
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
 #' @export
 
 

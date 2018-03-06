@@ -6,6 +6,10 @@
 \usage{
 monthly_report(KEYS, month, year)
 }
+\arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+}
 \details{
 This function is triggered via a CRON job,
  and prints the results from a months worth of data

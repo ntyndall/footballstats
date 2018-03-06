@@ -7,6 +7,9 @@
 generate_predictions(KEYS, fixtureList)
 }
 \arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+
 \item{fixtureList}{A data frame containing match localteam vs. visitorteam
 information which CAN include actual results if testing == TRUE.}
 }

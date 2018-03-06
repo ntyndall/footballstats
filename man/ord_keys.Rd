@@ -6,3 +6,7 @@
 \usage{
 ord_keys(commentaryKeys, KEYS)
 }
+\arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+}

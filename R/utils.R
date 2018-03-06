@@ -107,7 +107,6 @@ start_season <- function() {
 #'  x calls per t time. So this function is checked each time before an
 #'  endpoint is hit and waits a given time if no requests are remaining.
 #'
-#'
 #' @param requestsAllowed An integer value that defines the number of requests
 #'  that can be made in a given time period.
 #' @param timePeriod An integer value in seconds that defines the time period

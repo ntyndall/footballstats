@@ -11,11 +11,8 @@ get_data(endpoint, KEYS)
 utilized to gather the data. The endpoint is accessed by concatenating the
 string HOST -> endpoint -> apiKey.}
 
-\item{apiKey}{An alphanumeric value that contains a given API_KEY
-which is loaded into the global environment to allow access to the endpoint.}
-
-\item{host}{An alphanumeric value that contains a given HOST
-which is loaded into the global environment to allow access to the endpoint.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 }
 \value{
 A list of data corresponding to the `endpoint` if status_code == 200

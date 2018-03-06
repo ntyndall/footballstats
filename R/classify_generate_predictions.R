@@ -3,6 +3,8 @@
 #' @description Another layer which can handle both normal fixture prediction
 #'  and also predicting a test data set with known results.
 #'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #' @param fixtureList A data frame containing match localteam vs. visitorteam
 #'  information which CAN include actual results if testing == TRUE.
 #'

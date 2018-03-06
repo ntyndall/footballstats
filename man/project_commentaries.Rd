@@ -6,3 +6,7 @@
 \usage{
 project_commentaries(KEYS, teamIDs, matchDate, matchID)
 }
+\arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+}

@@ -7,10 +7,8 @@
 recreate_matchdata(KEYS, matchLimit = 10000)
 }
 \arguments{
-\item{KEYS}{keys list...}
-
-\item{redisData}{An environment that defines the redis configuration where data is
-to be searched for.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 }
 \value{
 matchData. A data frame containing all the matches in a particular season.

@@ -174,6 +174,9 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 
 #' @title Commentary Feature
 #'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
 #' @export
 
 
@@ -212,6 +215,10 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
 }
 
 #' @title Relative Position Feature
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
 #' @export
 
 

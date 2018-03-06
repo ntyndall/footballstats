@@ -4,8 +4,9 @@
 #'  upcoming matches then with the current optimized SVM, attempts to predict
 #'  the results.
 #'
-#' @param competitionID An integer value denoting the competition ID.
-
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
 #' @return Nothing. Print results to screen.
 #'
 #' @export

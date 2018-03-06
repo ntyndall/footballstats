@@ -1,4 +1,8 @@
 #' @title Commentary Projection
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
 #' @export
 
 
@@ -130,6 +134,10 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
 
 #' @title Commentary Projection
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
 #' @export
 
 
