@@ -24,7 +24,7 @@ test_that("Send in a single commentary to see it is stored correctly", {
 
   # The home team as the teamID
   res <- singleMatch %>% footballstats::current_or_other(
-    teamID = sing$localteam_id
+    teamID = singleMatch$localteam_id
   )
 
   expect_equal( singleMatch$localteam_score %>% as.integer, res$current )
@@ -32,7 +32,7 @@ test_that("Send in a single commentary to see it is stored correctly", {
 
   # The away team as the teamID
   res <- singleMatch %>% footballstats::current_or_other(
-    teamID = sing$visitorteam_id
+    teamID = singleMatch$visitorteam_id
   )
 
   expect_equal( singleMatch$visitorteam_score %>% as.integer, res$current )

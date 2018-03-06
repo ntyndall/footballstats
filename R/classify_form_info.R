@@ -98,8 +98,8 @@ team_form <- function(matchData, teamID) {
 
     # Determine the result of the match for the current team
     footballstats::match_result(
-      scoreHome = scorers$home,
-      scoreAway = scorers$away
+      scoreHome = scorers$current,
+      scoreAway = scorers$other
     )
   })
   results %>% list(
