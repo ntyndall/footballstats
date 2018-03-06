@@ -42,20 +42,6 @@ test_that("Test that commentary data is sent to Redis.", {
     as.character
 
   expect_equal( commentaryKeys %>% length, 2 )
-  # Produces a list of available commentary names, Must be a total intersection
-  commentaryNames <- KEYS$COMP %>%
-    footballstats::available_commentaries()
-
-  expect_equal( commentaryNames %>% length, 9 )
-  expect_true( 'shots_total' %in% commentaryNames )
-  expect_true( 'shots_ongoal' %in% commentaryNames )
-  expect_true( 'fouls' %in% commentaryNames )
-  expect_true( 'corners' %in% commentaryNames )
-  expect_true( 'offsides' %in% commentaryNames )
-  expect_true( 'possesiontime' %in% commentaryNames )
-  expect_true( 'yellowcards' %in% commentaryNames )
-  expect_true( 'redcards' %in% commentaryNames )
-  expect_true( 'saves' %in% commentaryNames )
 
 })
 
@@ -110,14 +96,6 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
   }
   ongoalVec %<>% as.integer
 
-  averaged <- footballstats::commentary_stats(
-    commentary = commentaryKeys,
-    returnItems = c('shots_ongoal', 'saves')
-  )
-
-  expect_equal( averaged %>% length, 2 )
-  expect_equal( averaged %>% sort, c(5.5, 6.5) )
-
   # Put two dummy keys into Redis to calculate average better
   addedOngoal <- c(10, 14)
   for (i in 1:length(addedOngoal)) {
@@ -135,14 +113,7 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
 
   expect_equal( keyLen, 4 )
 
-  averaged <- footballstats::commentary_stats(
-    commentary = newKeys,
-    returnItems = 'shots_ongoal'
-  )
   totalStats <- c(ongoalVec, addedOngoal)
-
-  expect_equal( averaged %>% length, 1 )
-  expect_equal( averaged %>% round(digits = 2), totalStats %>% sum %>% `/`(keyLen) %>% round(digits = 2) )
 
 })
 
