@@ -10,8 +10,8 @@
 #'     \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #' @param matchIDs A character vector of matchIDs that match
 #'  the matchEvents.
 #' @param localteam An integer ID value representing the home team
