@@ -11,24 +11,23 @@
 #' @export
 
 
-predict_matches <- function(competitionID, competitionName, KEYS) {
+predict_matches <- function(KEYS) {
 
   # Get fixtures
   cat(paste0(Sys.time(), ' | About to report on results...\n'))
   fixtureList <- if (KEYS$TEST) {
     footballstats::matchData[60:70, ]
   } else { # nocov start
-    paste0("/matches?comp_id=", competitionID, "&from_date=", KEYS$DATE_FROM, "&to_date=", KEYS$DATE_TO, "&") %>%
+    paste0("/matches?comp_id=", KEYS$COMP, "&from_date=", KEYS$DATE_FROM, "&to_date=", KEYS$DATE_TO, "&") %>%
       footballstats::get_data(KEYS = KEYS)
   } # nocov end
 
   # Generate predictions based on actual fixtures!
   if (fixtureList %>% is.null %>% `!`()) {
-    numOfPredicted <- footballstats::generate_predictions(
-      fixtureList = fixtureList,
-      competitionName = competitionName,
-      KEYS = KEYS
-    )
+    numOfPredicted <- KEYS %>%
+      footballstats::generate_predictions(
+        fixtureList = fixtureList
+      )
     cat(paste0(Sys.time(), ' | Predicted a total of ', numOfPredicted, ' matches. \n'))
   } else {
     cat(paste0(Sys.time(), ' | No upcoming fixture in the next week! \n'))

@@ -13,16 +13,7 @@ rredis::redisConnect(
 rredis::redisSelect(3)
 
 # Set up enough keys for testing
-KEYS <<- list(
-  COMP= 1204,
-  SEASON = 2017,
-  DATE_FROM = NULL,
-  DATE_TO = NULL,
-  SLACK_PRNT = FALSE,
-  TEST = TRUE,
-  LOG_PRED = FALSE,
-  LOGGING = FALSE
-)
+KEYS <<- footballstats::keys_for_testing()
 
 # Run the tests!
 results <- testthat::test_dir(

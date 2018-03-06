@@ -27,13 +27,17 @@ sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  #
   prof <- footballstats::possible_env()
 
   if (c(fsHost, fsApikey, fsSlack) %>% nchar %>% `<`(1) %>% any) {
-    stop(paste0('Halting - please set environment variables for `FS_HOST`, `FS_APIKEY`, and `FS_SLACK`.',
-                '\n Possible locations include :: \n ',
-                paste(' -->', prof, collapse = '\n '),
-                '\n\n Current values are : \n',
-                paste0('FS_HOST = ', fsHost, '\n'),
-                paste0('FS_APIKEY = ', fsApikey, '\n'),
-                paste0('FS_SLACK = ', fsSlack, '\n')))
+    stop(
+      paste0(
+        'Halting - please set environment variables for `FS_HOST`, `FS_APIKEY`, and `FS_SLACK`.',
+        '\n Possible locations include :: \n ',
+        paste(' -->', prof, collapse = '\n '),
+        '\n\n Current values are : \n',
+        paste0('FS_HOST = ', fsHost, '\n'),
+        paste0('FS_APIKEY = ', fsApikey, '\n'),
+        paste0('FS_SLACK = ', fsSlack, '\n')
+      )
+    )
   } else {
     list(
       FS_HOST = fsHost,
@@ -42,7 +46,9 @@ sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  #
       SLACK_PRNT = printToSlack,
       TEST = testing,
       LOGGING = printToScreen,
-      LOG_PRED = storePred
+      LOG_PRED = storePred,
+      DAYS = 4,
+      STAND = 0.5
     ) %>%
     return()
   }
@@ -53,12 +59,17 @@ sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  #
 
 
 possible_env <- function() {  # nocov start
-  return(Filter(function(f) nchar(f) > 0, c(
-    Sys.getenv("R_PROFILE"),
-    file.path(Sys.getenv("R_HOME"), "etc", "Rprofile.site"),
-    Sys.getenv("R_PROFILE_USER"),
-    file.path(getwd(), ".Rprofile"))))
-
+  return(
+    Filter(
+      f = function(f) nchar(f) > 0,
+      x = c(
+        Sys.getenv("R_PROFILE"),
+        file.path(Sys.getenv("R_HOME"), "etc", "Rprofile.site"),
+        Sys.getenv("R_PROFILE_USER"),
+        file.path(getwd(), ".Rprofile")
+      )
+    )
+  )
 } # nocov end
 
 #' @title API Date Formatter
@@ -207,3 +218,18 @@ create_log_dir <- function() { # nocov start
     cat(paste0(' ## Log path exists already @ ', logPath, ' \n'))
   }
 } # nocov end
+
+
+#' @title Split, Map, and Flatten
+#'
+#' @export
+
+
+flatt <- function(keyVector, y) {
+  return(
+    keyVector %>%
+      strsplit(split = ':') %>%
+      purrr::map(y) %>%
+      purrr::flatten_chr()
+  )
+}

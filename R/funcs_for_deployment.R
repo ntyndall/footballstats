@@ -36,9 +36,6 @@
 
 predict_fixtures <- function(deployed = FALSE) { # nocov start
 
-  # Get season starting year
-  seasonStarting <- footballstats::start_season()
-
   # Obtain API and sensitive key information
   KEYS <<- footballstats::sensitive_keys(
     printToSlack = TRUE,
@@ -50,6 +47,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   # Get dates for querying fixutres now
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
   KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
+  KEYS$SEASON <- footballstats::start_season()
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -71,11 +69,9 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
     # Predict actual future results
     cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
-    footballstats::predict_matches(
-      competitionID = competitions$id[i],
-      competitionName = competitions$name[i],
-      KEYS = KEYS
-    )
+    KEYS$COMP <- competitions$id[i]
+    KEYS$COMP_NAME <- competitions$name[i]
+    KEYS %>% footballstats::predict_matches()
   }
 } # nocov end
 
@@ -151,7 +147,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions %>% subset(competitions$id %in% footballstats::allowed_comps())
+  competitions %<>% subset(competitions$id %in% footballstats::allowed_comps())
 
   # Create the sink for adding data
   if (deployed) 'summary_adding' %>% footballstats::create_sink()

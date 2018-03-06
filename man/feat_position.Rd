@@ -4,5 +4,5 @@
 \alias{feat_position}
 \title{Relative Position Feature}
 \usage{
-feat_position(competitionID, seasonStarting, matchID, teamIDs)
+feat_position(KEYS, matchID, teamIDs, matchDate = NULL)
 }

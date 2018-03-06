@@ -4,5 +4,5 @@
 \alias{project_form}
 \title{Commentary Projection}
 \usage{
-project_form(competitionID, seasonStarting, teamIDs)
+project_form(KEYS, teamIDs)
 }

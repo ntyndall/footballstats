@@ -2,124 +2,121 @@
 #' @export
 
 
-project_commentaries <- function(competitionID, seasonStarting, teamIDs, matchDate, KEYS) {
+project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
-  sVar <- if (KEYS$STAND %>% is.null) 0.3 else KEYS$STAND
-
+  # Initialise
   resSds <- resList <- weights <- c()
+  commKey <- paste0('cmt_commentary:', KEYS$COMP)
+
+  # Get the commentary names
+  commentaryNames <- footballstats::dataScales$commentaries %>%
+    strsplit(split = '[.]') %>%
+    purrr::map(1) %>%
+    purrr::flatten_chr() %>%
+    unique
+
+  # Loop over both teams
   for (j in 1:2) {
-    commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
+    commentaryKeys <- paste0(commKey, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
     if (commentaryKeys %>% is.null) break
 
     # If it does then continue on
     commentaryKeys %<>% as.character %>%
       footballstats::ord_keys(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting
+        KEYS = KEYS
       ) %>% rev
 
-    # --- WIP
-    matchIDs <- commentaryKeys %>% strsplit(split = ':') %>% purrr::map(3) %>% purrr::flatten_chr()
+    # Get all the relative positions
+    matchIDs <- commentaryKeys %>%
+      footballstats::flatt(y = 3)
+
     totalPositions <- data.frame(stringsAsFactors = FALSE)
     for (k in 1:(commentaryKeys %>% length)) {
-      otherTeam <- paste0('cmt_commentary:', competitionID, ':', matchIDs[k], ':*') %>%
-        rredis::redisKeys()
 
-      otherTeam %<>% strsplit(split = ':') %>% purrr::map(4) %>% purrr::flatten_chr()
-      otherTeam %<>% subset(otherTeam != teamIDs[j])
+      # Get the other team from the matchID
+      bothIDs <- paste0(commKey, ':', matchIDs[k], ':*') %>%
+        rredis::redisKeys() %>%
+        footballstats::flatt(y = 4)
 
-      positions <- footballstats::feat_position(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting,
+      # Get the positions from
+      positions <- KEYS %>% footballstats::feat_position(
         matchID = matchIDs[k],
-        teamIDs = c(teamIDs[j], otherTeam)
+        teamIDs = bothIDs
       )
+
+      # Bind to a total data frame
       totalPositions %<>% rbind(positions)
     }
-    # --- WIP
 
     # Get data frame of commentary metrics
-    bFrame <- commentaryKeys %>%
+    comMetrics <- commentaryKeys %>%
       footballstats::get_av(
-        commentaryNames = footballstats::dataScales$commentaries %>%
-          strsplit(split = '[.]') %>%
-          purrr::map(1) %>%
-          purrr::flatten_chr() %>%
-          unique
+        commentaryNames = commentaryNames
       )
 
+    # Get number of rows for commentary frame
+    comRows <- comMetrics %>% nrow
+
     # Check the commentary feature NA list (as database will not always have complete set)
-    naCount <- sapply(bFrame, function(x) x %>% is.na %>% sum) %>% as.integer
-    thresh <- bFrame %>% nrow %>% `/`(4)
+    naCount <- sapply(comMetrics, function(x) x %>% is.na %>% sum) %>% as.integer
+    thresh <- comRows %>% `/`(4)
     if (`>`(naCount, thresh) %>% any) next
-    bFrame[bFrame %>% is.na] <- 0
+    comMetrics[comMetrics %>% is.na] <- 0
 
     # Get the extremeties first
-    minss <- apply(bFrame, 2, min) %>% as.numeric
-    maxss <- apply(bFrame, 2, max) %>% as.numeric
+    minVals <- apply(comMetrics, 2, min) %>% as.numeric
+    maxVals <- apply(comMetrics, 2, max) %>% as.numeric
 
     # Only take the average of the last 4 matches!
-    if (bFrame %>% nrow %>% `<`(4)) next
-    bFrame <- bFrame[1:4, ]
+    if (comMetrics %>% nrow %>% `<`(KEYS$DAYS)) next
+    comMetrics <- comMetrics[1:KEYS$DAYS, ]
 
     # Adjust bFrame
-    tNew <- data.frame(stringsAsFactors = FALSE)
-    facts <- totalPositions$position.h %>% `/`(totalPositions$position.a) %>% `^`(sVar)
+    newMetrics <- data.frame(stringsAsFactors = FALSE)
+    facts <- totalPositions$position.h %>%
+      `/`(totalPositions$position.a) %>%
+      `^`(KEYS$STAND)
 
-    for (k in 1:(bFrame %>% nrow)) {
-      new <- bFrame[k, ] %>% `*`(facts[k]) %>% as.numeric
-      tNew %<>% rbind(new %>% pmax(minss) %>% pmin(maxss) %>% as.data.frame %>% t)
+    for (k in 1:KEYS$DAYS) {
+      # Adjust score by the factor
+      adjustedScore <- comMetrics[k, ] %>%
+        `*`(facts[k]) %>%
+        as.numeric
+
+      # Make sure factors dont exceed the bounds
+      newMetrics %<>% rbind(
+        adjustedScore %>%
+          pmax(minVals) %>%
+          pmin(maxVals) %>%
+          as.data.frame %>%
+          t
+      )
     }
-    names(tNew) <- names(bFrame)
-    bFrame <- tNew
+    names(newMetrics) <- names(comMetrics)
 
     # Calculate the average (and possible the standard deviation?)
-    resList %<>% c(apply(bFrame, 2, mean) %>% list)
-    resSds %<>% c(apply(bFrame, 2, stats::sd) %>% `/`(3))
+    resList %<>% c(apply(newMetrics, 2, mean) %>% list)
+    resSds %<>% c(apply(newMetrics, 2, stats::sd) %>% `/`(3))
   }
 
-  # I need to get teams playing positions
-  #######
-  startDate <- paste0('c_startDate:', competitionID, ':', seasonStarting) %>%
-    rredis::redisGet() %>%
-    as.integer
-
-  # Get the current date
-  currentDate <- matchDate %>%
-    as.Date(format = '%d.%m.%Y') %>%
-    as.integer
-
-  # Convert to week number
-  weekNum <- currentDate %>%
-    `-`(startDate) %>%
-    `/`(7) %>%
-    floor %>%
-    `+`(1)
-
-  # Get the last known position of the two teams
-  weekKeys <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':*') %>%
-    rredis::redisKeys() %>%
-    footballstats::get_weeks()
-
-  prevWeek <- weekKeys %>%
-    `[`(weekNum %>%
-          `-`(weekKeys) %>%
-          abs %>% which.min
+  # Get the positions of the two current teams
+  positions <- KEYS %>%
+    footballstats::feat_position(
+      matchID = matchID,
+      teamIDs = teamIDs,
+      matchDate = matchDate
     )
 
-  positions <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':', prevWeek) %>%
-    rredis::redisHGetAll() %>%
-    lapply(as.integer)
-
+  # Create an adjust object to tweak the resList
   adjust <- list(
-    home = positions[[teamIDs[1]]],
-    away = positions[[teamIDs[2]]],
-    min = minss,
-    max = maxss,
-    sVar = sVar
+    home = positions$position.h,
+    away = positions$position.a,
+    min = minVals,
+    max = maxVals,
+    sVar = KEYS$STAND
   )
-  #####
+
   # Return a mini frame containing commentary information
   commentaryFrame <- dataScales$commentaries %>%
     footballstats::handle_projections(
@@ -136,11 +133,11 @@ project_commentaries <- function(competitionID, seasonStarting, teamIDs, matchDa
 #' @export
 
 
-project_form <- function(competitionID, seasonStarting, teamIDs) {
+project_form <- function(KEYS, teamIDs) {
 
   resList <- forms <- c()
   for (j in 1:2) {
-    commentaryKeys <- paste0('cmt_commentary:', competitionID, ':*:', teamIDs[j]) %>%
+    commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
     if (commentaryKeys %>% is.null) break
 
@@ -148,21 +145,18 @@ project_form <- function(competitionID, seasonStarting, teamIDs) {
     commentaryKeys %<>%
       as.character %>%
       footballstats::ord_keys(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting
+        KEYS = KEYS
       )
 
     # Get match IDs
     matchIDs <- commentaryKeys %>%
-      strsplit(split = ':') %>%
-      purrr::map(3) %>%
-      purrr::flatten_chr()
+      footballstats::flatt(y = 3)
 
     # Needs to be 3 or more long
-    if (matchIDs %>% length %>% `<`(3)) next
+    if (matchIDs %>% length %>% `<`(KEYS$DAYS)) next
 
     # Construct matchData like obect
-    csmIDs <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs)
+    csmIDs <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs)
     cLen <- csmIDs %>% length
     matchData <- data.frame(stringsAsFactors = FALSE)
 
@@ -201,10 +195,17 @@ handle_projections <- function(frameNames, resList, adjust = NULL) {
     NA %>% rep(frameNames %>% length) %>% t
   } else {
     if (adjust %>% is.null %>% `!`()) {
-      adj <- adjust$home %>% `/`(adjust$away) %>% `^`(adjust$sVar)
-      resList[[1]] %<>% as.numeric %>% `*`(adj) %>% pmax(adjust$min) %>% pmin(adjust$max)
-      adj <- adjust$away %>% `/`(adjust$home) %>% `^`(adjust$sVar)
-      resList[[2]] %<>% as.numeric %>% `*`(adj) %>% pmax(adjust$min) %>% pmin(adjust$max)
+
+      # Get fraction between home and away
+      fr <- adjust$home %>% `/`(adjust$away)
+      for (i in 1:2) {
+        if (i == 2) fr %<>% `^`(-1) # Inverse for away / home
+        resList[[i]] %<>%
+          as.numeric %>%
+          `*`(fr %>% `^`(adjust$sVar)) %>%
+          pmax(adjust$min) %>%
+          pmin(adjust$max)
+      }
     }
     resList %>% purrr::flatten_dbl() %>% t
   }

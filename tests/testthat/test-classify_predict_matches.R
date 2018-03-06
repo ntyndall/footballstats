@@ -17,14 +17,10 @@ test_that('Classify all - end to end from adding data to classifying and predict
   matchData %<>% footballstats::order_matchdata()
   matchData %>% footballstats::create_table()
   KEYS %>% footballstats::weekly_positions()
-  
+
   # Create the predictions here
   KEYS$LOG_PRED <- TRUE
-  footballstats::predict_matches(
-    competitionID = KEYS$COMP,
-    competitionName = 'test-competition',
-    KEYS = KEYS
-  )
+  KEYS %>% footballstats::predict_matches()
   KEYS$LOG_PRED <- FALSE
 
   predictions <- 'csdm_pred:1204:*' %>%

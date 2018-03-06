@@ -26,7 +26,7 @@ calculate_data <- function(matchData, logger = FALSE) {
   )
 
   # Infer the season
-  seasonStarting <- matchData$season %>% footballstats::prs_season()
+  KEYS$SEASON <- matchData$season %>% footballstats::prs_season()
   mDat <- data.frame(stringsAsFactors = FALSE)
 
   # Data rows
@@ -51,11 +51,11 @@ calculate_data <- function(matchData, logger = FALSE) {
     # Take a single slice of match data at a time
     matchSlice <- matchData[i, ]
     matchID <- matchSlice$id %>% as.integer
-    competitionID <- matchSlice$comp_id
+    KEYS$COMP <- matchSlice$comp_id
     teamIDs <- c(matchSlice$localteam_id, matchSlice$visitorteam_id)
 
     # Get single match information
-    singleMatchInfo <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchID) %>%
+    singleMatchInfo <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchID) %>%
       rredis::redisHGetAll()
 
     # 0) datSlice contains the match ID from the start
@@ -69,7 +69,7 @@ calculate_data <- function(matchData, logger = FALSE) {
     # 1) Get commentary information (Initialise datSlice)
     datSlice %<>% cbind(
       footballstats::feat_commentaries(
-        competitionID = competitionID,
+        KEYS = KEYS,
         matchID = matchID,
         teamIDs = teamIDs,
         commentaryNames = allowedNames
@@ -100,8 +100,7 @@ calculate_data <- function(matchData, logger = FALSE) {
     # Get relative position
     datSlice %<>% cbind(
       footballstats::feat_position(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting,
+        KEYS = KEYS,
         matchID = matchID,
         teamIDs = teamIDs
       )
@@ -178,11 +177,11 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 #' @export
 
 
-feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) {
+feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
 
   cResults <- c()
   for (j in 1:2) {
-    commentaryKey <- paste0('cmt_commentary:', competitionID, ':', matchID, ':', teamIDs[j]) %>%
+    commentaryKey <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[j]) %>%
       rredis::redisKeys() %>% as.character
 
     # Check commentary key exists
@@ -216,19 +215,25 @@ feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) 
 #' @export
 
 
-feat_position <- function(competitionID, seasonStarting, matchID, teamIDs) {
+feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
 
   # Get the start date
-  startDate <- paste0('c_startDate:', competitionID, ':', seasonStarting) %>%
+  startDate <- paste0('c_startDate:', KEYS$COMP, ':', KEYS$SEASON) %>%
     rredis::redisGet() %>%
     as.integer
 
   # Get the current date
-  currentDate <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchID) %>%
-    rredis::redisHGet(field = 'formatted_date') %>%
-    as.character %>%
-    as.Date(format = '%d.%m.%Y') %>%
-    as.integer
+  currentDate <- if (matchDate %>% is.null) {
+    paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchID) %>%
+      rredis::redisHGet(field = 'formatted_date') %>%
+      as.character %>%
+      as.Date(format = '%d.%m.%Y') %>%
+      as.integer
+  } else {
+    matchDate %>%
+      as.Date(format = '%d.%m.%Y') %>%
+      as.integer
+  }
 
   # Convert to week number
   weekNum <- currentDate %>%
@@ -237,8 +242,18 @@ feat_position <- function(competitionID, seasonStarting, matchID, teamIDs) {
     floor %>%
     `+`(1)
 
+  # Position key
+  posKey <- paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':')
+
+  # Get the last known position of the two teams
+  weekKeys <- posKey %>%
+    paste0('*') %>%
+    rredis::redisKeys() %>%
+    footballstats::get_weeks()
+
   # Get the positions from the week being investigated
-  positions <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':', weekNum) %>%
+  positions <- posKey %>%
+    paste0(weekKeys %>% `[`(weekNum %>% `-`(weekKeys) %>% abs %>% which.min)) %>%
     rredis::redisHGetAll() %>%
     lapply(as.integer)
 

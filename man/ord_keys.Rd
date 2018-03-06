@@ -4,5 +4,5 @@
 \alias{ord_keys}
 \title{ord keys}
 \usage{
-ord_keys(commentaryKeys, competitionID, seasonStarting)
+ord_keys(commentaryKeys, KEYS)
 }

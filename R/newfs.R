@@ -3,15 +3,13 @@
 #' @export
 
 
-ord_keys <-function(commentaryKeys, competitionID, seasonStarting) {
+ord_keys <-function(commentaryKeys, KEYS) {
 
   # Get the dates just incase and make sure they are in order:
   matchIDs <- commentaryKeys %>%
-    strsplit(split = ':') %>%
-    purrr::map(3) %>%
-    purrr::flatten_chr()
+    footballstats::flatt(y = 3)
 
-  csmIDs <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchIDs)
+  csmIDs <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs)
 
   dates <- c()
   for (k in 1:(csmIDs %>% length)) {
@@ -41,16 +39,21 @@ ord_keys <-function(commentaryKeys, competitionID, seasonStarting) {
 get_frm <- function(df, teamID, matchData) {
   formResults <- footballstats::team_form(
     matchData = matchData,
-    teamID = teamID)
+    teamID = teamID
+  )
 
   # Create a data frame of forms and dates.
   totalForm <- data.frame(
     date = formResults[[2]],
     form = formResults[[1]],
-    stringsAsFactors = FALSE)
+    stringsAsFactors = FALSE
+  )
   nr <- totalForm %>% nrow
 
-  df[['form']] <- totalForm$form[c((nr - 2):nr)] %>% rev %>% paste(collapse = '') %>% footballstats::form_to_int()
+  df[['form']] <- totalForm$form[c((nr - 2):nr)] %>%
+    rev %>%
+    paste(collapse = '') %>%
+    footballstats::form_to_int()
   df %>% return()
 }
 

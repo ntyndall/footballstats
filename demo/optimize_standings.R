@@ -3,26 +3,52 @@
 # Optimization
 uniqueComps <- totalData$comp_id %>% unique
 
-standVar <- seq(from = 0.05, to = 0.5, by = 0.05)
+standVar <- seq(from = 1, to = 0.5, by = -0.05)
+daysVar <- seq(from = 3, to = 5, by = 1)
 footballstats::redis_con()
+summaryStats <- data.frame(stringsAsFactors = FALSE)
 KEYS$LOGGING <- FALSE
 
-for (i in 1:(standVar %>% length)) {
-  KEYS$STAND <- standVar[i]
+tmp <- tempfile()
+Rprof(tmp)
+for (k in 1:(daysVar %>% length)) {
+  # Increment the days
+  KEYS$DAYS <- daysVar[k]
+  for (i in 1:(standVar %>% length)) {
+    # Incremement the standing variable constant
+    KEYS$STAND <- standVar[i]
 
-  totalCorrect <- 0
-  for (j in 1:(uniqueComps %>% length)) {
-    testData <- totalData %>% subset(totalData$comp_id == uniqueComps[j])
-    correct <- footballstats::generate_predictions(
-      fixtureList = testData,
-      competitionName = 'test',
-      KEYS = KEYS
-    )
-    per <- correct %>% `/`(testData %>% nrow) %>% scales::percent()
-    cat('\n  ## ', per, ' accurate [', standVar[i], '] \n')
-    totalCorrect %<>% `+`(correct)
+    totalCorrect <- 0
+    for (j in 1:(uniqueComps %>% length)) {
+      testData <- totalData %>% subset(totalData$comp_id == uniqueComps[j])
+      subComp <- competitions %>% subset(competitions$id == uniqueComps[j])
+      singleLeague <- paste0(subComp$name, ' :: ', subComp$region)
+      KEYS$COMP_NAME <- subComp$name
+
+      if (j > 1) next
+      # Run to generate the fixtures (only the first 10 for now!)
+      correct <- KEYS %>% footballstats::generate_predictions(
+        fixtureList = testData
+      )
+
+      per <- correct %>% `/`(testData %>% nrow) %>% scales::percent()
+      cat('\n  ## ', singleLeague, '::', per, '{ DAY =', KEYS$DAYS, '/ STAND =', KEYS$STAND, '} \n')
+      totalCorrect %<>% `+`(correct)
+
+      # Save the total summary Statistics
+      summaryStats %<>% rbind(
+        data.frame(
+          name = subComp$name,
+          region = subComp$region,
+          days = KEYS$DAYS,
+          standVar = KEYS$STAND,
+          accuracy = per,
+          stringsAsFactors = FALSE
+        )
+      )
+    }
+
+    #per <- totalCorrect %>% `/`(totalData %>% nrow) %>% scales::percent()
+    #cat('\n ## Total = ', per, ' accurate [', standVar[i], '] \n')
   }
-
-  per <- totalCorrect %>% `/`(totalData %>% nrow) %>% scales::percent()
-  cat('\n Total! \n ## ', per, ' accurate [', standVar[i], '] \n')
 }

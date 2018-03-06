@@ -4,7 +4,7 @@
 \alias{predict_matches}
 \title{classify_predict_matches}
 \usage{
-predict_matches(competitionID, competitionName, KEYS)
+predict_matches(KEYS)
 }
 \arguments{
 \item{competitionID}{An integer value denoting the competition ID.}
