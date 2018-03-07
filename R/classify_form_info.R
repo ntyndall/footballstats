@@ -98,8 +98,8 @@ team_form <- function(matchData, teamID) {
 
     # Determine the result of the match for the current team
     footballstats::match_result(
-      scoreHome = scorers$current,
-      scoreAway = scorers$other
+      scoreCurrent = scorers$current,
+      scoreOther = scorers$other
     )
   })
   results %>% list(
@@ -130,7 +130,7 @@ team_form <- function(matchData, teamID) {
 #' @examples
 #'  singleMatch <- list(localteam_id = '1000', localteam_score = '2')
 #'  result <- singleMatch %>% footballstats::current_or_other(teamID = 1000)
-#'  :: result == list(current = 2, other = ...)
+#'  # result == list(current = 2, other = ...)
 #'
 #' @export
 
