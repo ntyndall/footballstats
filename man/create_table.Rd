@@ -6,8 +6,20 @@
 \usage{
 create_table(matchData)
 }
+\arguments{
+\item{matchData}{A data frame that contains rows of single matches
+that have been played between two teams.}
+}
+\value{
+Nothing. The points and goal information is stored in redis.
+}
 \description{
-MAKE SURE THE MATCH DATA IS RECREATED!!
+A function that takes a data frame of matchData and recreates
+ the league table by adding points on a weekly basis based on the date
+ timestamps of the data frame.
+
+ Make sure the match data has been recreated, i.e. it needs to be stored
+ in redis, then ordered by date to work.
 }
 \details{
 Redis Keys used;

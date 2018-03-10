@@ -1,5 +1,10 @@
 #' @title Predictions vs Actual Results
 #'
+#' @description A function that takes the prediction keys and the gathered
+#'  matchData and decides whether the match has been played and then decides
+#'  whether the match was a 'W' / 'L' / 'D' pivoted on the home team,
+#'  and checks the prediction if it was correct (T) or incorrect (F).
+#'
 #' @details Redis Keys used;
 #'   \itemize{
 #'     \item{\strong{[HASH]} :: \code{csdm_pred:{comp_id}:{season}:{month}:{match_id}}}
@@ -7,6 +12,12 @@
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
+#' @param readyToAnalyse A character vector of the form of the redis keys.
+#' @param matches A data frame that contains rows of single matches
+#'  that have been played between two teams.
+#'
+#' @return Nothing. The prediction key for a particular match is updated with
+#'  a T or F whether the prediction was true or false.
 #'
 #' @export
 
@@ -79,6 +90,13 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
+#' @param month An integer value defining the month that the match was
+#'  played in.
+#' @param year An integer value defining the season that the match was
+#'  played in.
+#'
+#' @return Nothing. The monthly report is either printed to screen or
+#'  sent directly to Slack.
 #'
 #' @export
 

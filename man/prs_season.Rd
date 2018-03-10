@@ -6,3 +6,15 @@
 \usage{
 prs_season(mSeasons)
 }
+\arguments{
+\item{mSeasons}{A character vector of the form
+2017/2018. (Can also take multiple, not sure of the
+benefit just yet)}
+}
+\value{
+A character string of yyyy format.
+}
+\description{
+A function that takes a season form
+ and returns the correct season starting value.
+}

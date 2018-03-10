@@ -34,7 +34,17 @@ form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0)
 
 #' @title Relative Form
 #'
-#' @description A function that ....
+#' @description A function that calculates the relative form from an
+#'  arbitrary date, derived from the current date found in matchInfo and
+#'  the data frame of total results and the dates which they happened.
+#'
+#' @param matchInfo A list / data frame object that is a slice of data
+#'  of the form of matchData, which contains useful match information and
+#'  the date.
+#' @totalForm A named list object which contains the \code{$date} and \code{$form}
+#'  values, each vector is of equal length.
+#'
+#' @return An integer value of the current relative form as an integer.
 #'
 #' @export
 
@@ -69,18 +79,17 @@ relative_form <- function(matchInfo, totalForm) {
 }
 
 
-#' @title classify_team_form
+#' @title Team Form
 #'
 #' @description A function that generates both the team form and date of
-#'  the match in a list. A list is generated for both of these in terms
-#'  of a home and away list.
+#'  a particular team.
 #'
-#' @param matchData A dataframe containing all the match data, so it can
-#'  be subsetting easily during the vectorized function.
+#' @param matchData A data frame that contains rows of single matches
+#'  that have been played between two teams.
 #' @param teamID A character string that denotes the current team being
 #'  analysed.
 #'
-#' @return Returns two lists nested inside one list.
+#' @return Returns a named list with `date` and `form`.
 #'
 #' @export
 

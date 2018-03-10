@@ -6,3 +6,18 @@
 \usage{
 flatt(keyVector, y)
 }
+\arguments{
+\item{keyVector}{A character vector of redis keys of the form
+a:b:c.}
+
+\item{y}{An integer value to define where to split and flatten the
+keys, i.e. if y = 2 split on a: _ : b}
+}
+\value{
+A character vector of the values on the split.
+}
+\description{
+A function that is used in multiple locations
+ to help split the redis key format at a particular value
+ around the ':'.
+}

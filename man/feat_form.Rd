@@ -7,12 +7,17 @@
 feat_form(matchData, teamIDs, singleMatchInfo)
 }
 \arguments{
-\item{matchData}{A data frame}
+\item{matchData}{A data frame that contains rows of single matches
+that have been played between two teams.}
 
-\item{teamIDs}{An integer vector that contains c(home_id, away_id).}
+\item{teamIDs}{A character vector of length two, containing the home team
+and away team in that order.}
 
 \item{singleMatchInfo}{A data frame with one row that contains
 important match information between two teams.}
+}
+\value{
+A data frame with two columns, `form.h` and `form.a`.
 }
 \description{
 A function that takes a matchData data frame and two

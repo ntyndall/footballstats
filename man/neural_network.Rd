@@ -10,3 +10,12 @@ neural_network(totalData)
 \item{totalData}{A data set that contains scaled data
 and a vector of results as a column in the data frame.}
 }
+\value{
+A neural network model built from \code{totalData}
+ which is of class 'nn'.
+}
+\description{
+A function that takes a scaled data set
+ builds a neural network and reports on the accuracy
+ of the built model.
+}

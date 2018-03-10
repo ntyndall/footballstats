@@ -1,4 +1,4 @@
-#' @title get_data
+#' @title Get Data
 #'
 #' @description A function that generates JSON data from a particular
 #'  endpoint provided to the function as a string.
@@ -9,8 +9,8 @@
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
 #'
-#' @return A list of data corresponding to the `endpoint` if status_code == 200
-#' @return Null for an appropriate response if status_code != 200
+#' @return A list of data corresponding to the `endpoint` if status_code == 200,
+#'  or NULL for an appropriate response if status_code != 200
 #'
 #' @export
 

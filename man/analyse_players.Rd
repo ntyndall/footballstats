@@ -6,6 +6,13 @@
 \usage{
 analyse_players(deployed = FALSE)
 }
+\arguments{
+\item{deployed}{A boolean value to indicate whether the
+function is being run from a deployed environment.}
+}
+\value{
+Nothing. Redis is updated.
+}
 \description{
 A function that analyses players only,
  this is to be run as a CRON job in deployment.

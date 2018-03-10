@@ -4,5 +4,17 @@
 \alias{order_matchdata}
 \title{Order Match Dataset}
 \usage{
-order_matchdata(matchData, limit = 5000)
+order_matchdata(matchData)
+}
+\arguments{
+\item{matchData}{A data frame that contains rows of single matches
+that have been played between two teams.}
+}
+\value{
+A data frame that has been ordered by date.
+}
+\description{
+A function that takes an arbitrary data frame
+ consisting of match data and orders it by date in ascending
+ order.
 }

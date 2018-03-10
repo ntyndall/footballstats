@@ -6,3 +6,13 @@
 \usage{
 prs_comp(mComps)
 }
+\arguments{
+\item{mComps}{A character vector of competitionIDs.}
+}
+\value{
+A character vector of unique competitionIDs.
+}
+\description{
+A function that parses competitionIDs
+ and returns only the unique IDs.
+}

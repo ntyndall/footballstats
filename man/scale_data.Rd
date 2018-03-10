@@ -2,7 +2,21 @@
 % Please edit documentation in R/classify_utils.R
 \name{scale_data}
 \alias{scale_data}
-\title{Scale SVM Data}
+\title{Scale Data}
 \usage{
 scale_data(mDat, dataScales)
+}
+\arguments{
+\item{mDat}{A data frame that defines the data set used to build the model
+which is currently UNSCALED.}
+
+\item{dataScales}{A list which contains multiple information, including \code{sMax}
+and \code{sMin} which define the bounds of the \code{dataScale$commentaries} values.}
+}
+\value{
+A data frame the same size as \code{mDat}, which has now been scaled.
+}
+\description{
+A function that takes a data set and scals it based
+ on the scaling parameters that have already been calculated elsewhere.
 }

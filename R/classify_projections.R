@@ -1,5 +1,13 @@
 #' @title Commentary Projection
 #'
+#' @description A function that tries to project the values of the commentary
+#'  information by getting the raw commentary data of previous matches for the
+#'  two teamIDs. Variables are used, such as how many commentaries to look back on
+#'  to make the projection. Then the positions of those teams when they played the matches
+#'  are taken to try and normalise the commentary information as best as possible, this
+#'  squeezes data closer to try and see how well they actually played while trying to lift
+#'  the constraint of teams being physically better.
+#'
 #' @details Redis Keys used;
 #'   \itemize{
 #'     \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
@@ -7,6 +15,15 @@
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
+#' @param teamIDs A character vector of length two, containing the home team
+#'  and away team in that order.
+#' @param matchDate A character string of the matchDate API form, i.e. of
+#'  the form dd.mm.yyyy
+#' @param matchID A character string that represents the current matchID
+#'  under investigation.
+#'
+#' @return A data frame of projected commentary information based on the
+#'  data found in redis.
 #'
 #' @export
 
@@ -137,7 +154,10 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 }
 
 
-#' @title Commentary Projection
+#' @title Form Projection
+#'
+#' @description A function that projects the form of the two teams to the
+#'  build up of this match.
 #'
 #' @details Redis Keys used;
 #'   \itemize{
@@ -147,7 +167,10 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
+#' @param teamIDs A character vector of length two, containing the home team
+#'  and away team in that order.
 #'
+#' @return A data frame that contains two columns, `form.h` and `form.a`
 #' @export
 
 
@@ -168,7 +191,7 @@ project_form <- function(KEYS, teamIDs) {
     matchIDs <- commentaryKeys %>%
       footballstats::flatt(y = 3)
 
-    # Needs to be 3 or more long
+    # Needs to be KEYS$DAYS or more long
     if (matchIDs %>% length %>% `<`(KEYS$DAYS)) next
 
     # Construct matchData like obect
@@ -202,6 +225,21 @@ project_form <- function(KEYS, teamIDs) {
 }
 
 #' @title Handle Projections
+#'
+#' @description A function that is used to handle empty data
+#'  when trying to project the commentaries or form etc. It
+#'  creates a data frame of consistent format with the data
+#'  frame names provided. It can also make adjustments to
+#'  the results based on the adjust param.
+#'
+#' @param frameNames A character vector of names to assign to
+#'  the data frame columns.
+#' @param resList A list of length two, which contains the home
+#'  team and away team data in that order.
+#' @param adjust A list object to handle the commentary data so it
+#'  is tweaked based on the variable parameters.
+#'
+#' @return A data frame with column names defined by \code{frameNames}.
 #'
 #' @export
 

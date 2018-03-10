@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_data.R
 \name{get_data}
 \alias{get_data}
-\title{get_data}
+\title{Get Data}
 \usage{
 get_data(endpoint, KEYS)
 }
@@ -15,9 +15,8 @@ string HOST -> endpoint -> apiKey.}
 important variables and information. Also contains API information.}
 }
 \value{
-A list of data corresponding to the `endpoint` if status_code == 200
-
-Null for an appropriate response if status_code != 200
+A list of data corresponding to the `endpoint` if status_code == 200,
+ or NULL for an appropriate response if status_code != 200
 }
 \description{
 A function that generates JSON data from a particular

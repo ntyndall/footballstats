@@ -6,6 +6,16 @@
 \usage{
 relative_form(matchInfo, totalForm)
 }
+\arguments{
+\item{matchInfo}{A list / data frame object that is a slice of data
+of the form of matchData, which contains useful match information and
+the date.}
+}
+\value{
+An integer value of the current relative form as an integer.
+}
 \description{
-A function that ....
+A function that calculates the relative form from an
+ arbitrary date, derived from the current date found in matchInfo and
+ the data frame of total results and the dates which they happened.
 }

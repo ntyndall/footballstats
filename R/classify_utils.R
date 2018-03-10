@@ -1,7 +1,7 @@
 #' @title Recreate Match Data
 #'
-#' @description A function that provided with a competitionID and season start year,
-#'  can auto generate and order by date all the basic match information
+#' @description A function that can auto generate and order by date all
+#'  the basic match information if it exists in redis.
 #'
 #' @details Redis Keys used;
 #'   \itemize{
@@ -10,6 +10,8 @@
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
+#' @param matchLimit An integer value that cuts off the match data after this
+#'  value. Should really never need to be used.
 #'
 #' @return matchData. A data frame containing all the matches in a particular season.
 #'
@@ -48,17 +50,38 @@ recreate_matchdata <- function(KEYS, matchLimit = 10000) {
 }
 
 #' @title Order Match Dataset
+#'
+#' @description A function that takes an arbitrary data frame
+#'  consisting of match data and orders it by date in ascending
+#'  order.
+#'
+#' @param matchData A data frame that contains rows of single matches
+#'  that have been played between two teams.
+#'
+#' @return A data frame that has been ordered by date.
+#'
 #' @export
 
 
-order_matchdata <- function(matchData, limit = 5000) {
+order_matchdata <- function(matchData) {
   matchData$formatted_date %<>% as.Date('%d.%m.%Y')
   matchData <- matchData[matchData$formatted_date %>% order, ]
-  limit %<>% min(matchData %>% nrow)
-  return(matchData[1:limit, ])
+  return(matchData)
 }
 
 #' @title Commentary From Redis
+#'
+#' @description A function that retrieves the basic commentary
+#'  information from redis.
+#'
+#' @param keyName A character string that defines the redis key
+#'  where the commentary is stored.
+#' @param returnItems A character vector defining the names of the
+#'  fields in the commentary key in redis to be retrieved.
+#'
+#' @return A vector of integers that correspond to the \code{returnItem}
+#'  values requested.
+#'
 #' @export
 
 
@@ -96,7 +119,18 @@ commentary_from_redis <- function(keyName, returnItems) {
   )
 }
 
-#' @title Scale SVM Data
+#' @title Scale Data
+#'
+#' @description A function that takes a data set and scals it based
+#'  on the scaling parameters that have already been calculated elsewhere.
+#'
+#' @param mDat A data frame that defines the data set used to build the model
+#'  which is currently UNSCALED.
+#' @param dataScales A list which contains multiple information, including \code{sMax}
+#'  and \code{sMin} which define the bounds of the \code{dataScale$commentaries} values.
+#'
+#' @return A data frame the same size as \code{mDat}, which has now been scaled.
+#'
 #' @export
 
 
@@ -108,13 +142,13 @@ scale_data <- function(mDat, dataScales) {
   ) %>% as.data.frame
 
   if ('res' %in% (mDat %>% colnames)) scaled.data %<>% cbind(res = mDat$res)
-  scaled.data %>% return()
+  return(scaled.data)
 }
 
-#' @title Scale SVM Data
+#' @title Get Scales
 #'
 #' @details We subtract 1 from the data frame as the data set
-#'  MUST always have a leading column that contains labelled
+#'  MUST always have a trailing column that contains labelled
 #'  match data with 'W / D / L' etc. Also, one feature is not
 #'  permitted, so mDat must therefore have 3 or more columns.
 #'

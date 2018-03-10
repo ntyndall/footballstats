@@ -2,7 +2,7 @@
 #'
 #' @description A function that takes current statistical data and combines
 #'  a series of features into a data frame one at a time and returns a
-#'  data set ready for analysis
+#'  data set ready for analysis.
 #'
 #' @details Redis Keys used;
 #'   \itemize{
@@ -129,10 +129,14 @@ calculate_data <- function(matchData, logger = FALSE) {
 #'  to the match information passed. The functionality is looped for both
 #'  teamIDs.
 #'
-#' @param matchData A data frame
-#' @param teamIDs An integer vector that contains c(home_id, away_id).
+#' @param matchData A data frame that contains rows of single matches
+#'  that have been played between two teams.
+#' @param teamIDs A character vector of length two, containing the home team
+#'  and away team in that order.
 #' @param singleMatchInfo A data frame with one row that contains
 #'  important match information between two teams.
+#'
+#' @return A data frame with two columns, `form.h` and `form.a`.
 #'
 #' @export
 
@@ -175,6 +179,11 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 
 #' @title Commentary Feature
 #'
+#' @description A function that takes matchIDs, teamIDs, and commentaryNames
+#'  and tries to query the commentaries from redis to recreate the commentary
+#'  information. It is looped over twice for each match, one for the home team
+#'  and secondly for the away team.
+#'
 #' @details Redis Keys used;
 #'   \itemize{
 #'     \item{\strong{[HASH]} :: \code{cmt:_commentary:{comp_id}:{match_id}:{team_id}}}
@@ -182,6 +191,14 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
+#' @param matchID A character string that represents the current matchID
+#'  under investigation.
+#' @param teamIDs A character vector of length two, containing the home team
+#'  and away team in that order.
+#' @param commentaryNames A character vector of allowed commentaryNames to
+#'  be investigated.
+#'
+#' @return A data frame of commentary data for the home and away team.
 #'
 #' @export
 
@@ -200,11 +217,6 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
     availableNames <- commentaryKey %>% rredis::redisHGetAll() %>% names
     if (commentaryNames %in% availableNames %>% all %>% `!`()) break
 
-    commentary <- footballstats::commentary_from_redis(
-      keyName = commentaryKey,
-      returnItems = commentaryNames
-    )
-
     # Get Commentary results from Redis
     cResults %<>% c(
       footballstats::commentary_from_redis(
@@ -220,7 +232,13 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
     return()
 }
 
-#' @title Relative Position Feature
+#' @title League Position
+#'
+#' @description A function that takes a matchID, and the teams associated
+#'  to calculate their position in the league table whenever that match
+#'  was played. If there is no \code{matchDate} supplied then, a query
+#'  to redis to figure out the date of the match is carried out. The weekly
+#'  positions is queried to figure out the positions for that particular week.
 #'
 #' @details Redis Keys used;
 #'   \itemize{
@@ -230,6 +248,14 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
+#' @param matchID A character string that represents the matchID under
+#'  investigation.
+#' @param teamIDs A character vector of length two that contains the
+#'  two teams involved in the match in order of home and away.
+#' @param matchDate If NULL the date is queried by in the basic commentary
+#'  information, else a date of the form dd.mm.yyyy can be supplied.
+#'
+#' @return A data frame with two columns, `position.h` and `position.a`.
 #'
 #' @export
 

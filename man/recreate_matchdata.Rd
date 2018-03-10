@@ -9,13 +9,16 @@ recreate_matchdata(KEYS, matchLimit = 10000)
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
+
+\item{matchLimit}{An integer value that cuts off the match data after this
+value. Should really never need to be used.}
 }
 \value{
 matchData. A data frame containing all the matches in a particular season.
 }
 \description{
-A function that provided with a competitionID and season start year,
- can auto generate and order by date all the basic match information
+A function that can auto generate and order by date all
+ the basic match information if it exists in redis.
 }
 \details{
 Redis Keys used;

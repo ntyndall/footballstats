@@ -9,6 +9,24 @@ feat_commentaries(KEYS, matchID, teamIDs, commentaryNames)
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
+
+\item{matchID}{A character string that represents the current matchID
+under investigation.}
+
+\item{teamIDs}{A character vector of length two, containing the home team
+and away team in that order.}
+
+\item{commentaryNames}{A character vector of allowed commentaryNames to
+be investigated.}
+}
+\value{
+A data frame of commentary data for the home and away team.
+}
+\description{
+A function that takes matchIDs, teamIDs, and commentaryNames
+ and tries to query the commentaries from redis to recreate the commentary
+ information. It is looped over twice for each match, one for the home team
+ and secondly for the away team.
 }
 \details{
 Redis Keys used;

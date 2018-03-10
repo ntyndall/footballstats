@@ -10,6 +10,13 @@ weekly_positions(KEYS)
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
 }
+\value{
+Nothing. The weekly position of each team is stored in redis.
+}
+\description{
+A function that can take the data stored by \code{create_table} and
+ reproduce a list of standings for every team based on each week.
+}
 \details{
 Redis Keys used;
   \itemize{

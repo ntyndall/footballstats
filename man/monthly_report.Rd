@@ -9,6 +9,16 @@ monthly_report(KEYS, month, year)
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
+
+\item{month}{An integer value defining the month that the match was
+played in.}
+
+\item{year}{An integer value defining the season that the match was
+played in.}
+}
+\value{
+Nothing. The monthly report is either printed to screen or
+ sent directly to Slack.
 }
 \details{
 This function is triggered via a CRON job,
