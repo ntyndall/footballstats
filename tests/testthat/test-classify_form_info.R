@@ -23,17 +23,19 @@ test_that("Send in a single commentary to see it is stored correctly", {
   singleMatch <- footballstats::matchData[1, ]
 
   # The home team as the teamID
-  res <- singleMatch %>% footballstats::current_or_other(
-    teamID = singleMatch$localteam_id
-  )
+  res <- singleMatch %>%
+    footballstats::current_or_other(
+      teamID = singleMatch$localteam_id
+    )
 
   expect_equal( singleMatch$localteam_score %>% as.integer, res$current )
   expect_equal( singleMatch$visitorteam_score %>% as.integer, res$other )
 
   # The away team as the teamID
-  res <- singleMatch %>% footballstats::current_or_other(
-    teamID = singleMatch$visitorteam_id
-  )
+  res <- singleMatch %>%
+    footballstats::current_or_other(
+      teamID = singleMatch$visitorteam_id
+    )
 
   expect_equal( singleMatch$visitorteam_score %>% as.integer, res$current )
   expect_equal( singleMatch$localteam_score %>% as.integer, res$other )
@@ -54,7 +56,8 @@ test_that("Does the list return a character result of 'W' / 'L' / 'D' ", {
 
 test_that("Create team form.", {
 
-  matchData <- footballstats::matchData %>% footballstats::order_matchdata()
+  matchData <- footballstats::matchData %>%
+    footballstats::order_matchdata()
 
   # Choose a team from the ordered data set, this one is Arsenal.
   teamID <- matchData$localteam_id[2]
@@ -70,9 +73,9 @@ test_that("Create team form.", {
 
   expect_equal( numMatches, formList[[1]] %>% length )
   expect_equal( numMatches, formList[[2]] %>% length )
-  expect_equal( formList[[1]] %>% paste(collapse = ''), 'WDWWLWW' )
+  expect_equal( formList[[2]] %>% paste(collapse = ''), 'WDWWLWW' )
 
-  sortedDates <- formList[[2]] %>% sort
+  sortedDates <- formList[[1]] %>% sort
 
   expect_equal( sortedDates[1], 17418 )
   expect_equal( sortedDates[numMatches], 17467 )
