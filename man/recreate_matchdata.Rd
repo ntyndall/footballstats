@@ -4,14 +4,11 @@
 \alias{recreate_matchdata}
 \title{Recreate Match Data}
 \usage{
-recreate_matchdata(KEYS, matchLimit = 10000)
+recreate_matchdata(KEYS)
 }
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
-
-\item{matchLimit}{An integer value that cuts off the match data after this
-value. Should really never need to be used.}
 }
 \value{
 matchData. A data frame containing all the matches in a particular season.

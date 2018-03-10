@@ -10,23 +10,25 @@
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
-#' @param matchLimit An integer value that cuts off the match data after this
-#'  value. Should really never need to be used.
 #'
 #' @return matchData. A data frame containing all the matches in a particular season.
 #'
 #' @export
 
 
-recreate_matchdata <- function(KEYS, matchLimit = 10000) {
-  allMatches <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, '*') %>% rredis::redisKeys()
-  matchData <- data.frame(stringsAsFactors = FALSE)
-  if (!is.null(allMatches)) {
-    for (i in 1:length(allMatches)) {
-      singleMatch <- rredis::redisHGetAll(
-        key = allMatches[i]
-      )
+recreate_matchdata <- function(KEYS) {
 
+  # Get all the redis match keys
+  allMatches <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, '*') %>%
+    rredis::redisKeys()
+  matchData <- data.frame(stringsAsFactors = FALSE)
+  if (!(allMatches %>% is.null))   {
+    for (i in 1:length(allMatches)) {
+      # Get basic match info for each match
+      singleMatch <- allMatches[i] %>%
+        rredis::redisHGetAll()
+
+      # Recreate the data frame
       matchID <- data.frame(
         singleMatch %>% as.character %>% t,
         stringsAsFactors = FALSE
@@ -42,9 +44,7 @@ recreate_matchdata <- function(KEYS, matchLimit = 10000) {
     print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
   } else {
     # Re-order the dataframe by date.
-    matchData %<>% footballstats::order_matchdata(
-      limit = matchLimit
-    )
+    matchData %<>% footballstats::order_matchdata()
   }
   return(matchData)
 }
