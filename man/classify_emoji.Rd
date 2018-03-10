@@ -6,3 +6,16 @@
 \usage{
 classify_emoji()
 }
+\value{
+A hashmap of key-value pairs of icon name to be
+ printed to slack and the corresponding teamID.
+}
+\description{
+A hashmap of emoji's that are printed to slack
+ i.e. \code{:premier-ars:} and the corresponding teamID.
+}
+\details{
+In order to add a new icon, it must be resized that
+ slack accepts it. Give it a name, and assign it below here
+ with whichever competition.
+}

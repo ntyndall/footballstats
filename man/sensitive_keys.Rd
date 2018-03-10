@@ -2,29 +2,28 @@
 % Please edit documentation in R/utils.R
 \name{sensitive_keys}
 \alias{sensitive_keys}
-\title{sensitive_keys}
+\title{Sensitive Keys}
 \usage{
 sensitive_keys(printToSlack, printToScreen, testing, storePred)
 }
 \arguments{
-\item{printToSlack}{A boolean}
+\item{printToSlack}{A boolean on whether results should be returned
+to slack or not.}
 
-\item{testing}{A boolean}
+\item{printToScreen}{A boolean on whether results should be printed
+to screen or sink file or not.}
 
-\item{storePred}{A boolean}
+\item{testing}{A boolean to indicate whether tests are being run,
+so that preloaded data sets are used and API endpoints are generally
+avoided to test functionality rather than the endpoints.}
+
+\item{storePred}{A boolean to indicate whether to store predicted
+results in the prediction hash in redis.}
 }
 \value{
-Returns nothing.
+Returns a list of KEYS used by most functionality of \code{footballstats}.
 }
 \description{
 A function that loads all sensitive information into a
  global namespace for use throughout the code.
-}
-\details{
-Set up:
- \itemize{
- \item Fill in the  appropriate sensitive information.
-  \item Copy this file to sensitiveInfo.R and rename the
-    function to sensitiveInfo
-}
 }

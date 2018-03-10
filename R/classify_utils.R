@@ -6,6 +6,7 @@
 #' @details Redis Keys used;
 #'   \itemize{
 #'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}"{match_id}}}
+#'   }
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.

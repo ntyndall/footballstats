@@ -4,5 +4,18 @@
 \alias{redis_con}
 \title{Redis Connection}
 \usage{
-redis_con()
+redis_con(db = 1)
+}
+\arguments{
+\item{db}{An integer value that defines which DB should
+be accessed in redis.}
+}
+\value{
+Nothing. A redis connection is established which
+ is accessible through the \code{rredis::} set of commands.
+}
+\description{
+A function that checks to see if the
+ redis connection exists, if not then a new connection is
+ set up on the supplied db input value (Default = 1).
 }

@@ -1,5 +1,15 @@
 #' @title Emoji's for Slack
 #'
+#' @description A hashmap of emoji's that are printed to slack
+#'  i.e. \code{:premier-ars:} and the corresponding teamID.
+#'
+#' @details In order to add a new icon, it must be resized that
+#'  slack accepts it. Give it a name, and assign it below here
+#'  with whichever competition.
+#'
+#' @return A hashmap of key-value pairs of icon name to be
+#'  printed to slack and the corresponding teamID.
+#'
 #' @export
 
 classify_emoji <- function() { # nocov start

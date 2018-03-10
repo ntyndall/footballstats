@@ -17,3 +17,9 @@ matchData. A data frame containing all the matches in a particular season.
 A function that provided with a competitionID and season start year,
  can auto generate and order by date all the basic match information
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}"{match_id}}}
+  }
+}

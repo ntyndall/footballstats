@@ -15,8 +15,8 @@ Nothing. Print results to screen.
 }
 \description{
 A function that queries the endpoint and redis to obtain
- upcoming matches then with the current optimized SVM, attempts to predict
- the results.
+ upcoming matches then with the current model attempts to predict the
+ matches that are being played between \code{DATE_FROM} and \code{DATE_TO}
 }
 \details{
 API endpoints;

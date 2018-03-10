@@ -3,12 +3,13 @@
 
 
 prs_season <- function(mSeasons) {
-  mSeasons %>%
-    unique %>%
-    strsplit(split = '[/]') %>%
-    purrr::map(1) %>%
-    purrr::flatten_chr() %>%
-    return()
+  return(
+    mSeasons %>%
+      unique %>%
+      strsplit(split = '[/]') %>%
+      purrr::map(1) %>%
+      purrr::flatten_chr()
+  )
 }
 
 #' @title Parse Competition
@@ -16,9 +17,9 @@ prs_season <- function(mSeasons) {
 
 
 prs_comp <- function(mComps) {
-  mComps %>%
-    unique %>%
-    return()
+  return(
+    mComps %>% unique
+  )
 }
 
 #' @title Parse Full Time score
@@ -31,12 +32,13 @@ prs_comp <- function(mComps) {
 
 
 prs_ftscore <- function(ftScore) {
-  conv <- ftScore %>%
+  return(
+  ftScore %>%
     strsplit(split = '[[:punct:]]') %>%
     purrr::flatten_chr() %>%
     `[`(c(2:3)) %>%
-    as.integer %>%
-    return()
+    as.integer
+  )
 }
 
 #' @title Split, Map, and Flatten

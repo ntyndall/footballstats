@@ -2,7 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{start_season}
 \alias{start_season}
-\title{Current Season}
+\title{Start Season}
 \usage{
 start_season()
+}
+\value{
+A character string of the form yyyy.
+}
+\description{
+A function that tries to guess what the season value
+ is based on the month of the year, assuming that matches are
+ complete by month 7, so if the month is 8 and the year is 2020,
+ then the season is 2020/2021. However if the month is 1 and the year
+ is 2021 then the season is still 2020/2021.
 }

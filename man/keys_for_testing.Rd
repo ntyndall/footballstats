@@ -6,3 +6,11 @@
 \usage{
 keys_for_testing()
 }
+\value{
+A list of important key values, accessible through KEYS$...
+}
+\description{
+A function that sets up the \code{KEYS}
+ variable used throughout the package, with default parameters
+ that avoid API calls and printing to screen etc.
+}
