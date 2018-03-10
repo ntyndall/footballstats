@@ -84,7 +84,7 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 
 #' @title Create Monthly Report
 #'
-#' @details This function is triggered via a CRON job,
+#' @description This function is triggered via a CRON job,
 #'  and prints the results from a months worth of data
 #'  to the slack channel #reports
 #'

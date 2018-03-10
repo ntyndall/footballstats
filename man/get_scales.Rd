@@ -20,7 +20,7 @@ A list value with the following names :
   of sMax and sMin}
  }
 }
-\details{
+\description{
 We subtract 1 from the data frame as the data set
  MUST always have a trailing column that contains labelled
  match data with 'W / D / L' etc. Also, one feature is not

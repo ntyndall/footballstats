@@ -147,7 +147,7 @@ scale_data <- function(mDat, dataScales) {
 
 #' @title Get Scales
 #'
-#' @details We subtract 1 from the data frame as the data set
+#' @description We subtract 1 from the data frame as the data set
 #'  MUST always have a trailing column that contains labelled
 #'  match data with 'W / D / L' etc. Also, one feature is not
 #'  permitted, so mDat must therefore have 3 or more columns.

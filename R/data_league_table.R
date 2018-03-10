@@ -253,6 +253,13 @@ weekly_positions <- function(KEYS) {
 
 #' @title Get Weeks
 #'
+#' @description A function that is used by the data league table functionality
+#'  in order to extract the week information from the keys
+#'
+#' @param x A character vector of \code{cwt_l} style keys
+#'
+#' @return An integer vector of weeks that are defined in the redis keys.
+#'
 #' @export
 
 

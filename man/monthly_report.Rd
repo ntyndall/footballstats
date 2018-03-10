@@ -20,7 +20,7 @@ played in.}
 Nothing. The monthly report is either printed to screen or
  sent directly to Slack.
 }
-\details{
+\description{
 This function is triggered via a CRON job,
  and prints the results from a months worth of data
  to the slack channel #reports
