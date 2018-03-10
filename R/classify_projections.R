@@ -23,13 +23,12 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
   for (j in 1:2) {
     commentaryKeys <- paste0(commKey, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
-    if (commentaryKeys %>% is.null) break
+    if (commentaryKeys %>% is.null) break else commentaryKeys %<>% as.character
 
     # If it does then continue on
-    commentaryKeys %<>% as.character %>%
-      footballstats::ord_keys(
-        KEYS = KEYS
-      ) %>% rev
+    KEYS %>% footballstats::order_commentaries(
+      commentaryKeys = commentaryKeys
+    ) %>% rev
 
     # Get all the relative positions
     matchIDs <- commentaryKeys %>%
@@ -55,7 +54,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
     # Get data frame of commentary metrics
     comMetrics <- commentaryKeys %>%
-      footballstats::get_av(
+      footballstats::commentary_frame(
         commentaryNames = commentaryNames
       )
 
@@ -147,14 +146,12 @@ project_form <- function(KEYS, teamIDs) {
   for (j in 1:2) {
     commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
-    if (commentaryKeys %>% is.null) break
+    if (commentaryKeys %>% is.null) break else commentaryKeys %<>% as.character
 
     # If it does then continue on
-    commentaryKeys %<>%
-      as.character %>%
-      footballstats::ord_keys(
-        KEYS = KEYS
-      )
+    KEYS %>% footballstats::order_commentaries(
+      commentaryKeys = commentaryKeys
+    )
 
     # Get match IDs
     matchIDs <- commentaryKeys %>%
@@ -178,7 +175,7 @@ project_form <- function(KEYS, teamIDs) {
     }
 
     # Get average and append form on
-    forms %<>% footballstats::get_frm(
+    forms <- footballstats::form_from_matchdata(
       teamID = teamIDs[j],
       matchData = matchData
     )

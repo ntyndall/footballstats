@@ -1,4 +1,4 @@
-#' @title ord keys
+#' @title Order Commentaries
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
@@ -6,7 +6,7 @@
 #' @export
 
 
-ord_keys <-function(commentaryKeys, KEYS) {
+order_commentaries <-function(KEYS, commentaryKeys) {
 
   # Get the dates just incase and make sure they are in order:
   matchIDs <- commentaryKeys %>%
@@ -14,58 +14,56 @@ ord_keys <-function(commentaryKeys, KEYS) {
 
   csmIDs <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs)
 
-  dates <- c()
-  for (k in 1:(csmIDs %>% length)) {
-    dates %<>% c(
-      csmIDs[k] %>%
-        rredis::redisHGet(field = 'formatted_date') %>%
-        as.character
-    )
-  }
+  # Get formatted dates as a vector
+  dates <- csmIDs %>%
+    lapply(function(x) x %>% rredis::redisHGet(field = 'formatted_date')) %>%
+    lapply(as.character) %>%
+    purrr::flatten_chr()
 
   # Order keys by the formatted date
-  ordKeys <- commentaryKeys[
-    dates %>%
-      as.Date('%d.%m.%Y') %>%
-      as.integer %>%
-      order
-    ]
-
-  ordKeys %>% return()
+  return(
+    commentaryKeys %>%
+      `[`(dates %>% as.Date('%d.%m.%Y') %>% as.integer %>% order)
+  )
 }
 
-#' @title get frm
+#' @title Form From MatchData
+#'
+#' @description A function that takes a matchData data.frame
+#'  and a teamID and calculates the form cast as an integer
+#'  value.
+#'
+#' @param teamID ...
+#' @param matchData ...
+#'
+#' @return An integer value
 #'
 #' @export
 
 
-get_frm <- function(df, teamID, matchData) {
+form_from_matchdata <- function(teamID, matchData) {
+  # Calculate a list of form and dates
   formResults <- footballstats::team_form(
     matchData = matchData,
     teamID = teamID
   )
 
-  # Create a data frame of forms and dates.
-  totalForm <- data.frame(
-    date = formResults[[2]],
-    form = formResults[[1]],
-    stringsAsFactors = FALSE
+  # Return the LAST 3 form and calculate integer score
+  return(
+    formResults$form %>%
+      tail(3) %>%
+      rev %>%
+      paste(collapse = '') %>%
+      footballstats::form_to_int()
   )
-  nr <- totalForm %>% nrow
-
-  df[['form']] <- totalForm$form[c((nr - 2):nr)] %>%
-    rev %>%
-    paste(collapse = '') %>%
-    footballstats::form_to_int()
-  df %>% return()
 }
 
-#' @title get av
+#' @title Commentary Frame
 #'
 #' @export
 
 
-get_av <- function(orderedKeys, commentaryNames) {
+commentary_frame <- function(orderedKeys, commentaryNames) {
   bFrame <- data.frame(stringsAsFactors = FALSE)
   ln <- length(orderedKeys)
   for (i in 1:ln) {

@@ -139,34 +139,28 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
       teamID = teamIDs[j]
     )
 
-    # Create a data frame of forms and dates.
-    totalForm <- data.frame(
-      date = formResults[[2]],
-      form = formResults[[1]],
-      stringsAsFactors = FALSE
-    )
-
     # Find out form relative to current date.
     forms %<>% c(
       footballstats::relative_form(
         matchInfo = singleMatchInfo,
-        totalForm = totalForm
+        totalForm = formResults
       )
     )
   }
 
   # Calculate the difference in forms
   form <- if (forms %>% length %>% `!=`(2)) {
-    c(NA, NA)
+    list(NA, NA)
   } else {
-    footballstats::form_to_int(oldForms = forms)
+    # NEED TO RETURN TWO HERE!!!
+    forms %>% lapply(footballstats::form_to_int)
   }
 
   # Return the data frame with form as the only column
   return(
     data.frame(
-      `form.h` = form[1],
-      `form.a` = form[2],
+      `form.h` = form[[1]],
+      `form.a` = form[[2]],
       stringsAsFactors = FALSE
     )
   )

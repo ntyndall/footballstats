@@ -45,7 +45,9 @@ relative_form <- function(matchInfo, totalForm) {
     as.Date('%d.%m.%Y') %>%
     as.integer
 
+  totalForm %<>% as.data.frame
   # Determine total data frame of forms ordered highest to lowest
+
   totalForm <- totalForm[
     sort.int(
       x = totalForm$date,
@@ -84,7 +86,7 @@ relative_form <- function(matchInfo, totalForm) {
 
 
 team_form <- function(matchData, teamID) {
-  teamID <- teamID %>% as.integer
+  teamID %<>% as.integer
   teamsResult <- dateOfMatch <- c()
   singleTeam <- matchData[matchData$localteam_id == teamID | matchData$visitorteam_id == teamID, ]
 
@@ -102,12 +104,16 @@ team_form <- function(matchData, teamID) {
       scoreOther = scorers$other
     )
   })
-  results %>% list(
-    singleTeam$formatted_date %>%
-      as.Date('%d.%m.%Y') %>%
-      as.integer
-    ) %>%
-    return()
+
+  # Return a list of results
+  return(
+    list(
+      date = singleTeam$formatted_date %>%
+        as.Date('%d.%m.%Y') %>%
+        as.integer,
+      form = results
+    )
+  )
 }
 
 #' @title Current Or Other
