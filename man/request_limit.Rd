@@ -27,4 +27,9 @@ A function that stores the number of requests made to the
 The API is constrained to 1000 request per hour (default), or
  x calls per t time. So this function is checked each time before an
  endpoint is hit and waits a given time if no requests are remaining.
+
+ Redis Keys used;
+  \itemize{
+    \item{\strong{[KEY]} :: \code{requestLimit}}
+  }
 }

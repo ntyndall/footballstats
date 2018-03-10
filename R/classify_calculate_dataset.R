@@ -1,7 +1,8 @@
 #' @title Calculate Data Set
 #'
 #' @description A function that takes current statistical data and combines
-#'  it into a dataframe to be passed later to an SVM classifier.
+#'  a series of features into a data frame one at a time and returns a
+#'  data set ready for analysis
 #'
 #' @details Redis Keys used;
 #'   \itemize{
@@ -120,9 +121,15 @@ calculate_data <- function(matchData, logger = FALSE) {
   mDat %>% return()
 }
 
-#' @title Relative Form Feature
+#' @title Form Feature
 #'
-#' @param matchData A data frame...
+#' @description A function that takes a matchData data frame and two
+#'  teamID values stored in \code{teamIDs}, with a single match piece
+#'  of information and calculates the form of the team in the run up
+#'  to the match information passed. The functionality is looped for both
+#'  teamIDs.
+#'
+#' @param matchData A data frame
 #' @param teamIDs An integer vector that contains c(home_id, away_id).
 #' @param singleMatchInfo A data frame with one row that contains
 #'  important match information between two teams.
@@ -168,6 +175,11 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 
 #' @title Commentary Feature
 #'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{cmt:_commentary:{comp_id}:{match_id}:{team_id}}}
+#'   }
+#'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
 #'
@@ -209,6 +221,12 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
 }
 
 #' @title Relative Position Feature
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
+#'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+#'   }
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.

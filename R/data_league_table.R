@@ -2,6 +2,13 @@
 #'
 #' @description MAKE SURE THE MATCH DATA IS RECREATED!!
 #'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
+#'     \item{\strong[[SET]] :: \code{leagueMatchSet}}
+#'     \item{\strong{[HASH]} :: \code{cwt_l:{comp_id}:{season}:{week#}:{team_id}}}
+#'   }
+#'
 #' @export
 
 
@@ -110,6 +117,12 @@ create_table <- function(matchData) {
 }
 
 #' @title Weekly Positions
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{cwt_l:{comp_id}:{season}:{week#}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{cw_pl:{comp_id}:{season}:{week#}}}
+#'   }
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.

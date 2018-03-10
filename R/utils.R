@@ -107,6 +107,11 @@ start_season <- function() {
 #'  x calls per t time. So this function is checked each time before an
 #'  endpoint is hit and waits a given time if no requests are remaining.
 #'
+#'  Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[KEY]} :: \code{requestLimit}}
+#'   }
+#'
 #' @param requestsAllowed An integer value that defines the number of requests
 #'  that can be made in a given time period.
 #' @param timePeriod An integer value in seconds that defines the time period
@@ -119,8 +124,7 @@ start_season <- function() {
 
 request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
 
-  requestCount <- as.integer(rredis::redisIncr(
-    key = "requestLimit"))
+  requestCount <- "requestLimit" %>% rredis::redisIncr() %>% as.integer
   if (requestCount == 1) {
     rredis::redisExpire(
       key = "requestLimit",
@@ -217,18 +221,3 @@ create_log_dir <- function() { # nocov start
     cat(paste0(' ## Log path exists already @ ', logPath, ' \n'))
   }
 } # nocov end
-
-
-#' @title Split, Map, and Flatten
-#'
-#' @export
-
-
-flatt <- function(keyVector, y) {
-  return(
-    keyVector %>%
-      strsplit(split = ':') %>%
-      purrr::map(y) %>%
-      purrr::flatten_chr()
-  )
-}

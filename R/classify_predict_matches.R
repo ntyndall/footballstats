@@ -1,8 +1,13 @@
-#' @title classify_predict_matches
+#' @title Predict Matches
 #'
 #' @description A function that queries the endpoint and redis to obtain
 #'  upcoming matches then with the current optimized SVM, attempts to predict
 #'  the results.
+#'
+#' @details API endpoints;
+#'   \itemize{
+#'     \item{\emph{"/matches?comp_id={comp_id}&from_date={mm.dd.yyyy}&to_date={mm.dd.yyyy}&Authorization={auth_id}"}}
+#'   }
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.

@@ -1,5 +1,10 @@
 #' @title Predictions vs Actual Results
 #'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{csdm_pred:{comp_id}:{season}:{month}:{match_id}}}
+#'   }
+#'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
 #'

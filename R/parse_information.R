@@ -39,3 +39,16 @@ prs_ftscore <- function(ftScore) {
     return()
 }
 
+#' @title Split, Map, and Flatten
+#'
+#' @export
+
+
+flatt <- function(keyVector, y) {
+  return(
+    keyVector %>%
+      strsplit(split = ':') %>%
+      purrr::map(y) %>%
+      purrr::flatten_chr()
+  )
+}

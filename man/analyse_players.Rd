@@ -10,3 +10,9 @@ analyse_players(deployed = FALSE)
 A function that analyses players only,
  this is to be run as a CRON job in deployment.
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[LIST]} :: \code{analysePlayers}}
+  }
+}

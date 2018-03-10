@@ -20,3 +20,9 @@ The agregated value of `correct`.
 Another layer which can handle both normal fixture prediction
  and also predicting a test data set with known results.
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[KEY]} :: \code{csdm_pred:{comp_id}:{season}:{month}:{match_id}}}
+  }
+}

@@ -9,3 +9,11 @@ create_table(matchData)
 \description{
 MAKE SURE THE MATCH DATA IS RECREATED!!
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
+    \item{\strong[[SET]] :: \code{leagueMatchSet}}
+    \item{\strong{[HASH]} :: \code{cwt_l:{comp_id}:{season}:{week#}:{team_id}}}
+  }
+}

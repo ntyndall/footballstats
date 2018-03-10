@@ -3,8 +3,9 @@
 #' @description A function that provided with a competitionID and season start year,
 #'  can auto generate and order by date all the basic match information
 #'
-#' @details A search for all matches in a particular subset is made in Redis, a data frame
-#'  is then constructed to rebuild the original API query and ordered by date.
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}"{match_id}}}
 #'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
@@ -80,7 +81,7 @@ commentary_from_redis <- function(keyName, returnItems) {
         ) %>% as.double
       } else if (single %>% is.null) {
         NA
-      } else  if (single %>% is.na) {
+      } else if (single %>% is.na) {
         NA
       } else {
         if (single %>% `==`('')) 0 else single %>% as.double

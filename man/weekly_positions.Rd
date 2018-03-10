@@ -10,3 +10,10 @@ weekly_positions(KEYS)
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{cwt_l:{comp_id}:{season}:{week#}:{team_id}}}
+    \item{\strong{[HASH]} :: \code{cw_pl:{comp_id}:{season}:{week#}}}
+  }
+}

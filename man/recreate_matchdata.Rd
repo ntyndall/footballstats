@@ -17,7 +17,3 @@ matchData. A data frame containing all the matches in a particular season.
 A function that provided with a competitionID and season start year,
  can auto generate and order by date all the basic match information
 }
-\details{
-A search for all matches in a particular subset is made in Redis, a data frame
- is then constructed to rebuild the original API query and ordered by date.
-}

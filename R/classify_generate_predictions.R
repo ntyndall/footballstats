@@ -3,6 +3,11 @@
 #' @description Another layer which can handle both normal fixture prediction
 #'  and also predicting a test data set with known results.
 #'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[KEY]} :: \code{csdm_pred:{comp_id}:{season}:{month}:{match_id}}}
+#'   }
+#'
 #' @param KEYS A list containing options such as testing / prediction /
 #'  important variables and information. Also contains API information.
 #' @param fixtureList A data frame containing match localteam vs. visitorteam

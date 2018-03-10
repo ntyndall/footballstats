@@ -10,3 +10,9 @@ feat_commentaries(KEYS, matchID, teamIDs, commentaryNames)
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{cmt:_commentary:{comp_id}:{match_id}:{team_id}}}
+  }
+}

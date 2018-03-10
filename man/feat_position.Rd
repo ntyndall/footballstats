@@ -10,3 +10,10 @@ feat_position(KEYS, matchID, teamIDs, matchDate = NULL)
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
+    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+  }
+}

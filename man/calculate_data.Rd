@@ -18,7 +18,8 @@ Returns a dataframe containing the column names of 'returnItems'
 }
 \description{
 A function that takes current statistical data and combines
- it into a dataframe to be passed later to an SVM classifier.
+ a series of features into a data frame one at a time and returns a
+ data set ready for analysis
 }
 \details{
 Redis Keys used;

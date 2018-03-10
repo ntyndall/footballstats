@@ -10,3 +10,9 @@ predict_vs_real(KEYS, readyToAnalyse, matches)
 \item{KEYS}{A list containing options such as testing / prediction /
 important variables and information. Also contains API information.}
 }
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{csdm_pred:{comp_id}:{season}:{month}:{match_id}}}
+  }
+}
