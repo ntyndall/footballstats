@@ -24,6 +24,6 @@ A function that converts a form vector e.g. 'WLD' into an integer
  value defined by the function default values for win / lose / draw.
 }
 \examples{
- 'WLDW' \%>\% footballstats::form_to_int()
+ footballstats::form_to_int('WLDW')
 
 }

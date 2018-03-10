@@ -26,8 +26,10 @@ Take a single slice of match data and a teamID
  teamIDs score (don't need to know this ID).
 }
 \examples{
- singleMatch <- list(localteam_id = '1000', localteam_score = '2')
- result <- singleMatch \%>\% footballstats::current_or_other(teamID = 1000)
- # result == list(current = 2, other = ...)
+ \dontrun{
+  singleMatch <- list(localteam_id = '1000', localteam_score = '2')
+  result <- singleMatch \%>\% footballstats::current_or_other(teamID = 1000)
+  # result == list(current = 2, other = ...)
+ }
 
 }

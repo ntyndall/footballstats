@@ -10,7 +10,7 @@
 #' @param losePoints Same as above for a loss.
 #'
 #' @examples
-#'  'WLDW' %>% footballstats::form_to_int()
+#'  footballstats::form_to_int('WLDW')
 #'
 #' @return An integer value defining the value of a teams form
 #'
@@ -134,9 +134,11 @@ team_form <- function(matchData, teamID) {
 #'  which is inferred from the teamID.
 #'
 #' @examples
-#'  singleMatch <- list(localteam_id = '1000', localteam_score = '2')
-#'  result <- singleMatch %>% footballstats::current_or_other(teamID = 1000)
-#'  # result == list(current = 2, other = ...)
+#'  \dontrun{
+#'   singleMatch <- list(localteam_id = '1000', localteam_score = '2')
+#'   result <- singleMatch %>% footballstats::current_or_other(teamID = 1000)
+#'   # result == list(current = 2, other = ...)
+#'  }
 #'
 #' @export
 
