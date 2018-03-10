@@ -23,6 +23,6 @@ A function that can auto generate and order by date all
 \details{
 Redis Keys used;
   \itemize{
-    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}"{match_id}}}
+    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
   }
 }
