@@ -10,6 +10,9 @@ relative_form(matchInfo, totalForm)
 \item{matchInfo}{A list / data frame object that is a slice of data
 of the form of matchData, which contains useful match information and
 the date.}
+
+\item{totalForm}{A named list object which contains the \code{$date} and \code{$form}
+values, each vector is of equal length.}
 }
 \value{
 An integer value of the current relative form as an integer.

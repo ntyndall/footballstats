@@ -41,7 +41,7 @@ form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0)
 #' @param matchInfo A list / data frame object that is a slice of data
 #'  of the form of matchData, which contains useful match information and
 #'  the date.
-#' @totalForm A named list object which contains the \code{$date} and \code{$form}
+#' @param totalForm A named list object which contains the \code{$date} and \code{$form}
 #'  values, each vector is of equal length.
 #'
 #' @return An integer value of the current relative form as an integer.

@@ -25,7 +25,7 @@ A function that takes a data frame of matchData and recreates
 Redis Keys used;
   \itemize{
     \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
-    \item{\strong[[SET]] :: \code{leagueMatchSet}}
+    \item{\strong{[SET]} :: \code{leagueMatchSet}}
     \item{\strong{[HASH]} :: \code{cwt_l:{comp_id}:{season}:{week#}:{team_id}}}
   }
 }
