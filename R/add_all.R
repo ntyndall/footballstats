@@ -32,7 +32,7 @@
 add_all <- function(KEYS) { # nocov start
 
   # Add competition standing
-  KEYS%>% footballstats::acomp_standings()
+  KEYS %>% footballstats::acomp_standings()
 
   # Lookup request timings
   startingRequests <- 'requestLimit' %>% rredis::redisGet() %>% as.integer

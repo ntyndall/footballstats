@@ -166,7 +166,7 @@ acomp_standings <- function(KEYS) {
   if (standings %>% is.null %>% `!`()) {
     for (i in 1:nrow(standings)) {
       singleTable <- standings[i, ]
-      standingKey <- paste0("comp:season:_standing_:", KEYS$COMP, singleTable$season)
+      standingKey <- paste0("comp:season:_standing_:", KEYS$COMP, ':', singleTable$season)
       rredis::redisHMSet(
         key = standingKey,
         values = singleTable
