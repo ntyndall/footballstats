@@ -16,44 +16,6 @@
 
 
 
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-</style>
 
 
 
@@ -98,12 +60,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="competitioninfo" class="section level4">
 <h4>Competition Information</h4>
 <p><code>competition:set</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">competition.set &lt;-<span class="st"> &quot;competition:set&quot;</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
-<span class="st">  </span><span class="kw">first_four</span>() %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">f_json</span>()
-<span class="kw">print</span>(competition.set)</code></pre></div>
 <pre><code>## [
 ##     &quot;1005&quot;,
 ##     &quot;1007&quot;,
@@ -116,11 +72,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="matchinfo" class="section level4">
 <h4>Match Information</h4>
 <p><code>csm:{comp_id}:{season}:{match_id}</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">match.info &lt;-<span class="st"> &quot;csm:1204:2017:2213059&quot;</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">f_json</span>()
-<span class="kw">print</span>(match.info)</code></pre></div>
 <pre><code>## {
 ##     &quot;id&quot;: &quot;2213059&quot;,
 ##     &quot;comp_id&quot;: &quot;1204&quot;,
@@ -147,7 +98,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## }
 ## </code></pre>
 <p><code>c:1204:ready</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;2213173&quot;</span>, <span class="st">&quot;2213174&quot;</span>, <span class="st">&quot;2213175&quot;</span>, <span class="st">&quot;2213176&quot;</span>, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
 <pre><code>## [
 ##     &quot;2213173&quot;,
 ##     &quot;2213174&quot;,
@@ -157,12 +107,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## ]
 ## </code></pre>
 <p>Check to see if the match belongs to the set</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">match.in.set &lt;-<span class="st"> &quot;c_matchSetInfo:1204&quot;</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
-<span class="st">  </span><span class="kw">first_four</span>() %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">f_json</span>()
-<span class="kw">print</span>(match.in.set)</code></pre></div>
 <pre><code>## [
 ##     &quot;2212907&quot;,
 ##     &quot;2212908&quot;,
@@ -175,7 +119,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="teaminformation" class="section level4">
 <h4>Team Information</h4>
 <p>This list is constantly pushed to and lifted from with no replace. It looks like the following when we issue <code>lrange analyseTeams 0 -1</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;9221&quot;</span>, <span class="st">&quot;9074&quot;</span>, <span class="st">&quot;9348&quot;</span>, <span class="st">&quot;9021&quot;</span>, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
 <pre><code>## [
 ##     &quot;9221&quot;,
 ##     &quot;9074&quot;,
@@ -206,7 +149,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="playerinformation" class="section level4">
 <h4>Player Information</h4>
 <p>Everytime a match is analysed and the team information stored, all the player IDs involved in the update are pushed to a new list, and are accessible through <code>lrange analysePlayers 0 -1</code>. Through another approach, and another CRON job, the players are analysed one by one.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;453145&quot;</span>, <span class="st">&quot;49530&quot;</span>, <span class="st">&quot;376371&quot;</span>, <span class="st">&quot;15512&quot;</span>, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
 <pre><code>## [
 ##     &quot;453145&quot;,
 ##     &quot;49530&quot;,
@@ -238,30 +180,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="leaguetable" class="section level4">
 <h4>League Table</h4>
 <p>Lets have a look at the key structure first</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">team.info.keys &lt;-<span class="st"> &quot;cwt_l:1204:2017*&quot;</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>rredis::<span class="kw">redisKeys</span>() %&gt;%<span class="st"> </span>
-<span class="st">  `</span><span class="dt">[</span><span class="st">`</span>(<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">10</span>))
-<span class="kw">print</span>(<span class="kw">c</span>(team.info.keys, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
 <pre><code>## [
 ##     &quot;cwt_l:1204:2017:12:9423&quot;,
 ##     &quot;cwt_l:1204:2017:15:9158&quot;,
 ##     &quot;cwt_l:1204:2017:16:9053&quot;,
 ##     &quot;cwt_l:1204:2017:20:9426&quot;,
-##     &quot;cwt_l:1204:2017:27:9259&quot;,
-##     &quot;cwt_l:1204:2017:7:9287&quot;,
-##     &quot;cwt_l:1204:2017:6:9426&quot;,
-##     &quot;cwt_l:1204:2017:10:9249&quot;,
-##     &quot;cwt_l:1204:2017:1:9259&quot;,
-##     &quot;cwt_l:1204:2017:18:9249&quot;,
 ##     &quot;...&quot;
 ## ]
 ## </code></pre>
 <p>Then looking at a particular key we can see the structure each one has.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">team.week.info &lt;-<span class="st"> &quot;cwt_l:1204:2017:23:9287&quot;</span> %&gt;%
-<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">lapply</span>(as.character)
-<span class="kw">names</span>(team.week.info) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;TEAM&quot;</span>, <span class="st">&quot;PTS&quot;</span>, <span class="st">&quot;GF&quot;</span>, <span class="st">&quot;GD&quot;</span>)
-<span class="kw">print</span>(team.week.info %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
 <pre><code>## {
 ##     &quot;TEAM&quot;: &quot;Newcastle United&quot;,
 ##     &quot;PTS&quot;: &quot;23&quot;,
@@ -270,12 +197,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## }
 ## </code></pre>
 <p>Once a key is analysed it is pushed to here;</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">league.updated &lt;-<span class="st"> &quot;leagueMatchSet&quot;</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
-<span class="st">  </span><span class="kw">first_four</span>() %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">f_json</span>()
-<span class="kw">print</span>(league.updated)</code></pre></div>
 <pre><code>## [
 ##     &quot;2243999:17002&quot;,
 ##     &quot;2243932:17072&quot;,
@@ -285,32 +206,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## ]
 ## </code></pre>
 <p>All these individual hash maps containing a single teams accumulative points for each week means we can build a league table for any of the weeks up until the current date, and is accessible through the following;</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">positions &lt;-<span class="st"> &quot;cw_pl:1204:2017:23&quot;</span> %&gt;%
-<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">f_json</span>()
-<span class="kw">print</span>(positions)</code></pre></div>
 <pre><code>## {
 ##     &quot;9259&quot;: &quot;1&quot;,
 ##     &quot;9260&quot;: &quot;2&quot;,
 ##     &quot;9249&quot;: &quot;3&quot;,
 ##     &quot;9092&quot;: &quot;4&quot;,
-##     &quot;9406&quot;: &quot;5&quot;,
-##     &quot;9002&quot;: &quot;6&quot;,
-##     &quot;9072&quot;: &quot;7&quot;,
-##     &quot;9240&quot;: &quot;8&quot;,
-##     &quot;9158&quot;: &quot;9&quot;,
-##     &quot;9423&quot;: &quot;10&quot;,
-##     &quot;9427&quot;: &quot;11&quot;,
-##     &quot;9127&quot;: &quot;12&quot;,
-##     &quot;9053&quot;: &quot;13&quot;,
-##     &quot;9220&quot;: &quot;14&quot;,
-##     &quot;9287&quot;: &quot;15&quot;,
-##     &quot;9065&quot;: &quot;16&quot;,
-##     &quot;9363&quot;: &quot;17&quot;,
-##     &quot;9378&quot;: &quot;18&quot;,
-##     &quot;9426&quot;: &quot;19&quot;,
-##     &quot;9387&quot;: &quot;20&quot;
+##     &quot;...&quot;: &quot;...&quot;
 ## }
 ## </code></pre>
 </div>
