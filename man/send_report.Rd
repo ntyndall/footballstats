@@ -6,6 +6,9 @@
 \usage{
 send_report()
 }
+\value{
+Nothing. Redis is updated.
+}
 \description{
 A function to send a monthly report
 }

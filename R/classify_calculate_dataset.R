@@ -1,7 +1,8 @@
 #' @title Calculate Data Set
 #'
 #' @description A function that takes current statistical data and combines
-#'  it into a dataframe to be passed later to an SVM classifier.
+#'  a series of features into a data frame one at a time and returns a
+#'  data set ready for analysis.
 #'
 #' @details Redis Keys used;
 #'   \itemize{
@@ -26,7 +27,7 @@ calculate_data <- function(matchData, logger = FALSE) {
   )
 
   # Infer the season
-  seasonStarting <- matchData$season %>% footballstats::prs_season()
+  KEYS$SEASON <- matchData$season %>% footballstats::prs_season()
   mDat <- data.frame(stringsAsFactors = FALSE)
 
   # Data rows
@@ -51,11 +52,11 @@ calculate_data <- function(matchData, logger = FALSE) {
     # Take a single slice of match data at a time
     matchSlice <- matchData[i, ]
     matchID <- matchSlice$id %>% as.integer
-    competitionID <- matchSlice$comp_id
+    KEYS$COMP <- matchSlice$comp_id
     teamIDs <- c(matchSlice$localteam_id, matchSlice$visitorteam_id)
 
     # Get single match information
-    singleMatchInfo <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchID) %>%
+    singleMatchInfo <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchID) %>%
       rredis::redisHGetAll()
 
     # 0) datSlice contains the match ID from the start
@@ -69,7 +70,7 @@ calculate_data <- function(matchData, logger = FALSE) {
     # 1) Get commentary information (Initialise datSlice)
     datSlice %<>% cbind(
       footballstats::feat_commentaries(
-        competitionID = competitionID,
+        KEYS = KEYS,
         matchID = matchID,
         teamIDs = teamIDs,
         commentaryNames = allowedNames
@@ -100,8 +101,7 @@ calculate_data <- function(matchData, logger = FALSE) {
     # Get relative position
     datSlice %<>% cbind(
       footballstats::feat_position(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting,
+        KEYS = KEYS,
         matchID = matchID,
         teamIDs = teamIDs
       )
@@ -121,12 +121,22 @@ calculate_data <- function(matchData, logger = FALSE) {
   mDat %>% return()
 }
 
-#' @title Relative Form Feature
+#' @title Form Feature
 #'
-#' @param matchData A data frame...
-#' @param teamIDs An integer vector that contains c(home_id, away_id).
+#' @description A function that takes a matchData data frame and two
+#'  teamID values stored in \code{teamIDs}, with a single match piece
+#'  of information and calculates the form of the team in the run up
+#'  to the match information passed. The functionality is looped for both
+#'  teamIDs.
+#'
+#' @param matchData A data frame that contains rows of single matches
+#'  that have been played between two teams.
+#' @param teamIDs A character vector of length two, containing the home team
+#'  and away team in that order.
 #' @param singleMatchInfo A data frame with one row that contains
 #'  important match information between two teams.
+#'
+#' @return A data frame with two columns, `form.h` and `form.a`.
 #'
 #' @export
 
@@ -140,34 +150,28 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
       teamID = teamIDs[j]
     )
 
-    # Create a data frame of forms and dates.
-    totalForm <- data.frame(
-      date = formResults[[2]],
-      form = formResults[[1]],
-      stringsAsFactors = FALSE
-    )
-
     # Find out form relative to current date.
     forms %<>% c(
       footballstats::relative_form(
         matchInfo = singleMatchInfo,
-        totalForm = totalForm
+        totalForm = formResults
       )
     )
   }
 
   # Calculate the difference in forms
   form <- if (forms %>% length %>% `!=`(2)) {
-    c(NA, NA)
+    list(NA, NA)
   } else {
-    footballstats::form_to_int(oldForms = forms)
+    # NEED TO RETURN TWO HERE!!!
+    forms %>% lapply(footballstats::form_to_int)
   }
 
   # Return the data frame with form as the only column
   return(
     data.frame(
-      `form.h` = form[1],
-      `form.a` = form[2],
+      `form.h` = form[[1]],
+      `form.a` = form[[2]],
       stringsAsFactors = FALSE
     )
   )
@@ -175,14 +179,35 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
 
 #' @title Commentary Feature
 #'
+#' @description A function that takes matchIDs, teamIDs, and commentaryNames
+#'  and tries to query the commentaries from redis to recreate the commentary
+#'  information. It is looped over twice for each match, one for the home team
+#'  and secondly for the away team.
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{cmt:_commentary:{comp_id}:{match_id}:{team_id}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#' @param matchID A character string that represents the current matchID
+#'  under investigation.
+#' @param teamIDs A character vector of length two, containing the home team
+#'  and away team in that order.
+#' @param commentaryNames A character vector of allowed commentaryNames to
+#'  be investigated.
+#'
+#' @return A data frame of commentary data for the home and away team.
+#'
 #' @export
 
 
-feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) {
+feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
 
   cResults <- c()
   for (j in 1:2) {
-    commentaryKey <- paste0('cmt_commentary:', competitionID, ':', matchID, ':', teamIDs[j]) %>%
+    commentaryKey <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[j]) %>%
       rredis::redisKeys() %>% as.character
 
     # Check commentary key exists
@@ -191,11 +216,6 @@ feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) 
     # Check that all the allowed names is a subset of the commentary
     availableNames <- commentaryKey %>% rredis::redisHGetAll() %>% names
     if (commentaryNames %in% availableNames %>% all %>% `!`()) break
-
-    commentary <- footballstats::commentary_from_redis(
-      keyName = commentaryKey,
-      returnItems = commentaryNames
-    )
 
     # Get Commentary results from Redis
     cResults %<>% c(
@@ -212,23 +232,53 @@ feat_commentaries <- function(competitionID, matchID, teamIDs, commentaryNames) 
     return()
 }
 
-#' @title Relative Position Feature
+#' @title League Position
+#'
+#' @description A function that takes a matchID, and the teams associated
+#'  to calculate their position in the league table whenever that match
+#'  was played. If there is no \code{matchDate} supplied then, a query
+#'  to redis to figure out the date of the match is carried out. The weekly
+#'  positions is queried to figure out the positions for that particular week.
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
+#'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#' @param matchID A character string that represents the matchID under
+#'  investigation.
+#' @param teamIDs A character vector of length two that contains the
+#'  two teams involved in the match in order of home and away.
+#' @param matchDate If NULL the date is queried by in the basic commentary
+#'  information, else a date of the form dd.mm.yyyy can be supplied.
+#'
+#' @return A data frame with two columns, `position.h` and `position.a`.
+#'
 #' @export
 
 
-feat_position <- function(competitionID, seasonStarting, matchID, teamIDs) {
+feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
 
   # Get the start date
-  startDate <- paste0('c_startDate:', competitionID, ':', seasonStarting) %>%
+  startDate <- paste0('c_startDate:', KEYS$COMP, ':', KEYS$SEASON) %>%
     rredis::redisGet() %>%
     as.integer
 
   # Get the current date
-  currentDate <- paste0('csm:', competitionID, ':', seasonStarting, ':', matchID) %>%
-    rredis::redisHGet(field = 'formatted_date') %>%
-    as.character %>%
-    as.Date(format = '%d.%m.%Y') %>%
-    as.integer
+  currentDate <- if (matchDate %>% is.null) {
+    paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchID) %>%
+      rredis::redisHGet(field = 'formatted_date') %>%
+      as.character %>%
+      as.Date(format = '%d.%m.%Y') %>%
+      as.integer
+  } else {
+    matchDate %>%
+      as.Date(format = '%d.%m.%Y') %>%
+      as.integer
+  }
 
   # Convert to week number
   weekNum <- currentDate %>%
@@ -237,8 +287,18 @@ feat_position <- function(competitionID, seasonStarting, matchID, teamIDs) {
     floor %>%
     `+`(1)
 
+  # Position key
+  posKey <- paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':')
+
+  # Get the last known position of the two teams
+  weekKeys <- posKey %>%
+    paste0('*') %>%
+    rredis::redisKeys() %>%
+    footballstats::get_weeks()
+
   # Get the positions from the week being investigated
-  positions <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':', weekNum) %>%
+  positions <- posKey %>%
+    paste0(weekKeys %>% `[`(weekNum %>% `-`(weekKeys) %>% abs %>% which.min)) %>%
     rredis::redisHGetAll() %>%
     lapply(as.integer)
 

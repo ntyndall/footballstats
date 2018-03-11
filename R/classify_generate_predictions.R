@@ -3,6 +3,13 @@
 #' @description Another layer which can handle both normal fixture prediction
 #'  and also predicting a test data set with known results.
 #'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[KEY]} :: \code{csdm_pred:{comp_id}:{season}:{month}:{match_id}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #' @param fixtureList A data frame containing match localteam vs. visitorteam
 #'  information which CAN include actual results if testing == TRUE.
 #'
@@ -11,7 +18,7 @@
 #' @export
 
 
-generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
+generate_predictions <- function(KEYS, fixtureList) {
 
   # Order the fixture list dataframe
   fixtureList <- fixtureList[fixtureList$formatted_date %>%
@@ -23,32 +30,28 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
   dataScales <- footballstats::dataScales
   correct <- todaysDate <- 0
   totalTxt <- c()
+  fixtureRow <- fixtureList %>% nrow
 
   # Parse important information
-  competitionID <- fixtureList$comp_id %>% footballstats::prs_comp()
-  seasonStarting <- fixtureList$season %>% footballstats::prs_season()
+  KEYS$COMP <- fixtureList$comp_id %>% footballstats::prs_comp()
+  KEYS$SEASON <- fixtureList$season %>% footballstats::prs_season()
 
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
 
-  # Just query for the standings here!
-  #standings <- if (!KEYS$TEST) {
-  #  paste0('/standings/', competitionID, '?') %>%
-  #    footballstats::get_data(KEYS = KEYS)
-  #} else {
-  #  footballstats::standings
-  #}
-
   # Set up progress bar
   progressBar <- utils::txtProgressBar(
     min = 0,
-    max = nrow(fixtureList),
+    max = fixtureRow,
     style = 3
   )
 
   # Loop over each fixture
-  for (i in 1:nrow(fixtureList)) {
+  for (i in 1:fixtureRow) {
+    # Update progress bar
     utils::setTxtProgressBar(progressBar, i)
+
+    # Take a single row slice of the fixture list
     singleFixture <- fixtureList[i, ]
 
     # Get team information from fixture data frame
@@ -66,61 +69,33 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     # Bind the commentaries together
     matchMetrics %<>% cbind(
       footballstats::project_commentaries(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting,
+        KEYS = KEYS,
         teamIDs = teamIDs,
         matchDate = singleFixture$formatted_date,
-        KEYS = KEYS
+        matchID = matchID
       )
     )
 
     # Bind the form
     matchMetrics %<>% cbind(
       footballstats::project_form(
-        competitionID = competitionID,
-        seasonStarting = seasonStarting,
+        KEYS = KEYS,
         teamIDs = teamIDs
       )
     )
 
-
-
     # Figure out the standings
-    startDate <- paste0('c_startDate:', competitionID, ':', seasonStarting) %>%
-      rredis::redisGet() %>%
-      as.integer
-
-    # Get the current date
-    currentDate <- singleFixture$formatted_date %>%
-      as.Date(format = '%d.%m.%Y') %>%
-      as.integer
-
-    # Convert to week number
-    weekNum <- currentDate %>%
-      `-`(startDate) %>%
-      `/`(7) %>%
-      floor %>%
-      `+`(1)
-
-    # Get the last known position of the two teams
-    weekKeys <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':*') %>%
-      rredis::redisKeys() %>%
-      footballstats::get_weeks()
-
-    prevWeek <- weekKeys %>%
-      `[`(weekNum %>%
-            `-`(weekKeys) %>%
-            abs %>% which.min
-      )
-
-    positions <- paste0('cw_pl:', competitionID, ':', seasonStarting, ':', prevWeek) %>%
-      rredis::redisHGetAll() %>%
-      lapply(as.integer)
+    positions <- footballstats::feat_position(
+      KEYS = KEYS,
+      matchID = matchID,
+      teamIDs = teamIDs,
+      matchDate = singleFixture$formatted_date
+    )
 
     matchMetrics %<>% cbind(
       data.frame(
-        `position.h` = positions[[teamIDs[1]]],
-        `position.a` = positions[[teamIDs[2]]],
+        `position.h` = positions$position.h,
+        `position.a` = positions$position.a,
         stringsAsFactors = FALSE
       )
     )
@@ -132,13 +107,14 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
     scled <- matchMetrics %>%
       scale(
         center = dataScales$sMin,
-        scale = dataScales$sMax - dataScales$sMin) %>%
-      as.data.frame
+        scale = dataScales$sMax - dataScales$sMin
+      ) %>% as.data.frame
 
     # Make the prediction
     result <- neuralnet::compute(
       x = footballstats::nn,
-      covariate = scled)
+      covariate = scled
+    )
 
     # Get the home team result
     resultsOrd <- c('D', 'L', 'W')
@@ -188,7 +164,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         as.integer
 
       rredis::redisHMSet(
-        key = paste0('csdm_pred:', competitionID, ':', seasonStarting, ':', month, ':', singleFixture$id),
+        key = paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':', month, ':', singleFixture$id),
         values = list(
           localteam = homeName,
           visitorteam = awayName,
@@ -200,7 +176,6 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
         )
       )
     }
-    Sys.sleep(0.1)
   }
 
   # Close the progress bar
@@ -214,7 +189,7 @@ generate_predictions <- function(fixtureList, competitionName = "", KEYS) {
 
     firstMsg <- paste0(
       ':soccer: _Reporting on results for week ',
-      fixtureList$week[1], ' (', competitionName,
+      fixtureList$week[1], ' (', KEYS$COMP_NAME,
       ')_ :soccer: ')
 
     slackr::slackr_msg(

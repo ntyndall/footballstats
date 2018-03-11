@@ -4,9 +4,12 @@
 \alias{generate_predictions}
 \title{generate_predictions}
 \usage{
-generate_predictions(fixtureList, competitionName = "", KEYS)
+generate_predictions(KEYS, fixtureList)
 }
 \arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+
 \item{fixtureList}{A data frame containing match localteam vs. visitorteam
 information which CAN include actual results if testing == TRUE.}
 }
@@ -16,4 +19,10 @@ The agregated value of `correct`.
 \description{
 Another layer which can handle both normal fixture prediction
  and also predicting a test data set with known results.
+}
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[KEY]} :: \code{csdm_pred:{comp_id}:{season}:{month}:{match_id}}}
+  }
 }

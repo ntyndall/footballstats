@@ -1,33 +1,15 @@
-#' @title  Run script to populate Redis.
+#' @title Predict Fixtures
 #'
-#' @details -- Summary of data structures stored in Redis --
+#' @description A function to be run as a CRON job during
+#'  deployment. It gathers some data from redis, tries to
+#'  project features and then builds a data set which is
+#'  run against some predefined (or dynamic) model carried
+#'  in the package.
 #'
-#'  1.1) Match information:
-#'  -->  [csm]:{comp_id}:{season}:{match_id} - [HASH]
-#'  1.2) Match exists?
-#'  -->  [c_matchSetInfo]:{comp_id} - [SET]
-#'  1.3) Team exists?
-#'  -->  [c_teamSetInfo]:{comp_id} - [SET]
-#'  1.4) Match commentary
-#'  -->  [cmt_commentary]:{comp_id}:{match_id}:{team_id} - [HASH]
-#'  1.5) Player statistics per match
-#'  -->  [cmp]:{comp_id}:{match_id}:{player_id} - [HASH]
+#' @param deployed A boolean value to indicate whether the
+#'  function is being run from a deployed environment.
 #'
-#'  2.1) Events already analysed?
-#'  -->  [c_eventInSet]:{comp_id} - [SET]
-#'  2.2) Single event information:
-#'  -->  [cme]:{comp_id}:{match_id}:{event_id} - [HASH]
-#'
-#'  3.1) Basic team information:
-#'  -->  [ct_basic]:{comp_id}:{team_id} - [HASH]
-#'  3.2) Team statistics:
-#'  -->  [ct_stats]:{comp_id}:{team_id} - [HASH]
-#'  3.3) Player information:
-#'  -->  [ctp]:{comp_id}:{team_id}:{player_id} - [HASH]
-#'
-#'  4.1) Player statistics:
-#'  -->  [ctps_[x]]:{comp_id}:{team_id}:{player_id}:{season} - [HASH]
-#'       -->  where x = { club, club_intl, cups, national}
+#' @return Nothing. Redis is updated.
 #'
 #' @importFrom magrittr %>% %<>% %T>% %$%
 #'
@@ -35,9 +17,6 @@
 
 
 predict_fixtures <- function(deployed = FALSE) { # nocov start
-
-  # Get season starting year
-  seasonStarting <- footballstats::start_season()
 
   # Obtain API and sensitive key information
   KEYS <<- footballstats::sensitive_keys(
@@ -49,7 +28,8 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
   # Get dates for querying fixutres now
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
-  KEYS$DATE_TO <- Sys.Date() %>% `+`(8) %>% footballstats::format_dates()
+  KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
+  KEYS$SEASON <- footballstats::start_season()
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -58,7 +38,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
+  competitions %<>% subset(competitions$id %in% footballstats::allowed_comps())
 
   # Create the sink for output
   if (deployed) 'summary_pred' %>% footballstats::create_sink()
@@ -71,11 +51,9 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
     # Predict actual future results
     cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
-    footballstats::predict_matches(
-      competitionID = competitions$id[i],
-      competitionName = competitions$name[i],
-      KEYS = KEYS
-    )
+    KEYS$COMP <- competitions$id[i]
+    KEYS$COMP_NAME <- competitions$name[i]
+    KEYS %>% footballstats::predict_matches()
   }
 } # nocov end
 
@@ -83,6 +61,16 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 #'
 #' @description A function that analyses players only,
 #'  this is to be run as a CRON job in deployment.
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[LIST]} :: \code{analysePlayers}}
+#'   }
+#'
+#' @param deployed A boolean value to indicate whether the
+#'  function is being run from a deployed environment.
+#'
+#' @return Nothing. Redis is updated.
 #'
 #' @export
 
@@ -127,6 +115,10 @@ analyse_players <- function(deployed = FALSE) { # nocov start
 #' @description A function that analyses matches and events only,
 #'  this is to be run as a CRON job in deployment.
 #'
+#' @param deployed A boolean value to indicate whether the
+#'  function is being run from a deployed environment.
+#'
+#' @return Nothing. Redis is updated.
 #' @export
 
 
@@ -151,7 +143,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
   competitions <- KEYS %>% footballstats::acomp_info()
 
   # Subset the available competitions
-  competitions <- competitions[footballstats::allowed_comps() %>% match(competitions$id), ]
+  competitions %<>% subset(competitions$id %in% footballstats::allowed_comps())
 
   # Create the sink for adding data
   if (deployed) 'summary_adding' %>% footballstats::create_sink()
@@ -171,6 +163,8 @@ analyse_data <- function(deployed = FALSE) { # nocov start
 #' @title Send Report
 #'
 #' @description A function to send a monthly report
+#'
+#' @return Nothing. Redis is updated.
 #'
 #' @export
 

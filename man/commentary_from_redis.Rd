@@ -6,3 +6,18 @@
 \usage{
 commentary_from_redis(keyName, returnItems)
 }
+\arguments{
+\item{keyName}{A character string that defines the redis key
+where the commentary is stored.}
+
+\item{returnItems}{A character vector defining the names of the
+fields in the commentary key in redis to be retrieved.}
+}
+\value{
+A vector of integers that correspond to the \code{returnItem}
+ values requested.
+}
+\description{
+A function that retrieves the basic commentary
+ information from redis.
+}

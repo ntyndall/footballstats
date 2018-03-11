@@ -2,7 +2,34 @@
 % Please edit documentation in R/classify_form_info.R
 \name{current_or_other}
 \alias{current_or_other}
-\title{Current or Other}
+\title{Current Or Other}
 \usage{
 current_or_other(singleMatch, teamID)
+}
+\arguments{
+\item{singleMatch}{A list / data frame object that is a single slice
+of a matchData data frame that contains information such as
+localteam_id, localteam_score (plus visitorteam information and
+scorelines etc).}
+
+\item{teamID}{An integer value that represents the team ID which
+we want to determine the scoreline from.}
+}
+\value{
+A named list object with \code{home} and \code{away} values,
+ which is inferred from the teamID.
+}
+\description{
+Take a single slice of match data and a teamID
+ and work out whether the ID belongs to the home team or the away
+ team and return a list of the current teamIDs score and the other
+ teamIDs score (don't need to know this ID).
+}
+\examples{
+ \dontrun{
+  singleMatch <- list(localteam_id = '1000', localteam_score = '2')
+  result <- singleMatch \%>\% footballstats::current_or_other(teamID = 1000)
+  # result == list(current = 2, other = ...)
+ }
+
 }

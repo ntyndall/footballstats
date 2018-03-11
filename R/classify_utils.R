@@ -1,29 +1,34 @@
 #' @title Recreate Match Data
 #'
-#' @description A function that provided with a competitionID and season start year,
-#'  can auto generate and order by date all the basic match information
+#' @description A function that can auto generate and order by date all
+#'  the basic match information if it exists in redis.
 #'
-#' @details A search for all matches in a particular subset is made in Redis, a data frame
-#'  is then constructed to rebuild the original API query and ordered by date.
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+#'   }
 #'
-#' @param KEYS keys list...
-#' @param redisData An environment that defines the redis configuration where data is
-#'  to be searched for.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #'
 #' @return matchData. A data frame containing all the matches in a particular season.
 #'
 #' @export
 
 
-recreate_matchdata <- function(KEYS, matchLimit = 10000) {
-  allMatches <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, '*') %>% rredis::redisKeys()
-  matchData <- data.frame(stringsAsFactors = FALSE)
-  if (!is.null(allMatches)) {
-    for (i in 1:length(allMatches)) {
-      singleMatch <- rredis::redisHGetAll(
-        key = allMatches[i]
-      )
+recreate_matchdata <- function(KEYS) {
 
+  # Get all the redis match keys
+  allMatches <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, '*') %>%
+    rredis::redisKeys()
+  matchData <- data.frame(stringsAsFactors = FALSE)
+  if (!(allMatches %>% is.null))   {
+    for (i in 1:length(allMatches)) {
+      # Get basic match info for each match
+      singleMatch <- allMatches[i] %>%
+        rredis::redisHGetAll()
+
+      # Recreate the data frame
       matchID <- data.frame(
         singleMatch %>% as.character %>% t,
         stringsAsFactors = FALSE
@@ -39,99 +44,44 @@ recreate_matchdata <- function(KEYS, matchLimit = 10000) {
     print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
   } else {
     # Re-order the dataframe by date.
-    matchData %<>% footballstats::order_matchdata(
-      limit = matchLimit
-    )
+    matchData %<>% footballstats::order_matchdata()
   }
   return(matchData)
 }
 
 #' @title Order Match Dataset
+#'
+#' @description A function that takes an arbitrary data frame
+#'  consisting of match data and orders it by date in ascending
+#'  order.
+#'
+#' @param matchData A data frame that contains rows of single matches
+#'  that have been played between two teams.
+#'
+#' @return A data frame that has been ordered by date.
+#'
 #' @export
 
 
-order_matchdata <- function(matchData, limit = 5000) {
+order_matchdata <- function(matchData) {
   matchData$formatted_date %<>% as.Date('%d.%m.%Y')
   matchData <- matchData[matchData$formatted_date %>% order, ]
-  limit %<>% min(matchData %>% nrow)
-  return(matchData[1:limit, ])
-}
-
-#' @title Available Commentaries
-#'
-#' @export
-
-
-available_commentaries <- function(competitionID = 'all', includeNames = 'all') {
-
-  # Single competitionID or all
-  allowedComps <- footballstats::allowed_comps()
-
-  commentaryKeys <- c()
-  for (i in 1:(allowedComps %>% length)) {
-    commentaryKeys %<>% c(paste0('cmt_commentary:', allowedComps[i], '*') %>%
-      rredis::redisKeys() %>% as.character)
-  }
-
-  allAvailable <- c()
-  getAll <- if (`==`(includeNames %>% length, 1)) TRUE else FALSE
-   for (x in 1:length(commentaryKeys)) {
-    results <- commentaryKeys[x] %>% rredis::redisHGetAll()
-    cNames <- results %>% names
-    cValues <- results %>% as.character
-    empties <- cValues == ""
-
-    # Default to all
-    if (`==`(x, 1) && getAll) includeNames <- cNames %>% subset(cNames != 'table_id')
-
-    # Remove any empty string fields
-    cNames <- if (empties %>% any) cNames[-which(empties)] else cNames
-
-    # Remove any predefined variables that should never be used
-    intersection <- intersect(cNames, includeNames)
-
-    if (identical(intersection, character(0))) stop('A complete set of required names does not exist.')
-    allAvailable <- if (x == 1) includeNames else intersect(intersection, allAvailable)
-  }
-  return(allAvailable)
-}
-
-#' @title Commentary Statistics
-#'
-#' @description A function that takes the commentary values stored in redis and
-#'  calculates an average value for the list of variables in the key for that team.
-#'
-#' @param commentary A character vector of redis keys that hold a teams match
-#'  commentary.
-#' @param returnItems A vector of character values that hold the names of
-#'  fields to be returned for the commentary statistics.
-#'
-#' @return A average statistics for a particular team.
-#'
-#' @export
-
-
-commentary_stats <- function(commentary, returnItems) {
-  vals <- sapply(1:length(commentary), function(j) {
-    return(
-      footballstats::commentary_from_redis(
-        keyName = commentary[j],
-        returnItems = returnItems
-      )
-    )
-  })
-
-  if (`==`(returnItems %>% length, 1)) {
-    return(`/`(vals %>% sum, vals %>% length %>% as.double))
-  } else {
-    columns <- vals %>% ncol
-    return(sapply(1:(vals %>% nrow), function(k) {
-      `/`(vals[k, 1:columns] %>% sum, columns %>% as.double)
-    }))
-  }
+  return(matchData)
 }
 
 #' @title Commentary From Redis
+#'
+#' @description A function that retrieves the basic commentary
+#'  information from redis.
+#'
+#' @param keyName A character string that defines the redis key
+#'  where the commentary is stored.
+#' @param returnItems A character vector defining the names of the
+#'  fields in the commentary key in redis to be retrieved.
+#'
+#' @return A vector of integers that correspond to the \code{returnItem}
+#'  values requested.
+#'
 #' @export
 
 
@@ -155,7 +105,7 @@ commentary_from_redis <- function(keyName, returnItems) {
         ) %>% as.double
       } else if (single %>% is.null) {
         NA
-      } else  if (single %>% is.na) {
+      } else if (single %>% is.na) {
         NA
       } else {
         if (single %>% `==`('')) 0 else single %>% as.double
@@ -169,7 +119,18 @@ commentary_from_redis <- function(keyName, returnItems) {
   )
 }
 
-#' @title Scale SVM Data
+#' @title Scale Data
+#'
+#' @description A function that takes a data set and scals it based
+#'  on the scaling parameters that have already been calculated elsewhere.
+#'
+#' @param mDat A data frame that defines the data set used to build the model
+#'  which is currently UNSCALED.
+#' @param dataScales A list which contains multiple information, including \code{sMax}
+#'  and \code{sMin} which define the bounds of the \code{dataScale$commentaries} values.
+#'
+#' @return A data frame the same size as \code{mDat}, which has now been scaled.
+#'
 #' @export
 
 
@@ -181,13 +142,13 @@ scale_data <- function(mDat, dataScales) {
   ) %>% as.data.frame
 
   if ('res' %in% (mDat %>% colnames)) scaled.data %<>% cbind(res = mDat$res)
-  scaled.data %>% return()
+  return(scaled.data)
 }
 
-#' @title Scale SVM Data
+#' @title Get Scales
 #'
-#' @details We subtract 1 from the data frame as the data set
-#'  MUST always have a leading column that contains labelled
+#' @description We subtract 1 from the data frame as the data set
+#'  MUST always have a trailing column that contains labelled
 #'  match data with 'W / D / L' etc. Also, one feature is not
 #'  permitted, so mDat must therefore have 3 or more columns.
 #'

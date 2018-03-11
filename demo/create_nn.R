@@ -1,16 +1,15 @@
 library(footballstats)
 library(magrittr)
 
-#
 # This is a static script - and should be built interactively
 # depending on how the model should be set up
 #
 
 # Define the season when building the model
-seasonStarting <- 2017
+#seasonStarting <- 2017
 
 # Define a single competitionID if only one is to be used
-competitionID <- 1204
+#competitionID <- 1204
 
 # Get allowed competitions
 comps <- footballstats::allowed_comps()
@@ -24,6 +23,7 @@ for (i in 1:(comps %>% length)) {
   KEYS$COMP <- comps[i]
   KEYS$SEASON <- seasonStarting
 
+  # Recreate the match data
   matchData <- KEYS %>% footballstats::recreate_matchdata()
   totalData %<>% rbind(matchData)
 
@@ -34,25 +34,39 @@ for (i in 1:(comps %>% length)) {
   KEYS %>% footballstats::weekly_positions()
 }
 
-# Only select one competition
-totalData <- totalData[totalData$comp_id == '1204', ]
-
 # Remove any matches that can't be found by the API (i.e. no FT score)!
 totalData %<>% subset(totalData$ft_score %>% `!=`('[-]'))
 
 # Construct data set for building a classifier (for some reason this is very slow.. and can hang)
 cat(paste0(Sys.time(), ' | Creating a dataframe from the match data. \n'))
 groups <- 100
-loops <- totalData %>% nrow %>% `/`(groups) %>% ceiling
+
+# Get the total number of iterations
+loops <- totalData %>%
+  nrow %>%
+  `/`(groups) %>%
+  ceiling
+
 original.data <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:loops) {
-  print(paste0(' Looping ', i, ' / ', loops))
+  cat(' Looping ', i, ' / ', loops)
+
+  # Get the upper index
   upper <- if (i %>% `==`(loops)) {
-    totalData %>% nrow %>% mod(groups) %>% `+`(groups %>% `*`(loops - 1))
+    totalData %>%
+      nrow %>%
+      mod(groups) %>%
+      `+`(groups %>% `*`(loops - 1))
   } else {
     groups %>% `*`(i)
   }
-  lower <- groups %>% `*`(i - 1) %>% `+`(1)
+
+  # Get the lower index
+  lower <- groups %>%
+    `*`(i - 1) %>%
+    `+`(1)
+
+  # Bind the data set on each time
   original.data %<>% rbind(totalData[lower:upper, ] %>% footballstats::calculate_data())
 }
 

@@ -6,7 +6,21 @@
 \usage{
 monthly_report(KEYS, month, year)
 }
-\details{
+\arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+
+\item{month}{An integer value defining the month that the match was
+played in.}
+
+\item{year}{An integer value defining the season that the match was
+played in.}
+}
+\value{
+Nothing. The monthly report is either printed to screen or
+ sent directly to Slack.
+}
+\description{
 This function is triggered via a CRON job,
  and prints the results from a months worth of data
  to the slack channel #reports

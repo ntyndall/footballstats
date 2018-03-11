@@ -2,12 +2,13 @@
 % Please edit documentation in R/classify_form_info.R
 \name{form_to_int}
 \alias{form_to_int}
-\title{classify_form_to_int}
+\title{From Vector To Integer}
 \usage{
 form_to_int(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0)
 }
 \arguments{
-\item{oldForms}{A character string which contains either `W`, `L`, or `D`.}
+\item{oldForms}{A character string which contains either `W`, `L`, or `D`
+of arbitrary length}
 
 \item{winPoints}{An integer defining the points accredited for a win.}
 
@@ -21,4 +22,8 @@ An integer value defining the value of a teams form
 \description{
 A function that converts a form vector e.g. 'WLD' into an integer
  value defined by the function default values for win / lose / draw.
+}
+\examples{
+ footballstats::form_to_int('WLDW')
+
 }

@@ -4,5 +4,37 @@
 \alias{project_commentaries}
 \title{Commentary Projection}
 \usage{
-project_commentaries(competitionID, seasonStarting, teamIDs, matchDate, KEYS)
+project_commentaries(KEYS, teamIDs, matchDate, matchID)
+}
+\arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+
+\item{teamIDs}{A character vector of length two, containing the home team
+and away team in that order.}
+
+\item{matchDate}{A character string of the matchDate API form, i.e. of
+the form dd.mm.yyyy}
+
+\item{matchID}{A character string that represents the current matchID
+under investigation.}
+}
+\value{
+A data frame of projected commentary information based on the
+ data found in redis.
+}
+\description{
+A function that tries to project the values of the commentary
+ information by getting the raw commentary data of previous matches for the
+ two teamIDs. Variables are used, such as how many commentaries to look back on
+ to make the projection. Then the positions of those teams when they played the matches
+ are taken to try and normalise the commentary information as best as possible, this
+ squeezes data closer to try and see how well they actually played while trying to lift
+ the constraint of teams being physically better.
+}
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+  }
 }

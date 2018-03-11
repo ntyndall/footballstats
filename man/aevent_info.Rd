@@ -7,8 +7,8 @@
 aevent_info(KEYS, matchIDs, matchEvents)
 }
 \arguments{
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 
 \item{matchIDs}{An integer character vector of matchIDs that match
 the matchEvents.}

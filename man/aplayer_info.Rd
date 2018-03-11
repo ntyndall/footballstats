@@ -7,8 +7,8 @@
 aplayer_info(KEYS, playerLength)
 }
 \arguments{
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 
 \item{playerLength}{An integer value that defines the number of players to
 analyse for a given list of ID's previously generated.}

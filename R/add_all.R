@@ -21,11 +21,8 @@
 #'    }
 #'  }
 #'
-#' @param competitionID An integer ID of the competition defined by the API.
-#' @param seasonStarting An integer of _Y_ format that defines the start of the
-#'  season.
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #'
 #' @return Returns nothing.
 #'
@@ -35,7 +32,7 @@
 add_all <- function(KEYS) { # nocov start
 
   # Add competition standing
-  KEYS%>% footballstats::acomp_standings()
+  KEYS %>% footballstats::acomp_standings()
 
   # Lookup request timings
   startingRequests <- 'requestLimit' %>% rredis::redisGet() %>% as.integer

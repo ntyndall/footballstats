@@ -2,29 +2,31 @@
 % Please edit documentation in R/utils.R
 \name{request_limit}
 \alias{request_limit}
-\title{check_request_limit}
+\title{Check Request Limit}
 \usage{
 request_limit(requestsAllowed = 1000, timePeriod = 60 * 60)
 }
 \arguments{
 \item{requestsAllowed}{An integer value that defines the number of requests
-that can be made in a given time period.}
+that can be made in a given time period (Default = 1000).}
 
 \item{timePeriod}{An integer value in seconds that defines the time period
-where `requestsAllowed` API calls are allowed.}
+where `requestsAllowed` API calls are allowed (Default = 60 * 60).}
 }
 \value{
 Nothing. Redis is updated with the correct requestLimit values.
 }
 \description{
 A function that stores the number of requests made to the
- API within a given time period. The redis key is available through
-    ->   requestLimit
- If limit is reached then the code will stall until requests are free
- to query the API again successfully.
-}
-\details{
-The API is constrained to 1000 request per hour (default), or
+ API within a given time period. If the limit is reached then the code
+ will stall until requests are free to query the API again successfully.
+ The API is constrained to 1000 request per hour (default), or
  x calls per t time. So this function is checked each time before an
  endpoint is hit and waits a given time if no requests are remaining.
+}
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[KEY]} :: \code{requestLimit}}
+  }
 }

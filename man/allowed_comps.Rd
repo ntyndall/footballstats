@@ -2,7 +2,16 @@
 % Please edit documentation in R/utils.R
 \name{allowed_comps}
 \alias{allowed_comps}
-\title{Allowed competitions}
+\title{Allowed Competitions}
 \usage{
 allowed_comps()
+}
+\value{
+A character vector of competition IDs defined by the API.
+}
+\description{
+A lot of the competitions from the API
+ are not accessible, or only provide minimal data. To avoid
+ issues when running the code, so complete data sets are used,
+ this provides a list of complete competitions.
 }

@@ -6,3 +6,11 @@
 \usage{
 possible_env()
 }
+\value{
+A character string of R global environment location paths.
+}
+\description{
+A function that searches typical R global
+ environment locations, to try and read the values
+ defining the API and other sensitive data.
+}

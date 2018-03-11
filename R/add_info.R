@@ -10,8 +10,8 @@
 #'     \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #' @param matchIDs A character vector of matchIDs that match
 #'  the matchEvents.
 #' @param localteam An integer ID value representing the home team
@@ -91,8 +91,8 @@ acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
 #'     \item{\strong{[SET]} :: \code{competition:set}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #'
 #' @return returns competitionIDs, a redis hash is set with season IDs, and a
 #'  redis set is created to store the current seasonIDs.
@@ -143,8 +143,8 @@ acomp_info <- function(KEYS) {
 #'     \item{\strong{[HASH]} :: \code{comp:season:_standing_:{comp_id}:{season}}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #'
 #' @return Returns nothing, a redis hash map is set with the competition
 #'  standing information.
@@ -166,7 +166,7 @@ acomp_standings <- function(KEYS) {
   if (standings %>% is.null %>% `!`()) {
     for (i in 1:nrow(standings)) {
       singleTable <- standings[i, ]
-      standingKey <- paste0("comp:season:_standing_:", KEYS$COMP, singleTable$season)
+      standingKey <- paste0("comp:season:_standing_:", KEYS$COMP, ':', singleTable$season)
       rredis::redisHMSet(
         key = standingKey,
         values = singleTable
@@ -188,8 +188,8 @@ acomp_standings <- function(KEYS) {
 #'     \item{\strong{[HASH]} :: \code{cme:{comp_id}:{match_id}:{event_id}}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #' @param matchIDs An integer character vector of matchIDs that match
 #'  the matchEvents.
 #' @param matchEvents A list of data frames containing individual events
@@ -246,8 +246,8 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
 #'     \item{\strong{[HASH]} :: \code{c:{comp_id}:pred:{match_id}}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #'
 #' @return Returns a match dataframe containing all match information to update
 #'  events in a particular match. Redis is updated with match information.
@@ -343,8 +343,8 @@ amatch_info <- function(KEYS) {
 #'     \item{\strong{[HASH]} :: \code{ctps_**:{comp_id}:{team_id}:{player_id}:{season}}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #' @param playerLength An integer value that defines the number of players to
 #'  analyse for a given list of ID's previously generated.
 #'
@@ -436,8 +436,8 @@ aplayer_info <- function(KEYS, playerLength) {
 #'     \item{\strong{[HASH]} :: \code{ctp:{comp_id}:{team_id}:{player_id}}}
 #'   }
 #'
-#' @param KEYS A list containing options such as testing / prediction
-#'  options and also the API query information such as url.
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
 #' @param teamListLength An integer value that defines how long the list
 #'  containing teamID's is TeamID's are then popped from the list as they
 #'  are anaylsed.

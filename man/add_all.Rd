@@ -7,13 +7,8 @@
 add_all(KEYS)
 }
 \arguments{
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
-
-\item{competitionID}{An integer ID of the competition defined by the API.}
-
-\item{seasonStarting}{An integer of _Y_ format that defines the start of the
-season.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 }
 \value{
 Returns nothing.

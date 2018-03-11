@@ -2,7 +2,37 @@
 % Please edit documentation in R/classify_calculate_dataset.R
 \name{feat_position}
 \alias{feat_position}
-\title{Relative Position Feature}
+\title{League Position}
 \usage{
-feat_position(competitionID, seasonStarting, matchID, teamIDs)
+feat_position(KEYS, matchID, teamIDs, matchDate = NULL)
+}
+\arguments{
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
+
+\item{matchID}{A character string that represents the matchID under
+investigation.}
+
+\item{teamIDs}{A character vector of length two that contains the
+two teams involved in the match in order of home and away.}
+
+\item{matchDate}{If NULL the date is queried by in the basic commentary
+information, else a date of the form dd.mm.yyyy can be supplied.}
+}
+\value{
+A data frame with two columns, `position.h` and `position.a`.
+}
+\description{
+A function that takes a matchID, and the teams associated
+ to calculate their position in the league table whenever that match
+ was played. If there is no \code{matchDate} supplied then, a query
+ to redis to figure out the date of the match is carried out. The weekly
+ positions is queried to figure out the positions for that particular week.
+}
+\details{
+Redis Keys used;
+  \itemize{
+    \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
+    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+  }
 }

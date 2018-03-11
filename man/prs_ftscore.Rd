@@ -11,3 +11,10 @@ prs_ftscore(ftScore)
 '[2-0]', and will be parsed as an integer vector of
 2 0.}
 }
+\value{
+An integer vector of the form c(home_score, away_score).
+}
+\description{
+A function that takes a full time result and
+ tries to parse this as an integer vector of H vs. A.
+}

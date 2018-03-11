@@ -15,16 +15,7 @@ rredis::redisConnect(
 rredis::redisSelect(3)
 
 # Set up enough keys for testing
-KEYS <<- list(
-  COMP= 1204,
-  SEASON = 2017,
-  DATE_FROM = NULL,
-  DATE_TO = NULL,
-  SLACK_PRNT = FALSE,
-  TEST = TRUE,
-  LOG_PRED = FALSE,
-  LOGGING = FALSE
-)
+KEYS <<- footballstats::keys_for_testing()
 
 results <- testthat::test_dir(
   path = "testthat",
@@ -39,9 +30,7 @@ for(i in 1:length(results)) {
 
   for (j in 1:length(testResults)) {
     check <- utils::capture.output(testResults[[j]])
-    if (check[1] != "As expected ") {
-      failures %<>% `+`(1)
-    }
+    if (check[1] != "As expected ") failures %<>% `+`(1)
   }
 
   fileName <- singleTest$file[1]

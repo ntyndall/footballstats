@@ -6,3 +6,17 @@
 \usage{
 create_sink(fName)
 }
+\arguments{
+\item{fName}{A character string that defines the type of
+log file to create - it will be appended by the date it
+is being run, i.e. this should only be called from the
+deployed functions.}
+}
+\value{
+Nothing. A log file to write to is set up.
+}
+\description{
+A function that creates a log file that
+ gets written to when the \code{footballstats} code
+ is running, either gathering data or predicting results.
+}

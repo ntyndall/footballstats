@@ -7,8 +7,8 @@
 acomp_standings(KEYS)
 }
 \arguments{
-\item{KEYS}{A list containing options such as testing / prediction
-options and also the API query information such as url.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 }
 \value{
 Returns nothing, a redis hash map is set with the competition

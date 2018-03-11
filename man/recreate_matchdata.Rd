@@ -4,22 +4,22 @@
 \alias{recreate_matchdata}
 \title{Recreate Match Data}
 \usage{
-recreate_matchdata(KEYS, matchLimit = 10000)
+recreate_matchdata(KEYS)
 }
 \arguments{
-\item{KEYS}{keys list...}
-
-\item{redisData}{An environment that defines the redis configuration where data is
-to be searched for.}
+\item{KEYS}{A list containing options such as testing / prediction /
+important variables and information. Also contains API information.}
 }
 \value{
 matchData. A data frame containing all the matches in a particular season.
 }
 \description{
-A function that provided with a competitionID and season start year,
- can auto generate and order by date all the basic match information
+A function that can auto generate and order by date all
+ the basic match information if it exists in redis.
 }
 \details{
-A search for all matches in a particular subset is made in Redis, a data frame
- is then constructed to rebuild the original API query and ordered by date.
+Redis Keys used;
+  \itemize{
+    \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
+  }
 }

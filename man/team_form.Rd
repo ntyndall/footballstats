@@ -2,25 +2,21 @@
 % Please edit documentation in R/classify_form_info.R
 \name{team_form}
 \alias{team_form}
-\title{classify_team_form}
+\title{Team Form}
 \usage{
 team_form(matchData, teamID)
 }
 \arguments{
-\item{matchData}{A dataframe containing all the match data, so it can
-be subsetting easily during the vectorized function.}
+\item{matchData}{A data frame that contains rows of single matches
+that have been played between two teams.}
 
 \item{teamID}{A character string that denotes the current team being
 analysed.}
-
-\item{whichTeam}{A vector to denote either home / away team used in
-both subsetting and generating result of the matches.}
 }
 \value{
-Returns two lists nested inside one list.
+Returns a named list with `date` and `form`.
 }
 \description{
 A function that generates both the team form and date of
- the match in a list. A list is generated for both of these in terms
- of a home and away list.
+ a particular team.
 }

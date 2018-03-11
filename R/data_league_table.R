@@ -1,6 +1,23 @@
 #' @title Create weekly points
 #'
-#' @description MAKE SURE THE MATCH DATA IS RECREATED!!
+#' @description A function that takes a data frame of matchData and recreates
+#'  the league table by adding points on a weekly basis based on the date
+#'  timestamps of the data frame.
+#'
+#'  Make sure the match data has been recreated, i.e. it needs to be stored
+#'  in redis, then ordered by date to work.
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[KEY]} :: \code{c_startDate:{comp_id}:{season}}}
+#'     \item{\strong{[SET]} :: \code{leagueMatchSet}}
+#'     \item{\strong{[HASH]} :: \code{cwt_l:{comp_id}:{season}:{week#}:{team_id}}}
+#'   }
+#'
+#' @param matchData A data frame that contains rows of single matches
+#'  that have been played between two teams.
+#'
+#' @return Nothing. The points and goal information is stored in redis.
 #'
 #' @export
 
@@ -110,6 +127,21 @@ create_table <- function(matchData) {
 }
 
 #' @title Weekly Positions
+#'
+#' @description A function that can take the data stored by \code{create_table} and
+#'  reproduce a list of standings for every team based on each week.
+#'
+#' @details Redis Keys used;
+#'   \itemize{
+#'     \item{\strong{[HASH]} :: \code{cwt_l:{comp_id}:{season}:{week#}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{cw_pl:{comp_id}:{season}:{week#}}}
+#'   }
+#'
+#' @param KEYS A list containing options such as testing / prediction /
+#'  important variables and information. Also contains API information.
+#'
+#' @return Nothing. The weekly position of each team is stored in redis.
+#'
 #' @export
 
 
@@ -220,6 +252,13 @@ weekly_positions <- function(KEYS) {
 }
 
 #' @title Get Weeks
+#'
+#' @description A function that is used by the data league table functionality
+#'  in order to extract the week information from the keys
+#'
+#' @param x A character vector of \code{cwt_l} style keys
+#'
+#' @return An integer vector of weeks that are defined in the redis keys.
 #'
 #' @export
 

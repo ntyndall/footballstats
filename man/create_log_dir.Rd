@@ -6,3 +6,11 @@
 \usage{
 create_log_dir()
 }
+\value{
+Nothing, a log directory is created.
+}
+\description{
+A function that checks for the global enviornment
+ variable \code{FS_DEPLOYLOC}, if it exists then it creates a
+ log directory structure at \code{FS_DEPLOYLOC/logs/}.
+}
