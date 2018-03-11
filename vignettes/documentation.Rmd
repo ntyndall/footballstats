@@ -1,0 +1,116 @@
+---
+title: "Put the title of your vignette here"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Put the title of your vignette here}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+## Redis Data Structures
+Below is a list of data structures that are available through the redis DB
+
+ * [Match Information](#matchinfo)
+
+```{r, echo=FALSE}
+library(footballstats)
+library(rredis)
+library(magrittr)
+blank <- utils::capture.output(footballstats::redis_con())
+first_four <- function(z) {
+  z <- lapply(1:4, function(x) z[[x]])
+  return(c(z, '...'))
+}
+```
+
+
+#### Match Information {#matchinfo}
+`csm:{comp_id}:{season}:{match_id}`
+```{r}
+match.info <- "csm:1204:2017:2213059" %>% 
+  rredis::redisHGetAll() %>%
+  lapply(as.character)
+print(match.info)
+```
+
+
+#### Competition Information {#competitioninfo}
+`competition:set`
+```{r}
+competition.set <- "competition:set" %>% 
+  rredis::redisSMembers() %>%
+  lapply(as.character) %>%
+  first_four()
+print(competition.set)
+```
+
+
+#### Analyse Teams {#analyseteams}
+This list is constantly pushed to and lifted from with no replace. It looks like the following when we issue `lrange analyseTeams 0 -1`.
+```{r}
+print(list("9221", "9074", "9348", "9021", "..."))
+```
+
+
+#### ... {#...}
+```{r}
+match.in.set <- "c_matchSetInfo:1204" %>% 
+  rredis::redisSMembers() %>%
+  lapply(as.character) %>%
+  first_four()
+print(match.in.set)
+```
+
+
+#### ... {#...}
+`c:1204:ready`.
+```{r}
+print(list("2213173", "2213174", "2213175", "2213176", "..."))
+```
+
+
+#### ... {#...}
+```{r}
+league.updated <- "leagueMatchSet" %>% 
+  rredis::redisSMembers() %>%
+  lapply(as.character) %>%
+  first_four()
+print(league.updated)
+```
+
+
+
+#### League Table {#leaguetable}
+Lets have a look at the key structure first
+```{r}
+team.info.keys <- "cwt_l:1204:2017*" %>% 
+  rredis::redisKeys() %>% 
+  `[`(c(1:10))
+print(c(team.info.keys, "..."))
+```
+Then looking at a particular key we can see the structure each one has.
+```{r}
+team.week.info <- "cwt_l:1204:2017:23:9287" %>%
+  rredis::redisHGetAll() %>% 
+  lapply(as.character)
+names(team.week.info) <- c("TEAM", "PTS", "GF", "GD")
+print(team.week.info)
+```
+All these individual hash maps containing a single teams accumulative points for each week means we can build a league table for any of the weeks up until the current date, and is accessible through the following;
+```{r}
+positions <- "cw_pl:1204:2017:23" %>%
+  rredis::redisHGetAll() %>%
+  lapply(as.character)
+print(positions)
+```
+
+
+#### ... {#...}
+```{r}
+league.updated <- "leagueMatchSet" %>% 
+  rredis::redisSMembers() %>%
+  lapply(as.character) %>%
+  first_four()
+print(league.updated)
+```
+

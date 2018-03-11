@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>Put the title of your vignette here</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Put the title of your vignette here</h1>
+
+
+
+<div id="redis-data-structures" class="section level2">
+<h2>Redis Data Structures</h2>
+<p>Below is a list of data structures that are available through the redis DB</p>
+<ul>
+<li><a href="#matchinfo">Match Information</a></li>
+</ul>
+<div id="matchinfo" class="section level4">
+<h4>Match Information</h4>
+<p><code>csm:{comp_id}:{season}:{match_id}</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">match.info &lt;-<span class="st"> &quot;csm:1204:2017:2213059&quot;</span> %&gt;%<span class="st"> </span>
+<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character)
+<span class="kw">print</span>(match.info)</code></pre></div>
+<pre><code>## $id
+## [1] &quot;2213059&quot;
+## 
+## $comp_id
+## [1] &quot;1204&quot;
+## 
+## $formatted_date
+## [1] &quot;09.12.2017&quot;
+## 
+## $season
+## [1] &quot;2017/2018&quot;
+## 
+## $week
+## [1] &quot;16&quot;
+## 
+## $venue
+## [1] &quot;The John Smith's Stadium (Huddersfield, West Yorkshire)&quot;
+## 
+## $venue_id
+## [1] &quot;15188&quot;
+## 
+## $venue_city
+## [1] &quot;Huddersfield, West Yorkshire&quot;
+## 
+## $status
+## [1] &quot;FT&quot;
+## 
+## $timer
+## [1] &quot;&quot;
+## 
+## $time
+## [1] &quot;15:00&quot;
+## 
+## $localteam_id
+## [1] &quot;9220&quot;
+## 
+## $localteam_name
+## [1] &quot;Huddersfield Town&quot;
+## 
+## $localteam_score
+## [1] &quot;2&quot;
+## 
+## $visitorteam_id
+## [1] &quot;9065&quot;
+## 
+## $visitorteam_name
+## [1] &quot;Brighton &amp; Hove Albion&quot;
+## 
+## $visitorteam_score
+## [1] &quot;0&quot;
+## 
+## $ht_score
+## [1] &quot;[2-0]&quot;
+## 
+## $ft_score
+## [1] &quot;[2-0]&quot;
+## 
+## $et_score
+## [1] NA
+## 
+## $penalty_local
+## [1] NA
+## 
+## $penalty_visitor
+## [1] NA</code></pre>
+</div>
+<div id="competitioninfo" class="section level4">
+<h4>Competition Information</h4>
+<p><code>competition:set</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">competition.set &lt;-<span class="st"> &quot;competition:set&quot;</span> %&gt;%<span class="st"> </span>
+<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
+<span class="st">  </span><span class="kw">first_four</span>()
+<span class="kw">print</span>(competition.set)</code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;1005&quot;
+## 
+## [[2]]
+## [1] &quot;1007&quot;
+## 
+## [[3]]
+## [1] &quot;1093&quot;
+## 
+## [[4]]
+## [1] &quot;1102&quot;
+## 
+## [[5]]
+## [1] &quot;...&quot;</code></pre>
+</div>
+<div id="analyseteams" class="section level4">
+<h4>Analyse Teams</h4>
+<p>This list is constantly pushed to and lifted from with no replace. It looks like the following when we issue <code>lrange analyseTeams 0 -1</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;9221&quot;</span>, <span class="st">&quot;9074&quot;</span>, <span class="st">&quot;9348&quot;</span>, <span class="st">&quot;9021&quot;</span>, <span class="st">&quot;...&quot;</span>))</code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;9221&quot;
+## 
+## [[2]]
+## [1] &quot;9074&quot;
+## 
+## [[3]]
+## [1] &quot;9348&quot;
+## 
+## [[4]]
+## [1] &quot;9021&quot;
+## 
+## [[5]]
+## [1] &quot;...&quot;</code></pre>
+</div>
+<div id="section" class="section level4">
+<h4>… {#…}</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">match.in.set &lt;-<span class="st"> &quot;c_matchSetInfo:1204&quot;</span> %&gt;%<span class="st"> </span>
+<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
+<span class="st">  </span><span class="kw">first_four</span>()
+<span class="kw">print</span>(match.in.set)</code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;2212907&quot;
+## 
+## [[2]]
+## [1] &quot;2212908&quot;
+## 
+## [[3]]
+## [1] &quot;2212909&quot;
+## 
+## [[4]]
+## [1] &quot;2212910&quot;
+## 
+## [[5]]
+## [1] &quot;...&quot;</code></pre>
+</div>
+<div id="section-1" class="section level4">
+<h4>… {#…}</h4>
+<p><code>c:1204:ready</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;2213173&quot;</span>, <span class="st">&quot;2213174&quot;</span>, <span class="st">&quot;2213175&quot;</span>, <span class="st">&quot;2213176&quot;</span>, <span class="st">&quot;...&quot;</span>))</code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;2213173&quot;
+## 
+## [[2]]
+## [1] &quot;2213174&quot;
+## 
+## [[3]]
+## [1] &quot;2213175&quot;
+## 
+## [[4]]
+## [1] &quot;2213176&quot;
+## 
+## [[5]]
+## [1] &quot;...&quot;</code></pre>
+</div>
+<div id="section-2" class="section level4">
+<h4>… {#…}</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">league.updated &lt;-<span class="st"> &quot;leagueMatchSet&quot;</span> %&gt;%<span class="st"> </span>
+<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
+<span class="st">  </span><span class="kw">first_four</span>()
+<span class="kw">print</span>(league.updated)</code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;2243999:17002&quot;
+## 
+## [[2]]
+## [1] &quot;2243932:17072&quot;
+## 
+## [[3]]
+## [1] &quot;2239831:14378&quot;
+## 
+## [[4]]
+## [1] &quot;2224810:10307&quot;
+## 
+## [[5]]
+## [1] &quot;...&quot;</code></pre>
+</div>
+<div id="leaguetable" class="section level4">
+<h4>League Table</h4>
+<p>Lets have a look at the key structure first</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">team.info.keys &lt;-<span class="st"> &quot;cwt_l:1204:2017*&quot;</span> %&gt;%<span class="st"> </span>
+<span class="st">  </span>rredis::<span class="kw">redisKeys</span>() %&gt;%<span class="st"> </span>
+<span class="st">  `</span><span class="dt">[</span><span class="st">`</span>(<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">10</span>))
+<span class="kw">print</span>(<span class="kw">c</span>(team.info.keys, <span class="st">&quot;...&quot;</span>))</code></pre></div>
+<pre><code>##  [1] &quot;cwt_l:1204:2017:12:9423&quot; &quot;cwt_l:1204:2017:15:9158&quot;
+##  [3] &quot;cwt_l:1204:2017:16:9053&quot; &quot;cwt_l:1204:2017:20:9426&quot;
+##  [5] &quot;cwt_l:1204:2017:27:9259&quot; &quot;cwt_l:1204:2017:7:9287&quot; 
+##  [7] &quot;cwt_l:1204:2017:6:9426&quot;  &quot;cwt_l:1204:2017:10:9249&quot;
+##  [9] &quot;cwt_l:1204:2017:1:9259&quot;  &quot;cwt_l:1204:2017:18:9249&quot;
+## [11] &quot;...&quot;</code></pre>
+<p>Then looking at a particular key we can see the structure each one has.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">team.week.info &lt;-<span class="st"> &quot;cwt_l:1204:2017:23:9287&quot;</span> %&gt;%
+<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">lapply</span>(as.character)
+<span class="kw">names</span>(team.week.info) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;TEAM&quot;</span>, <span class="st">&quot;PTS&quot;</span>, <span class="st">&quot;GF&quot;</span>, <span class="st">&quot;GD&quot;</span>)
+<span class="kw">print</span>(team.week.info)</code></pre></div>
+<pre><code>## $TEAM
+## [1] &quot;Newcastle United&quot;
+## 
+## $PTS
+## [1] &quot;23&quot;
+## 
+## $GF
+## [1] &quot;21&quot;
+## 
+## $GD
+## [1] &quot;-10&quot;</code></pre>
+<p>All these individual hash maps containing a single teams accumulative points for each week means we can build a league table for any of the weeks up until the current date, and is accessible through the following;</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">positions &lt;-<span class="st"> &quot;cw_pl:1204:2017:23&quot;</span> %&gt;%
+<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character)
+<span class="kw">print</span>(positions)</code></pre></div>
+<pre><code>## $`9259`
+## [1] &quot;1&quot;
+## 
+## $`9260`
+## [1] &quot;2&quot;
+## 
+## $`9249`
+## [1] &quot;3&quot;
+## 
+## $`9092`
+## [1] &quot;4&quot;
+## 
+## $`9406`
+## [1] &quot;5&quot;
+## 
+## $`9002`
+## [1] &quot;6&quot;
+## 
+## $`9072`
+## [1] &quot;7&quot;
+## 
+## $`9240`
+## [1] &quot;8&quot;
+## 
+## $`9158`
+## [1] &quot;9&quot;
+## 
+## $`9423`
+## [1] &quot;10&quot;
+## 
+## $`9427`
+## [1] &quot;11&quot;
+## 
+## $`9127`
+## [1] &quot;12&quot;
+## 
+## $`9053`
+## [1] &quot;13&quot;
+## 
+## $`9220`
+## [1] &quot;14&quot;
+## 
+## $`9287`
+## [1] &quot;15&quot;
+## 
+## $`9065`
+## [1] &quot;16&quot;
+## 
+## $`9363`
+## [1] &quot;17&quot;
+## 
+## $`9378`
+## [1] &quot;18&quot;
+## 
+## $`9426`
+## [1] &quot;19&quot;
+## 
+## $`9387`
+## [1] &quot;20&quot;</code></pre>
+</div>
+<div id="section-3" class="section level4">
+<h4>… {#…}</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">league.updated &lt;-<span class="st"> &quot;leagueMatchSet&quot;</span> %&gt;%<span class="st"> </span>
+<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
+<span class="st">  </span><span class="kw">first_four</span>()
+<span class="kw">print</span>(league.updated)</code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;2243999:17002&quot;
+## 
+## [[2]]
+## [1] &quot;2243932:17072&quot;
+## 
+## [[3]]
+## [1] &quot;2239831:14378&quot;
+## 
+## [[4]]
+## [1] &quot;2224810:10307&quot;
+## 
+## [[5]]
+## [1] &quot;...&quot;</code></pre>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
