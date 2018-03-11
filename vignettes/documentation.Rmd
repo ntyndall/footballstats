@@ -1,16 +1,29 @@
 ---
-title: "Put the title of your vignette here"
+title: "Documentation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Put the title of your vignette here}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-## Redis Data Structures
+# Table Of Contents
+1. [Redis Data Structures](#datastructures)
+ * [Competition Information](#competitioninfo)
+ * [Match Information](#matchinfo)
+ * [Team Information](#teaminfo)
+ * [Player Information](#playerinfo)
+ * [League Table](#leaguetable)
+2. [Results](#results)
+
+
+## Redis Data Structures {#datastructures}
 Below is a list of data structures that are available through the redis DB
 
- * [Match Information](#matchinfo)
+* [Competition Information](#competitioninfo)
+* [Match Information](#matchinfo)
+* [Team Information](#teaminfo)
+* [Player Information](#playerinfo)
+* [League Table](#leaguetable)
 
 ```{r, echo=FALSE}
 library(footballstats)
@@ -21,6 +34,20 @@ first_four <- function(z) {
   z <- lapply(1:4, function(x) z[[x]])
   return(c(z, '...'))
 }
+f_json <- function(y) {
+  return(y %>% jsonlite::toJSON(auto_unbox = TRUE) %>% jsonlite::prettify())
+}
+```
+
+#### Competition Information {#competitioninfo}
+`competition:set`
+```{r}
+competition.set <- "competition:set" %>% 
+  rredis::redisSMembers() %>%
+  lapply(as.character) %>%
+  first_four() %>% 
+  f_json()
+print(competition.set)
 ```
 
 
@@ -29,55 +56,78 @@ first_four <- function(z) {
 ```{r}
 match.info <- "csm:1204:2017:2213059" %>% 
   rredis::redisHGetAll() %>%
-  lapply(as.character)
+  lapply(as.character) %>% 
+  f_json()
 print(match.info)
 ```
-
-
-#### Competition Information {#competitioninfo}
-`competition:set`
+`c:1204:ready`.
 ```{r}
-competition.set <- "competition:set" %>% 
-  rredis::redisSMembers() %>%
-  lapply(as.character) %>%
-  first_four()
-print(competition.set)
+print(list("2213173", "2213174", "2213175", "2213176", "...") %>% f_json())
 ```
-
-
-#### Analyse Teams {#analyseteams}
-This list is constantly pushed to and lifted from with no replace. It looks like the following when we issue `lrange analyseTeams 0 -1`.
-```{r}
-print(list("9221", "9074", "9348", "9021", "..."))
-```
-
-
-#### ... {#...}
+Check to see if the match belongs to the set
 ```{r}
 match.in.set <- "c_matchSetInfo:1204" %>% 
   rredis::redisSMembers() %>%
   lapply(as.character) %>%
-  first_four()
+  first_four() %>% 
+  f_json()
 print(match.in.set)
 ```
 
 
-#### ... {#...}
-`c:1204:ready`.
+#### Team Information {#teaminformation}
+This list is constantly pushed to and lifted from with no replace. It looks like the following when we issue `lrange analyseTeams 0 -1`.
 ```{r}
-print(list("2213173", "2213174", "2213175", "2213176", "..."))
+print(list("9221", "9074", "9348", "9021", "...") %>% f_json())
+```
+`hgetall ct_basic:1204:9065`
+```{r, echo=FALSE}
+basic.info <- list(
+  team_id = "9065",
+  is_national = "False",
+  name = "Brighton & Hove Albion",
+  country = "England",
+  founded = "1901",
+  leagues = "1204,1198,1199",
+  venue_name = "The American Express Community Stadium",
+  venue_id = "86109",
+  venue_surface = "grass",
+  venue_address = "Village Way",
+  venue_city = "Falmer, East Sussex",
+  venue_capacity = "30750",
+  coach_name = "C. Hughton",
+  coach_id = "136328"
+) %>% f_json()
+print(basic.info)
 ```
 
 
-#### ... {#...}
+#### Player Information {#playerinformation}
+Everytime a match is analysed and the team information stored, all the player IDs involved in the update are pushed to a new list, and are accessible through `lrange analysePlayers 0 -1`. Through another approach, and another CRON job, the players are analysed one by one.
 ```{r}
-league.updated <- "leagueMatchSet" %>% 
-  rredis::redisSMembers() %>%
-  lapply(as.character) %>%
-  first_four()
-print(league.updated)
+print(list("453145", "49530", "376371", "15512", "...") %>% f_json())
 ```
-
+Player statistics are then accessible through the following key names and all have a similar data structure.
+```{r, echo=FALSE}
+player.info <- list(
+  name = "West Bromwich Albion",
+  id = "9426",
+  league = "Premier League",
+  league_id = "1204",
+  season = "2017/2018",
+  minutes = "180",
+  appearances = "2",
+  lineups = "2",
+  substitute_in = "0",
+  substitute_out = "0",
+  substitute_on_bench = "0",
+  goals = "0",
+  yellowcards = "0",
+  yellowred = "0",
+  redcards = "0"
+) 
+print(player.info %>% f_json())
+```
 
 
 #### League Table {#leaguetable}
@@ -86,7 +136,7 @@ Lets have a look at the key structure first
 team.info.keys <- "cwt_l:1204:2017*" %>% 
   rredis::redisKeys() %>% 
   `[`(c(1:10))
-print(c(team.info.keys, "..."))
+print(c(team.info.keys, "...") %>% f_json())
 ```
 Then looking at a particular key we can see the structure each one has.
 ```{r}
@@ -94,23 +144,26 @@ team.week.info <- "cwt_l:1204:2017:23:9287" %>%
   rredis::redisHGetAll() %>% 
   lapply(as.character)
 names(team.week.info) <- c("TEAM", "PTS", "GF", "GD")
-print(team.week.info)
+print(team.week.info %>% f_json())
+```
+Once a key is analysed it is pushed to here;
+```{r}
+league.updated <- "leagueMatchSet" %>% 
+  rredis::redisSMembers() %>%
+  lapply(as.character) %>%
+  first_four() %>% 
+  f_json()
+print(league.updated)
 ```
 All these individual hash maps containing a single teams accumulative points for each week means we can build a league table for any of the weeks up until the current date, and is accessible through the following;
 ```{r}
 positions <- "cw_pl:1204:2017:23" %>%
   rredis::redisHGetAll() %>%
-  lapply(as.character)
+  lapply(as.character) %>% 
+  f_json()
 print(positions)
 ```
 
 
-#### ... {#...}
-```{r}
-league.updated <- "leagueMatchSet" %>% 
-  rredis::redisSMembers() %>%
-  lapply(as.character) %>%
-  first_four()
-print(league.updated)
-```
-
+## Results {#results}
+Below is a list of the results obtained so far...

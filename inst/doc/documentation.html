@@ -12,7 +12,7 @@
 
 
 
-<title>Put the title of your vignette here</title>
+<title>Documentation</title>
 
 
 
@@ -66,193 +66,174 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore">Put the title of your vignette here</h1>
+<h1 class="title toc-ignore">Documentation</h1>
 
 
 
-<div id="redis-data-structures" class="section level2">
+<div id="table-of-contents" class="section level1">
+<h1>Table Of Contents</h1>
+<ol style="list-style-type: decimal">
+<li><a href="#datastructures">Redis Data Structures</a></li>
+</ol>
+<ul>
+<li><a href="#competitioninfo">Competition Information</a></li>
+<li><a href="#matchinfo">Match Information</a></li>
+<li><a href="#teaminfo">Team Information</a></li>
+<li><a href="#playerinfo">Player Information</a></li>
+<li><a href="#leaguetable">League Table</a></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li><a href="#results">Results</a></li>
+</ol>
+<div id="datastructures" class="section level2">
 <h2>Redis Data Structures</h2>
 <p>Below is a list of data structures that are available through the redis DB</p>
 <ul>
+<li><a href="#competitioninfo">Competition Information</a></li>
 <li><a href="#matchinfo">Match Information</a></li>
+<li><a href="#teaminfo">Team Information</a></li>
+<li><a href="#playerinfo">Player Information</a></li>
+<li><a href="#leaguetable">League Table</a></li>
 </ul>
-<div id="matchinfo" class="section level4">
-<h4>Match Information</h4>
-<p><code>csm:{comp_id}:{season}:{match_id}</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">match.info &lt;-<span class="st"> &quot;csm:1204:2017:2213059&quot;</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character)
-<span class="kw">print</span>(match.info)</code></pre></div>
-<pre><code>## $id
-## [1] &quot;2213059&quot;
-## 
-## $comp_id
-## [1] &quot;1204&quot;
-## 
-## $formatted_date
-## [1] &quot;09.12.2017&quot;
-## 
-## $season
-## [1] &quot;2017/2018&quot;
-## 
-## $week
-## [1] &quot;16&quot;
-## 
-## $venue
-## [1] &quot;The John Smith's Stadium (Huddersfield, West Yorkshire)&quot;
-## 
-## $venue_id
-## [1] &quot;15188&quot;
-## 
-## $venue_city
-## [1] &quot;Huddersfield, West Yorkshire&quot;
-## 
-## $status
-## [1] &quot;FT&quot;
-## 
-## $timer
-## [1] &quot;&quot;
-## 
-## $time
-## [1] &quot;15:00&quot;
-## 
-## $localteam_id
-## [1] &quot;9220&quot;
-## 
-## $localteam_name
-## [1] &quot;Huddersfield Town&quot;
-## 
-## $localteam_score
-## [1] &quot;2&quot;
-## 
-## $visitorteam_id
-## [1] &quot;9065&quot;
-## 
-## $visitorteam_name
-## [1] &quot;Brighton &amp; Hove Albion&quot;
-## 
-## $visitorteam_score
-## [1] &quot;0&quot;
-## 
-## $ht_score
-## [1] &quot;[2-0]&quot;
-## 
-## $ft_score
-## [1] &quot;[2-0]&quot;
-## 
-## $et_score
-## [1] NA
-## 
-## $penalty_local
-## [1] NA
-## 
-## $penalty_visitor
-## [1] NA</code></pre>
-</div>
 <div id="competitioninfo" class="section level4">
 <h4>Competition Information</h4>
 <p><code>competition:set</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">competition.set &lt;-<span class="st"> &quot;competition:set&quot;</span> %&gt;%<span class="st"> </span>
 <span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
 <span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
-<span class="st">  </span><span class="kw">first_four</span>()
+<span class="st">  </span><span class="kw">first_four</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">f_json</span>()
 <span class="kw">print</span>(competition.set)</code></pre></div>
-<pre><code>## [[1]]
-## [1] &quot;1005&quot;
-## 
-## [[2]]
-## [1] &quot;1007&quot;
-## 
-## [[3]]
-## [1] &quot;1093&quot;
-## 
-## [[4]]
-## [1] &quot;1102&quot;
-## 
-## [[5]]
-## [1] &quot;...&quot;</code></pre>
+<pre><code>## [
+##     &quot;1005&quot;,
+##     &quot;1007&quot;,
+##     &quot;1093&quot;,
+##     &quot;1102&quot;,
+##     &quot;...&quot;
+## ]
+## </code></pre>
 </div>
-<div id="analyseteams" class="section level4">
-<h4>Analyse Teams</h4>
-<p>This list is constantly pushed to and lifted from with no replace. It looks like the following when we issue <code>lrange analyseTeams 0 -1</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;9221&quot;</span>, <span class="st">&quot;9074&quot;</span>, <span class="st">&quot;9348&quot;</span>, <span class="st">&quot;9021&quot;</span>, <span class="st">&quot;...&quot;</span>))</code></pre></div>
-<pre><code>## [[1]]
-## [1] &quot;9221&quot;
-## 
-## [[2]]
-## [1] &quot;9074&quot;
-## 
-## [[3]]
-## [1] &quot;9348&quot;
-## 
-## [[4]]
-## [1] &quot;9021&quot;
-## 
-## [[5]]
-## [1] &quot;...&quot;</code></pre>
-</div>
-<div id="section" class="section level4">
-<h4>… {#…}</h4>
+<div id="matchinfo" class="section level4">
+<h4>Match Information</h4>
+<p><code>csm:{comp_id}:{season}:{match_id}</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">match.info &lt;-<span class="st"> &quot;csm:1204:2017:2213059&quot;</span> %&gt;%<span class="st"> </span>
+<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">f_json</span>()
+<span class="kw">print</span>(match.info)</code></pre></div>
+<pre><code>## {
+##     &quot;id&quot;: &quot;2213059&quot;,
+##     &quot;comp_id&quot;: &quot;1204&quot;,
+##     &quot;formatted_date&quot;: &quot;09.12.2017&quot;,
+##     &quot;season&quot;: &quot;2017/2018&quot;,
+##     &quot;week&quot;: &quot;16&quot;,
+##     &quot;venue&quot;: &quot;The John Smith's Stadium (Huddersfield, West Yorkshire)&quot;,
+##     &quot;venue_id&quot;: &quot;15188&quot;,
+##     &quot;venue_city&quot;: &quot;Huddersfield, West Yorkshire&quot;,
+##     &quot;status&quot;: &quot;FT&quot;,
+##     &quot;timer&quot;: &quot;&quot;,
+##     &quot;time&quot;: &quot;15:00&quot;,
+##     &quot;localteam_id&quot;: &quot;9220&quot;,
+##     &quot;localteam_name&quot;: &quot;Huddersfield Town&quot;,
+##     &quot;localteam_score&quot;: &quot;2&quot;,
+##     &quot;visitorteam_id&quot;: &quot;9065&quot;,
+##     &quot;visitorteam_name&quot;: &quot;Brighton &amp; Hove Albion&quot;,
+##     &quot;visitorteam_score&quot;: &quot;0&quot;,
+##     &quot;ht_score&quot;: &quot;[2-0]&quot;,
+##     &quot;ft_score&quot;: &quot;[2-0]&quot;,
+##     &quot;et_score&quot;: null,
+##     &quot;penalty_local&quot;: null,
+##     &quot;penalty_visitor&quot;: null
+## }
+## </code></pre>
+<p><code>c:1204:ready</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;2213173&quot;</span>, <span class="st">&quot;2213174&quot;</span>, <span class="st">&quot;2213175&quot;</span>, <span class="st">&quot;2213176&quot;</span>, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
+<pre><code>## [
+##     &quot;2213173&quot;,
+##     &quot;2213174&quot;,
+##     &quot;2213175&quot;,
+##     &quot;2213176&quot;,
+##     &quot;...&quot;
+## ]
+## </code></pre>
+<p>Check to see if the match belongs to the set</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">match.in.set &lt;-<span class="st"> &quot;c_matchSetInfo:1204&quot;</span> %&gt;%<span class="st"> </span>
 <span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
 <span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
-<span class="st">  </span><span class="kw">first_four</span>()
+<span class="st">  </span><span class="kw">first_four</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">f_json</span>()
 <span class="kw">print</span>(match.in.set)</code></pre></div>
-<pre><code>## [[1]]
-## [1] &quot;2212907&quot;
-## 
-## [[2]]
-## [1] &quot;2212908&quot;
-## 
-## [[3]]
-## [1] &quot;2212909&quot;
-## 
-## [[4]]
-## [1] &quot;2212910&quot;
-## 
-## [[5]]
-## [1] &quot;...&quot;</code></pre>
+<pre><code>## [
+##     &quot;2212907&quot;,
+##     &quot;2212908&quot;,
+##     &quot;2212909&quot;,
+##     &quot;2212910&quot;,
+##     &quot;...&quot;
+## ]
+## </code></pre>
 </div>
-<div id="section-1" class="section level4">
-<h4>… {#…}</h4>
-<p><code>c:1204:ready</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;2213173&quot;</span>, <span class="st">&quot;2213174&quot;</span>, <span class="st">&quot;2213175&quot;</span>, <span class="st">&quot;2213176&quot;</span>, <span class="st">&quot;...&quot;</span>))</code></pre></div>
-<pre><code>## [[1]]
-## [1] &quot;2213173&quot;
-## 
-## [[2]]
-## [1] &quot;2213174&quot;
-## 
-## [[3]]
-## [1] &quot;2213175&quot;
-## 
-## [[4]]
-## [1] &quot;2213176&quot;
-## 
-## [[5]]
-## [1] &quot;...&quot;</code></pre>
+<div id="teaminformation" class="section level4">
+<h4>Team Information</h4>
+<p>This list is constantly pushed to and lifted from with no replace. It looks like the following when we issue <code>lrange analyseTeams 0 -1</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;9221&quot;</span>, <span class="st">&quot;9074&quot;</span>, <span class="st">&quot;9348&quot;</span>, <span class="st">&quot;9021&quot;</span>, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
+<pre><code>## [
+##     &quot;9221&quot;,
+##     &quot;9074&quot;,
+##     &quot;9348&quot;,
+##     &quot;9021&quot;,
+##     &quot;...&quot;
+## ]
+## </code></pre>
+<p><code>hgetall ct_basic:1204:9065</code></p>
+<pre><code>## {
+##     &quot;team_id&quot;: &quot;9065&quot;,
+##     &quot;is_national&quot;: &quot;False&quot;,
+##     &quot;name&quot;: &quot;Brighton &amp; Hove Albion&quot;,
+##     &quot;country&quot;: &quot;England&quot;,
+##     &quot;founded&quot;: &quot;1901&quot;,
+##     &quot;leagues&quot;: &quot;1204,1198,1199&quot;,
+##     &quot;venue_name&quot;: &quot;The American Express Community Stadium&quot;,
+##     &quot;venue_id&quot;: &quot;86109&quot;,
+##     &quot;venue_surface&quot;: &quot;grass&quot;,
+##     &quot;venue_address&quot;: &quot;Village Way&quot;,
+##     &quot;venue_city&quot;: &quot;Falmer, East Sussex&quot;,
+##     &quot;venue_capacity&quot;: &quot;30750&quot;,
+##     &quot;coach_name&quot;: &quot;C. Hughton&quot;,
+##     &quot;coach_id&quot;: &quot;136328&quot;
+## }
+## </code></pre>
 </div>
-<div id="section-2" class="section level4">
-<h4>… {#…}</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">league.updated &lt;-<span class="st"> &quot;leagueMatchSet&quot;</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
-<span class="st">  </span><span class="kw">first_four</span>()
-<span class="kw">print</span>(league.updated)</code></pre></div>
-<pre><code>## [[1]]
-## [1] &quot;2243999:17002&quot;
-## 
-## [[2]]
-## [1] &quot;2243932:17072&quot;
-## 
-## [[3]]
-## [1] &quot;2239831:14378&quot;
-## 
-## [[4]]
-## [1] &quot;2224810:10307&quot;
-## 
-## [[5]]
-## [1] &quot;...&quot;</code></pre>
+<div id="playerinformation" class="section level4">
+<h4>Player Information</h4>
+<p>Everytime a match is analysed and the team information stored, all the player IDs involved in the update are pushed to a new list, and are accessible through <code>lrange analysePlayers 0 -1</code>. Through another approach, and another CRON job, the players are analysed one by one.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="kw">list</span>(<span class="st">&quot;453145&quot;</span>, <span class="st">&quot;49530&quot;</span>, <span class="st">&quot;376371&quot;</span>, <span class="st">&quot;15512&quot;</span>, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
+<pre><code>## [
+##     &quot;453145&quot;,
+##     &quot;49530&quot;,
+##     &quot;376371&quot;,
+##     &quot;15512&quot;,
+##     &quot;...&quot;
+## ]
+## </code></pre>
+<p>Player statistics are then accessible through the following key names and all have a similar data structure.</p>
+<pre><code>## {
+##     &quot;name&quot;: &quot;West Bromwich Albion&quot;,
+##     &quot;id&quot;: &quot;9426&quot;,
+##     &quot;league&quot;: &quot;Premier League&quot;,
+##     &quot;league_id&quot;: &quot;1204&quot;,
+##     &quot;season&quot;: &quot;2017/2018&quot;,
+##     &quot;minutes&quot;: &quot;180&quot;,
+##     &quot;appearances&quot;: &quot;2&quot;,
+##     &quot;lineups&quot;: &quot;2&quot;,
+##     &quot;substitute_in&quot;: &quot;0&quot;,
+##     &quot;substitute_out&quot;: &quot;0&quot;,
+##     &quot;substitute_on_bench&quot;: &quot;0&quot;,
+##     &quot;goals&quot;: &quot;0&quot;,
+##     &quot;yellowcards&quot;: &quot;0&quot;,
+##     &quot;yellowred&quot;: &quot;0&quot;,
+##     &quot;redcards&quot;: &quot;0&quot;
+## }
+## </code></pre>
 </div>
 <div id="leaguetable" class="section level4">
 <h4>League Table</h4>
@@ -260,116 +241,83 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">team.info.keys &lt;-<span class="st"> &quot;cwt_l:1204:2017*&quot;</span> %&gt;%<span class="st"> </span>
 <span class="st">  </span>rredis::<span class="kw">redisKeys</span>() %&gt;%<span class="st"> </span>
 <span class="st">  `</span><span class="dt">[</span><span class="st">`</span>(<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">10</span>))
-<span class="kw">print</span>(<span class="kw">c</span>(team.info.keys, <span class="st">&quot;...&quot;</span>))</code></pre></div>
-<pre><code>##  [1] &quot;cwt_l:1204:2017:12:9423&quot; &quot;cwt_l:1204:2017:15:9158&quot;
-##  [3] &quot;cwt_l:1204:2017:16:9053&quot; &quot;cwt_l:1204:2017:20:9426&quot;
-##  [5] &quot;cwt_l:1204:2017:27:9259&quot; &quot;cwt_l:1204:2017:7:9287&quot; 
-##  [7] &quot;cwt_l:1204:2017:6:9426&quot;  &quot;cwt_l:1204:2017:10:9249&quot;
-##  [9] &quot;cwt_l:1204:2017:1:9259&quot;  &quot;cwt_l:1204:2017:18:9249&quot;
-## [11] &quot;...&quot;</code></pre>
+<span class="kw">print</span>(<span class="kw">c</span>(team.info.keys, <span class="st">&quot;...&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
+<pre><code>## [
+##     &quot;cwt_l:1204:2017:12:9423&quot;,
+##     &quot;cwt_l:1204:2017:15:9158&quot;,
+##     &quot;cwt_l:1204:2017:16:9053&quot;,
+##     &quot;cwt_l:1204:2017:20:9426&quot;,
+##     &quot;cwt_l:1204:2017:27:9259&quot;,
+##     &quot;cwt_l:1204:2017:7:9287&quot;,
+##     &quot;cwt_l:1204:2017:6:9426&quot;,
+##     &quot;cwt_l:1204:2017:10:9249&quot;,
+##     &quot;cwt_l:1204:2017:1:9259&quot;,
+##     &quot;cwt_l:1204:2017:18:9249&quot;,
+##     &quot;...&quot;
+## ]
+## </code></pre>
 <p>Then looking at a particular key we can see the structure each one has.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">team.week.info &lt;-<span class="st"> &quot;cwt_l:1204:2017:23:9287&quot;</span> %&gt;%
 <span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">lapply</span>(as.character)
 <span class="kw">names</span>(team.week.info) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;TEAM&quot;</span>, <span class="st">&quot;PTS&quot;</span>, <span class="st">&quot;GF&quot;</span>, <span class="st">&quot;GD&quot;</span>)
-<span class="kw">print</span>(team.week.info)</code></pre></div>
-<pre><code>## $TEAM
-## [1] &quot;Newcastle United&quot;
-## 
-## $PTS
-## [1] &quot;23&quot;
-## 
-## $GF
-## [1] &quot;21&quot;
-## 
-## $GD
-## [1] &quot;-10&quot;</code></pre>
-<p>All these individual hash maps containing a single teams accumulative points for each week means we can build a league table for any of the weeks up until the current date, and is accessible through the following;</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">positions &lt;-<span class="st"> &quot;cw_pl:1204:2017:23&quot;</span> %&gt;%
-<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
-<span class="st">  </span><span class="kw">lapply</span>(as.character)
-<span class="kw">print</span>(positions)</code></pre></div>
-<pre><code>## $`9259`
-## [1] &quot;1&quot;
-## 
-## $`9260`
-## [1] &quot;2&quot;
-## 
-## $`9249`
-## [1] &quot;3&quot;
-## 
-## $`9092`
-## [1] &quot;4&quot;
-## 
-## $`9406`
-## [1] &quot;5&quot;
-## 
-## $`9002`
-## [1] &quot;6&quot;
-## 
-## $`9072`
-## [1] &quot;7&quot;
-## 
-## $`9240`
-## [1] &quot;8&quot;
-## 
-## $`9158`
-## [1] &quot;9&quot;
-## 
-## $`9423`
-## [1] &quot;10&quot;
-## 
-## $`9427`
-## [1] &quot;11&quot;
-## 
-## $`9127`
-## [1] &quot;12&quot;
-## 
-## $`9053`
-## [1] &quot;13&quot;
-## 
-## $`9220`
-## [1] &quot;14&quot;
-## 
-## $`9287`
-## [1] &quot;15&quot;
-## 
-## $`9065`
-## [1] &quot;16&quot;
-## 
-## $`9363`
-## [1] &quot;17&quot;
-## 
-## $`9378`
-## [1] &quot;18&quot;
-## 
-## $`9426`
-## [1] &quot;19&quot;
-## 
-## $`9387`
-## [1] &quot;20&quot;</code></pre>
-</div>
-<div id="section-3" class="section level4">
-<h4>… {#…}</h4>
+<span class="kw">print</span>(team.week.info %&gt;%<span class="st"> </span><span class="kw">f_json</span>())</code></pre></div>
+<pre><code>## {
+##     &quot;TEAM&quot;: &quot;Newcastle United&quot;,
+##     &quot;PTS&quot;: &quot;23&quot;,
+##     &quot;GF&quot;: &quot;21&quot;,
+##     &quot;GD&quot;: &quot;-10&quot;
+## }
+## </code></pre>
+<p>Once a key is analysed it is pushed to here;</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">league.updated &lt;-<span class="st"> &quot;leagueMatchSet&quot;</span> %&gt;%<span class="st"> </span>
 <span class="st">  </span>rredis::<span class="kw">redisSMembers</span>() %&gt;%
 <span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%
-<span class="st">  </span><span class="kw">first_four</span>()
+<span class="st">  </span><span class="kw">first_four</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">f_json</span>()
 <span class="kw">print</span>(league.updated)</code></pre></div>
-<pre><code>## [[1]]
-## [1] &quot;2243999:17002&quot;
-## 
-## [[2]]
-## [1] &quot;2243932:17072&quot;
-## 
-## [[3]]
-## [1] &quot;2239831:14378&quot;
-## 
-## [[4]]
-## [1] &quot;2224810:10307&quot;
-## 
-## [[5]]
-## [1] &quot;...&quot;</code></pre>
+<pre><code>## [
+##     &quot;2243999:17002&quot;,
+##     &quot;2243932:17072&quot;,
+##     &quot;2239831:14378&quot;,
+##     &quot;2224810:10307&quot;,
+##     &quot;...&quot;
+## ]
+## </code></pre>
+<p>All these individual hash maps containing a single teams accumulative points for each week means we can build a league table for any of the weeks up until the current date, and is accessible through the following;</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">positions &lt;-<span class="st"> &quot;cw_pl:1204:2017:23&quot;</span> %&gt;%
+<span class="st">  </span>rredis::<span class="kw">redisHGetAll</span>() %&gt;%
+<span class="st">  </span><span class="kw">lapply</span>(as.character) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">f_json</span>()
+<span class="kw">print</span>(positions)</code></pre></div>
+<pre><code>## {
+##     &quot;9259&quot;: &quot;1&quot;,
+##     &quot;9260&quot;: &quot;2&quot;,
+##     &quot;9249&quot;: &quot;3&quot;,
+##     &quot;9092&quot;: &quot;4&quot;,
+##     &quot;9406&quot;: &quot;5&quot;,
+##     &quot;9002&quot;: &quot;6&quot;,
+##     &quot;9072&quot;: &quot;7&quot;,
+##     &quot;9240&quot;: &quot;8&quot;,
+##     &quot;9158&quot;: &quot;9&quot;,
+##     &quot;9423&quot;: &quot;10&quot;,
+##     &quot;9427&quot;: &quot;11&quot;,
+##     &quot;9127&quot;: &quot;12&quot;,
+##     &quot;9053&quot;: &quot;13&quot;,
+##     &quot;9220&quot;: &quot;14&quot;,
+##     &quot;9287&quot;: &quot;15&quot;,
+##     &quot;9065&quot;: &quot;16&quot;,
+##     &quot;9363&quot;: &quot;17&quot;,
+##     &quot;9378&quot;: &quot;18&quot;,
+##     &quot;9426&quot;: &quot;19&quot;,
+##     &quot;9387&quot;: &quot;20&quot;
+## }
+## </code></pre>
+</div>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p>Below is a list of the results obtained so far…</p>
 </div>
 </div>
 
