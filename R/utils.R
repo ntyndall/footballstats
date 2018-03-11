@@ -48,7 +48,7 @@ sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  #
         LOGGING = printToScreen,
         LOG_PRED = storePred,
         DAYS = 4,
-        STAND = 0.5
+        STAND = 0.04
       )
     )
   }
