@@ -48,7 +48,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     if (commentaryKeys %>% is.null) break else commentaryKeys %<>% as.character
 
     # If it does then continue on
-    KEYS %>% footballstats::order_commentaries(
+    commentaryKeys <- KEYS %>% footballstats::order_commentaries(
       commentaryKeys = commentaryKeys
     ) %>% rev
 
@@ -63,6 +63,8 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
       bothIDs <- paste0(commKey, ':', matchIDs[k], ':*') %>%
         rredis::redisKeys() %>%
         footballstats::flatt(y = 4)
+
+      if (teamIDs[j] %>% `==`(bothIDs) %>% which %>% `==`(2)) bothIDs %<>% rev
 
       # Get the positions from
       positions <- KEYS %>% footballstats::feat_position(
