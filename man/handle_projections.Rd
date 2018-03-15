@@ -4,7 +4,7 @@
 \alias{handle_projections}
 \title{Handle Projections}
 \usage{
-handle_projections(frameNames, resList, adjust = NULL)
+handle_projections(frameNames, resList)
 }
 \arguments{
 \item{frameNames}{A character vector of names to assign to
