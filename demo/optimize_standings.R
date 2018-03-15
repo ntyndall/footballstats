@@ -16,14 +16,13 @@ for (j in 1:(uniqueComps %>% length)) {
   singleLeague <- paste0(subComp$name, ' :: ', subComp$region)
   KEYS$COMP_NAME <- subComp$name
 
-  if (j > 1) next
   # Run to generate the fixtures (only the first 10 for now!)
   correct <- KEYS %>% footballstats::generate_predictions(
     fixtureList = testData
   )
 
   per <- correct %>% `/`(testData %>% nrow) %>% scales::percent()
-  cat('\n  ## ', singleLeague, '::', per, '{ DAY =', KEYS$DAYS, '/ STAND =', KEYS$STAND, '} \n')
+  cat('\n  ## ', singleLeague, '::', per, ' \n')
   totalCorrect %<>% `+`(correct)
 
   # Save the total summary Statistics
@@ -31,8 +30,6 @@ for (j in 1:(uniqueComps %>% length)) {
     data.frame(
       name = subComp$name,
       region = subComp$region,
-      days = KEYS$DAYS,
-      standVar = KEYS$STAND,
       accuracy = per,
       stringsAsFactors = FALSE
     )
