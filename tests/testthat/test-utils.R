@@ -18,6 +18,9 @@ test_that('test the request limitations can be implemented', {
     as.character %>%
     as.integer
 
+  print('what is going on?')
+  print(timeout)
+  print(timePeriod)
   expect_gt( timeout, timePeriod %>% `/`(2) )
 
   # Remove the key to disable the expiry
