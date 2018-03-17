@@ -36,5 +36,5 @@ for (j in 1:(uniqueComps %>% length)) {
   )
 }
 
-#per <- totalCorrect %>% `/`(totalData %>% nrow) %>% scales::percent()
-#cat('\n ## Total = ', per, ' accurate [', standVar[i], '] \n')
+per <- totalCorrect %>% `/`(totalData %>% nrow) %>% scales::percent()
+cat('\n ## Total = ', per, ' accurate \n')

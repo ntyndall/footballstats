@@ -139,71 +139,73 @@ for (i in 1:(comps %>% length)) {
     paste(collapse = ' + ')
 
   # Build an SVM for each attribute
-  uniqueSVM <- c()
   positionInt <- c(0, 5, 10, 15, 20, Inf)
 
   # Bucket up standings too
   totTraining$currentPos %<>% findInterval(positionInt)
   totTraining$otherPos %<>% findInterval(positionInt)
 
+  uniqueSVM <- totRes <- c()
   for (k in 1:(commentaryNames %>% length)) {
     totTraining <- original
-    sepInt <- if (k == 1 || k == 3) {
-      c(0, 5, 10, 15, 20, 25, 30, Inf)
-    } else if (k == 2 || k == 4 || k == 7) {
-      c(0, 3, 6, 9, 12, Inf)
-    } else if (k == 5) {
-      c(0, 21, 41, 61, 81, 101)
-    } else if (k == 6) {
-      c(0, 2, 4, 6, Inf)
-    }
 
     nuNames <- paste0(commentaryNames[k], c('_mean', '_sd'))
     newF <- data.frame(
-      frame = featureFrame[[nuNames[1]]] %>% findInterval(sepInt) %>% as.factor,
+      frame = featureFrame[[nuNames[1]]],
       frametwo = featureFrame[[nuNames[2]]],
-      framethree = correctFeatures[[commentaryNames[k]]] %>% findInterval(sepInt) %>% as.factor,
+      framethree = correctFeatures[[commentaryNames[k]]],
       stringsAsFactors = FALSE
     )
     names(newF) <- c(nuNames, commentaryNames[k])
 
-    # Bind it on!
+    # Bind it on and remove duplicated rows!
     totTraining %<>% cbind(newF)
+    totTraining %<>% subset(totTraining %>% duplicated %>% `!`())
 
     # Build an SVM
-    commentarySVM <- e1071::svm(
-      paste0(commentaryNames[k], ' ~ ', varNames) %>% as.formula,
-      data = totTraining,
-      kernel = 'radial'
-    )
+    svmMethods <- c('radial', 'sigmoid', 'linear')
+    newScore <- topScore <- 0
+    for (m in 1:(svmMethods %>% length)) {
+      #cat(m, '/ ')
+      svmTune <- e1071::tune.svm(
+        paste0(commentaryNames[k], ' ~ ', varNames) %>% as.formula,
+        data = totTraining,
+        kernel = svmMethods[m],
+        sampling = 'fix',
+        gamma = 2 %>% `^`(c(-8:4)),
+        cost = 2 %>% `^`(c(-8:4))
+      )
+      newScore %<>% max(svmTune$best.performance)
+      if (newScore > topScore) {
+        topScore <- newScore
+        bestModel <- svmTune$best.model
+      }
+    }
 
-    # Set up prediction vector
-    prd <- totTraining
-    prd[[commentaryNames[k]]] <- NULL
-
-    # Calculate prediction as a percentage
-    res <- predict(commentarySVM, prd) %>%
-      as.integer %>%
-      `==`(totTraining[[commentaryNames[k]]]) %>%
-      sum %>%
-      `/`(totTraining %>% nrow)
-    print(res)
+    totRes %<>% c(topScore)
 
     ###
-    uniqueSVM %<>% c(commentarySVM %>% list)
+    uniqueSVM %<>% c(bestModel %>% list)
   }
+
+  print(totRes)
   names(uniqueSVM) <- commentaryNames
 
   ##
   svm.models %<>% c(uniqueSVM %>% list)
 }
 
+# ONLY FOR SINGLE!!
+#
+svm.models$`1425` <- uniqueSVM
+allsvms <- svm.models
+#
+
 # Update list by competitionID
 names(svm.models) <- comps
 
 allsvms <- svm.models
 save(allsvms, file = getwd() %>% paste0('/data/allsvms.rda'))
-
 
 
 my_metrics <- function() {

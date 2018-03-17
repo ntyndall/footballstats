@@ -97,6 +97,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     comSD <- apply(comMetrics, 2, stats::sd)
 
     # for each metric need to adjust value (bucket the mean) and then
+    positionInt <- c(0, 5, 10, 15, 20, Inf)
     totalPreds <- c()
     for (k in 1:(commentaryNames %>% length)) {
       curName <- commentaryNames[k]
@@ -105,8 +106,8 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
       myData <- data.frame(
         one = testVar,
         two = comSD[[curName]],
-        three = positions[1],
-        four = positions[2],
+        three = positions[1] %>% findInterval(positionInt),
+        four = positions[2] %>% findInterval(positionInt),
         five = HAvec,
         stringsAsFactors = FALSE
       )
@@ -115,10 +116,10 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
         as.integer
 
       # Now I just need to multiply it back up!!
-      cMet <- myMetrics[[curName]]
-      midPoint <- cMet[2] %>% `-`(cMet[1]) %>% `/`(2)
-      finalVal <- cMet[newValue] %>% `+`(midPoint)
-      totalPreds %<>% c(finalVal)
+      #cMet <- myMetrics[[curName]]
+      #midPoint <- cMet[2] %>% `-`(cMet[1]) %>% `/`(2)
+      #finalVal <- cMet[newValue] %>% `+`(midPoint)
+      totalPreds %<>% c(newValue)
     }
 
     # Calculate the average (and possible the standard deviation?)
