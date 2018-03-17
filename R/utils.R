@@ -145,7 +145,9 @@ start_season <- function() {
 
 request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
 
-  requestCount <- "requestLimit" %>% rredis::redisIncr() %>% as.integer
+  requestCount <- "requestLimit" %>%
+    rredis::redisIncr() %>%
+    as.integer
   if (requestCount == 1) {
     rredis::redisExpire(
       key = "requestLimit",

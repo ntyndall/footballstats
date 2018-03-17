@@ -6,7 +6,7 @@ rredis::redisFlushDB()
 test_that('test the request limitations can be implemented', {
 
   allowedRequests <- 200
-  timePeriod <- 10
+  timePeriod <- 40
 
   footballstats::request_limit(
     requestsAllowed = allowedRequests,
@@ -33,6 +33,7 @@ test_that('test the request limitations can be implemented', {
     timePeriod = 1
   )
 
+  Sys.sleep(1)
   expect_equal( rredis::redisGet(key = 'requestLimit') %>% as.character %>% as.integer, 0 )
 
 })
