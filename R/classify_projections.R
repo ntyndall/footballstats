@@ -25,6 +25,8 @@
 #' @return A data frame of projected commentary information based on the
 #'  data found in redis.
 #'
+#' @import e1071
+#'
 #' @export
 
 
@@ -33,6 +35,8 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
   # Initialise
   resSds <- resList <- weights <- c()
   commKey <- paste0('cmt_commentary:', KEYS$COMP)
+  myMetrics <- footballstats::cIntervals
+  mySVM <- footballstats::allsvms
 
   # Get the commentary names
   commentaryNames <- footballstats::dataScales$commentaries %>%
@@ -40,6 +44,14 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     purrr::map(1) %>%
     purrr::flatten_chr() %>%
     unique
+
+  # Get the positions of the two current teams!
+  positions <- KEYS %>%
+    footballstats::feat_position(
+      matchID = matchID,
+      teamIDs = teamIDs,
+      matchDate = matchDate
+    ) %>% as.integer
 
   # Loop over both teams
   for (j in 1:2) {
@@ -56,25 +68,10 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     matchIDs <- commentaryKeys %>%
       footballstats::flatt(y = 3)
 
-    totalPositions <- data.frame(stringsAsFactors = FALSE)
-    for (k in 1:(commentaryKeys %>% length)) {
+    # Team IDs will ALWAYS be c(home, away)
+    HAvec <- j %>% mod(2)
 
-      # Get the other team from the matchID
-      bothIDs <- paste0(commKey, ':', matchIDs[k], ':*') %>%
-        rredis::redisKeys() %>%
-        footballstats::flatt(y = 4)
-
-      if (teamIDs[j] %>% `==`(bothIDs) %>% which %>% `==`(2)) bothIDs %<>% rev
-
-      # Get the positions from
-      positions <- KEYS %>% footballstats::feat_position(
-        matchID = matchIDs[k],
-        teamIDs = bothIDs
-      )
-
-      # Bind to a total data frame
-      totalPositions %<>% rbind(positions)
-    }
+    if (j == 2) positions %<>% rev
 
     # Get data frame of commentary metrics
     comMetrics <- commentaryKeys %>%
@@ -91,40 +88,42 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     if (`>`(naCount, thresh) %>% any) next
     comMetrics[comMetrics %>% is.na] <- 0
 
-    # Get the extremeties first
-    minVals <- apply(comMetrics, 2, min) %>% as.numeric
-    maxVals <- apply(comMetrics, 2, max) %>% as.numeric
-
     # Only take the average of the last 4 matches!
     if (comMetrics %>% nrow %>% `<`(KEYS$DAYS)) next
     comMetrics <- comMetrics[1:KEYS$DAYS, ]
 
-    # Adjust bFrame
-    newMetrics <- data.frame(stringsAsFactors = FALSE)
-    facts <- totalPositions$position.h %>%
-      `/`(totalPositions$position.a) %>%
-      `^`(KEYS$STAND)
+    # Get mean and standard deviation for all metrics
+    comMean <- apply(comMetrics, 2, mean)
+    comSD <- apply(comMetrics, 2, stats::sd)
 
-    for (k in 1:KEYS$DAYS) {
-      # Adjust score by the factor
-      adjustedScore <- comMetrics[k, ] %>%
-        `*`(facts[k]) %>%
-        as.numeric
+    # for each metric need to adjust value (bucket the mean) and then
+    positionInt <- c(0, 5, 10, 15, 20, Inf)
+    totalPreds <- c()
+    for (k in 1:(commentaryNames %>% length)) {
+      curName <- commentaryNames[k]
+      testVar <- comMean[[curName]] %>% findInterval(myMetrics[[curName]]) %>% as.factor
 
-      # Make sure factors dont exceed the bounds
-      newMetrics %<>% rbind(
-        adjustedScore %>%
-          pmax(minVals) %>%
-          pmin(maxVals) %>%
-          as.data.frame %>%
-          t
+      myData <- data.frame(
+        one = testVar,
+        two = comSD[[curName]],
+        three = positions[1] %>% findInterval(positionInt),
+        four = positions[2] %>% findInterval(positionInt),
+        five = HAvec,
+        stringsAsFactors = FALSE
       )
+      names(myData) <- c(paste0(curName, c('_mean', '_sd')), 'currentPos', 'otherPos', 'homeaway')
+      newValue <- stats::predict(mySVM[[KEYS$COMP %>% as.character]][[curName]], myData) %>%
+        as.integer
+
+      # Now I just need to multiply it back up!!
+      #cMet <- myMetrics[[curName]]
+      #midPoint <- cMet[2] %>% `-`(cMet[1]) %>% `/`(2)
+      #finalVal <- cMet[newValue] %>% `+`(midPoint)
+      totalPreds %<>% c(newValue)
     }
-    names(newMetrics) <- names(comMetrics)
 
     # Calculate the average (and possible the standard deviation?)
-    resList %<>% c(apply(newMetrics, 2, mean) %>% list)
-    resSds %<>% c(apply(newMetrics, 2, stats::sd) %>% `/`(3))
+    resList %<>% c(totalPreds %>% list)
   }
 
   # Get the positions of the two current teams
@@ -135,20 +134,10 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
       matchDate = matchDate
     )
 
-  # Create an adjust object to tweak the resList
-  adjust <- list(
-    home = positions$position.h,
-    away = positions$position.a,
-    min = minVals,
-    max = maxVals,
-    sVar = KEYS$STAND
-  )
-
   # Return a mini frame containing commentary information
   commentaryFrame <- dataScales$commentaries %>%
     footballstats::handle_projections(
-      resList = resList,
-      adjust = adjust
+      resList = resList
     )
 
   # Return the frame back
@@ -246,23 +235,10 @@ project_form <- function(KEYS, teamIDs) {
 #' @export
 
 
-handle_projections <- function(frameNames, resList, adjust = NULL) {
+handle_projections <- function(frameNames, resList) {
   toFrame <- if (resList %>% length %>% `!=`(2)) {
     NA %>% rep(frameNames %>% length) %>% t
   } else {
-    if (adjust %>% is.null %>% `!`()) {
-
-      # Get fraction between home and away
-      fr <- adjust$home %>% `/`(adjust$away)
-      for (i in 1:2) {
-        if (i == 2) fr %<>% `^`(-1) # Inverse for away / home
-        resList[[i]] %<>%
-          as.numeric %>%
-          `*`(fr %>% `^`(adjust$sVar)) %>%
-          pmax(adjust$min) %>%
-          pmin(adjust$max)
-      }
-    }
     resList %>% purrr::flatten_dbl() %>% t
   }
 
