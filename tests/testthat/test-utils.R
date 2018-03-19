@@ -18,7 +18,12 @@ test_that('test the request limitations can be implemented', {
     as.character %>%
     as.integer
 
-  expect_gt( timeout, timePeriod %>% `/`(2) )
+  exceeded <- timePeriod %>% `/`(2)
+  print(exceeded)
+
+  expect_gt( 4, 3 )
+
+  expect_gt( timeout, exceeded )
 
   # Remove the key to disable the expiry
   'requestLimit' %>% rredis::redisDelete()
