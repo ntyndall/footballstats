@@ -135,7 +135,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     )
 
   # Return a mini frame containing commentary information
-  commentaryFrame <- dataScales$commentaries %>%
+  commentaryFrame <- footballstats::dataScales$commentaries %>%
     footballstats::handle_projections(
       resList = resList
     )
