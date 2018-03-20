@@ -160,12 +160,15 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 #'  important variables and information. Also contains API information.
 #' @param teamIDs A character vector of length two, containing the home team
 #'  and away team in that order.
+#' @param currentID An integer ID that is the current matchID being analysed
 #'
 #' @return A data frame that contains two columns, `form.h` and `form.a`
 #' @export
 
 
-project_form <- function(KEYS, teamIDs) {
+project_form <- function(KEYS, teamIDs, currentID) {
+
+  currentID <- fixtureList$id %>% as.integer
 
   resList <- forms <- c()
   for (j in 1:2) {
@@ -174,13 +177,17 @@ project_form <- function(KEYS, teamIDs) {
     if (commentaryKeys %>% is.null) break else commentaryKeys %<>% as.character
 
     # If it does then continue on
-    KEYS %>% footballstats::order_commentaries(
+    commentaryKeys <- KEYS %>% footballstats::order_commentaries(
       commentaryKeys = commentaryKeys
     )
 
     # Get match IDs
     matchIDs <- commentaryKeys %>%
-      footballstats::flatt(y = 3)
+      footballstats::flatt(y = 3) %>%
+      as.integer
+
+    # Count how many are greater than the currentID
+    matchIDs %<>% subset(currentID > matchIDs)
 
     # Needs to be KEYS$DAYS or more long
     if (matchIDs %>% length %>% `<`(KEYS$DAYS)) next
@@ -210,9 +217,10 @@ project_form <- function(KEYS, teamIDs) {
   }
 
   # Return a mini frame containing form information
-  c('form.h', 'form.a') %>%
-    footballstats::handle_projections(resList = resList) %>%
-    return()
+  return(
+    c('form.h', 'form.a') %>%
+      footballstats::handle_projections(resList = resList)
+  )
 }
 
 #' @title Handle Projections

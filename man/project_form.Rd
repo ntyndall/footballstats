@@ -4,7 +4,7 @@
 \alias{project_form}
 \title{Form Projection}
 \usage{
-project_form(KEYS, teamIDs)
+project_form(KEYS, teamIDs, currentID)
 }
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /
@@ -12,6 +12,8 @@ important variables and information. Also contains API information.}
 
 \item{teamIDs}{A character vector of length two, containing the home team
 and away team in that order.}
+
+\item{currentID}{An integer ID that is the current matchID being analysed}
 }
 \value{
 A data frame that contains two columns, `form.h` and `form.a`

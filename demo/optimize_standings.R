@@ -17,11 +17,11 @@ for (j in 1:(uniqueComps %>% length)) {
   KEYS$COMP_NAME <- subComp$name
 
   # Run to generate the fixtures (only the first 10 for now!)
-  correct <- KEYS %>% footballstats::generate_predictions(
+  analysis <- KEYS %>% footballstats::generate_predictions(
     fixtureList = testData
   )
 
-  per <- correct %>% `/`(testData %>% nrow) %>% scales::percent()
+  per <- analysis$correct %>% `/`(testData %>% nrow %>% `-`(analysis$notAnalysed)) %>% scales::percent()
   cat('\n  ## ', singleLeague, '::', per, ' \n')
   totalCorrect %<>% `+`(correct)
 

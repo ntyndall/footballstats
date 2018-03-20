@@ -28,7 +28,7 @@ generate_predictions <- function(KEYS, fixtureList) {
 
   # Initialise arguments
   dataScales <- footballstats::dataScales
-  correct <- todaysDate <- 0
+  nAnalysed <- correct <- todaysDate <- 0
   totalTxt <- c()
   fixtureRow <- fixtureList %>% nrow
 
@@ -80,7 +80,8 @@ generate_predictions <- function(KEYS, fixtureList) {
     matchMetrics %<>% cbind(
       footballstats::project_form(
         KEYS = KEYS,
-        teamIDs = teamIDs
+        teamIDs = teamIDs,
+        currentID = matchID
       )
     )
 
@@ -101,7 +102,12 @@ generate_predictions <- function(KEYS, fixtureList) {
     )
 
     # Go onto the next feature if any features arent present
-    if (matchMetrics %>% is.na %>% any) next else matchMetrics$matchID <- NULL
+    if (matchMetrics %>% is.na %>% any) {
+      nAnalysed %<>% `+`(1)
+      next
+    } else {
+      matchMetrics$matchID <- NULL
+    }
 
     # Scale the data as required
     scled <- matchMetrics %>%
@@ -213,5 +219,5 @@ generate_predictions <- function(KEYS, fixtureList) {
     print(totalTxt)
   } # nocov end
 
-  return(correct)
+  return(list(correct = correct, notAnalysed = nAnalysed))
 }
