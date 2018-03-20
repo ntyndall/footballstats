@@ -32,7 +32,7 @@ for (i in 1:(comps %>% length)) {
 
 
 svm.models <- c()
-for (i in 1:(comps %>% length)) {
+for (i in 2:(comps %>% length)) {
 
   # Find the best result with different days
   singleLeague <- totalData[totalData$comp_id == comps[i], ]
@@ -139,11 +139,11 @@ for (i in 1:(comps %>% length)) {
     paste(collapse = ' + ')
 
   # Build an SVM for each attribute
-  positionInt <- c(0, 5, 10, 15, 20, Inf)
+  #positionInt <- c(0, 5, 10, 15, 20, Inf)
 
   # Bucket up standings too
-  totTraining$currentPos %<>% findInterval(positionInt)
-  totTraining$otherPos %<>% findInterval(positionInt)
+  #totTraining$currentPos %<>% findInterval(positionInt)
+  #totTraining$otherPos %<>% findInterval(positionInt)
 
   uniqueSVM <- totRes <- c()
   for (k in 1:(commentaryNames %>% length)) {
@@ -197,8 +197,8 @@ for (i in 1:(comps %>% length)) {
 
 # ONLY FOR SINGLE!!
 #
-svm.models$`1425` <- uniqueSVM
-allsvms <- svm.models
+#svm.models$`1425` <- uniqueSVM
+#allsvms <- svm.models
 #
 
 # Update list by competitionID
@@ -208,19 +208,19 @@ allsvms <- svm.models
 save(allsvms, file = getwd() %>% paste0('/data/allsvms.rda'))
 
 
-my_metrics <- function() {
-  return(
-    list(
-      shots_total =  c(0, 5, 10, 15, 20, 25, 30, Inf),
-      shots_ongoal = c(0, 3, 6, 9, 12, Inf),
-      fouls =  c(0, 5, 10, 15, 20, 25, 30, Inf),
-      corners = c(0, 3, 6, 9, 12, Inf),
-      possesiontime = c(0, 21, 41, 61, 81, 101),
-      yellowcards = c(0, 2, 4, 6, Inf),
-      saves = c(0, 3, 6, 9, 12, Inf)
-    )
-  )
-}
+#my_metrics <- function() {
+  #return(
+    #list(
+      #shots_total =  c(0, 5, 10, 15, 20, 25, 30, Inf),
+      #shots_ongoal = c(0, 3, 6, 9, 12, Inf),
+      #fouls =  c(0, 5, 10, 15, 20, 25, 30, Inf),
+      #corners = c(0, 3, 6, 9, 12, Inf),
+      #possesiontime = c(0, 21, 41, 61, 81, 101),
+      #yellowcards = c(0, 2, 4, 6, Inf),
+      #saves = c(0, 3, 6, 9, 12, Inf)
+      #)
+    #  )
+#}
 
-myMetrics -> cIntervals
-save(cIntervals, file = getwd() %>% paste0('/data/cIntervals.rda'))
+#myMetrics -> cIntervals
+#save(cIntervals, file = getwd() %>% paste0('/data/cIntervals.rda'))

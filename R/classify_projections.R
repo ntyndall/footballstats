@@ -97,17 +97,17 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     comSD <- apply(comMetrics, 2, stats::sd)
 
     # for each metric need to adjust value (bucket the mean) and then
-    positionInt <- c(0, 5, 10, 15, 20, Inf)
+    #positionInt <- c(0, 5, 10, 15, 20, Inf)
     totalPreds <- c()
     for (k in 1:(commentaryNames %>% length)) {
       curName <- commentaryNames[k]
-      testVar <- comMean[[curName]] %>% findInterval(myMetrics[[curName]]) %>% as.factor
+      #testVar <- comMean[[curName]] %>% findInterval(myMetrics[[curName]]) %>% as.factor
 
       myData <- data.frame(
-        one = testVar,
+        one = comMean[[curName]],
         two = comSD[[curName]],
-        three = positions[1] %>% findInterval(positionInt),
-        four = positions[2] %>% findInterval(positionInt),
+        three = positions[1],
+        four = positions[2],
         five = HAvec,
         stringsAsFactors = FALSE
       )
