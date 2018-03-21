@@ -23,7 +23,7 @@ for (j in 1:(uniqueComps %>% length)) {
 
   per <- analysis$correct %>% `/`(testData %>% nrow %>% `-`(analysis$notAnalysed)) %>% scales::percent()
   cat('\n  ## ', singleLeague, '::', per, ' \n')
-  totalCorrect %<>% `+`(correct)
+  #totalCorrect %<>% `+`(correct)
 
   # Save the total summary Statistics
   summaryStats %<>% rbind(

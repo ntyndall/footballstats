@@ -168,8 +168,6 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
 project_form <- function(KEYS, teamIDs, currentID) {
 
-  currentID <- fixtureList$id %>% as.integer
-
   resList <- forms <- c()
   for (j in 1:2) {
     commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, ':*:', teamIDs[j]) %>%
