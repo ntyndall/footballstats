@@ -164,7 +164,7 @@ monthly_report <- function(KEYS, month, year) {
     }
 
     # If True send to slack, if not just print out!
-    if (KEYS$SLACK_PRNT) {
+    if (KEYS$SLACK_PRNT) { # nocov start
       slackr::slackrSetup(
         channel = '#general',
         api_token = KEYS$FS_SLACK
@@ -176,8 +176,7 @@ monthly_report <- function(KEYS, month, year) {
         api_token = KEYS$FS_SLACK,
         username = 'report'
       )
-
-    } else {
+    } else { # nocov end
       cat(totalTxt %>% paste(collapse = '\n'))
     }
   }

@@ -7,6 +7,9 @@
 commentary_sub(competitionID, matchID, teamID, teamStats, commentary)
 }
 \arguments{
+\item{competitionID}{A character string representing the competitionID
+that is under investigation.}
+
 \item{matchID}{An integer ID representing a single match
 as defined by the API.}
 

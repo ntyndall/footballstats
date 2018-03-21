@@ -55,7 +55,7 @@ for (i in 1:loops) {
   upper <- if (i %>% `==`(loops)) {
     totalData %>%
       nrow %>%
-      mod(groups) %>%
+      magrittr::mod(groups) %>%
       `+`(groups %>% `*`(loops - 1))
   } else {
     groups %>% `*`(i)

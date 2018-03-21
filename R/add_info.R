@@ -534,6 +534,8 @@ ateam_info <- function(KEYS, teamListLength) {
 #'     \item{\strong{[HASH]} :: \code{cmp:{comp_id}:{match_id}:{player_id}}}
 #'   }
 #'
+#' @param competitionID A character string representing the competitionID
+#'  that is under investigation.
 #' @param matchID An integer ID representing a single match
 #'  as defined by the API.
 #' @param teamID An integer ID value representing a single team

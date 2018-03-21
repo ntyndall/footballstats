@@ -12,9 +12,6 @@ the data frame columns.}
 
 \item{resList}{A list of length two, which contains the home
 team and away team data in that order.}
-
-\item{adjust}{A list object to handle the commentary data so it
-is tweaked based on the variable parameters.}
 }
 \value{
 A data frame with column names defined by \code{frameNames}.
@@ -23,6 +20,5 @@ A data frame with column names defined by \code{frameNames}.
 A function that is used to handle empty data
  when trying to project the commentaries or form etc. It
  creates a data frame of consistent format with the data
- frame names provided. It can also make adjustments to
- the results based on the adjust param.
+ frame names provided.
 }

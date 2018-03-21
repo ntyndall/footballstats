@@ -69,7 +69,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
       footballstats::flatt(y = 3)
 
     # Team IDs will ALWAYS be c(home, away)
-    HAvec <- j %>% mod(2)
+    HAvec <- j %>% magrittr::mod(2)
 
     if (j == 2) positions %<>% rev
 
@@ -226,15 +226,12 @@ project_form <- function(KEYS, teamIDs, currentID) {
 #' @description A function that is used to handle empty data
 #'  when trying to project the commentaries or form etc. It
 #'  creates a data frame of consistent format with the data
-#'  frame names provided. It can also make adjustments to
-#'  the results based on the adjust param.
+#'  frame names provided.
 #'
 #' @param frameNames A character vector of names to assign to
 #'  the data frame columns.
 #' @param resList A list of length two, which contains the home
 #'  team and away team data in that order.
-#' @param adjust A list object to handle the commentary data so it
-#'  is tweaked based on the variable parameters.
 #'
 #' @return A data frame with column names defined by \code{frameNames}.
 #'

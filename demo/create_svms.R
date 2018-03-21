@@ -87,7 +87,7 @@ for (i in 2:(comps %>% length)) {
           fields = c('localteam_id', 'visitorteam_id')
         )
 
-      homeAway <- teamID %>% `==`(homeAway) %>% which %>% mod(2) %>% as.integer
+      homeAway <- teamID %>% `==`(homeAway) %>% which %>% magrittr::mod(2) %>% as.integer
       HAvec %<>% c(homeAway)
 
       # Get the positions from
