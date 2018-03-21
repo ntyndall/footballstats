@@ -31,6 +31,8 @@ test_that('Classify all - end to end from adding data to classifying and predict
     as.integer %>%
     sort
 
-  expect_equal( predictions %>% length, 11 )
-  expect_equal( predictions[1], 2212967 )
+  # Only 4 from the
+  expect_equal( predictions %>% length, 4 )
+  expect_equal( predictions[1], 2212997 )
+
 })
