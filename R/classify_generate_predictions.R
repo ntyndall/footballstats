@@ -28,7 +28,7 @@ generate_predictions <- function(KEYS, fixtureList) {
 
   # Initialise arguments
   dataScales <- footballstats::dataScales
-  nAnalysed <- correct <- todaysDate <- 0
+  analysed <- nAnalysed <- correct <- todaysDate <- 0
   totalTxt <- c()
   fixtureRow <- fixtureList %>% nrow
 
@@ -107,6 +107,7 @@ generate_predictions <- function(KEYS, fixtureList) {
       next
     } else {
       matchMetrics$matchID <- NULL
+      analysed %<>% `+`(1)
     }
 
     # Scale the data as required
@@ -196,7 +197,8 @@ generate_predictions <- function(KEYS, fixtureList) {
     firstMsg <- paste0(
       ':soccer: _Reporting on results for week ',
       fixtureList$week[1], ' (', KEYS$COMP_NAME,
-      ')_ :soccer: ')
+      ')_ :soccer: '
+    )
 
     slackr::slackr_msg(
       txt = firstMsg,
@@ -219,5 +221,11 @@ generate_predictions <- function(KEYS, fixtureList) {
     print(totalTxt)
   } # nocov end
 
-  return(list(correct = correct, notAnalysed = nAnalysed))
+  return(
+    list(
+      correct = correct,
+      notAnalysed = nAnalysed,
+      analysed = analysed
+    )
+  )
 }

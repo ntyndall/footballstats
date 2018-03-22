@@ -34,9 +34,14 @@ predict_matches <- function(KEYS) {
       footballstats::generate_predictions(
         fixtureList = fixtureList
       )
-    cat(paste0(Sys.time(), ' | Predicted a total of ', numOfPredicted$correct, ' matches. \n'))
-
+    predictions <- numOfPredicted$analysed
+    cat(paste0(Sys.time(), ' | Predicted a total of ', numOfPredicted$analysed, ' matches. \n'))
+    if (KEYS$TEST) cat(paste0(Sys.time(), ' | With ', numOfPredicted$correct, ' matches guessed correctly. \n'))
   } else {
+    predictions <- 0
     cat(paste0(Sys.time(), ' | No upcoming fixture in the next week! \n'))
   }
+
+  # Return the number of predictions made
+  return(predictions)
 }

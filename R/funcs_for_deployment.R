@@ -45,15 +45,33 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   cat(' -- Beginning analysis -- \n\n\n')
 
   # Loop over all competitions being analysed
+  totalPredictions <- 0
   for (i in 1:nrow(competitions)) {
     cat(paste0(Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
                competitions$name[i], ' - ', competitions$region[i], '). \n'))
 
     # Predict actual future results
-    cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
     KEYS$COMP <- competitions$id[i]
     KEYS$COMP_NAME <- competitions$name[i]
-    KEYS %>% footballstats::predict_matches()
+
+    cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
+    predictions <- KEYS %>%
+      footballstats::predict_matches()
+    totalPredictions %<>% `+`(predictions)
+
+    # Send a slack message to indicate how many matches have been predicted
+    if (KEYS$SLACK_PRNT && i == nrow(competitions)) {
+      slackr::slackrSetup(
+        channel = '#results',
+        api_token = KEYS$FS_SLACK
+      )
+      slackr::slackr_msg(
+        txt = paste0('Predicted a total of ', totalPredictions, ' matches'),
+        channel = '#results',
+        api_token = KEYS$FS_SLACK,
+        username = 'predictions'
+      )
+    }
   }
 } # nocov end
 
