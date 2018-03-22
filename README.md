@@ -66,3 +66,8 @@ There are a number of useful scripts for testing and building models. Make sure 
     - `Rscript demo/run_tests.R`
   - To rebuild one of the data models with updated information in redis, run from the root directory
     - `Rscript demo/create_nn.R`
+
+## Accuracy
+Below will be information on the accuracy so far that the app is achieving. To add more results, run through the data sets and append to the `data/accuracyFrame` data set in a similar fashion and from the root directory create the plot by running `Rscript demo/create_acc_plot.R` and push the new image to the repo.
+![Accuracy Data Frame](https://raw.githubusercontent.com/niallbenj/footballstats/master/plots/accuracy.png)
+
