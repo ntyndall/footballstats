@@ -38,6 +38,7 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
       matchID <- readyToAnalyse[i]
       resultKey <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchID)
       resultKey %<>% rredis::redisKeys()
+      resultKey %<>% `[`(resultKey %>% length)
       predicted <- resultKey %>% rredis::redisHGetAll()
       pre <- predicted$prediction %>% as.character
 
