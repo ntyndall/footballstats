@@ -163,7 +163,6 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
   form <- if (forms %>% length %>% `!=`(2)) {
     list(NA, NA)
   } else {
-    # NEED TO RETURN TWO HERE!!!
     forms %>% lapply(footballstats::form_to_int)
   }
 
