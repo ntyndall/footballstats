@@ -82,7 +82,7 @@ calculate_data <- function(matchData, logger = FALSE) {
     # 2) Get form information
     datSlice %<>% cbind(
       footballstats::feat_form(
-        matchData = totalData,
+        matchData = matchData,
         teamIDs = teamIDs,
         singleMatchInfo = singleMatchInfo
       )
