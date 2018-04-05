@@ -67,6 +67,8 @@ calculate_data <- function(matchData, logger = FALSE) {
 
     if (logger) print(datSlice)
 
+    if (i == 51) loggs <<- TRUE else loggs <<- FALSE
+
     # 1) Get commentary information (Initialise datSlice)
     datSlice %<>% cbind(
       footballstats::feat_commentaries(
@@ -217,13 +219,19 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
       commentaryKeys = commentaryKeys
     ) %>% rev
 
+    if (loggs) print(commentaryKeys)
+
     # Get all the matchIDs
     matchIDs <- commentaryKeys %>%
       footballstats::flatt(y = 3) %>%
       as.integer
 
+    if (loggs) print(matchIDs)
+
     bigger <- matchID %>% `>`(matchIDs)
     if (bigger %>% sum %>% `>`(4)) commentaryKeys %<>% `[`(bigger %>% which %>% `[`(1:4)) else next
+
+    if (loggs) print(bigger)
 
     # Check that all the allowed names is a subset of the commentary
     for (k in 1:(commentaryKeys %>% length)) {
@@ -240,6 +248,9 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
       allStats %<>% rbind(res %>% as.data.frame %>% t)
     }
     names(allStats) <- commentaryNames
+
+    if (loggs) print(allStats)
+    if (loggs) print(apply(allStats, 2, mean))
 
     cResults %<>% c(apply(allStats, 2, mean) %>% as.double %>% list)
   }
