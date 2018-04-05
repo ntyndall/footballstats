@@ -95,6 +95,7 @@ commentary_from_redis <- function(keyName, returnItems) {
 
   if (loggs) {
     print('commentary from redis')
+    print(keyName)
     print(results)
   }
   # Make sure something exists in the requested fields
