@@ -62,7 +62,7 @@ acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
       rKey <- paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs[i], ":", teamIDs[j])
       if (rKey %>% rredis::redisExists()) next
 
-      if (i == 51) {
+      if (i == 43) {
         print('adding some info!')
         print(singleTeamStats)
         print(rKey)
