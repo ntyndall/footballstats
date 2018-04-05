@@ -219,19 +219,13 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
       commentaryKeys = commentaryKeys
     ) %>% rev
 
-    if (loggs) print(commentaryKeys)
-
     # Get all the matchIDs
     matchIDs <- commentaryKeys %>%
       footballstats::flatt(y = 3) %>%
       as.integer
 
-    if (loggs) print(matchIDs)
-
     bigger <- matchID %>% `>`(matchIDs)
     if (bigger %>% sum %>% `>`(4)) commentaryKeys %<>% `[`(bigger %>% which %>% `[`(1:4)) else next
-
-    if (loggs) print(bigger)
 
     # Check that all the allowed names is a subset of the commentary
     for (k in 1:(commentaryKeys %>% length)) {
@@ -239,18 +233,22 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
       if (commentaryNames %in% availableNames %>% all %>% `!`()) break
     }
 
+    if (loggs) print(commentaryKeys)
+
     allStats <- data.frame(stringsAsFactors = FALSE)
     for (k in 1:(commentaryKeys %>% length)) {
       res <- footballstats::commentary_from_redis(
         keyName = commentaryKeys[k],
         returnItems = commentaryNames
       )
+
+      if (loggs) print(res)
+
       allStats %<>% rbind(res %>% as.data.frame %>% t)
     }
     names(allStats) <- commentaryNames
 
     if (loggs) print(allStats)
-    if (loggs) print(apply(allStats, 2, mean))
 
     cResults %<>% c(apply(allStats, 2, mean) %>% as.double %>% list)
   }
