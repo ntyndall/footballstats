@@ -11,6 +11,8 @@ test_that('Calculate data set built from features', {
   # Need to recreate it as new dates are created
   matchData <- KEYS %>% footballstats::recreate_matchdata()
 
+  print(matchData$id)
+
   KEYS %>% footballstats::acommentary_info(
     matchIDs = matchData$id,
     localteam = matchData$localteam_id,
@@ -36,24 +38,24 @@ test_that('Calculate data set built from features', {
   print(totalData)
 
   # Home details
-  expect_equal( totalData$shots_total.h %>% ri(), c(7, 17) )
-  expect_equal( totalData$shots_ongoal.h %>% ri(), c(2, 6) )
-  expect_equal( totalData$fouls.h %>% ri(), c(7, 13) )
-  expect_equal( totalData$corners.h %>% ri(), c(2, 9) )
-  expect_equal( totalData$possesiontime.h %>% ri(), c(37, 64) )
-  expect_equal( totalData$yellowcards.h %>% ri(), c(0, 3) )
+  expect_equal( totalData$shots_total.h %>% ri(), c(8, 15) )
+  expect_equal( totalData$shots_ongoal.h %>% ri(), c(1, 6) )
+  expect_equal( totalData$fouls.h %>% ri(), c(6, 12) )
+  expect_equal( totalData$corners.h %>% ri(), c(3, 6) )
+  expect_equal( totalData$possesiontime.h %>% ri(), c(37, 61) )
+  expect_equal( totalData$yellowcards.h %>% ri(), c(1, 2) )
   expect_equal( totalData$saves.h %>% ri(), c(1, 4) )
   expect_equal( totalData$form.h %>% ri(), c(1, 6) )
   expect_equal( totalData$position.h %>% ri(), c(1, 20) )
 
   # Away details
-  expect_equal( totalData$shots_total.a %>% ri(), c(8, 18) )
+  expect_equal( totalData$shots_total.a %>% ri(), c(7, 17) )
   expect_equal( totalData$shots_ongoal.a %>% ri(), c(1, 6) )
   expect_equal( totalData$fouls.a %>% ri(), c(7, 12) )
-  expect_equal( totalData$corners.a %>% ri(), c(3, 9) )
-  expect_equal( totalData$possesiontime.a %>% ri(), c(40, 68) )
-  expect_equal( totalData$yellowcards.a %>% ri(), c(0, 2) )
-  expect_equal( totalData$saves.a %>% ri(), c(0, 4) )
+  expect_equal( totalData$corners.a %>% ri(), c(3, 6) )
+  expect_equal( totalData$possesiontime.a %>% ri(), c(36, 61) )
+  expect_equal( totalData$yellowcards.a %>% ri(), c(0, 3) )
+  expect_equal( totalData$saves.a %>% ri(), c(1, 4) )
   expect_equal( totalData$form.a %>% ri(), c(1, 6) )
   expect_equal( totalData$position.a %>% ri(), c(1, 20) )
 
