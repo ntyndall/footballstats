@@ -33,7 +33,7 @@ test_that('Calculate data set built from features', {
   # range to int
   ri <- function(x) x %>% range %>% as.integer
 
-  print(totalData$shots_ongoal.h)
+  print(totalData)
 
   # Home details
   expect_equal( totalData$shots_total.h %>% ri(), c(7, 17) )
