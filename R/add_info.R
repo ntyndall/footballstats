@@ -62,10 +62,11 @@ acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
       rKey <- paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs[i], ":", teamIDs[j])
       if (rKey %>% rredis::redisExists()) next
 
-      if (matchIDs[i] == 2212978) {
+      if (rKey == 'cmt_commentary:1204:2212977:9065') {
         print('adding some info!')
-        print(singleTeamStats)
         print(rKey)
+        print(paste0('j / i = ', j, ' / ', i))
+        print(singleTeamStats)
       }
 
       # Add the commentary information

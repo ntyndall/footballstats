@@ -93,11 +93,11 @@ commentary_from_redis <- function(keyName, returnItems) {
   hashNames <- results %>% names
   hashLen <- hashNames %>% length
 
-  if (loggs) {
-    print('commentary from redis')
-    print(keyName)
-    print(results)
-  }
+  #if (loggs) {
+    #print('commentary from redis')
+    #print(keyName)
+    #print(results)
+  #}
   # Make sure something exists in the requested fields
   vec <- c()
   for (j in 1:hashLen) {
