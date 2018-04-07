@@ -28,13 +28,14 @@ test_that("Send in a single commentary to see it is stored correctly", {
     unique
 
   expect_equal( singleMatch %>% length, 1 )
+  expect_equal( singleMatch, matchID )
 
   checkPlayerExists <- rredis::redisHMGet(
-    key = paste0('cmp:', KEYS$COMP, ':', matchID, ':153493'),
+    key = paste0('cmp:', KEYS$COMP, ':', matchID, ':724'),
     fields = 'name'
   )
 
-  expect_equal( checkPlayerExists$name %>% as.character %>% tolower, 'mohamed elneny' )
+  expect_equal( checkPlayerExists$name %>% as.character %>% tolower, 'artur boruc' )
 
   # Get the general match commentaries
   teamCommentaries <- 'cmt_commentary:*' %>% rredis::redisKeys()
@@ -51,9 +52,11 @@ test_that("Send in a single commentary to see it is stored correctly", {
   index <- grepl(teamIDs[1], teamCommentaries) %>% which
   teamDetails <-  teamCommentaries[index] %>% rredis::redisHGetAll()
 
-  expect_equal( teamDetails$shots_total %>% as.character %>% as.integer, 25 )
-  expect_equal( teamDetails$shots_ongoal %>% as.character %>% as.integer, 12 )
-  expect_equal( teamDetails$fouls %>% as.character %>% as.integer, 7 )
-  expect_equal( teamDetails$corners %>% as.character %>% as.integer, 6 )
+  cToI <- function(x) x %>% as.character %>% as.integer
+
+  expect_equal( teamDetails$shots_total %>% cToI(), 17 )
+  expect_equal( teamDetails$shots_ongoal %>% cToI(), 9 )
+  expect_equal( teamDetails$fouls %>% cToI(), 14 )
+  expect_equal( teamDetails$corners %>% cToI(), 10 )
 
 })
