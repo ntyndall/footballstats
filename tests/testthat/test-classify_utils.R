@@ -66,7 +66,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
   )
 
   expect_equal( result %>% length, 1 )
-  expect_equal( result, 1 )
+  expect_equal( result, 2 )
 
   result <- footballstats::commentary_from_redis(
     keyName = keyName,
@@ -74,7 +74,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
   )
 
   expect_equal( result %>% length, 2 )
-  expect_equal( result %>% sort, c(0, 65) )
+  expect_equal( result %>% sort, c(0, 58) )
 
 })
 
