@@ -103,7 +103,7 @@ team_form <- function(matchData, teamID) {
   results <- sapply(1:nrow(singleTeam), function(x) {
     # Need to choose which current team is being analysed for each match.
     scorers <- footballstats::current_or_other(
-      singleMatch = singleTeam[x, ] %>% as.list,
+      singleMatch = singleTeam[x, ],
       teamID = teamID
     )
 
@@ -155,11 +155,11 @@ team_form <- function(matchData, teamID) {
 current_or_other <- function(singleMatch, teamID) {
 
   # Assume localteam first, if not, then reverse the vector
-  order <- c('localteam_score', 'visitorteam_score')
-  if (singleMatch$visitorteam_id %>% as.integer %>% `==`(teamID)) order %<>% rev
+  orders <- c('localteam_score', 'visitorteam_score')
+  if (singleMatch$visitorteam_id %>% as.integer %>% `==`(teamID)) orders %<>% rev
 
   # Return the score id's of the match slice as  integers
-  homeaway <- singleMatch[order] %>% as.integer
+  homeaway <- singleMatch[orders] %>% as.integer
   return(list(current = homeaway[1], other = homeaway[2]))
 }
 

@@ -94,5 +94,32 @@ original.data %<>% footballstats::scale_data(dataScales = dataScales)
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
 nn <- original.data %>% footballstats::neural_network()
 
+# Check ALL the data!!
+check.data <- original.data
+realVec <- original.data$res %>% as.character
+newLabels <- original.data$res %>% unique %>% sort %>% as.character
+check.data$res <- NULL
+
+predictions <- neuralnet::compute(
+  x = nn,
+  covariate = check.data
+)
+
+# Create vectors to measure accuracy
+predVec <- 0 %>% rep(check.data %>% nrow)
+tot <- 0
+
+# Check the max values per row for the predictions
+netRes <- predictions$net.result
+for (j in 1:(netRes %>% nrow)) predVec[j] <- newLabels[netRes[j, ] %>% which.max]
+
+Actual.score <- realVec %>% factor(levels = newLabels)
+Predicted.score <- predVec %>% factor(levels = newLabels)
+
+# Build a table of results
+resultTable <- table(Actual.score, Predicted.score)
+print(' ## Confusion matrix ##')
+print(caret::confusionMatrix(data = resultTable))
+
 # Save the neural network
 save(nn, file = getwd() %>% paste0('/data/nn.rda'))

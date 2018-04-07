@@ -1,4 +1,5 @@
 
+# Build totalData elsewhere!!
 
 # Optimization
 uniqueComps <- totalData$comp_id %>% unique
@@ -11,6 +12,7 @@ KEYS$LOGGING <- FALSE
 
 totalCorrect <- 0
 for (j in 1:(uniqueComps %>% length)) {
+
   testData <- totalData %>% subset(totalData$comp_id == uniqueComps[j])
   subComp <- competitions %>% subset(competitions$id == uniqueComps[j])
   singleLeague <- paste0(subComp$name, ' :: ', subComp$region)

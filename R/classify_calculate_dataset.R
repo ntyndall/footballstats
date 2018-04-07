@@ -67,6 +67,8 @@ calculate_data <- function(matchData, logger = FALSE) {
 
     if (logger) print(datSlice)
 
+    if (i == 51) loggs <<- TRUE else loggs <<- FALSE
+
     # 1) Get commentary information (Initialise datSlice)
     datSlice %<>% cbind(
       footballstats::feat_commentaries(
@@ -163,7 +165,6 @@ feat_form <- function(matchData, teamIDs, singleMatchInfo) {
   form <- if (forms %>% length %>% `!=`(2)) {
     list(NA, NA)
   } else {
-    # NEED TO RETURN TWO HERE!!!
     forms %>% lapply(footballstats::form_to_int)
   }
 
@@ -207,23 +208,49 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
 
   cResults <- c()
   for (j in 1:2) {
-    commentaryKey <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[j]) %>%
+    commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, ':*:', teamIDs[j]) %>%
       rredis::redisKeys() %>% as.character
 
     # Check commentary key exists
-    if (identical(commentaryKey, character(0))) break
+    if (commentaryKeys %>% length %>% `==`(0)) break
+
+    # Get the last 4
+    commentaryKeys <- KEYS %>% footballstats::order_commentaries(
+      commentaryKeys = commentaryKeys
+    ) %>% rev
+
+    # Get all the matchIDs
+    matchIDs <- commentaryKeys %>%
+      footballstats::flatt(y = 3) %>%
+      as.integer
+
+    bigger <- matchID %>% `>`(matchIDs)
+    if (bigger %>% sum %>% `>`(4)) commentaryKeys %<>% `[`(bigger %>% which %>% `[`(1:4)) else next
 
     # Check that all the allowed names is a subset of the commentary
-    availableNames <- commentaryKey %>% rredis::redisHGetAll() %>% names
-    if (commentaryNames %in% availableNames %>% all %>% `!`()) break
+    for (k in 1:(commentaryKeys %>% length)) {
+      availableNames <- commentaryKeys[k] %>% rredis::redisHGetAll() %>% names
+      if (commentaryNames %in% availableNames %>% all %>% `!`()) break
+    }
 
-    # Get Commentary results from Redis
-    cResults %<>% c(
-      footballstats::commentary_from_redis(
-        keyName = commentaryKey,
+    if (loggs) print(commentaryKeys)
+
+    allStats <- data.frame(stringsAsFactors = FALSE)
+    for (k in 1:(commentaryKeys %>% length)) {
+      res <- footballstats::commentary_from_redis(
+        keyName = commentaryKeys[k],
         returnItems = commentaryNames
-      ) %>% list
-    )
+      )
+
+      if (loggs) print(res)
+
+      allStats %<>% rbind(res %>% as.data.frame %>% t)
+    }
+    names(allStats) <- commentaryNames
+
+    if (loggs) print(allStats)
+
+    cResults %<>% c(apply(allStats, 2, mean) %>% as.double %>% list)
   }
 
   # Return a mini frame containing form information

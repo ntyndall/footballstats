@@ -71,14 +71,14 @@ test_that("Create team form.", {
     `==`(teamID) %>%
     sum
 
-  expect_equal( numMatches, formList[[1]] %>% length )
-  expect_equal( numMatches, formList[[2]] %>% length )
-  expect_equal( formList[[2]] %>% paste(collapse = ''), 'WDWWLWW' )
+  expect_equal( numMatches, formList$date %>% length )
+  expect_equal( numMatches, formList$form %>% length )
+  expect_equal( formList$form %>% paste(collapse = ''), 'WLWLDWD' )
 
-  sortedDates <- formList[[1]] %>% sort
+  sortedDates <- formList$date %>% sort
 
   expect_equal( sortedDates[1], 17418 )
-  expect_equal( sortedDates[numMatches], 17467 )
+  expect_equal( sortedDates[numMatches], 17468 )
 
 })
 

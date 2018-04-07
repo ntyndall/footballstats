@@ -61,7 +61,8 @@ neural_network <- function(totalData) {
   nn <- neuralnet::neuralnet(
     formula = f,
     data = train.data,
-    hidden = neurons %>% rep(4),
+    hidden = neurons %>% rep(5),
+    rep = 10,
     act.fct = "logistic",
     linear.output = FALSE,
     lifesign = 'minimal',

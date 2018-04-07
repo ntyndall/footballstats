@@ -65,7 +65,7 @@ recreate_matchdata <- function(KEYS) {
 
 order_matchdata <- function(matchData) {
   matchData$formatted_date %<>% as.Date('%d.%m.%Y')
-  matchData <- matchData[matchData$formatted_date %>% order, ]
+  matchData <- matchData[matchData$formatted_date %>% order(matchData$id), ]
   return(matchData)
 }
 
@@ -93,6 +93,11 @@ commentary_from_redis <- function(keyName, returnItems) {
   hashNames <- results %>% names
   hashLen <- hashNames %>% length
 
+  #if (loggs) {
+    #print('commentary from redis')
+    #print(keyName)
+    #print(results)
+  #}
   # Make sure something exists in the requested fields
   vec <- c()
   for (j in 1:hashLen) {

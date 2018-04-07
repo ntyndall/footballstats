@@ -35,8 +35,6 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
   # Initialise
   resSds <- resList <- weights <- c()
   commKey <- paste0('cmt_commentary:', KEYS$COMP)
-  myMetrics <- footballstats::cIntervals
-  mySVM <- footballstats::allsvms
 
   # Get the commentary names
   commentaryNames <- footballstats::dataScales$commentaries %>%
@@ -68,8 +66,35 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     matchIDs <- commentaryKeys %>%
       footballstats::flatt(y = 3)
 
+    bigger <- matchID %>% `>`(matchIDs)
+    if (bigger %>% sum %>% `>`(4)) commentaryKeys %<>% `[`(bigger %>% which %>% `[`(1:4)) else next
+
     # Team IDs will ALWAYS be c(home, away)
     HAvec <- j %>% magrittr::mod(2)
+
+    totalPositions <- data.frame(stringsAsFactors = FALSE)
+    commKey <- paste0('cmt_commentary:', KEYS$COMP)
+    for (k in 1:(commentaryKeys %>% length)) {
+
+      # Get the other team from the matchID
+      bothIDs <- paste0(commKey, ':', matchIDs[k], ':*') %>%
+        rredis::redisKeys() %>%
+        footballstats::flatt(y = 4)
+
+      if (teamIDs[j] %>% `==`(bothIDs) %>% which %>% `==`(2)) bothIDs %<>% rev
+
+      # Get the positions from
+      currentPos <- KEYS %>% footballstats::feat_position(
+        matchID = matchIDs[k],
+        teamIDs = bothIDs
+      )
+
+      # Bind to a total data frame
+      totalPositions %<>% rbind(currentPos)
+    }
+
+    # Other team info
+    recentOp <- totalPositions$position.a
 
     if (j == 2) positions %<>% rev
 
@@ -91,48 +116,38 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     # Only take the average of the last 4 matches!
     if (comMetrics %>% nrow %>% `<`(KEYS$DAYS)) next
     comMetrics <- comMetrics[1:KEYS$DAYS, ]
+    recentOp %<>% `[`(c(1:KEYS$DAYS))
 
     # Get mean and standard deviation for all metrics
     comMean <- apply(comMetrics, 2, mean)
-    comSD <- apply(comMetrics, 2, stats::sd)
+    #comSD <- apply(comMetrics, 2, stats::sd)
+    #recentOp %<>% mean
 
     # for each metric need to adjust value (bucket the mean) and then
-    #positionInt <- c(0, 5, 10, 15, 20, Inf)
-    totalPreds <- c()
-    for (k in 1:(commentaryNames %>% length)) {
-      curName <- commentaryNames[k]
-      #testVar <- comMean[[curName]] %>% findInterval(myMetrics[[curName]]) %>% as.factor
+    # totalPreds <- c()
+    # for (k in 1:(commentaryNames %>% length)) {
+    #  curName <- commentaryNames[k]
 
-      myData <- data.frame(
-        one = comMean[[curName]],
-        two = comSD[[curName]],
-        three = positions[1],
-        four = positions[2],
-        five = HAvec,
-        stringsAsFactors = FALSE
-      )
-      names(myData) <- c(paste0(curName, c('_mean', '_sd')), 'currentPos', 'otherPos', 'homeaway')
-      newValue <- stats::predict(mySVM[[KEYS$COMP %>% as.character]][[curName]], myData) %>%
-        as.integer
+      #myData <- data.frame(
+        #one = comMean[[curName]],
+        #two = comSD[[curName]],
+        #three = positions[1],
+        #four = positions[2],
+        #five = recentOp,
+        #six = HAvec,
+        #stringsAsFactors = FALSE
+        #)
 
-      # Now I just need to multiply it back up!!
-      #cMet <- myMetrics[[curName]]
-      #midPoint <- cMet[2] %>% `-`(cMet[1]) %>% `/`(2)
-      #finalVal <- cMet[newValue] %>% `+`(midPoint)
-      totalPreds %<>% c(newValue)
-    }
+      #names(myData) <- c(paste0(curName, c('_mean', '_sd')), 'currentPos', 'otherPos', 'recentOp', 'homeaway')
+      #newValue <- stats::predict(mySVM[[KEYS$COMP %>% as.character]][[curName]], myData) %>%
+        #    as.integer
+
+      #  totalPreds %<>% c(newValue)
+    #}
 
     # Calculate the average (and possible the standard deviation?)
-    resList %<>% c(totalPreds %>% list)
+    resList %<>% c(comMean %>% list)
   }
-
-  # Get the positions of the two current teams
-  positions <- KEYS %>%
-    footballstats::feat_position(
-      matchID = matchID,
-      teamIDs = teamIDs,
-      matchDate = matchDate
-    )
 
   # Return a mini frame containing commentary information
   commentaryFrame <- footballstats::dataScales$commentaries %>%
@@ -200,7 +215,7 @@ project_form <- function(KEYS, teamIDs, currentID) {
       matchData %<>% rbind(
         csmIDs[k] %>%
         rredis::redisHGetAll() %>%
-        as.data.frame
+        as.data.frame(stringsAsFactors = FALSE)
       )
     }
 

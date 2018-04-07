@@ -32,8 +32,9 @@ for (i in 1:(comps %>% length)) {
 
 
 svm.models <- c()
-for (i in 2:(comps %>% length)) {
+for (i in 1:(comps %>% length)) {
 
+  print(paste0('looking @ comp ', i, ' / ', comps %>% length))
   # Find the best result with different days
   singleLeague <- totalData[totalData$comp_id == comps[i], ]
   allTeams <- c(singleLeague$localteam_id, singleLeague$visitorteam_id) %>%
@@ -109,19 +110,36 @@ for (i in 2:(comps %>% length)) {
     # Take a running average every 4 games!
     dataRowsAdj <- comMetrics %>% nrow %>% `-`(3)
 
-    allMean <- sapply(1:(commentaryNames %>% length), function(x) {
-      sapply(2:dataRowsAdj, function(i) comMetrics[[commentaryNames[x]]][c(i:(i+3))] %>% mean)
-    })
-    allSD <- sapply(1:(commentaryNames %>% length), function(x) {
-      sapply(2:dataRowsAdj, function(i) comMetrics[[commentaryNames[x]]][c(i:(i+3))] %>% sd)
-    })
+    # Set up function for calculating mean and SD of running 4 game average
+    run_avg <- function(z = 'mean', dataset) {
+      datNames <- dataset %>% names
+      fn <- if (z == 'mean') mean else getFromNamespace(x = 'sd', ns = 'stats')
+      return(
+        sapply(
+          X = 1:(datNames %>% length),
+          FUN = function(x) {
+            sapply(
+              X = 2:dataRowsAdj,
+              FUN = function(i) dataset %>% `[[`(datNames[x]) %>% `[`(c(i:(i+3))) %>% fn
+            )
+        })
+      )
+    }
 
-    elems <- c(1:(dataRowsAdj - 1))
+    # Calculate mean and SD of 4 game average
+    allMean <- run_avg(z = 'mean', dataset = comMetrics)
+    allSD <- run_avg(z = 'sd', dataset = comMetrics)
+    recentOp <- run_avg(z = 'mean', dataset = totalPositions %>% subset(select = 'position.a'))
 
+    elems <- 2:dataRowsAdj
+
+    # Do I need to offset the elems here?
     newF <- data.frame(
       currentPos = totalPositions$position.h[elems],
       otherPos = totalPositions$position.a[elems],
-      homeaway = HAvec[elems]
+      recentOp = recentOp[ , 1],
+      homeaway = HAvec[elems],
+      stringsAsFactors = FALSE
     )
 
     myFeatures <- data.frame(allMean, allSD)
@@ -133,17 +151,9 @@ for (i in 2:(comps %>% length)) {
   }
 
   # Now with the total training data, build and save an SVM per competition
-  #totTraining %>% subset(totTraining %>% duplicated %>% `!`()) -> nn
   original <- totTraining
   varNames <- names(original) %>%
     paste(collapse = ' + ')
-
-  # Build an SVM for each attribute
-  #positionInt <- c(0, 5, 10, 15, 20, Inf)
-
-  # Bucket up standings too
-  #totTraining$currentPos %<>% findInterval(positionInt)
-  #totTraining$otherPos %<>% findInterval(positionInt)
 
   uniqueSVM <- totRes <- c()
   for (k in 1:(commentaryNames %>% length)) {
@@ -182,45 +192,23 @@ for (i in 2:(comps %>% length)) {
       }
     }
 
-    totRes %<>% c(topScore)
-
-    ###
+    # Create a list with SVMs for each commentary Name
     uniqueSVM %<>% c(bestModel %>% list)
   }
 
-  print(totRes)
+  # Create a total SVM model to hold the unique competition svm.
   names(uniqueSVM) <- commentaryNames
-
-  ##
   svm.models %<>% c(uniqueSVM %>% list)
 }
+
+# Update list by competitionID
+names(svm.models) <- comps
+allsvms <- svm.models
+save(allsvms, file = getwd() %>% paste0('/data/allsvms.rda'))
+
 
 # ONLY FOR SINGLE!!
 #
 #svm.models$`1425` <- uniqueSVM
 #allsvms <- svm.models
 #
-
-# Update list by competitionID
-names(svm.models) <- comps
-
-allsvms <- svm.models
-save(allsvms, file = getwd() %>% paste0('/data/allsvms.rda'))
-
-
-#my_metrics <- function() {
-  #return(
-    #list(
-      #shots_total =  c(0, 5, 10, 15, 20, 25, 30, Inf),
-      #shots_ongoal = c(0, 3, 6, 9, 12, Inf),
-      #fouls =  c(0, 5, 10, 15, 20, 25, 30, Inf),
-      #corners = c(0, 3, 6, 9, 12, Inf),
-      #possesiontime = c(0, 21, 41, 61, 81, 101),
-      #yellowcards = c(0, 2, 4, 6, Inf),
-      #saves = c(0, 3, 6, 9, 12, Inf)
-      #)
-    #  )
-#}
-
-#myMetrics -> cIntervals
-#save(cIntervals, file = getwd() %>% paste0('/data/cIntervals.rda'))
