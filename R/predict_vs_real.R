@@ -38,6 +38,14 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
       matchID <- readyToAnalyse[i]
       resultKey <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchID)
       resultKey %<>% rredis::redisKeys()
+
+      # Should really delete unused / postponed games here!
+      #resultLen <- resultKey %>% length
+      #if (resultLen %>% `>`(1)) {
+      #  for (j in 1:(resultLen - 1)) {
+      #
+      #  }
+      #}
       resultKey %<>% `[`(resultKey %>% length)
       predicted <- resultKey %>% rredis::redisHGetAll()
       pre <- predicted$prediction %>% as.character
