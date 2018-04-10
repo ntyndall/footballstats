@@ -20,10 +20,10 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <<- footballstats::sensitive_keys(
-    printToSlack = FALSE,
-    printToScreen = TRUE,
+    printToSlack = TRUE,
+    printToScreen = FALSE,
     testing = FALSE,
-    storePred = FALSE
+    storePred = TRUE
   )
 
   # Get dates for querying fixutres now

@@ -46,7 +46,6 @@ generate_predictions <- function(KEYS, fixtureList) {
     style = 3
   )
 
-  gen.pred <- data.frame(stringsAsFactors = FALSE)
   # Loop over each fixture
   for (i in 1:fixtureRow) {
     # Update progress bar
@@ -101,7 +100,6 @@ generate_predictions <- function(KEYS, fixtureList) {
         stringsAsFactors = FALSE
       )
     )
-  gen.pred %<>% rbind(matchMetrics)
 
     # Go onto the next feature if any features arent present
     if (matchMetrics %>% is.na %>% any) {
