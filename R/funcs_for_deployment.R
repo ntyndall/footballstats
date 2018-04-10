@@ -20,10 +20,10 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <<- footballstats::sensitive_keys(
-    printToSlack = TRUE,
-    printToScreen = FALSE,
+    printToSlack = FALSE,
+    printToScreen = TRUE,
     testing = FALSE,
-    storePred = TRUE
+    storePred = FALSE
   )
 
   # Get dates for querying fixutres now
@@ -52,6 +52,7 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
 
     # Predict actual future results
     KEYS$COMP <- competitions$id[i]
+    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
     KEYS$COMP_NAME <- competitions$name[i]
 
     cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
@@ -174,6 +175,7 @@ analyse_data <- function(deployed = FALSE) { # nocov start
     )
 
     KEYS$COMP <- competitions$id[i]
+    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
     KEYS %>% footballstats::add_all()
   }
 } # nocov end

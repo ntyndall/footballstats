@@ -6,7 +6,7 @@ library(magrittr)
 #
 
 # Define the season when building the model
-#seasonStarting <- 2017
+seasonStarting <- 2017
 
 # Define a single competitionID if only one is to be used
 #competitionID <- 1204
@@ -14,11 +14,15 @@ library(magrittr)
 # Get allowed competitions
 comps <- footballstats::allowed_comps()
 
+# Start up redis
+footballstats::redis_con()
+
 # Get all the data first
 cat(paste0(Sys.time(), ' | Recreating match data. \n'))
 totalData <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:(comps %>% length)) {
 
+  print(paste0('Comp ', i, ' / ', comps %>% length))
   # Define the keys for each recreation
   KEYS$COMP <- comps[i]
   KEYS$SEASON <- seasonStarting
@@ -49,7 +53,7 @@ loops <- totalData %>%
 
 original.data <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:loops) {
-  cat(' Looping ', i, ' / ', loops)
+  print(paste0(' Looping ', i, ' / ', loops))
 
   # Get the upper index
   upper <- if (i %>% `==`(loops)) {
@@ -69,6 +73,8 @@ for (i in 1:loops) {
   # Bind the data set on each time
   original.data %<>% rbind(totalData[lower:upper, ] %>% footballstats::calculate_data())
 }
+
+#big.original.data <- original.data
 
 # Only look at complete rows!
 original.data %<>% subset(original.data %>% stats::complete.cases())

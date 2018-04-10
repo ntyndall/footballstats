@@ -53,6 +53,7 @@ calculate_data <- function(matchData, logger = FALSE) {
     matchSlice <- matchData[i, ]
     matchID <- matchSlice$id %>% as.integer
     KEYS$COMP <- matchSlice$comp_id
+    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
     teamIDs <- c(matchSlice$localteam_id, matchSlice$visitorteam_id)
 
     # Get single match information
@@ -83,12 +84,20 @@ calculate_data <- function(matchData, logger = FALSE) {
 
     # 2) Get form information
     datSlice %<>% cbind(
-      footballstats::feat_form(
-        matchData = matchData,
+      footballstats::project_form(
+        KEYS = KEYS,
         teamIDs = teamIDs,
-        singleMatchInfo = singleMatchInfo
+        currentID = matchID
       )
     )
+
+    #datSlice %<>% cbind(
+    #  footballstats::feat_form(
+    #    matchData = matchData,
+    #    teamIDs = teamIDs,
+    #    singleMatchInfo = singleMatchInfo
+    #  )
+    #)
 
     if (logger) print(datSlice)
 
@@ -208,6 +217,7 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
 
   cResults <- c()
   for (j in 1:2) {
+    totOppData <- c()
     commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, ':*:', teamIDs[j]) %>%
       rredis::redisKeys() %>% as.character
 
@@ -233,28 +243,59 @@ feat_commentaries <- function(KEYS, matchID, teamIDs, commentaryNames) {
       if (commentaryNames %in% availableNames %>% all %>% `!`()) break
     }
 
-    if (loggs) print(commentaryKeys)
-
+    # Calculate all the statistics
     allStats <- data.frame(stringsAsFactors = FALSE)
     for (k in 1:(commentaryKeys %>% length)) {
       res <- footballstats::commentary_from_redis(
         keyName = commentaryKeys[k],
         returnItems = commentaryNames
       )
-
-      if (loggs) print(res)
-
       allStats %<>% rbind(res %>% as.data.frame %>% t)
     }
     names(allStats) <- commentaryNames
 
-    if (loggs) print(allStats)
 
-    cResults %<>% c(apply(allStats, 2, mean) %>% as.double %>% list)
+    # Calculate opposition strength here!
+    newMatchIDs <- commentaryKeys %>%
+      footballstats::flatt(y = 3) %>%
+      as.integer
+    calcPos <- data.frame()
+    for (k in 1:(commentaryKeys %>% length)) {
+      oppResults <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', newMatchIDs[k]) %>%
+        rredis::redisHMGet(fields = c('formatted_date', 'localteam_id', 'visitorteam_id')) %>%
+        as.character
+
+      twoIDs <- oppResults[c(2, 3)]
+      oth <- if (oppResults %>% `==`(teamIDs[j]) %>% which %>% `==`(2)) oppResults[3] else oppResults[2]
+      oppFrame <- footballstats::feat_position(
+        KEYS = KEYS,
+        matchID = NULL,
+        teamIDs = c(oth, teamIDs[j]),
+        matchDate = oppResults[1]
+      )
+      calcPos %<>% rbind(oppFrame)
+      totOppData %<>% c(oppFrame$position.h)
+    }
+
+    # Normalise!
+    #totOppData %<>% `/`(KEYS$TIL) %>% `*`(100)
+
+    cResults %<>% c(
+      c(apply(allStats, 2, mean), apply(allStats, 2, stats::sd), totOppData %>% mean, totOppData %>% stats::sd()) %>%
+        as.double %>% list
+    )
   }
 
+  allNames <- c(
+    commentaryNames %>% paste0('.h'),
+    commentaryNames %>% paste0('.sdh'),
+    commentaryNames %>% paste0('.a'),
+    commentaryNames %>% paste0('.sda'),
+    c('strength.h', 'strength.sdh', 'strength.a', 'strength.sda')
+  )
+
   # Return a mini frame containing form information
-  c(commentaryNames %>% paste0('.h'), commentaryNames %>% paste0('.a')) %>%
+  allNames %>%
     footballstats::handle_projections(resList = cResults) %>%
     return()
 }
@@ -331,8 +372,8 @@ feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
 
   # Determine & Return relative position as a data.frame
   data.frame(
-    `position.h` = positions[[teamIDs[1]]],
-    `position.a` = positions[[teamIDs[2]]],
+    `position.h` = positions[[teamIDs[1]]] %>% `/`(KEYS$TIL) %>% `*`(100),
+    `position.a` = positions[[teamIDs[2]]] %>% `/`(KEYS$TIL) %>% `*`(100),
     stringsAsFactors = FALSE
   ) %>% return()
 }

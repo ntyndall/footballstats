@@ -73,11 +73,14 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     HAvec <- j %>% magrittr::mod(2)
 
     totalPositions <- data.frame(stringsAsFactors = FALSE)
+    newMatchIDs <- commentaryKeys %>%
+      footballstats::flatt(y = 3) %>%
+      as.integer
     commKey <- paste0('cmt_commentary:', KEYS$COMP)
     for (k in 1:(commentaryKeys %>% length)) {
 
       # Get the other team from the matchID
-      bothIDs <- paste0(commKey, ':', matchIDs[k], ':*') %>%
+      bothIDs <- paste0(commKey, ':', newMatchIDs[k], ':*') %>%
         rredis::redisKeys() %>%
         footballstats::flatt(y = 4)
 
@@ -85,7 +88,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
       # Get the positions from
       currentPos <- KEYS %>% footballstats::feat_position(
-        matchID = matchIDs[k],
+        matchID = newMatchIDs[k],
         teamIDs = bothIDs
       )
 
@@ -120,37 +123,31 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
     # Get mean and standard deviation for all metrics
     comMean <- apply(comMetrics, 2, mean)
-    #comSD <- apply(comMetrics, 2, stats::sd)
-    #recentOp %<>% mean
-
-    # for each metric need to adjust value (bucket the mean) and then
-    # totalPreds <- c()
-    # for (k in 1:(commentaryNames %>% length)) {
-    #  curName <- commentaryNames[k]
-
-      #myData <- data.frame(
-        #one = comMean[[curName]],
-        #two = comSD[[curName]],
-        #three = positions[1],
-        #four = positions[2],
-        #five = recentOp,
-        #six = HAvec,
-        #stringsAsFactors = FALSE
-        #)
-
-      #names(myData) <- c(paste0(curName, c('_mean', '_sd')), 'currentPos', 'otherPos', 'recentOp', 'homeaway')
-      #newValue <- stats::predict(mySVM[[KEYS$COMP %>% as.character]][[curName]], myData) %>%
-        #    as.integer
-
-      #  totalPreds %<>% c(newValue)
-    #}
+    comSD <- apply(comMetrics, 2, stats::sd)
 
     # Calculate the average (and possible the standard deviation?)
-    resList %<>% c(comMean %>% list)
+    resList %<>% c(
+      c(
+        apply(comMetrics, 2, mean),
+        apply(comMetrics, 2, stats::sd),
+        recentOp %>% mean,
+        recentOp %>% stats::sd()
+      ) %>%
+        as.double %>% list
+    )
   }
 
+  # Define the commentary frame names here
+  allNames <- c(
+    commentaryNames %>% paste0('.h'),
+    commentaryNames %>% paste0('.sdh'),
+    commentaryNames %>% paste0('.a'),
+    commentaryNames %>% paste0('.sda'),
+    c('strength.h', 'strength.sdh', 'strength.a', 'strength.sda')
+  )
+
   # Return a mini frame containing commentary information
-  commentaryFrame <- footballstats::dataScales$commentaries %>%
+  commentaryFrame <- allNames %>%
     footballstats::handle_projections(
       resList = resList
     )

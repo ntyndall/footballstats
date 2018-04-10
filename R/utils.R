@@ -210,6 +210,24 @@ allowed_comps <- function() { # nocov start
 } # nocov end
 
 
+#' @title Teams in league
+#'
+#' @description To normalise some of the data we need to know how
+#'  many teams are present within each league.
+#'
+#' @return A list of matching competition ids and team numbers
+#'
+#' @export
+
+
+teams_in_league <- function(compID) { # nocov start
+  allLeagues <- list(
+    id = c('1204', '1205', '1221', '1229', '1269', '1352', '1425'),
+    teams = c(20, 24, 20, 18, 20, 18, 18)
+  )
+  return(allLeagues$teams[allLeagues$id %>% `==`(compID) %>% which])
+} # nocov end
+
 #' @title Create Sink
 #'
 #' @description A function that creates a log file that
