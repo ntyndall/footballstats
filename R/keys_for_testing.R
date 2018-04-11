@@ -22,7 +22,8 @@ keys_for_testing <- function() {
       LOG_PRED = FALSE,
       LOGGING = FALSE,
       DAYS = 4,
-      STAND = 0.5
+      STAND = 0.5,
+      TIL = 20
     )
   )
 }
