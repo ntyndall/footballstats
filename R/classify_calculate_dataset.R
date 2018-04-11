@@ -91,14 +91,6 @@ calculate_data <- function(matchData, logger = FALSE) {
       )
     )
 
-    #datSlice %<>% cbind(
-    #  footballstats::feat_form(
-    #    matchData = matchData,
-    #    teamIDs = teamIDs,
-    #    singleMatchInfo = singleMatchInfo
-    #  )
-    #)
-
     if (logger) print(datSlice)
 
     # Finally, find out how convincing the match was for the home team
