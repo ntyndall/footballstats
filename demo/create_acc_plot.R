@@ -1,8 +1,8 @@
-footballstats::accuracyFrame
+currentFrame <- footballstats::accuracyFrame
 
 # Define new values to be stored
-newVals <- c(68, 59.4, 65.6, 66.7, 67.3, 74.1, 66)
-newGroup <- 3
+newVals <- c(80.1, 75.7, 79.5, 79.4, 79.8, 79.9, 82.5)
+newGroup <- 'v1.4'
 
 newFrame <- footballstats::accuracyFrame[1:7, ]
 newFrame$accuracy <- NULL
@@ -14,7 +14,7 @@ newFrame %<>% cbind(
 )
 newFrame$groups <- newGroup %>% as.factor
 
-accuracyFrame <- rbind(footballstats::accuracyFrame, newFrame)
+accuracyFrame <- rbind(currentFrame, newFrame)
 
 # Plot
 g <- ggplot2::ggplot(
