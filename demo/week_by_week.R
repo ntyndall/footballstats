@@ -1,29 +1,49 @@
 # Run through week by week
-uniqueComps <- totalData$comp_id %>% unique
 
+# Set up KEYS
+KEYS <- footballstats::sensitive_keys(
+  printToSlack = FALSE,
+  printToScreen = FALSE,
+  testing = FALSE,
+  storePred = FALSE
+)
+KEYS$SEASON <- 2017
+KEYS$LOGGING <- FALSE
+
+# Get competition information
 footballstats::redis_con()
 KEYS %>% footballstats::acomp_info() -> competitions
 competitions %<>% subset(competitions$id %in% footballstats::allowed_comps())
-summaryStats <- data.frame(stringsAsFactors = FALSE)
-KEYS$LOGGING <- FALSE
+uniqueComps <- competitions$id
 
-totalCorrect <- 0
-for (j in 1:(uniqueComps %>% length)) {
+# Choose a start date
+startDate <- '31.08.2017' %>%
+  as.Date('%d.%m.%Y')
 
-  someDate <- Sys.Date() - 105
+# Calculate number of week loops to go through
+numLoops <- Sys.Date() %>%
+  `-`(startDate) %>%
+  as.integer %>%
+  `/`(7) %>%
+  floor %>%
+  `-`(1)
 
-  testData <- totalData %>% subset(totalData$comp_id == uniqueComps[j])
-  subComp <- competitions %>% subset(competitions$id == uniqueComps[j])
-  singleLeague <- paste0(subComp$name, ' :: ', subComp$region)
+# Initialise week data frame
+weekByWeek <- data.frame(stringsAsFactors = FALSE)
 
-  KEYS$COMP <- 1205
-  KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
-  KEYS$COMP_NAME <- subComp$name
+# Loop each week
+for (i in 6:numLoops) {
 
-  for (j in 1:14) {
-    print(j)
-    KEYS$DATE_FROM <- someDate %>% `+`(j %>% `*`(7)) %>% footballstats::format_dates()
-    KEYS$DATE_TO <- someDate %>% `+`(j %>% `*`(7) %>% `+`(6)) %>% footballstats::format_dates()
+  avgPer <- totalCorrect <- totalAnalysed <- 0
+
+  # Set up query keys
+  KEYS$DATE_FROM <- startDate %>% `+`(i %>% `*`(7)) %>% footballstats::format_dates()
+  KEYS$DATE_TO <- startDate %>% `+`(i %>% `*`(7) %>% `+`(6)) %>% footballstats::format_dates()
+
+  for (j in 1:(uniqueComps %>% length)) {
+    if (j %>% `==`(uniqueComps %>% length)) cat(j) else cat(j, '...')
+    KEYS$COMP <- uniqueComps[j]
+    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
 
     testData <- paste0("/matches?comp_id=", KEYS$COMP, "&from_date=", KEYS$DATE_FROM, "&to_date=", KEYS$DATE_TO, "&") %>%
       footballstats::get_data(KEYS = KEYS)
@@ -34,7 +54,38 @@ for (j in 1:(uniqueComps %>% length)) {
       fixtureList = testData
     )
 
-    per <- analysis$correct %>% `/`(testData %>% nrow %>% `-`(analysis$notAnalysed)) %>% scales::percent()
-    cat('\n  ## ', j, '::', per, ' \n')
+    totalAnalysed %<>% `+`(analysis$analysed)
+    totalCorrect %<>% `+`(analysis$correct)
   }
+
+  # Bind on the weekly percentages
+  if (totalAnalysed > 0) {
+    avgPer <- totalCorrect %>% `/`(totalAnalysed) %>% `*`(100) %>% round(2)
+    weekByWeek %<>% rbind(
+      data.frame(
+        week = i,
+        per = avgPer,
+        stringsAsFactors = FALSE
+      )
+    )
+  }
+
+  # Print weekly percentage
+  print(paste0(' ## Week [ ', i, ' ] Percentage :: ', avgPer))
 }
+
+
+g <- ggplot2::ggplot(
+  data = weekByWeek,
+  ggplot2::aes(
+    x = week,
+    y = per
+  )) %>%
+  `+`(ggplot2::geom_line()) %>%
+  `+`(ggplot2::scale_y_continuous(limits = c(1, 100))) %>%
+  `+`(ggplot2::ggtitle(label = 'Weekly Accuracy')) %>%
+  `+`(ggplot2::xlab(label = 'Week #')) %>%
+  `+`(ggplot2::ylab(label = 'Percentage')) %>%
+  `+`(footballstats::plot_theme())
+
+save(g, file = '~/Desktop/football-project/footballstats/plots/weekly-accuracy.png')

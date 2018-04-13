@@ -71,3 +71,6 @@ There are a number of useful scripts for testing and building models. Make sure 
 Below will be information on the accuracy so far that the app is achieving. To add more results, run through the data sets and append to the `data/accuracyFrame` data set in a similar fashion and from the root directory create the plot by running `Rscript demo/create_acc_plot.R` and push the new image to the repo.
 ![Accuracy Data Frame](https://raw.githubusercontent.com/niallbenj/footballstats/master/plots/accuracy.png)
 
+## Weekly Accuracy
+This is the accuracy across all competitions on a week by week basis, a more realistic idea of how well the app performs weekly.
+![Accuracy Data Frame](https://raw.githubusercontent.com/niallbenj/footballstats/master/plots/weekly-accuracy.png)
