@@ -1,0 +1,8 @@
+# Example
+# {matchID}:
+#   home: [shots_total, shots_ongoal, fouls, corners, possesiontime, yellowcards]
+#
+2212932: # Manchester United vs. Leicester City | Date = 26/08/17
+  home: [22, 7, 8, 9, 70, 1]
+  away: [11, 4, 7, 3, 30, 2]
+

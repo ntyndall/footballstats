@@ -25,12 +25,14 @@ get_data <- function(endpoint, KEYS) { # nocov start
       httr::config(timeout = 30)
     )
   }, error = function(e) {
-    cat(paste0(' ## WARNING : Could not resolve ', getUrl))
-    list(status_code = 600)
+    return(list(status_code = 600))
   })
 
   # Increment the request limit
   footballstats::request_limit()
+
+  # Record the bad request
+  if (rawContent$status_code != 200) print(paste0(' ## WARNING : Could not resolve ', getUrl))
 
   return(
     rawContent$status_code %>% purrr::when(

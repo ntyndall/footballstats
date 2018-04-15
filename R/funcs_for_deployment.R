@@ -53,7 +53,7 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   }
 
   # --- Now predict matches --- #
-  cat('*** Beginning predictions ***')
+  cat('\n\n *** Beginning predictions *** \n\n')
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
   KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
   totalPredictions <- 0
