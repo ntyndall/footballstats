@@ -1,10 +1,8 @@
-#' @title Predict Fixtures
+#' @title Analyse Match and Event and Predict
 #'
-#' @description A function to be run as a CRON job during
-#'  deployment. It gathers some data from redis, tries to
-#'  project features and then builds a data set which is
-#'  run against some predefined (or dynamic) model carried
-#'  in the package.
+#' @description A function that analyses matches and events only,
+#'  then straight after makes match predictions based on the competition,
+#'  this is to be run as a CRON job in deployment.
 #'
 #' @param deployed A boolean value to indicate whether the
 #'  function is being run from a deployed environment.
@@ -16,20 +14,19 @@
 #' @export
 
 
-predict_fixtures <- function(deployed = FALSE) { # nocov start
-
+analyse_and_predict <- function(deployed = FALSE) { # nocov start
   # Obtain API and sensitive key information
-  KEYS <<- footballstats::sensitive_keys(
+  KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
     printToScreen = FALSE,
     testing = FALSE,
     storePred = TRUE
   )
 
-  # Get dates for querying fixutres now
-  KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
-  KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
+  # Set up additional keys required for the main flow
   KEYS$SEASON <- footballstats::start_season()
+  KEYS$DATE_FROM <- paste0('31.07.', KEYS$SEASON)
+  KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
 
   # Make a connection to redis for storing data
   footballstats::redis_con()
@@ -40,11 +37,25 @@ predict_fixtures <- function(deployed = FALSE) { # nocov start
   # Subset the available competitions
   competitions %<>% subset(competitions$id %in% footballstats::allowed_comps())
 
-  # Create the sink for output
-  if (deployed) 'summary_pred' %>% footballstats::create_sink()
-  cat(' -- Beginning analysis -- \n\n\n')
+  # Create the sink for adding data
+  if (deployed) 'summary_predictions' %>% footballstats::create_sink()
 
   # Loop over all competitions being analysed
+  for (i in 1:nrow(competitions)) {
+    cat(
+      ' ## Storing ::' , i, '/', nrow(competitions), '(',
+      competitions$name[i], '-', competitions$region[i], '). \n'
+    )
+
+    KEYS$COMP <- competitions$id[i]
+    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
+    KEYS %>% footballstats::add_all()
+  }
+
+  # --- Now predict matches --- #
+  cat('*** Beginning predictions ***')
+  KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
+  KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
   totalPredictions <- 0
   for (i in 1:nrow(competitions)) {
     cat(paste0(Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
@@ -127,57 +138,6 @@ analyse_players <- function(deployed = FALSE) { # nocov start
   # Only complete - delete the analysePlayers key (if it exists..)
   if (rredis::redisExists(key = 'analysePlayers')) 'analysePlayers' %>% rredis::redisDelete()
 
-} # nocov end
-
-#' @title Analyse Match and Event
-#'
-#' @description A function that analyses matches and events only,
-#'  this is to be run as a CRON job in deployment.
-#'
-#' @param deployed A boolean value to indicate whether the
-#'  function is being run from a deployed environment.
-#'
-#' @return Nothing. Redis is updated.
-#' @export
-
-
-analyse_data <- function(deployed = FALSE) { # nocov start
-  # Obtain API and sensitive key information
-  KEYS <- footballstats::sensitive_keys(
-    printToSlack = TRUE,
-    printToScreen = FALSE,
-    testing = FALSE,
-    storePred = TRUE
-  )
-
-  # Set up additional keys required for the main flow
-  KEYS$SEASON <- footballstats::start_season()
-  KEYS$DATE_FROM <- paste0('31.07.', KEYS$SEASON)
-  KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
-
-  # Make a connection to redis for storing data
-  footballstats::redis_con()
-
-  # Load competitions and run the functionality below.
-  competitions <- KEYS %>% footballstats::acomp_info()
-
-  # Subset the available competitions
-  competitions %<>% subset(competitions$id %in% footballstats::allowed_comps())
-
-  # Create the sink for adding data
-  if (deployed) 'summary_adding' %>% footballstats::create_sink()
-
-  # Loop over all competitions being analysed
-  for (i in 1:nrow(competitions)) {
-    cat(
-      ' ## Storing ::' , i, '/', nrow(competitions), '(',
-      competitions$name[i], '-', competitions$region[i], '). \n'
-    )
-
-    KEYS$COMP <- competitions$id[i]
-    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
-    KEYS %>% footballstats::add_all()
-  }
 } # nocov end
 
 #' @title Send Report

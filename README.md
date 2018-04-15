@@ -40,11 +40,8 @@ Sys.setenv(FS_DEPLOYLOC = "___")
 where the last token is the root path of where the above script is run from, e.g. `/root/`.
   - Set up a cron job by typing `crontab -e` with the following...
 ```
-# Collect football information - such as match / team / commentary information
-50 23 * * 0 Rscript -e 'library(footballstats); footballstats::analyse_data(deployed = TRUE)'
-
-# Make predictions on upcoing fixtures
-0 22 * * 0 Rscript -e 'library(footballstats); footballstats::predict_fixtures(deployed = TRUE)'
+# Collect football information - such as match / team / commentary information THEN predict matches
+0 22 * * 0 Rscript -e 'library(footballstats); footballstats::analyse_and_predict(deployed = TRUE)'
 
 # After information has been gathered - update player status etc (COSTLY operation!)
 0 22 * * 1 Rscript -e 'library(footballstats); footballstats::analyse_players(deployed = TRUE)'
@@ -57,7 +54,6 @@ where the last token is the root path of where the above script is run from, e.g
   - Update `DESCRIPTION` file to required version (must be > than most recent `GIT` version).
   - Run `Rscript tag.R {v#}` inside root directory `/footballstats/`.
   - Update Github with the newest tag and binary that is produced from step 2.
-
 
 ## Scripts
 There are a number of useful scripts for testing and building models. Make sure that `redis` is running on port `6379`.
