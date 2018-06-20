@@ -1,6 +1,6 @@
 ## Code status
-[![Build Status](https://travis-ci.org/niallbenj/footballstats.svg?branch=master)](https://travis-ci.org/niallbenj/footballstats)
-[![codecov](https://codecov.io/gh/niallbenj/footballstats/branch/master/graph/badge.svg)](https://codecov.io/gh/niallbenj/footballstats)
+[![Build Status](https://travis-ci.org/ntyndall/footballstats.svg?branch=master)](https://travis-ci.org/ntyndall/footballstats)
+[![codecov](https://codecov.io/gh/ntyndall/footballstats/branch/master/graph/badge.svg)](https://codecov.io/gh/ntyndall/footballstats)
 
 ## Installing and running this package
 ```
