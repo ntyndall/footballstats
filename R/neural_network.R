@@ -13,7 +13,7 @@
 #' @export
 
 
-neural_network <- function(totalData) {
+neural_network <- function(totalData, NN) {
 
   # Check what labels are available, and how many
   totalData$res %<>% as.character
@@ -34,12 +34,31 @@ neural_network <- function(totalData) {
   labColSpace <- newLabels %>% length %>% `+`(1)
   names(dSet) <- newLabels %>% c(dSet[labColSpace:ncol(dSet)] %>% names)
 
-  # Create Split (any column is fine)
-  split.data <- dSet$W %>% caTools::sample.split(SplitRatio = 0.70)
+  # totalData$res[totalData$res == 'W'] <- 'L'
+  totalRows <- dSet %>% nrow
+  test.data <- train.data <- data.frame(stringsAsFactors = FALSE)
+  for (k in newLabels) {
+    dataByClass <- dSet[dSet[[k]] %>% `==`(1), ]
+    splitting <- dataByClass[[k]] %>% caTools::sample.split(0.7)
 
+
+    #logicalVec <- FALSE %>% rep(dataByClass %>% nrow)
+    #logicalVec[sample(c(1:(dataByClass %>% nrow)), 430)] <- TRUE
+
+    train.data %<>% rbind(dataByClass %>% subset(splitting %>% `==`(TRUE)))
+    test.data %<>% rbind(dataByClass %>% subset(splitting %>% `==`(FALSE)))
+   }
+
+
+
+  # train.data[sample(1:nrow(train.data)), ] -> train.data
+  # Create Split (any column is fine)
+  #splitting <- dSet$W %>% caTools::sample.split(SplitRatio = 0.70)
+
+  #split.data <- splitting
   # Split based off of split Boolean Vector
-  train.data <- dSet %>% subset(split.data %>% `==`(TRUE))
-  test.data <- dSet %>% subset(split.data %>% `==`(FALSE))
+  #train.data <- dSet %>% subset(splitting %>% `==`(TRUE))
+  #test.data <- dSet %>% subset(splitting %>% `==`(FALSE))
 
   # Concatenate strings : Create the formula by adding
   # them up and create symbolic formula
@@ -56,16 +75,17 @@ neural_network <- function(totalData) {
     round %>%
     `+`(1)
 
-  # Build the neural network
+  # Build the neural network 0.0000001
   print(' ## Building neural network ## ')
   nn <- neuralnet::neuralnet(
     formula = f,
     data = train.data,
-    hidden = neurons %>% rep(5),
-    rep = 10,
+    hidden = neurons %>% rep(3),
+    rep = NN$REP,
+    threshold = NN$THRESH,
     act.fct = "logistic",
     linear.output = FALSE,
-    lifesign = 'minimal',
+    lifesign = 'full',
     stepmax = 10000000
   )
 
@@ -93,8 +113,9 @@ neural_network <- function(totalData) {
   # Build a table of results
   resultTable <- table(Actual.score, Predicted.score)
   print(' ## Confusion matrix ##')
-  print(caret::confusionMatrix(data = resultTable))
+  rt <- caret::confusionMatrix(data = resultTable)
+  print(rt)
 
-  # Return the neural network
-  return(nn)
+  # Return neural network plus results
+  return(list(neural = nn, result = rt$overall[1]))
 }
