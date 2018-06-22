@@ -6,7 +6,7 @@ library(magrittr)
 #
 
 # Define the season when building the model
-seasonStarting <- 2017
+#seasonStarting <- 2017
 
 # Define a single competitionID if only one is to be used
 #competitionID <- 1204
@@ -14,15 +14,11 @@ seasonStarting <- 2017
 # Get allowed competitions
 comps <- footballstats::allowed_comps()
 
-# Start up redis
-footballstats::redis_con()
-
 # Get all the data first
 cat(paste0(Sys.time(), ' | Recreating match data. \n'))
 totalData <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:(comps %>% length)) {
 
-  print(paste0('Comp ', i, ' / ', comps %>% length))
   # Define the keys for each recreation
   KEYS$COMP <- comps[i]
   KEYS$SEASON <- seasonStarting
@@ -74,22 +70,18 @@ for (i in 1:loops) {
   original.data %<>% rbind(totalData[lower:upper, ] %>% footballstats::calculate_data())
 }
 
-# big.original.data <- original.data
-# big.original.data -> original.data
-
 # Only look at complete rows!
 original.data %<>% subset(original.data %>% stats::complete.cases())
 
 # Drop the match IDs
 original.data <- original.data[ , 2:(original.data %>% ncol)]
 
-
-#
-#
-
 # Create scaled data set
 dataScales <- original.data %>% footballstats::get_scales()
-commentaries <-   c('shots_total', 'shots_ongoal', 'possesiontime')
+commentaries <-  c(
+  'shots_total', 'shots_ongoal', 'fouls', 'corners',
+  'possesiontime', 'yellowcards', 'saves'
+)
 dataScales$commentaries <- c(commentaries %>% paste0('.h'), commentaries %>% paste0('.a'))
 
 # Save the scaled data set
@@ -100,62 +92,7 @@ original.data %<>% footballstats::scale_data(dataScales = dataScales)
 
 # Build the neural network with scaled data
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
-#
-#
-#
-
-
-#
-#
-my.original.data -> original.data
-eliminate <- c('fouls', 'corners', 'yellowcards')
-
-new.data <- subset(original.data, select = -c(paste0(eliminate, '.h'), paste0(eliminate, '.a')))
-original.data[ , -which(names(original.data) %in% c(paste0(eliminate, '.h'), paste0(eliminate, '.a')))] -> new.data
-
-
-bestResult <- 0
-allResults <- meanRes <- c()
-ITER <- 20
-THRESH <- 0.005
-
-# splitting <- original.data$res %>% caTools::sample.split(SplitRatio = 0.70)
-for (j in 1:ITER) {
-  if (j == 1) tStart <- Sys.time()
-  #splitting <- original.data$res %>% caTools::sample.split(SplitRatio = 0.70)
-  nn <- original.data %>% neural_network(
-    NN = list(REP = 1, THRESH = THRESH)
-  )
-
-  # Save all results
-  allResults %<>% c(nn$result)
-
-  # Save the new best NN
-  if (nn$result > bestResult) {
-    bestNN <- nn$neural
-    bestResult <- nn$result
-  }
-
-  if (j == ITER) {
-    tEnd <- Sys.time()
-    meanRes %<>% c(allResults %>% list)
-  }
-}
-# Total time spent
-difftime(tEnd, tStart, units = 'secs') %>%
-  as.integer %>%
-  cat
-
-#
-#
-#
-#
-#
-#
-#
-
-table(allNames)
-allNames %>% unique
+nn <- original.data %>% footballstats::neural_network()
 
 # Check ALL the data!!
 check.data <- original.data
@@ -164,7 +101,7 @@ newLabels <- original.data$res %>% unique %>% sort %>% as.character
 check.data$res <- NULL
 
 predictions <- neuralnet::compute(
-  x = nn,
+  x = footballstats::nn,
   covariate = check.data
 )
 
