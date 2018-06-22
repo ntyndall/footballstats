@@ -37,6 +37,9 @@ for (i in 6:numLoops) {
   avgPer <- totalCorrect <- totalAnalysed <- 0
 
   # Set up query keys
+  KEYS$DATE_FROM <- Sys.Date() %>% `-`(16) %>% footballstats::format_dates()
+  KEYS$DATE_TO <- Sys.Date() %>% footballstats::format_dates()
+
   KEYS$DATE_FROM <- startDate %>% `+`(i %>% `*`(7)) %>% footballstats::format_dates()
   KEYS$DATE_TO <- startDate %>% `+`(i %>% `*`(7) %>% `+`(6)) %>% footballstats::format_dates()
 
