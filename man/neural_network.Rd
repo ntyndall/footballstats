@@ -4,7 +4,7 @@
 \alias{neural_network}
 \title{Generate Artifical Neural Network}
 \usage{
-neural_network(totalData)
+neural_network(totalData, NN)
 }
 \arguments{
 \item{totalData}{A data set that contains scaled data
