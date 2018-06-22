@@ -119,7 +119,7 @@ generate_predictions <- function(KEYS, fixtureList) {
 
     # Make the prediction
     result <- neuralnet::compute(
-      x = footballstats::nn,
+      x = footballstats::nn$neural,
       covariate = scled
     )
 
