@@ -90,9 +90,10 @@ save(dataScales, file = getwd() %>% paste0('/data/dataScales.rda'))
 # Scale the original data set
 original.data %<>% footballstats::scale_data(dataScales = dataScales)
 
+NN <- list(REP = 2, THRESH = 0.1)
 # Build the neural network with scaled data
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
-nn <- original.data %>% footballstats::neural_network()
+nn <- original.data %>% footballstats::neural_network(NN = NN)
 
 # Check ALL the data!!
 check.data <- original.data
