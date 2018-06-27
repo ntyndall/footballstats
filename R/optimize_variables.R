@@ -12,6 +12,7 @@ optimize_variables <- function(total.metrics) {
   DECAY <- c(1)
 
   for (i in 1:(DAYS %>% length)) {
+    day <- DAYS[i]
     for (j in 1:(GRID_PTS %>% length)) {
       for (k in 1:(GRID_BOUND %>% length)) {
         for (l in 1:(DECAY %>% length)) {
@@ -23,17 +24,37 @@ optimize_variables <- function(total.metrics) {
             home <- current.row$localID
             away <- current.row$awayID
 
-            homeMatched <- smaller.metrics$localID %>% `==`(home)
-            awayMatched <- smaller.metrics$awayID %>% `==`(away)
+            hHomeMatched <- smaller.metrics$localID %>% `==`(home)
+            aHomeMatched <- smaller.metrics$awayID %>% `==`(home)
+            hAwayMatched <- smaller.metrics$localID %>% `==`(away)
+            aAwayMatched <- smaller.metrics$awayID %>% `==`(away)
 
-            homeSum <- homeMatched %>% sum
-            awaySum <- awayMatched %>% sum
+            # Number of rows of each type
+            hHomeSum <- hHomeMatched %>% sum
+            aHomeSum <- aHomeMatched %>% sum
+            hAwaySum <- hAwayMatched %>% sum
+            aAwaySum <- aAwayMatched %>% sum
 
-            if (homeMatched %>% sum %>% `>=`(DAYS[i]) && awayMatched %>% sum %>% `>`(DAYS[i])) {
+            if (hHomeSum %>% `>=`(day) && aHomeSum %>% `>=`(day) && hAwaySum %>% `>=`(day) && aAwaySum %>% `>=`(day)) {
+
+              # Get grid values here
+              h.home.dat <- smaller.metrics %>% subset(hHomeMatched)
+              h.home.dat <- h.home.dat[(hHomeSum - day + 1):(h.home.dat %>% nrow), ]
+
+              a.home.dat <- smaller.metrics %>% subset(aHomeMatched)
+              a.home.dat <- a.home.dat[(aHomeSum - day + 1):(a.home.dat %>% nrow), ]
+
+              h.away.dat <- smaller.metrics %>% subset(hAwayMatched)
+              h.away.dat <- h.away.dat[(hAwaySum - day + 1):(h.away.dat %>% nrow), ]
+
+              a.away.dat <- smaller.metrics %>% subset(aAwayMatched)
+              a.away.dat <- a.away.dat[(aAwaySum - day + 1):(a.away.dat %>% nrow), ]
+
+              home.away.dat <- rbind(h.home.dat, a.home.dat, h.away.dat, a.away.dat)
 
               # do calculations here
-              footballstats::optimize_calculation(
-                day = DAYS[i],
+              home.away.dat %>% footballstats::optimize_calculation(
+                day = day,
                 gridPoints = GRID_PTS[j],
                 gridBoundary= GRID_BOUND[k],
                 decayFactor = DECAY[l]
