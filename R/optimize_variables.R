@@ -8,7 +8,7 @@ optimize_variables <- function(total.metrics) {
   # Define variables here
   DAYS <- c(3, 4, 5)
   GRID_PTS <- c(2, 4, 6, 8, 10)
-  GRID_BOUND <- c(0.3, 0.4, 0.5, 0.6, 0.7)
+  GRID_BOUND <- c(0.01, 0.05, 0.1, 0.15, 0.2)
   DECAY <- c(1)
 
   for (i in 1:(DAYS %>% length)) {
