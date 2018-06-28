@@ -11,6 +11,9 @@
 
 optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, decay = 0.0, folds = 10) {
 
+  # Connect redis
+  footballstats::redis_con()
+
   # Define the Season
   KEYS$SEASON <- 2017
 
@@ -98,27 +101,9 @@ optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, de
   total.metrics$possesiontime.h %<>%
     substr(1, total.metrics$possesiontime.h %>% nchar %>% `-`(1))
 
-  DAYS <- 3
-  # Now loop over all of total.metrics
-  for (i in 2:(total.metrics %>% nrow)) {
-    current.row <- total.metrics[i, ]
-    smaller.metrics <- total.metrics[1:(i - 1), ]
-
-    home <- current.row$localID
-    away <- current.row$awayID
-
-    homeMatched <- smaller.metrics$localID %>% `==`(home)
-    awayMatched <- smaller.metrics$awayID %>% `==`(away)
-
-    homeSum <- homeMatched %>% sum
-    awaySum <- awayMatched %>% sum
-
-    if (homeMatched %>% sum %>% `>=`(DAYS) && awayMatched %>% sum %>% `>`(DAYS)) {
-      # do something here
-    } else {
-      next
-    }
-  }
+  # Start to optimize this data set
+  total.metrics %>%
+    footballstats::optimize_variables()
 
   # Get player strength once developed
   if (FALSE) {
