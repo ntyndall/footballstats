@@ -11,11 +11,14 @@ optimize_variables <- function(total.metrics) {
   GRID_BOUND <- c(0.01, 0.05, 0.1, 0.15, 0.2)
   DECAY <- c(1)
 
+
   for (i in 1:(DAYS %>% length)) {
     day <- DAYS[i]
     for (j in 1:(GRID_PTS %>% length)) {
       for (k in 1:(GRID_BOUND %>% length)) {
         for (l in 1:(DECAY %>% length)) {
+
+          total.results <- data.frame(stringsAsFactors = FALSE)
           # Now loop over all of total.metrics
           for (drow in 2:(total.metrics %>% nrow)) {
             current.row <- total.metrics[drow, ]
@@ -53,16 +56,24 @@ optimize_variables <- function(total.metrics) {
               home.away.dat <- rbind(h.home.dat, a.home.dat, h.away.dat, a.away.dat)
 
               # do calculations here
-              home.away.dat %>% footballstats::optimize_calculation(
+              result.dat <- home.away.dat %>% optimize_calculation(
                 day = day,
                 gridPoints = GRID_PTS[j],
                 gridBoundary= GRID_BOUND[k],
-                decayFactor = DECAY[l]
+                decayFactor = DECAY[l],
+                til = 20
               )
+              result.dat$res <- current.row$result
+              total.results %<>% rbind(result.dat)
             } else {
               next
             }
           }
+
+          # With a data set, complete and for each metric,
+          # do some linear regression here and build a neural network each time?
+          # ...
+
         }
       }
     }
