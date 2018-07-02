@@ -33,6 +33,16 @@ stats_from_yaml <- function() {
 
   # Loop over and check each entry
   for (i in 1:(newData %>% length)) {
+    # Make sure each entry is of length two
+    datLens <- newData[[i]] %>%
+      purrr::map(length) %>%
+      as.integer
+
+    if (7 %>% `==`(datLens) %>% all %>% `!()`) {
+      next
+      cat(' ## Check entry for ID :', dNames[i])
+    }
+
     statsKey <- "csm:*:" %>%
       paste0(dNames[i]) %>%
       rredis::redisKeys() %>%
