@@ -3,7 +3,7 @@
 #' @export
 
 
-optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, decayFactor, til) {
+optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, decayFactor, totalPer, til) {
 
   # Split up data set again to do some analysis and build the features
   frameList <- list(
@@ -48,33 +48,50 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
     # Set up conditions for each type first
     if (i == 1) {
 
-      uu <- list(
+      # Just home
+      first <- list(
         posH = cFrame$position.h,
         posA = cFrame$position.a
       ) %>%
-      optimize_positiongrid(
-        gridPoints = gridPoints,
-        mygrid = mygrid,
-        boundaries = boundaries
+        optimize_get_data(
+          cData = cFrame[ , c(10:15)],
+          gridPoints = gridPoints,
+          mygrid = mygrid,
+          boundaries = boundaries
+        )
+
+      first %<>% cbind(
+        data.frame(
+          `xg.h` = cFrame$localScore %>% as.integer %>% mean,
+          `form.h` = cFrame$result %>% footballstats::form_to_int(),
+          stringsAsFactors = FALSE
+        )
       )
 
-      mets <- cFrame[ , c(10:15)] %>%
-        optimize_rowwise(intervals = uu) %>%
-        apply(MARGIN = 2, FUN = mean) %>%
-        t %>%
-        data.frame
+      # Home and away
+      if (totalPer > 0.01) {
+        haDat <- optimize_sort_ha(
+          homeDat = cFrame,
+          awayDat = frameList[[2]],
+          gridPoints = gridPoints,
+          mygrid = mygrid,
+          boundaries = boundaries
+        )
+        mets <- haDat %>% `*`(totalPer) %>% `+`(first * (1 - totalPer))
+      } else {
+        mets <- first
+      }
 
-      clinicalHome <- cFrame$localScore %>% as.integer %>% `/`(cFrame$shots_ongoal.h %>% as.integer)
-      defensiveHome <- cFrame$awayScore %>% as.integer %>% `/`(cFrame$shots_ongoal.a %>% as.integer)
+      clinicalHome <- cFrame$localScore %>% as.integer %>% `/`(cFrame$shots_ongoal.h %>% as.integer) %>% pmin(1)
+      defensiveHome <- cFrame$awayScore %>% as.integer %>% `/`(cFrame$shots_ongoal.a %>% as.integer) %>% pmin(1)
       dNan <- defensiveHome %>% is.nan
       cNan <- clinicalHome %>% is.nan
       if (dNan %>% any) defensiveHome[dNan] <- 0.0
       if (cNan %>% any) clinicalHome[cNan] <- 0.0
       mets %<>% cbind(
         data.frame(
-          `clinical.h` = clinicalHome %>% mean,
-          `defensive.a` = defensiveHome %>% mean,
-          `xg.hh` = cFrame$localScore %>% as.integer %>% mean,
+          `clinical.hh` = clinicalHome %>% mean,
+          `defensive.ha` = defensiveHome %>% mean,
           stringsAsFactors = FALSE
         )
       )
@@ -83,36 +100,58 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
     } else if (i == 3) {
       next
     } else {
-
-      uu <- list(
-        posH = cFrame$position.a, # Looking at the away team so flip these for good reason!
+      # Just away
+      second <- list(
+        posH = cFrame$position.a,
         posA = cFrame$position.h
       ) %>%
-        optimize_positiongrid(
+        optimize_get_data(
+          cData = cFrame[ , c(16:21)],
           gridPoints = gridPoints,
           mygrid = mygrid,
           boundaries = boundaries
         )
 
-      mets %<>% cbind(
-        cFrame[ , c(16:21)] %>%
-          optimize_rowwise(intervals = uu) %>%
-          apply(MARGIN = 2, FUN = mean) %>%
-          t %>%
-          data.frame
+      # Readjust results...
+      cRes <- cFrame$result
+      newRes <- c()
+      for (i in 1:(cRes %>% length)) {
+        newRes %<>% c(if (cRes[i] == 'W') 'L' else if (cRes[i] == 'L') 'W' else 'D')
+      }
+
+      second %<>% cbind(
+        data.frame(
+          `xg.a` = cFrame$awayScore %>% as.integer %>% mean,
+          `form.a` = newRes %>% footballstats::form_to_int(),
+          stringsAsFactors = FALSE
+        )
       )
 
-      defensiveAway <- cFrame$localScore %>% as.integer %>% `/`(cFrame$shots_ongoal.h %>% as.integer)
-      clinicalAway <- cFrame$awayScore %>% as.integer %>% `/`(cFrame$shots_ongoal.a %>% as.integer)
+      # Home and away
+      if (totalPer > 0.01) {
+        haDat <- optimize_sort_ha(
+          homeDat = frameList[[3]],
+          awayDat = cFrame,
+          gridPoints = gridPoints,
+          mygrid = mygrid,
+          boundaries = boundaries,
+          ha = 'a'
+        )
+        mets %<>% cbind(haDat %>% `*`(totalPer) %>% `+`(second * (1 - totalPer)))
+      } else {
+        mets %<>% cbind(second)
+      }
+
+      defensiveAway <- cFrame$localScore %>% as.integer %>% `/`(cFrame$shots_ongoal.h %>% as.integer) %>% pmin(1)
+      clinicalAway <- cFrame$awayScore %>% as.integer %>% `/`(cFrame$shots_ongoal.a %>% as.integer) %>% pmin(1)
       dNan <- defensiveAway %>% is.nan
       cNan <- clinicalAway %>% is.nan
       if (dNan %>% any) defensiveAway[dNan] <- 0.0
       if (cNan %>% any) clinicalAway[cNan] <- 0.0
       mets %<>% cbind(
         data.frame(
-          `clinical.h` = clinicalAway %>% mean,
-          `defensive.a` = defensiveAway %>% mean,
-          `xg.aa` = cFrame$awayScore %>% as.integer %>% mean,
+          `clinical.ah` = clinicalAway %>% mean,
+          `defensive.aa` = defensiveAway %>% mean,
           stringsAsFactors = FALSE
         )
       )
@@ -122,3 +161,100 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
   # Return row of data frame here
   return(mets)
 }
+
+#' @title Optimize Get Dat
+#'
+#' @export
+
+
+optimize_get_data <- function(positions, cData, gridPoints, mygrid, boundaries) {
+  uu <- list(
+    posH = cFrame$position.h,
+    posA = cFrame$position.a
+  ) %>%
+    optimize_positiongrid(
+      gridPoints = gridPoints,
+      mygrid = mygrid,
+      boundaries = boundaries
+    )
+
+  mets <- cData %>%
+    optimize_rowwise(intervals = uu) %>%
+    apply(MARGIN = 2, FUN = mean) %>%
+    t %>%
+    data.frame
+  return(mets)
+}
+
+#' @title Optimize Sort HA
+#'
+#' @export
+
+optimize_sort_ha <- function(homeDat, awayDat, gridPoints, mygrid, boundaries, ha = 'h') {
+  allNames <- homeDat %>% names
+
+  # Readjust results...
+  cRes <- awayDat$result
+  newRes <- c()
+  for (i in 1:(cRes %>% length)) {
+    newRes %<>% c(if (cRes[i] == 'W') 'L' else if (cRes[i] == 'L') 'W' else 'D')
+  }
+
+  # Bluff home / away just to get the correct metrics! (as home away doesnt matter now)
+  newAway <- data.frame(
+    matchID = awayDat$matchID,
+    date = awayDat$date,
+    localName = awayDat$awayName,
+    awayName = awayDat$localName,
+    localID = awayDat$awayID,
+    awayID = awayDat$localID,
+    localScore = awayDat$awayScore,
+    awayScore = awayDat$localScore,
+    result = newRes,
+    stringsAsFactors = FALSE
+  )
+
+  aStats <- awayDat[ ,c(16:21)]
+  hStats <- awayDat[ ,c(10:15)]
+
+  aNames <- aStats %>% names
+  hNames <- hStats %>% names
+
+  names(hStats) <- aNames
+  names(aStats) <- hNames
+
+  newAway %<>% cbind(
+    hStats,
+    aStats,
+    data.frame(
+      `position.h` = awayDat$position.a,
+      `position.a` = awayDat$position.h,
+      stringsAsFactors = FALSE
+    )
+  )
+
+  orderDat <- rbind(homeDat, newAway)
+  orderDat <- orderDat[orderDat$date %>% order, ]
+
+  newDat <- list(
+    posH = orderDat$position.h,
+    posA = orderDat$position.a
+  ) %>%
+    optimize_get_data(
+      cDat = orderDat[ , c(10:15)],
+      gridPoints = gridPoints,
+      mygrid = mygrid,
+      boundaries = boundaries
+  )
+
+  other <- data.frame(
+    orderDat$localScore %>% as.integer %>% mean,
+    orderDat$result %>% footballstats::form_to_int(),
+    stringsAsFactors = FALSE
+  )
+  names(other) <- paste0(c('xg.', 'form.', ha))
+  newDat %<>% cbind(other)
+
+  return(newDat)
+}
+
