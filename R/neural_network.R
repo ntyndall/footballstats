@@ -49,8 +49,6 @@ neural_network <- function(totalData, NN) {
     test.data %<>% rbind(dataByClass %>% subset(splitting %>% `==`(FALSE)))
    }
 
-
-
   # train.data[sample(1:nrow(train.data)), ] -> train.data
   # Create Split (any column is fine)
   #splitting <- dSet$W %>% caTools::sample.split(SplitRatio = 0.70)
@@ -76,7 +74,7 @@ neural_network <- function(totalData, NN) {
     `+`(1)
 
   # Build the neural network 0.0000001
-  print(' ## Building neural network ## ')
+  # print(' ## Building neural network ## ')
   nn <- neuralnet::neuralnet(
     formula = f,
     data = train.data,
@@ -85,7 +83,7 @@ neural_network <- function(totalData, NN) {
     threshold = NN$THRESH,
     act.fct = "logistic",
     linear.output = FALSE,
-    lifesign = 'full',
+    lifesign = 'none',
     stepmax = 10000000
   )
 
@@ -112,9 +110,9 @@ neural_network <- function(totalData, NN) {
 
   # Build a table of results
   resultTable <- table(Actual.score, Predicted.score)
-  print(' ## Confusion matrix ##')
+  #print(' ## Confusion matrix ##')
   rt <- caret::confusionMatrix(data = resultTable)
-  print(rt)
+  #print(rt)
 
   # Return neural network plus results
   return(list(neural = nn, result = rt$overall[1]))
