@@ -23,9 +23,9 @@ optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, de
     'possesiontime', 'yellowcards'
   )
 
-  # SPlit by competition and subset
-  allComps <- data.set$comp_id %>% unique
-
+  # Get all competitions
+  allComps <- footballstats::allowed_comps()
+  data.set <- footballstats::data.2017
 
   total.metrics <- data.frame(stringsAsFactors = FALSE)
   for (comp in 1:(allComps %>% length)) {
@@ -94,6 +94,7 @@ optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, de
         )
       )
 
+      # Bind the teams in league on, to do analysis later
       matchMetrics %<>% cbind(
         data.frame(
           til = KEYS$TIL,
@@ -103,27 +104,13 @@ optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, de
       total.metrics %<>% rbind(matchMetrics)
     }
   }
+
   # Change possesion to some integer
-  total.metrics$possesiontime.a %<>%
-    substr(1, total.metrics$possesiontime.a %>% nchar %>% `-`(1))
-  total.metrics$possesiontime.h %<>%
-    substr(1, total.metrics$possesiontime.h %>% nchar %>% `-`(1))
+  poss_to_int <- function(x) substr(1, x %>% nchar %>% `-`(1))
+  total.metrics$possesiontime.a %<>% poss_to_int()
+  total.metrics$possesiontime.a %<>% poss_to_int()
 
   # Start to optimize this data set
   total.metrics %>%
     footballstats::optimize_variables()
-
-  # Get player strength once developed
-  if (FALSE) {
-    pStrength <- matchID %>%
-      footballstats::player_strength()
-  }
-
-  # Carry out Neural network CV
-  if (FALSE) {
-    for (i in 1:folds) {
-      footballstats::neural_network()
-    }
-  }
-
 }
