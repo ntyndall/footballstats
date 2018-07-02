@@ -2,7 +2,7 @@
 % Please edit documentation in R/stats_from_yaml.R
 \name{stats_from_yaml}
 \alias{stats_from_yaml}
-\title{}
+\title{Stats from YAML}
 \usage{
 stats_from_yaml()
 }

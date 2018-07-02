@@ -5,5 +5,5 @@
 \title{Optimize Calculation}
 \usage{
 optimize_calculation(home.away.dat, day, gridPoints, gridBoundary, decayFactor,
-  til)
+  totalPer, til)
 }

@@ -1,4 +1,4 @@
-#' @title
+#' @title Stats from YAML
 #'
 #' @description A function to insert statistics not returned
 #'  by the API from a well-defined yaml file.
@@ -38,7 +38,7 @@ stats_from_yaml <- function() {
       purrr::map(length) %>%
       as.integer
 
-    if (7 %>% `==`(datLens) %>% all %>% `!()`) {
+    if (7 %>% `==`(datLens) %>% all %>% `!`()) {
       next
       cat(' ## Check entry for ID :', dNames[i])
     }
