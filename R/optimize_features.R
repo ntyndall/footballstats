@@ -25,76 +25,84 @@ optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, de
 
   # SPlit by competition and subset
   allComps <- data.set$comp_id %>% unique
-  subs.data <- data.set %>% subset(allComps[1] == data.set$comp_id)
+
 
   total.metrics <- data.frame(stringsAsFactors = FALSE)
-  # Now look at subs.data
-  for (i in 1:(subs.data %>% nrow)) {
-    print(i)
+  for (comp in 1:(allComps %>% length)) {
 
-    # Take a single row slice of the fixture list
-    single.row <- subs.data[i, ]
+    cat(' ##', comp, '/', allComps %>% length, '\n')
+    subs.data <- data.set %>% subset(allComps[comp] == data.set$comp_id)
+    # Now look at subs.data
+    for (i in 1:(subs.data %>% nrow)) {
+      # Take a single row slice of the fixture list
+      single.row <- subs.data[i, ]
 
-    # Set up new keys
-    KEYS$COMP <- single.row$comp_id
-    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
+      # Set up new keys
+      KEYS$COMP <- single.row$comp_id
+      KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
 
-    # Get team information from fixture data frame
-    matchID <- single.row$id %>% as.integer
-    homeName <- single.row$localteam_name
-    awayName <- single.row$visitorteam_name
-    teamIDs <- c(single.row$localteam_id, single.row$visitorteam_id)
+      # Get team information from fixture data frame
+      matchID <- single.row$id %>% as.integer
+      homeName <- single.row$localteam_name
+      awayName <- single.row$visitorteam_name
+      teamIDs <- c(single.row$localteam_id, single.row$visitorteam_id)
 
-    # Scores for home and away
-    sHome <- single.row$localteam_score
-    sAway <- single.row$visitorteam_score
+      # Scores for home and away
+      sHome <- single.row$localteam_score
+      sAway <- single.row$visitorteam_score
 
-    # The result of the match
-    res <- if (sHome > sAway) 'W' else if (sHome == sAway) 'D' else 'L'
+      # The result of the match
+      res <- if (sHome > sAway) 'W' else if (sHome == sAway) 'D' else 'L'
 
-    # Need a non-null frame to start with
-    matchMetrics <- data.frame(
-      matchID = matchID,
-      date = single.row$formatted_date,
-      localName = single.row$localteam_name,
-      awayName = single.row$visitorteam_name,
-      localID = teamIDs[1],
-      awayID = teamIDs[2],
-      localScore = sHome,
-      awayScore = sAway,
-      result = res,
-      stringsAsFactors = FALSE
-    )
-
-    # Get commentary information
-    for (i in 1:2) {
-      cInfo <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[i]) %>%
-        rredis::redisHMGet(fields = allowedCommentaries) %>%
-        lapply(as.character)
-
-      # Any items that don't exist in redis will have zero length, replace with NA
-      cLengths <- cInfo %>% lapply(length) %>% purrr::flatten_int() %>% `==`(0)
-      if (cLengths %>% any) cInfo[cLengths %>% which] <- NA
-
-      # Rename this new data frame and bind it to the metrics row
-      cInfo %<>% data.frame(stringsAsFactors = FALSE)
-      names(cInfo) <- paste0(allowedCommentaries, if (i == 1) '.h' else '.a')
-      matchMetrics %<>% cbind(cInfo)
-    }
-
-    # Bind the positions on
-    matchMetrics %<>% cbind(
-      footballstats::feat_position(
-        KEYS = KEYS,
+      # Need a non-null frame to start with
+      matchMetrics <- data.frame(
         matchID = matchID,
-        teamIDs = teamIDs,
-        matchDate = single.row$formatted_date
+        date = single.row$formatted_date,
+        localName = single.row$localteam_name,
+        awayName = single.row$visitorteam_name,
+        localID = teamIDs[1],
+        awayID = teamIDs[2],
+        localScore = sHome,
+        awayScore = sAway,
+        result = res,
+        stringsAsFactors = FALSE
       )
-    )
 
-    total.metrics %<>% rbind(matchMetrics)
+      # Get commentary information
+      for (i in 1:2) {
+        cInfo <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[i]) %>%
+          rredis::redisHMGet(fields = allowedCommentaries) %>%
+          lapply(as.character)
+
+        # Any items that don't exist in redis will have zero length, replace with NA
+        cLengths <- cInfo %>% lapply(length) %>% purrr::flatten_int() %>% `==`(0)
+        if (cLengths %>% any) cInfo[cLengths %>% which] <- NA
+
+        # Rename this new data frame and bind it to the metrics row
+        cInfo %<>% data.frame(stringsAsFactors = FALSE)
+        names(cInfo) <- paste0(allowedCommentaries, if (i == 1) '.h' else '.a')
+        matchMetrics %<>% cbind(cInfo)
+      }
+
+      # Bind the positions on
+      matchMetrics %<>% cbind(
+        footballstats::feat_position(
+          KEYS = KEYS,
+          matchID = matchID,
+          teamIDs = teamIDs,
+          matchDate = single.row$formatted_date
+        )
+      )
+
+      matchMetrics %<>% cbind(
+        data.frame(
+          til = KEYS$TIL,
+          stringsAsFactors = FALSE
+        )
+      )
+      total.metrics %<>% rbind(matchMetrics)
+    }
   }
-
   # Change possesion to some integer
   total.metrics$possesiontime.a %<>%
     substr(1, total.metrics$possesiontime.a %>% nchar %>% `-`(1))
