@@ -74,11 +74,14 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
   # Build the neural network
   for (i in 1:(foldPer + 1)) {
 
+    if (i == (foldPer + 1)) cat('|') else cat('.')
+
     filterTest <- seq(
       from = i,
       by = 1,
       length.out = foldGroupLen
     )
+
     # Loop through all the folds
     foldInd <- 1:foldNum
 

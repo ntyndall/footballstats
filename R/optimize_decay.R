@@ -20,9 +20,13 @@
 optimize_decay <- function(nrows, decay) {
 
   # Use negative exponential to get decay (severity of decay through `decay`)
-  vals <- 1:nrows %>%
-    `*`(-decay) %>%
-    exp()
+  vals <- if (decay > 100) {
+    1.0 / nrows %>% rep(nrows)
+  } else {
+    1:nrows %>%
+      `*`(-decay) %>%
+      exp()
+  }
 
   # Normalise values to 1 and return
   return(vals %>% `/`(vals %>% sum))

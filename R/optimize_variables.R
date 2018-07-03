@@ -7,7 +7,7 @@ optimize_variables <- function(total.metrics,
                                DAYS = c(3, 4, 5),
                                GRID_PTS = c(2, 4, 6, 8, 10),
                                GRID_BOUND = c(0.01, 0.05, 0.1, 0.15, 0.2),
-                               DECAY = c(0.5, 0.75, 1, 1.25, 1.5, 2, 2.5),
+                               DECAY = c(0.5, 0.75, 1, 1.25, 1.5, 2, Inf),
                                TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 0.1),
                                REP = 1,
                                THRESH = 0.01) {
@@ -97,9 +97,10 @@ optimize_variables <- function(total.metrics,
           # With complete data set, build NN..
           dataScales <- total.results %>% footballstats::get_scales()
           scaled.results <- total.results %>% footballstats::scale_data(dataScales = dataScales)
-          nn <- scaled.results %>% footballstats::neural_network(NN = NN)
+          nn <- scaled.results %>% footballstats::neural_network(NN = NN, LOGS = T)
 
-          currentResult <- nn$result %>% `[[`('Accuracy')
+          # Store the best result + output to screen
+          currentResult <- nn$totAcc %>% mean
           if (currentResult > bestResult) {
             cat(' ## New best result of :', currentResult, 'from :', bestResult, '\n')
             bestResult <- currentResult
@@ -113,7 +114,11 @@ optimize_variables <- function(total.metrics,
               gridBoundary = GRID_BOUND[k],
               decay = DECAY[l],
               totalPercentage = TOTAL_PERC[m],
-              result = currentResult,
+              accuracy = currentResult,
+              `accuracy.sd` = nn$totAcc %>% stats::sd(),
+              `sensitivity.D` = nn$totD %>% mean,
+              `sensitivity.L` = nn$totL %>% mean,
+              `sensitivity.W` = nn$totW %>% mean,
               stringsAsFactors = FALSE
             )
           )
