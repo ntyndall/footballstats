@@ -3,19 +3,31 @@
 #' @export
 
 
-optimize_variables <- function(total.metrics) {
+optimize_variables <- function(total.metrics,
+                               DAYS = c(3, 4, 5),
+                               GRID_PTS = c(2, 4, 6, 8, 10),
+                               GRID_BOUND = c(0.01, 0.05, 0.1, 0.15, 0.2),
+                               DECAY = c(0.5, 0.75, 1, 1.25, 1.5, 2, 2.5),
+                               TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 0.1),
+                               REP = 1,
+                               THRESH = 0.01) {
 
-  # Define variables here
-  DAYS <- c(3, 4, 5)
-  GRID_PTS <- c(2, 4, 6, 8, 10)
-  GRID_BOUND <- c(0.01, 0.05, 0.1, 0.15, 0.2)
-  DECAY <- c(1)
-  TOTAL_PERC <- seq(from = 0.0, to = 1.0, by = 0.1)
+  # Define neural network input list
+  NN <- list(
+    REP = REP,
+    THRESH = THRESH
+  )
 
+  # Initialise values for generating and tracking results
   topscore.frame <- data.frame(stringsAsFactors = FALSE)
   bestResult <- icount <- 0
-  totalOps <- 3 * 5 * 5 * 11
+  totalOps <- (DAYS %>% length) *
+    (GRID_PTS %>% length) *
+    (GRID_BOUND %>% length) *
+    (DECAY %>% length) *
+    (TOTAL_PERC %>% length)
 
+  # Start looping the grid
   for (i in 1:(DAYS %>% length)) {
     day <- DAYS[i]
     for (j in 1:(GRID_PTS %>% length)) {
@@ -68,7 +80,7 @@ optimize_variables <- function(total.metrics) {
                   gridPoints = GRID_PTS[j],
                   gridBoundary= GRID_BOUND[k],
                   decayFactor = DECAY[l],
-                  til = 20,
+                  til = current.row$til,
                   totalPer = TOTAL_PERC[m]
                 )
                 result.dat$res <- current.row$result
@@ -79,16 +91,18 @@ optimize_variables <- function(total.metrics) {
             }
           }
 
+          # Replace NA's with 0 for now.
+          total.results[total.results %>% is.na] <- 0.0
+
           # With complete data set, build NN..
           dataScales <- total.results %>% footballstats::get_scales()
           scaled.results <- total.results %>% footballstats::scale_data(dataScales = dataScales)
-          NN <- list(REP = 1, THRESH = 0.1)
-          nn <- scaled.results %>% neural_network(NN = NN)
+          nn <- scaled.results %>% footballstats::neural_network(NN = NN)
 
           currentResult <- nn$result %>% `[[`('Accuracy')
           if (currentResult > bestResult) {
+            cat(' ## New best result of :', currentResult, 'from :', bestResult, '\n')
             bestResult <- currentResult
-            cat(' ## New best result of :', bestResult, '\n')
           }
 
           # Store all results in a data frame
