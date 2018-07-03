@@ -168,10 +168,7 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
 
 
 optimize_get_data <- function(positions, cData, gridPoints, mygrid, boundaries) {
-  uu <- list(
-    posH = cFrame$position.h,
-    posA = cFrame$position.a
-  ) %>%
+  uu <- positions %>%
     optimize_positiongrid(
       gridPoints = gridPoints,
       mygrid = mygrid,
