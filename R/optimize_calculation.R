@@ -48,16 +48,24 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
     # Set up conditions for each type first
     if (i == 1) {
 
+      # Calculate decay Factors
+      decayFactors <- cFrame %>%
+        nrow %>%
+        footballstats::optimize_decay(
+          decay = decayFactor
+        )
+
       # Just home
       first <- list(
         posH = cFrame$position.h,
         posA = cFrame$position.a
       ) %>%
-        optimize_get_data(
+        footballstats::optimize_get_data(
           cData = cFrame[ , c(10:15)],
           gridPoints = gridPoints,
           mygrid = mygrid,
-          boundaries = boundaries
+          boundaries = boundaries,
+          decayFactors = decayFactors
         )
 
       first %<>% cbind(
@@ -70,12 +78,13 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
 
       # Home and away
       if (totalPer > 0.01) {
-        haDat <- optimize_sort_ha(
+        haDat <- footballstats::optimize_sort_ha(
           homeDat = cFrame,
           awayDat = frameList[[2]],
           gridPoints = gridPoints,
           mygrid = mygrid,
-          boundaries = boundaries
+          boundaries = boundaries,
+          decayFactor = decayFactor
         )
         mets <- haDat %>% `*`(totalPer) %>% `+`(first * (1 - totalPer))
       } else {
@@ -100,16 +109,25 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
     } else if (i == 3) {
       next
     } else {
+
+      # Calculate decay Factors
+      decayFactors <- cFrame %>%
+        nrow %>%
+        footballstats::optimize_decay(
+          decay = decayFactor
+        )
+
       # Just away
       second <- list(
         posH = cFrame$position.a,
         posA = cFrame$position.h
       ) %>%
-        optimize_get_data(
+        footballstats::optimize_get_data(
           cData = cFrame[ , c(16:21)],
           gridPoints = gridPoints,
           mygrid = mygrid,
-          boundaries = boundaries
+          boundaries = boundaries,
+          decayFactors = decayFactors
         )
 
       # Readjust results...
@@ -129,13 +147,14 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
 
       # Home and away
       if (totalPer > 0.01) {
-        haDat <- optimize_sort_ha(
+        haDat <- footballstats::optimize_sort_ha(
           homeDat = frameList[[3]],
           awayDat = cFrame,
           gridPoints = gridPoints,
           mygrid = mygrid,
           boundaries = boundaries,
-          ha = 'a'
+          ha = 'a',
+          decayFactor = decayFactor
         )
         mets %<>% cbind(haDat %>% `*`(totalPer) %>% `+`(second * (1 - totalPer)))
       } else {
@@ -167,28 +186,38 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
 #' @export
 
 
-optimize_get_data <- function(positions, cData, gridPoints, mygrid, boundaries) {
+optimize_get_data <- function(positions, cData, gridPoints, mygrid, boundaries, decayFactors) {
   uu <- positions %>%
-    optimize_positiongrid(
+    footballstats::optimize_positiongrid(
       gridPoints = gridPoints,
       mygrid = mygrid,
       boundaries = boundaries
     )
 
-  mets <- cData %>%
-    optimize_rowwise(intervals = uu) %>%
-    apply(MARGIN = 2, FUN = mean) %>%
+  # Reverse the factors
+  decayFactors %<>% rev
+
+  # Apply the factors and summarise data
+  summarisedRes <- cData %>%
+    footballstats::optimize_rowwise(intervals = uu) %>%
+    apply(MARGIN = 2, FUN = function(x) x * decayFactors) %>%
+    apply(MARGIN = 2, FUN = sum) %>%
     t %>%
     data.frame
-  return(mets)
+
+  return(summarisedRes)
 }
 
 #' @title Optimize Sort HA
 #'
 #' @export
 
-optimize_sort_ha <- function(homeDat, awayDat, gridPoints, mygrid, boundaries, ha = 'h') {
+
+optimize_sort_ha <- function(homeDat, awayDat, gridPoints, mygrid, boundaries, ha = 'h', decayFactor) {
   allNames <- homeDat %>% names
+
+  # Remove til
+  homeDat$til <- NULL
 
   # Readjust results...
   cRes <- awayDat$result
@@ -233,15 +262,23 @@ optimize_sort_ha <- function(homeDat, awayDat, gridPoints, mygrid, boundaries, h
   orderDat <- rbind(homeDat, newAway)
   orderDat <- orderDat[orderDat$date %>% order, ]
 
+  # Calculate decay Factors
+  decayFactors <- orderDat %>%
+    nrow %>%
+    footballstats::optimize_decay(
+      decay = decayFactor
+    )
+
   newDat <- list(
     posH = orderDat$position.h,
     posA = orderDat$position.a
   ) %>%
-    optimize_get_data(
+    footballstats::optimize_get_data(
       cDat = orderDat[ , c(10:15)],
       gridPoints = gridPoints,
       mygrid = mygrid,
-      boundaries = boundaries
+      boundaries = boundaries,
+      decayFactors = decayFactors
   )
 
   other <- data.frame(

@@ -5,10 +5,10 @@
 
 optimize_variables <- function(total.metrics,
                                DAYS = c(3, 4, 5),
-                               GRID_PTS = c(2, 4, 6, 8, 10),
-                               GRID_BOUND = c(0.01, 0.05, 0.1, 0.15, 0.2),
-                               DECAY = c(0.5, 0.75, 1, 1.25, 1.5, 2, Inf),
-                               TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 0.1),
+                               GRID_PTS = c(2, 4, 6, 8),
+                               GRID_BOUND = c(0.05, 0.1, 0.15),
+                               DECAY = c(0.5, 1, 1.5, 2, Inf),
+                               TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 0.25),
                                REP = 1,
                                THRESH = 0.01) {
 
@@ -83,6 +83,9 @@ optimize_variables <- function(total.metrics,
                   til = current.row$til,
                   totalPer = TOTAL_PERC[m]
                 )
+
+                result.dat$`position.h` <- current.row$`position.h`
+                result.dat$`position.a` <- current.row$`position.a`
                 result.dat$res <- current.row$result
                 total.results %<>% rbind(result.dat)
               } else {
