@@ -4,8 +4,7 @@
 \alias{optimize_features}
 \title{Optimize Features}
 \usage{
-optimize_features(data.set, team = 100, player = 0, days = 4, decay = 0,
-  folds = 10)
+optimize_features(data.set)
 }
 \description{
 A function used to optimize data set features.

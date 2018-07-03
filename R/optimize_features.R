@@ -9,7 +9,7 @@
 #' @export
 
 
-optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, decay = 0.0, folds = 10) {
+optimize_features <- function(data.set) {
 
   # Connect redis
   footballstats::redis_con()
@@ -106,9 +106,9 @@ optimize_features <- function(data.set, team = 100.0, player = 0.0, days = 4, de
   }
 
   # Change possesion to some integer
-  poss_to_int <- function(x) substr(1, x %>% nchar %>% `-`(1))
+  poss_to_int <- function(x) x %>% substr(1, x %>% nchar %>% `-`(1))
   total.metrics$possesiontime.a %<>% poss_to_int()
-  total.metrics$possesiontime.a %<>% poss_to_int()
+  total.metrics$possesiontime.h %<>% poss_to_int()
 
   # Start to optimize this data set
   total.metrics %>%
