@@ -13,14 +13,14 @@
 #' @export
 
 
-neural_network <- function(totalData, NN) {
+neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALSE) {
 
   # Check what labels are available, and how many
   totalData$res %<>% as.character
   unlabel <- totalData
   unlabel$res <- NULL
 
-  # Convert to integers (3 is the standard non-feature part of the data set)
+  # Convert to integers
   totCols <- ncol(unlabel)
   features <- unlabel[ , 1:totCols] %>% names
 
@@ -34,32 +34,17 @@ neural_network <- function(totalData, NN) {
   labColSpace <- newLabels %>% length %>% `+`(1)
   names(dSet) <- newLabels %>% c(dSet[labColSpace:ncol(dSet)] %>% names)
 
-  # totalData$res[totalData$res == 'W'] <- 'L'
-  totalRows <- dSet %>% nrow
   test.data <- train.data <- data.frame(stringsAsFactors = FALSE)
-  for (k in newLabels) {
-    dataByClass <- dSet[dSet[[k]] %>% `==`(1), ]
-    splitting <- dataByClass[[k]] %>% caTools::sample.split(0.7)
 
+  # Create training folds for CV
+  holdFolds <- allFolds <- caret::createFolds(
+    y = totalData$res,
+    k = foldNum,
+    list = TRUE,
+    returnTrain = FALSE
+  )
 
-    #logicalVec <- FALSE %>% rep(dataByClass %>% nrow)
-    #logicalVec[sample(c(1:(dataByClass %>% nrow)), 430)] <- TRUE
-
-    train.data %<>% rbind(dataByClass %>% subset(splitting %>% `==`(TRUE)))
-    test.data %<>% rbind(dataByClass %>% subset(splitting %>% `==`(FALSE)))
-   }
-
-  # train.data[sample(1:nrow(train.data)), ] -> train.data
-  # Create Split (any column is fine)
-  #splitting <- dSet$W %>% caTools::sample.split(SplitRatio = 0.70)
-
-  #split.data <- splitting
-  # Split based off of split Boolean Vector
-  #train.data <- dSet %>% subset(splitting %>% `==`(TRUE))
-  #test.data <- dSet %>% subset(splitting %>% `==`(FALSE))
-
-  # Concatenate strings : Create the formula by adding
-  # them up and create symbolic formula
+  # Concat strings, create the formula by adding up for symbolic formula
   f <- paste0(
     newLabels %>% paste(collapse = ' + '), ' ~',
     paste(features, collapse = ' + ')) %>%
@@ -73,47 +58,97 @@ neural_network <- function(totalData, NN) {
     round %>%
     `+`(1)
 
-  # Build the neural network 0.0000001
-  # print(' ## Building neural network ## ')
-  nn <- neuralnet::neuralnet(
-    formula = f,
-    data = train.data,
-    hidden = neurons %>% rep(3),
-    rep = NN$REP,
-    threshold = NN$THRESH,
-    act.fct = "logistic",
-    linear.output = FALSE,
-    lifesign = 'none',
-    stepmax = 10000000
+  # How many folds per test set
+  foldGroupLen <- foldNum - foldPer
+
+  # Initialise list of vectors to save
+  totalStats <- list(
+    totAcc = c(),
+    totAccL = c(),
+    totAccU = c(),
+    totD = c(),
+    totL = c(),
+    totW = c()
   )
 
-  # Compute Predictions off Test Set
-  predictions <- neuralnet::compute(
-    x = nn,
-    covariate = test.data[(newLabels %>% length + 1):ncol(test.data)]
-  )
+  # Build the neural network
+  for (i in 1:(foldPer + 1)) {
 
-  # Create vectors to measure accuracy
-  realVec <- predVec <- 0 %>% rep(test.data %>% nrow)
-  tot <- 0
-  for (i in 1:(newLabels %>% length)) {
-    current <- test.data[[newLabels[i]]]
-    realVec[current %>% `==`(1) %>% which] <- newLabels[i]
+    filterTest <- seq(
+      from = i,
+      by = 1,
+      length.out = foldGroupLen
+    )
+    # Loop through all the folds
+    foldInd <- 1:foldNum
+
+    # Set up train and test data
+    train.data <- dSet[allFolds[foldInd[-filterTest]] %>%
+      purrr::flatten_int(), ]
+    test.data <- dSet[allFolds[filterTest] %>%
+      purrr::flatten_int(), ]
+
+    # Build the neural network with split data
+    if (LOGS) cat(' ## Building neural network ## \n')
+    nn <- neuralnet::neuralnet(
+      formula = f,
+      data = train.data,
+      hidden = neurons %>% rep(3),
+      rep = NN$REP,
+      threshold = NN$THRESH,
+      act.fct = "logistic",
+      linear.output = FALSE,
+      lifesign = if (LOGS) "full" else "none",
+      stepmax = 10000000
+    )
+
+    # Compute Predictions off Test Set
+    predictions <- neuralnet::compute(
+      x = nn,
+      covariate = test.data[(newLabels %>% length + 1):ncol(test.data)]
+    )
+
+    # Create vectors to measure accuracy
+    realVec <- predVec <- 0 %>% rep(test.data %>% nrow)
+    tot <- 0
+    for (i in 1:(newLabels %>% length)) {
+      current <- test.data[[newLabels[i]]]
+      realVec[current %>% `==`(1) %>% which] <- newLabels[i]
+    }
+
+    # Check the max values per row for the predictions
+    netRes <- predictions$net.result
+    for (j in 1:(netRes %>% nrow)) predVec[j] <- newLabels[netRes[j, ] %>% which.max]
+
+    Actual.score <- realVec %>% factor(levels = newLabels)
+    Predicted.score <- predVec %>% factor(levels = newLabels)
+
+    # Build a table of results
+    resultTable <- table(Actual.score, Predicted.score)
+    rt <- caret::confusionMatrix(data = resultTable)
+
+    # Print confusion table out
+    if (LOGS) {
+      cat(' ## Confusion matrix ## \n')
+      print(rt)
+    }
+
+    # Get overall stats
+    oStats <- rt$overall[c('Accuracy', 'AccuracyLower', 'AccuracyUpper')] %>% as.double
+    oSens <-  rt$byClass[1:3, 'Sensitivity'] %>% as.double
+
+    # Any dud results, just skip the whole lot
+    if (oStats %>% is.na %>% any || oSens %>% is.na %>% any) next
+
+    # Append list results on
+    totalStats$totAcc %<>% c(oStats[1])
+    totalStats$totAccL %<>% c(oStats[2])
+    totalStats$totAccU %<>% c(oStats[3])
+    totalStats$totD %<>% c(oSens[1])
+    totalStats$totL %<>% c(oSens[2])
+    totalStats$totW %<>% c(oSens[3])
   }
 
-  # Check the max values per row for the predictions
-  netRes <- predictions$net.result
-  for (j in 1:(netRes %>% nrow)) predVec[j] <- newLabels[netRes[j, ] %>% which.max]
-
-  Actual.score <- realVec %>% factor(levels = newLabels)
-  Predicted.score <- predVec %>% factor(levels = newLabels)
-
-  # Build a table of results
-  resultTable <- table(Actual.score, Predicted.score)
-  #print(' ## Confusion matrix ##')
-  rt <- caret::confusionMatrix(data = resultTable)
-  #print(rt)
-
   # Return neural network plus results
-  return(list(neural = nn, result = rt$overall[1]))
+  return(c(totalStats, list(neural = nn)))
 }
