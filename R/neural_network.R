@@ -34,8 +34,6 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
   labColSpace <- newLabels %>% length %>% `+`(1)
   names(dSet) <- newLabels %>% c(dSet[labColSpace:ncol(dSet)] %>% names)
 
-  test.data <- train.data <- data.frame(stringsAsFactors = FALSE)
-
   # Create training folds for CV
   holdFolds <- allFolds <- caret::createFolds(
     y = totalData$res,
@@ -74,8 +72,10 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
   # Build the neural network
   for (i in 1:(foldPer + 1)) {
 
+    # Print out to see the progress
     if (i == (foldPer + 1)) cat('|') else cat('.')
 
+    # Which indexes of the folds to include
     filterTest <- seq(
       from = i,
       by = 1,
@@ -93,17 +93,25 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
 
     # Build the neural network with split data
     if (LOGS) cat(' ## Building neural network ## \n')
-    nn <- neuralnet::neuralnet(
-      formula = f,
-      data = train.data,
-      hidden = neurons %>% rep(3),
-      rep = NN$REP,
-      threshold = NN$THRESH,
-      act.fct = "logistic",
-      linear.output = FALSE,
-      lifesign = if (LOGS) "full" else "none",
-      stepmax = 10000000
+
+    # Calculate the NN here
+    nn <- tryCatch({
+      neuralnet::neuralnet(
+        formula = f,
+        data = train.data,
+        hidden = neurons %>% rep(2),
+        rep = NN$REP,
+        threshold = NN$THRESH,
+        act.fct = "logistic",
+        linear.output = FALSE,
+        lifesign = if (LOGS) "full" else "none",
+        stepmax = 1000000 # Old = 10000000
+      )
+    }, warning = function(w) return(NULL)
     )
+
+    # If the NN couldn't converge in time then move on
+    if (nn %>% is.null) next
 
     # Compute Predictions off Test Set
     predictions <- neuralnet::compute(
