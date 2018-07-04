@@ -286,7 +286,7 @@ optimize_sort_ha <- function(homeDat, awayDat, gridPoints, mygrid, boundaries, h
     orderDat$result %>% footballstats::form_to_int(),
     stringsAsFactors = FALSE
   )
-  names(other) <- paste0(c('xg.', 'form.', ha))
+  names(other) <- paste0(c('xg.', 'form.'), ha)
   newDat %<>% cbind(other)
 
   return(newDat)
