@@ -75,7 +75,7 @@ optimize_variables <- function(total.metrics,
                 home.away.dat <- rbind(h.home.dat, a.home.dat, h.away.dat, a.away.dat)
 
                 # do calculations here
-                result.dat <- home.away.dat %>% optimize_calculation(
+                result.dat <- home.away.dat %>% footballstats::optimize_calculation(
                   day = day,
                   gridPoints = GRID_PTS[j],
                   gridBoundary= GRID_BOUND[k],
@@ -92,42 +92,41 @@ optimize_variables <- function(total.metrics,
                 next
               }
             }
-          }
 
-          # Replace NA's with 0 for now.
-          total.results[total.results %>% is.na] <- 0.0
+            # Replace NA's with 0 for now.
+            total.results[total.results %>% is.na] <- 0.0
 
-          # With complete data set, build NN..
-          dataScales <- total.results %>% footballstats::get_scales()
-          scaled.results <- total.results %>% footballstats::scale_data(dataScales = dataScales)
-          nn <- scaled.results %>% footballstats::neural_network(NN = NN, LOGS = T)
+            # With complete data set, build NN..
+            dataScales <- total.results %>% footballstats::get_scales()
+            scaled.results <- total.results %>% footballstats::scale_data(dataScales = dataScales)
+            nn <- scaled.results %>% footballstats::neural_network(NN = NN, LOGS = F)
 
-          # Store the best result + output to screen
-          currentResult <- nn$totAcc %>% mean
-          if (currentResult > bestResult) {
-            cat(' ## New best result of :', currentResult, 'from :', bestResult, '\n')
-            bestResult <- currentResult
-          }
+            # Store the best result + output to screen
+            currentResult <- nn$totAcc %>% mean
+            if (currentResult > bestResult) {
+              cat(' ## New best result of :', currentResult, 'from :', bestResult, '\n')
+              bestResult <- currentResult
+            }
 
-          # Store all results in a data frame
-          topscore.frame %<>% rbind(
-            data.frame(
-              day = DAYS[i],
-              gridPoints = GRID_PTS[j],
-              gridBoundary = GRID_BOUND[k],
-              decay = DECAY[l],
-              totalPercentage = TOTAL_PERC[m],
-              accuracy = currentResult,
-              `accuracy.sd` = nn$totAcc %>% stats::sd(),
-              `sensitivity.D` = nn$totD %>% mean,
-              `sensitivity.L` = nn$totL %>% mean,
-              `sensitivity.W` = nn$totW %>% mean,
-              stringsAsFactors = FALSE
+            # Store all results in a data frame
+            topscore.frame %<>% rbind(
+              data.frame(
+                day = DAYS[i],
+                gridPoints = GRID_PTS[j],
+                gridBoundary = GRID_BOUND[k],
+                decay = DECAY[l],
+                totalPercentage = TOTAL_PERC[m],
+                accuracy = currentResult,
+                `accuracy.sd` = nn$totAcc %>% stats::sd(),
+                `sensitivity.D` = nn$totD %>% mean,
+                `sensitivity.L` = nn$totL %>% mean,
+                `sensitivity.W` = nn$totW %>% mean,
+                stringsAsFactors = FALSE
+              )
             )
-          )
+          }
         }
       }
     }
   }
-
 }
