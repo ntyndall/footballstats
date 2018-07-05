@@ -6,20 +6,20 @@
 optimize_variables <- function(total.metrics,
                                DAYS = c(3, 4, 5),
                                GRID_PTS = c(2, 4, 6, 8),
-                               GRID_BOUND = c(0.05, 0.1, 0.15),
+                               GRID_BOUND = c(0.05, 0.1, 0.15, 0.2),
                                DECAY = c(0.5, 1, 1.5, 2, Inf),
                                TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 0.25),
                                REP = 1,
-                               THRESH = 0.01) {
+                               THRESH = 0.15) {
 
   # Define neural network input list
   NN <- list(
     REP = REP,
-    THRESH = THRESH
+    THRESH = 0.4
   )
 
   # Initialise values for generating and tracking results
-  topscore.frame <- data.frame(stringsAsFactors = FALSE)
+  plot.metrics <- topscore.frame <- data.frame(stringsAsFactors = FALSE)
   bestResult <- icount <- 0
   totalOps <- (DAYS %>% length) *
     (GRID_PTS %>% length) *
@@ -35,7 +35,7 @@ optimize_variables <- function(total.metrics,
         for (l in 1:(DECAY %>% length)) {
           for (m in 1:(TOTAL_PERC %>% length)) {
             icount %<>% `+`(1)
-            cat(' ## Analysing operation', icount, '/', totalOps, '\n')
+            cat(' ## Analysing operation', icount, '/', totalOps, ' ')
             total.results <- data.frame(stringsAsFactors = FALSE)
 
             # Now loop over all of total.metrics
@@ -96,15 +96,50 @@ optimize_variables <- function(total.metrics,
             # Replace NA's with 0 for now.
             total.results[total.results %>% is.na] <- 0.0
 
-            # With complete data set, build NN..
-            dataScales <- total.results %>% footballstats::get_scales()
-            scaled.results <- total.results %>% footballstats::scale_data(dataScales = dataScales)
-            nn <- scaled.results %>% footballstats::neural_network(NN = NN, LOGS = F)
+            # Create plots + get feature metrics
+            feat.metrics <- total.results %>%
+              footballstats::create_plot(
+                day = day,
+                gridPoints = GRID_PTS[j],
+                gridBoundary= GRID_BOUND[k],
+                decayFactor = DECAY[l],
+                totalPer = TOTAL_PERC[m]
+              )
+
+            # Combine the metrics on
+            plot.metrics %<>% rbind(feat.metrics)
+
+            # With complete data set,get scaling parameters
+            dataScales <- total.results %>%
+              footballstats::get_scales()
+
+            # Scale the data set
+            scaled.results <- total.results %>%
+              footballstats::scale_data(
+                dataScales = dataScales
+              )
+
+            # Remove troublesome features for now
+            scaled.results$shotacc.a <-
+              scaled.results$shotacc.h <-
+              scaled.results$shotrate.h <-
+              scaled.results$shotrate.a <-
+              NULL
+
+            # Build neural network using CV
+            nn <- scaled.results %>%
+              footballstats::neural_network(
+                NN = NN,
+                LOGS = F
+              )
 
             # Store the best result + output to screen
             currentResult <- nn$totAcc %>% mean
             if (currentResult > bestResult) {
-              cat(' ## New best result of :', currentResult, 'from :', bestResult, '\n')
+              cat(
+                ' \n   -> New best result of :', currentResult,
+                'from :', bestResult, '\n'
+              )
               bestResult <- currentResult
             }
 
