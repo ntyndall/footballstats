@@ -73,7 +73,7 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
   for (i in 1:(foldPer + 1)) {
 
     # Print out to see the progress
-    if (i == (foldPer + 1)) cat('|') else cat('.')
+    if (i == (foldPer + 1)) cat("! \n") else if (i == 1) cat( "## NN CV : .") else cat(".")
 
     # Which indexes of the folds to include
     filterTest <- seq(
