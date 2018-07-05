@@ -14,6 +14,9 @@ optimize_features <- function(data.set) {
   # Connect redis
   footballstats::redis_con()
 
+  # Set up keys
+  KEYS <- footballstats::keys_for_testing()
+
   # Define the Season
   KEYS$SEASON <- 2017
 
