@@ -2,3 +2,4 @@ utils_sensitive_info.R
 tagged/*
 .Rproj.user
 .Rhistory
+param_optimization/*
