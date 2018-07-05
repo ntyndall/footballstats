@@ -7,7 +7,7 @@
 plot_theme(fontFamily = "Purisa")
 }
 \arguments{
-\item{fontFamily}{A character string that defines the font 
+\item{fontFamily}{A character string that defines the font
 family to be used for the axis / title / legend etc.}
 }
 \description{

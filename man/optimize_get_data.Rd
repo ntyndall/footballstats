@@ -4,6 +4,5 @@
 \alias{optimize_get_data}
 \title{Optimize Get Dat}
 \usage{
-optimize_get_data(positions, cData, gridPoints, mygrid, boundaries,
-  decayFactors)
+optimize_get_data(positions, cData, gridPoints, mygrid, boundaries, decayFactor)
 }

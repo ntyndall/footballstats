@@ -5,6 +5,6 @@
 \title{Optimize Variables}
 \usage{
 optimize_variables(total.metrics, DAYS = c(3, 4, 5), GRID_PTS = c(2, 4, 6,
-  8), GRID_BOUND = c(0.05, 0.1, 0.15), DECAY = c(0.5, 1, 1.5, 2, Inf),
-  TOTAL_PERC = seq(from = 0, to = 1, by = 0.25), REP = 1, THRESH = 0.01)
+  8), GRID_BOUND = c(0.05, 0.1, 0.15, 0.2), DECAY = c(0.5, 1, 1.5, 2, Inf),
+  TOTAL_PERC = seq(from = 0, to = 1, by = 0.25), REP = 1, THRESH = 0.15)
 }
