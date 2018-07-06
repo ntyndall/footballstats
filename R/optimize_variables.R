@@ -15,7 +15,7 @@ optimize_variables <- function(total.metrics,
   # Define neural network input list
   NN <- list(
     REP = REP,
-    THRESH = 0.4
+    THRESH = 0.15
   )
 
   # Initialise values for generating and tracking results
@@ -96,16 +96,6 @@ optimize_variables <- function(total.metrics,
             # Replace NA's with 0 for now.
             total.results[total.results %>% is.na] <- 0.0
 
-            # Create plots + get feature metrics
-            feat.metrics <- total.results %>%
-              footballstats::create_plot(
-                day = day,
-                gridPoints = GRID_PTS[j],
-                gridBoundary= GRID_BOUND[k],
-                decayFactor = DECAY[l],
-                totalPer = TOTAL_PERC[m]
-              )
-
             # Combine the metrics on
             plot.metrics %<>% rbind(feat.metrics)
 
@@ -117,6 +107,16 @@ optimize_variables <- function(total.metrics,
             scaled.results <- total.results %>%
               footballstats::scale_data(
                 dataScales = dataScales
+              )
+
+            # Create plots + get feature metrics
+            feat.metrics <- scaled.results %>%
+              footballstats::create_plot(
+                day = day,
+                gridPoints = GRID_PTS[j],
+                gridBoundary= GRID_BOUND[k],
+                decayFactor = DECAY[l],
+                totalPer = TOTAL_PERC[m]
               )
 
             # Remove troublesome features for now
