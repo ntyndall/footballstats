@@ -23,6 +23,13 @@ create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFacto
     purrr::map(function(x) x %>% paste(collapse = '_')) %>%
     purrr::flatten_chr()
 
+  # Fill out actual directory location
+  dirNames <- getwd() %>%
+    paste0(
+      "/param_optimization/",
+      dirNames
+    )
+
   # Which directories don't exist
   dirExists <- dirNames %>%
     dir.exists %>%
@@ -31,10 +38,8 @@ create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFacto
   # If any then create them
   if (dirExists %>% any) {
     created <- capture.output(
-      getwd() %>% paste0(
-        "/param_optimization/",
-        dirNames %>% `[`(dirExists %>% which)
-      ) %>%
+      dirNames %>%
+        `[`(dirExists %>% which) %>%
         sapply(dir.create)
     )
   }
