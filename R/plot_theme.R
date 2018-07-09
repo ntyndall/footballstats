@@ -9,14 +9,14 @@
 #' @export
 
 
-plot_theme <- function(fontFamily = 'Purisa') { # nocov start
+plot_theme <- function(fontFamily = 'Purisa', titleFont = 26) { # nocov start
   return(
     ggplot2::theme(
       plot.title =  ggplot2::element_text(
         family = 'Purisa',
         face = 'plain',
         colour = '#353535',
-        size = 9,
+        size = titleFont,
         hjust = 0.5
       ),
       legend.title = ggplot2::element_text(
