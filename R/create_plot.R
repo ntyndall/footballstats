@@ -64,15 +64,15 @@ create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFacto
 
     # Create actual density ggplot
     g <- ggplot2::ggplot(data = total.results, mapping = ggplot2::aes(x = get(singlePlots[i]), fill = res)) %>%
-      `+`(ggplot2::geom_density(alpha=.3)) %>%
+      `+`(ggplot2::geom_density(alpha = .3)) %>%
       `+`(ggplot2::ggtitle(plotTitle)) %>%
       `+`(ggplot2::xlab(label = singlePlots[i])) %>%
       `+`(ggplot2::scale_fill_manual(values = c("blue", "red", "green"))) %>%
-      `+`(footballstats::plot_theme())
+      `+`(footballstats::plot_theme(titleFont = 9))
 
     # Save using the correct details
     ggplot2::ggsave(
-      filename = getwd() %>% paste0("/param_optimization/", dirNames[i], "/", fileName, ".png"),
+      filename = dirNames[i] %>% paste0("/", fileName, ".png"),
       plot = g
     )
 
