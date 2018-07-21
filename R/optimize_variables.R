@@ -25,13 +25,14 @@ optimize_variables <- function(total.metrics,
     existing.topscore <- read.csv2(
       file = resultsFile,
       header = TRUE,
-      sep = ','
+      sep = ',',
+      stringsAsFactors = FALSE
     )[ , 1:5]
 
     # Get matches with existing data frame
-    totMatches <- existing.topscore[, 1:5] %>%
+    totMatches <- existing.topscore %>%
       footballstats::get_grid_matches(
-        fullGrid =  expand.grid(DAYS, GRID_PTS, GRID_BOUND, DECAY, TOTAL_PERC)
+        fullGrid = expand.grid(DAYS, GRID_PTS, GRID_BOUND, DECAY, TOTAL_PERC)
       )
   } else {
     totMatches <- 0
@@ -50,8 +51,8 @@ optimize_variables <- function(total.metrics,
     (GRID_PTS %>% length) *
     (GRID_BOUND %>% length) *
     (DECAY %>% length) *
-    (TOTAL_PERC %>% length) %>%
-    `-`(totMatches)
+    (TOTAL_PERC %>% length)
+  totalOps %<>% `-`(totMatches)
 
   # Start looping the grid
   for (i in 1:(DAYS %>% length)) {
@@ -100,17 +101,17 @@ optimize_variables <- function(total.metrics,
               # Number of rows of each type
               allSums <- haMatches %>% purrr::map(sum)
 
-              if (allSums %>% purrr::map(function(x) x > day) %>% purrr::flatten_lgl() %>% all) {
+              if (allSums %>% purrr::map(function(x) x > DAYS[i]) %>% purrr::flatten_lgl() %>% all) {
 
                 # Separating function
                 sep_dat <- function(x, d, s) return(x[(s - d + 1):(x %>% nrow), ])
 
                 # Get grid values here
                 home.away.dat <- rbind(
-                  smaller.metrics %>% subset(haMatches$hh) %>% sep_dat(d = day, s = allSums$hh),
-                  smaller.metrics %>% subset(haMatches$ah) %>% sep_dat(d = day, s = allSums$ah),
-                  smaller.metrics %>% subset(haMatches$ha) %>% sep_dat(d = day, s = allSums$ha),
-                  smaller.metrics %>% subset(haMatches$aa) %>% sep_dat(d = day, s = allSums$aa)
+                  smaller.metrics %>% subset(haMatches$hh) %>% sep_dat(d = DAYS[i], s = allSums$hh),
+                  smaller.metrics %>% subset(haMatches$ah) %>% sep_dat(d = DAYS[i], s = allSums$ah),
+                  smaller.metrics %>% subset(haMatches$ha) %>% sep_dat(d = DAYS[i], s = allSums$ha),
+                  smaller.metrics %>% subset(haMatches$aa) %>% sep_dat(d = DAYS[i], s = allSums$aa)
                 )
 
                 # do calculations here
