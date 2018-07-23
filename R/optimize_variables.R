@@ -6,12 +6,12 @@
 optimize_variables <- function(total.metrics,
                                overwrite = FALSE,
                                DAYS = c(3, 4, 5),
-                               GRID_PTS = c(2, 4, 6, 8),
-                               GRID_BOUND = c(0.05, 0.1, 0.15, 0.2),
-                               DECAY = c(0.5, 1, 1.5, 2, 5000),
-                               TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 0.25),
+                               GRID_PTS = c(2, 4, 6),
+                               GRID_BOUND = c(0.1, 0.2),
+                               DECAY = c(1, 5000),
+                               TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 1),
                                REP = 1,
-                               THRESH = 0.1) {
+                               THRESH = 0.18) {
 
   # Make sure the base directory exists
   resultsDir <- getwd() %>% paste0("/results_optimization/")
@@ -38,11 +38,18 @@ optimize_variables <- function(total.metrics,
     totMatches <- 0
   }
 
-
   # Define neural network input list
   NN <- list(
     REP = REP,
     THRESH = THRESH
+  )
+
+  # Define XGBoost input list
+  XGB <- list(
+    ROUNDS = 50000,
+    DEPTH = 10,
+    ETA = 0.2,
+    GAMMA = 2
   )
 
   # Initialise values for generating and tracking results
@@ -137,7 +144,7 @@ optimize_variables <- function(total.metrics,
             # Replace NA's with 0 for now.
             total.results[total.results %>% is.na] <- 0.0
 
-            # With complete data set,get scaling parameters
+            # With complete data set, get scaling parameters
             dataScales <- total.results %>%
               footballstats::get_scales()
 
@@ -147,44 +154,82 @@ optimize_variables <- function(total.metrics,
                 dataScales = dataScales
               )
 
+            # Turn off plot creation for now...
             # Create plots + get feature metrics
-            feat.metrics <- scaled.results %>%
-              footballstats::create_plot(
-                day = DAY[i],
-                gridPoints = GRID_PTS[j],
-                gridBoundary= GRID_BOUND[k],
-                decayFactor = DECAY[l],
-                totalPer = TOTAL_PERC[m]
-              )
+            #feat.metrics <- scaled.results %>%
+            #  footballstats::create_plot(
+            #    day = DAY[i],
+            #    gridPoints = GRID_PTS[j],
+            #    gridBoundary= GRID_BOUND[k],
+            #    decayFactor = DECAY[l],
+            #    totalPer = TOTAL_PERC[m]
+            #  )
 
-            # Remove troublesome features for now
-            scaled.results$shotacc.a <-
-              scaled.results$shotacc.h <-
-              scaled.results$shotrate.h <-
-              scaled.results$shotrate.a <-
-              NULL
+            # Calculate folds for all methods
+            myFolds <- caret::createFolds(
+              y = total.results$res,
+              k = 10,
+              list = TRUE,
+              returnTrain = FALSE
+            )
+
+            # Create fold data information
+            FOLD_DATA <- list(
+              FOLDS = myFolds,
+              NUM = 10,
+              PER = 7
+            )
+
+            # Build XGBoost model using CV
+            startTime <- Sys.time()
+            xgb <- total.results %>%
+              footballstats::method_xgboost(
+                FOLD_DATA = FOLD_DATA,
+                XGB = XGB
+              )
+            endTime <- Sys.time()
+            tDiff <- difftime(
+              time1 = endTime,
+              time2 = startTime
+            ) %>% format
+            cat(" XGBoost took :", tDiff, "\n")
 
             # Build neural network using CV
+            startTime <- Sys.time()
             nn <- scaled.results %>%
               footballstats::neural_network(
+                FOLD_DATA = FOLD_DATA,
                 NN = NN,
                 LOGS = FALSE
               )
+            endTime <- Sys.time()
+            tDiff <- difftime(
+              time1 = endTime,
+              time2 = startTime
+            ) %>% format
+            cat(" Nueral Network took :", tDiff, "\n")
 
             # Store the best result + output to screen
-            currentResult <- nn$totAcc %>% mean
-            if (currentResult > bestResult) {
+            nnCurrentResult <- nn$totAcc %>% mean
+            xgbCurrentResult <- xgb$totAcc %>% mean
+            biggest <- nnCurrentResult %>% max(xgbCurrentResult)
+
+            # Print to screen the best result so far
+            if (biggest %>% `>`(bestResult)) {
               cat(
-                ' \n   -> New best result of :', currentResult,
+                ' \n   -> New best result of :', biggest,
                 'from :', bestResult, '\n'
               )
-              bestResult <- currentResult
+              bestResult <- biggest
             }
 
             # Get average sensitivities
-            sensD <- nn$totD %>% mean
-            sensL <- nn$totL %>% mean
-            sensW <- nn$totW %>% mean
+            nnSensD <- nn$totD %>% mean
+            nnSensL <- nn$totL %>% mean
+            nnSensW <- nn$totW %>% mean
+            xgbSensD <- xgb$totD %>% mean
+            xgbSensL <- xgb$totL %>% mean
+            xgbSensW <- xgb$totW %>% mean
 
             # Store all results in a data frame
             topscore.frame <- data.frame(
@@ -194,20 +239,34 @@ optimize_variables <- function(total.metrics,
               decay = DECAY[l],
               totalPercentage = TOTAL_PERC[m],
               `nn.threshold` = THRESH,
-              `accuracy` = currentResult,
-              `accuracy.sd` = nn$totAcc %>% stats::sd(),
-              `accuracy.min` = nn$totAcc %>% min,
-              `accuracy.max` = nn$totAcc %>% max,
-              `sensitivity.D` = nn$totD %>% mean,
-              `sensitivity.D.min` = nn$totD %>% min,
-              `sensitivity.D.max` = nn$totD %>% max,
-              `sensitivity.L` = nn$totL %>% mean,
-              `sensitivity.L.min` = nn$totL %>% min,
-              `sensitivity.L.max` = nn$totL %>% max,
-              `sensitivity.W` = nn$totW %>% mean,
-              `sensitivity.W.min` = nn$totW %>% min,
-              `sensitivity.W.max` = nn$totW %>% max,
-              `sensitivity.sd` = c(sensD, sensL, sensW) %>% stats::sd(),
+              `accuracy.nn` = nnCurrentResult,
+              `accuracy.sd.nn` = nn$totAcc %>% stats::sd(),
+              `accuracy.min.nn` = nn$totAcc %>% min,
+              `accuracy.max.nn` = nn$totAcc %>% max,
+              `sensitivity.D.nn` = nn$totD %>% mean,
+              `sensitivity.D.min.nn` = nn$totD %>% min,
+              `sensitivity.D.max.nn` = nn$totD %>% max,
+              `sensitivity.L.nn` = nn$totL %>% mean,
+              `sensitivity.L.min.nn` = nn$totL %>% min,
+              `sensitivity.L.max.nn` = nn$totL %>% max,
+              `sensitivity.W.nn` = nn$totW %>% mean,
+              `sensitivity.W.min.nn` = nn$totW %>% min,
+              `sensitivity.W.max.nn` = nn$totW %>% max,
+              `sensitivity.sd.nn` = c(nnSensD, nnSensL, nnSensW) %>% stats::sd(),
+              `accuracy.xgb` = xgbCurrentResult,
+              `accuracy.sd.xgb` = xgb$totAcc %>% stats::sd(),
+              `accuracy.min.xgb` = xgb$totAcc %>% min,
+              `accuracy.max.xgb` = xgb$totAcc %>% max,
+              `sensitivity.D.xgb` = xgb$totD %>% mean,
+              `sensitivity.D.min.xgb` = xgb$totD %>% min,
+              `sensitivity.D.max.xgb` = xgb$totD %>% max,
+              `sensitivity.L.xgb` = xgb$totL %>% mean,
+              `sensitivity.L.min.xgb` = xgb$totL %>% min,
+              `sensitivity.L.max.xgb` = xgb$totL %>% max,
+              `sensitivity.W.xgb` = xgb$totW %>% mean,
+              `sensitivity.W.min.xgb` = xgb$totW %>% min,
+              `sensitivity.W.max.xgb` = xgb$totW %>% max,
+              `sensitivity.sd.xgb` = c(xgbSensD, xgbSensL, xgbSensW) %>% stats::sd(),
               stringsAsFactors = FALSE
             )
 
@@ -219,15 +278,15 @@ optimize_variables <- function(total.metrics,
             if (scoreFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = scoreFile)
 
             # Make sure the metrics file exists and write header information
-            featureFile <- resultsDir %>% paste0("features.csv")
-            if (featureFile %>% file.exists %>% `!`()) feat.metrics %>% head_write(y = featureFile)
+            #featureFile <- resultsDir %>% paste0("features.csv")
+            #if (featureFile %>% file.exists %>% `!`()) feat.metrics %>% head_write(y = featureFile)
 
             # Write results to files
             topscore.frame %>% paste(collapse = ',') %>% write(file = scoreFile, append = T)
 
-            for (feat in 1:(feat.metrics %>% nrow)) {
-              feat.metrics[feat, ] %>% paste(collapse = ',') %>% write(file = featureFile, append = T)
-            }
+            #for (feat in 1:(feat.metrics %>% nrow)) {
+            #  feat.metrics[feat, ] %>% paste(collapse = ',') %>% write(file = featureFile, append = T)
+            #}
           }
         }
       }
