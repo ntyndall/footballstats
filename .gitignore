@@ -2,4 +2,5 @@ utils_sensitive_info.R
 tagged/*
 .Rproj.user
 .Rhistory
+raw_odds/*
 param_optimization/*
