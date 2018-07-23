@@ -9,6 +9,7 @@ append_conf_stats <- function(totalStats, Actual.score, Predicted.score, LOGS = 
   resultTable <- table(Actual.score, Predicted.score)
   rt <- caret::confusionMatrix(data = resultTable)
 
+  # Refine stats here from the confusion matrix
   oStats <- rt$overall[c('Accuracy', 'AccuracyLower', 'AccuracyUpper')] %>% as.double
   oSens <-  rt$byClass[1:3, 'Sensitivity'] %>% as.double
 

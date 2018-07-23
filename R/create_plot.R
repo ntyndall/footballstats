@@ -3,7 +3,7 @@
 #' @export
 
 
-create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFactor, totalPer) {
+create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFactor, totalPer, savePlot = TRUE) {
 
   # Get all unique feature names
   singlePlots <- total.results %>%
@@ -55,26 +55,29 @@ create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFacto
   # Plot each detail
   for (i in 1:toplot) {
 
-    # Define the plot title
-    plotTitle <- paste0(
-      "day : ", day, " | gridP : ", gridPoints,
-      " | gridB : ", gridBoundary,
-      " | decay : ", decayFactor, " | total % : ", totalPer
-    )
+    # Only create plot if required
+    if (savePlot) {
+      # Define the plot title
+      plotTitle <- paste0(
+        "day : ", day, " | gridP : ", gridPoints,
+        " | gridB : ", gridBoundary,
+        " | decay : ", decayFactor, " | total % : ", totalPer
+      )
 
-    # Create actual density ggplot
-    g <- ggplot2::ggplot(data = total.results, mapping = ggplot2::aes(x = get(singlePlots[i]), fill = res)) %>%
-      `+`(ggplot2::geom_density(alpha = .3)) %>%
-      `+`(ggplot2::ggtitle(plotTitle)) %>%
-      `+`(ggplot2::xlab(label = singlePlots[i])) %>%
-      `+`(ggplot2::scale_fill_manual(values = c("blue", "red", "green"))) %>%
-      `+`(footballstats::plot_theme(titleFont = 9))
+      # Create actual density ggplot
+      g <- ggplot2::ggplot(data = total.results, mapping = ggplot2::aes(x = get(singlePlots[i]), fill = res)) %>%
+        `+`(ggplot2::geom_density(alpha = .3)) %>%
+        `+`(ggplot2::ggtitle(plotTitle)) %>%
+        `+`(ggplot2::xlab(label = singlePlots[i])) %>%
+        `+`(ggplot2::scale_fill_manual(values = c("blue", "red", "green"))) %>%
+        `+`(footballstats::plot_theme(titleFont = 9))
 
-    # Save using the correct details
-    ggplot2::ggsave(
-      filename = dirNames[i] %>% paste0("/", fileName, ".png"),
-      plot = g
-    )
+      # Save using the correct details
+      ggplot2::ggsave(
+        filename = dirNames[i] %>% paste0("/", fileName, ".png"),
+        plot = g
+      )
+    }
 
     # Define current values of feature
     vals <- total.results[[singlePlots[i]]]
