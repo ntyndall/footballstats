@@ -1,160 +1,93 @@
+#' @title Method XGBoost
+#'
+#' @export
 
 
-method_xgboost <- function() {
+method_xgboost <- function(total.results, FOLD_DATA, XGB) {
 
-  total.results$shotrate.a <- total.results$shotrate.h <- NULL
-
-
-  xgboost::xgboost
-
-  data(agaricus.train, package='xgboost')
-  data(agaricus.test, package='xgboost')
-  train <- agaricus.train
-  test <- agaricus.test
-
-  #original.results <- total.results
-  #original.results -> total.results
-  mylab <- total.results$res %>% as.factor %>% as.integer %>% `-`(1)
-  total.results$res <- NULL
-
-  my.dat <- list(data = mytrain, label = mylab)
-  xgb <- xgboost::xgboost(data = sparse_matrix, label = mylab, max_depth = 2, eta = 1, nthread = 2, nrounds = 200, objective = "multi:softprob", num_class = 3)
-
-  total.results[1, ]
-
-  y_pred <- predict(xgb, sparse_matrix[1:2, ])
-
-  sparse_matrix <- Matrix::sparse.model.matrix(res ~ .-1, data = original.results)
-
-
-
-
-
-
-  # Split into train and test??
-  new.results <- original.results
+  # Convert to integer values
+  new.results <- total.results
+  newLabels <- new.results$res %>% levels
   new.results$res %<>% as.factor %>% as.integer %>% `-`(1)
 
-  split.data <- new.results$xg.h %>% caTools::sample.split(SplitRatio = 0.70)
-  train.data <- new.results %>% subset(split.data %>% `==`(TRUE))
-  test.data <- new.results %>% subset(split.data %>% `==`(FALSE))
-
-  mylab <- train.data$res
-
-  # creat matrix + train
-  sparse.matrix <- Matrix::sparse.model.matrix(res ~ .-1, data = train.data)
-  xgb <- xgboost::xgboost(data = sparse.matrix, label = mylab, max_depth = 2, eta = 1, nthread = 2, nrounds = 50000, objective = "multi:softprob", num_class = 3)
-
-  testRes <- test.data$res
-  test.data$res <- NULL
-
-  totCor <- 0
-  for (i in 1:(testRes %>% length)) {
-    y_pred <- predict(xgb, test.data[1, ] %>% as.matrix)
-    mypred <- y_pred %>% which.max %>% `-`(1)
-    if (testRes[i] == mypred) totCor %<>% `+`(1)
-  }
-
-  totCor/(testRes %>% length)
-
-
-
-
-
-  # Conver everything to a factor
-  #orig.scaled <- scaled.results
-  #orig.scaled -> scaled.results
+  # Convert new results to integer values
   boundLen <- 4
   bounds <- seq(0, 1, length.out = boundLen)
-
-  for (i in 1:(scaled.results %>% nrow)) {
-    for (j in 1:12) {
-      scaled.results[i, j] %<>% findInterval(bounds)
+  for (i in 1:(new.results %>% nrow)) {
+    for (j in 1:(new.results %>% ncol %>% `-`(1))) {
+      new.results[i, j] %<>% findInterval(bounds)
     }
   }
 
-  # Split into train and test??
-  new.results <- scaled.results
-  new.results$res %<>% as.factor %>% as.integer %>% `-`(1)
+  # How many folds per test set
+  foldGroupLen <- FOLD_DATA$NUM - FOLD_DATA$PER
 
-  split.data <- new.results$xg.h %>% caTools::sample.split(SplitRatio = 0.70)
-  train.data <- new.results %>% subset(split.data %>% `==`(TRUE))
-  test.data <- new.results %>% subset(split.data %>% `==`(FALSE))
+  # Loop through all the folds
+  foldInd <- 1:(FOLD_DATA$NUM)
 
-  mylab <- train.data$res
+  # Initialise confusion matrix stats
+  totalStats <- footballstats::init_conf_stats()
 
-  testRes <- test.data$res
-  #test.data$res <- NULL
+  # Build the model
+  for (i in 1:(FOLD_DATA$PER + 1)) {
 
-  # creat matrix + train
-  sparse.matrix <- Matrix::sparse.model.matrix(res ~ .-1, data = train.data)
+    # Print out to see the progress
+    if (i == (FOLD_DATA$PER + 1)) cat("! \n") else if (i == 1) cat( "## NN CV : .") else cat(".")
 
-
-  # Create a sparse matrix
-
-  c_sparse <- function(my.data) {
-    myDimNames <- indI <- indJ <- c()
-    boundLen <- 4
-    allNames <- my.data %>%
-      colnames %>%
-      `[`(1:12)
-    startLen <- 0
-
-    for (k in 1:(my.data %>% ncol %>% `-`(1))) {
-      for (j in 1:(my.data %>% nrow)) {
-        indJ %<>% c(startLen + my.data[j, k])
-        indI %<>% c(j)
-      }
-      myDimNames %<>% c(allNames[k] %>% paste0('=', c(1:boundLen)))
-      startLen %<>% `+`(boundLen)
-    }
-
-
-    Matrix::sparseMatrix(
-      i = indI,
-      j = indJ,
-      x = 1,
-      dimnames = list(NULL, myDimNames)
+    # Which indexes of the folds to include
+    filterTest <- seq(
+      from = i,
+      by = 1,
+      length.out = foldGroupLen
     )
 
+    # Set up train and test data
+    train.data <- new.results[FOLD_DATA$FOLDS[foldInd[-filterTest]] %>%
+                         purrr::flatten_int(), ]
+    test.data <- new.results[FOLD_DATA$FOLDS[filterTest] %>%
+                        purrr::flatten_int(), ]
 
-    return(
-      Matrix::sparseMatrix(
-        i = indI,
-        j = indJ,
-        x = 1,
-        dimnames = list(NULL, myDimNames)
+    # Create labels
+    trainLabels <- train.data$res
+    testLabels <- test.data$res
+
+    # Create sparse matrix of training data
+    sparse.train <- train.data %>%
+      footballstats::create_sparse(
+        boundLen = boundLen
       )
+
+    # Create sparse test matrix
+    sparse.test <- test.data %>%
+      footballstats::create_sparse(
+        boundLen = boundLen
+      )
+
+    # Build xgboost model
+    xgb <- xgboost::xgboost(
+      data = sparse.train,
+      label = trainLabels,
+      max_depth = XGB$DEPTH,
+      eta = XGB$ETA,
+      gamma = XGB$GAMMA,
+      nthread = 2,
+      nrounds = XGB$ROUNDS,
+      objective = "multi:softmax",
+      num_class = newLabels %>% length,
+      verbose = 0
+    )
+
+    # Make predictions
+    p <- predict(xgb, sparse.test)
+
+    # Get metrics from confusion table
+    totalStats %<>% footballstats::append_conf_stats(
+      Actual.score = newLabels[testLabels %>% `+`(1)] %>% factor(levels = newLabels),
+      Predicted.score = newLabels[p %>% `+`(1)] %>% factor(levels = newLabels)
     )
   }
 
-
-
-  sparse.matrix <- train.data %>% c_sparse()
-
-  numClasses <- 3
-  xgb <- xgboost::xgboost(
-    data = sparse.matrix,
-    label = mylab,
-    max_depth = 10,
-    eta = 0.2,
-    gamma = 4,
-    nthread = 2,
-    nrounds = 5000,
-    objective = "multi:softmax",
-    num_class = numClasses,
-    verbose = 1
-  )
-
-  test.sparse <- test.data %>% c_sparse()
-  totCor <- 0
-  mypreds <- predict(xgb, test.sparse)
-  for (i in 1:(testRes %>% length)) {
-    if (testRes[i] == mypreds[i]) totCor %<>% `+`(1)
-  }
-
-
-
-  mypres %>% match(testRes)
-  totCor/(testRes %>% length)
+  # Return neural network plus results
+  return(totalStats)
 }
+
