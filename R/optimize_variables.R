@@ -154,16 +154,16 @@ optimize_variables <- function(total.metrics,
                 dataScales = dataScales
               )
 
-            # Turn off plot creation for now...
             # Create plots + get feature metrics
-            #feat.metrics <- scaled.results %>%
-            #  footballstats::create_plot(
-            #    day = DAY[i],
-            #    gridPoints = GRID_PTS[j],
-            #    gridBoundary= GRID_BOUND[k],
-            #    decayFactor = DECAY[l],
-            #    totalPer = TOTAL_PERC[m]
-            #  )
+            feat.metrics <- scaled.results %>%
+              footballstats::create_plot(
+                day = DAY[i],
+                gridPoints = GRID_PTS[j],
+                gridBoundary= GRID_BOUND[k],
+                decayFactor = DECAY[l],
+                totalPer = TOTAL_PERC[m],
+                savePlot = FALSE
+              )
 
             # Calculate folds for all methods
             myFolds <- caret::createFolds(
@@ -223,70 +223,59 @@ optimize_variables <- function(total.metrics,
               bestResult <- biggest
             }
 
-            # Get average sensitivities
-            nnSensD <- nn$totD %>% mean
-            nnSensL <- nn$totL %>% mean
-            nnSensW <- nn$totW %>% mean
-            xgbSensD <- xgb$totD %>% mean
-            xgbSensL <- xgb$totL %>% mean
-            xgbSensW <- xgb$totW %>% mean
-
-            # Store all results in a data frame
-            topscore.frame <- data.frame(
-              day = DAYS[i],
-              gridPoints = GRID_PTS[j],
-              gridBoundary = GRID_BOUND[k],
-              decay = DECAY[l],
-              totalPercentage = TOTAL_PERC[m],
-              `nn.threshold` = THRESH,
-              `accuracy.nn` = nnCurrentResult,
-              `accuracy.sd.nn` = nn$totAcc %>% stats::sd(),
-              `accuracy.min.nn` = nn$totAcc %>% min,
-              `accuracy.max.nn` = nn$totAcc %>% max,
-              `sensitivity.D.nn` = nn$totD %>% mean,
-              `sensitivity.D.min.nn` = nn$totD %>% min,
-              `sensitivity.D.max.nn` = nn$totD %>% max,
-              `sensitivity.L.nn` = nn$totL %>% mean,
-              `sensitivity.L.min.nn` = nn$totL %>% min,
-              `sensitivity.L.max.nn` = nn$totL %>% max,
-              `sensitivity.W.nn` = nn$totW %>% mean,
-              `sensitivity.W.min.nn` = nn$totW %>% min,
-              `sensitivity.W.max.nn` = nn$totW %>% max,
-              `sensitivity.sd.nn` = c(nnSensD, nnSensL, nnSensW) %>% stats::sd(),
-              `accuracy.xgb` = xgbCurrentResult,
-              `accuracy.sd.xgb` = xgb$totAcc %>% stats::sd(),
-              `accuracy.min.xgb` = xgb$totAcc %>% min,
-              `accuracy.max.xgb` = xgb$totAcc %>% max,
-              `sensitivity.D.xgb` = xgb$totD %>% mean,
-              `sensitivity.D.min.xgb` = xgb$totD %>% min,
-              `sensitivity.D.max.xgb` = xgb$totD %>% max,
-              `sensitivity.L.xgb` = xgb$totL %>% mean,
-              `sensitivity.L.min.xgb` = xgb$totL %>% min,
-              `sensitivity.L.max.xgb` = xgb$totL %>% max,
-              `sensitivity.W.xgb` = xgb$totW %>% mean,
-              `sensitivity.W.min.xgb` = xgb$totW %>% min,
-              `sensitivity.W.max.xgb` = xgb$totW %>% max,
-              `sensitivity.sd.xgb` = c(xgbSensD, xgbSensL, xgbSensW) %>% stats::sd(),
-              stringsAsFactors = FALSE
-            )
-
             # Write headers function
             head_write <- function(x, y) x %>% names %>% paste(collapse = ",") %>% write(file = y)
 
-            # Make sure the results file exists and write header information
-            scoreFile <- resultsDir %>% paste0("results.csv")
-            if (scoreFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = scoreFile)
+            # Put the different methods into a list
+            types <- c("neuralnetwork", "xgboost")
+            allMethods <- list(xgb, nn)
+            for (z in 1:2) {
+              # Get average sensitivities
+              sensD <- allMethods[[z]]$totD %>% mean
+              sensL <- allMethods[[z]]$totL %>% mean
+              sensW <- allMethods[[z]]$totW %>% mean
+
+              # Store all results in a data frame
+              topscore.frame <- data.frame(
+                day = DAYS[i],
+                gridPoints = GRID_PTS[j],
+                gridBoundary = GRID_BOUND[k],
+                decay = DECAY[l],
+                totalPercentage = TOTAL_PERC[m],
+                profit = profit, # Still need to calculate this
+                `nn.threshold` = THRESH,
+                `accuracy` = allMethods[[z]]$totAcc %>% mean,
+                `accuracy.sd` = allMethods[[z]]$totAcc %>% stats::sd(),
+                `accuracy.min` = allMethods[[z]]$totAcc %>% min,
+                `accuracy.max` = allMethods[[z]]$totAcc %>% max,
+                `sensitivity.D` = allMethods[[z]]$totD %>% mean,
+                `sensitivity.D.min` = allMethods[[z]]$totD %>% min,
+                `sensitivity.D.max` = allMethods[[z]]$totD %>% max,
+                `sensitivity.L` = allMethods[[z]]$totL %>% mean,
+                `sensitivity.L.min` = allMethods[[z]]$totL %>% min,
+                `sensitivity.L.max` = allMethods[[z]]$totL %>% max,
+                `sensitivity.W` = allMethods[[z]]$totW %>% mean,
+                `sensitivity.W.min` = allMethods[[z]]$totW %>% min,
+                `sensitivity.W.max` = allMethods[[z]]$totW %>% max,
+                `sensitivity.sd` = c(sensD, sensL, sensW) %>% stats::sd(),
+                stringsAsFactors = FALSE
+              )
+
+              # Make sure the results file exists and write header information
+              scoreFile <- resultsDir %>% paste0(types[z], "_results.csv")
+              if (scoreFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = scoreFile)
+
+              # Write results to files line by line
+              topscore.frame %>% paste(collapse = ',') %>% write(file = scoreFile, append = T)
+            }
 
             # Make sure the metrics file exists and write header information
-            #featureFile <- resultsDir %>% paste0("features.csv")
-            #if (featureFile %>% file.exists %>% `!`()) feat.metrics %>% head_write(y = featureFile)
+            featureFile <- resultsDir %>% paste0("features.csv")
+            if (featureFile %>% file.exists %>% `!`()) feat.metrics %>% head_write(y = featureFile)
 
-            # Write results to files
-            topscore.frame %>% paste(collapse = ',') %>% write(file = scoreFile, append = T)
-
-            #for (feat in 1:(feat.metrics %>% nrow)) {
-            #  feat.metrics[feat, ] %>% paste(collapse = ',') %>% write(file = featureFile, append = T)
-            #}
+            for (feat in 1:(feat.metrics %>% nrow)) {
+              feat.metrics[feat, ] %>% paste(collapse = ',') %>% write(file = featureFile, append = T)
+            }
           }
         }
       }
