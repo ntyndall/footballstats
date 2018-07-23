@@ -3,7 +3,7 @@
 #' @export
 
 
-append_conf_stats <- function(totalStats, Actual.score, Predicted.score, LOGS = FALSE) {
+append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.score, LOGS = FALSE) {
 
   # Build a table of results
   resultTable <- table(Actual.score, Predicted.score)
@@ -12,6 +12,11 @@ append_conf_stats <- function(totalStats, Actual.score, Predicted.score, LOGS = 
   # Refine stats here from the confusion matrix
   oStats <- rt$overall[c('Accuracy', 'AccuracyLower', 'AccuracyUpper')] %>% as.double
   oSens <-  rt$byClass[1:3, 'Sensitivity'] %>% as.double
+
+  # Calculate odd information if it exists..
+  if (new.odds %>% nrow %>% `>`(0)) {
+    # ...
+  }
 
   # Any dud results, just skip the whole lot
   if (oStats %>% is.na %>% any || oSens %>% is.na %>% any) {

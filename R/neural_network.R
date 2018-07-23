@@ -13,7 +13,7 @@
 #' @export
 
 
-neural_network <- function(totalData, FOLD_DATA, NN, LOGS = FALSE) {
+neural_network <- function(totalData, odds.results, FOLD_DATA, NN, LOGS = FALSE) {
 
   # Check what labels are available, and how many
   totalData$res %<>% as.character

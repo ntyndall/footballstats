@@ -11,7 +11,8 @@ optimize_variables <- function(total.metrics,
                                DECAY = c(1, 5000),
                                TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 1),
                                REP = 1,
-                               THRESH = 0.18) {
+                               THRESH = 0.18,
+                               types = c("neuralnetwork", "xgboost")) {
 
   # Make sure the base directory exists
   resultsDir <- getwd() %>% paste0("/results_optimization/")
@@ -61,6 +62,9 @@ optimize_variables <- function(total.metrics,
     (TOTAL_PERC %>% length)
   totalOps %<>% `-`(totMatches)
 
+  # Load up the odds frame
+  odds.frame <- footballstats::odds.frame
+
   # Start looping the grid
   for (i in 1:(DAYS %>% length)) {
     for (j in 1:(GRID_PTS %>% length)) {
@@ -90,7 +94,7 @@ optimize_variables <- function(total.metrics,
 
             icount %<>% `+`(1)
             cat(' ## Analysing operation', icount, '/', totalOps, ' ')
-            total.results <- data.frame(stringsAsFactors = FALSE)
+            odds.results <- total.results <- data.frame(stringsAsFactors = FALSE)
 
             # Now loop over all of total.metrics
             for (drow in 2:(total.metrics %>% nrow)) {
@@ -136,6 +140,22 @@ optimize_variables <- function(total.metrics,
                 result.dat$`position.a` <- current.row$`position.a`
                 result.dat$res <- current.row$result
                 total.results %<>% rbind(result.dat)
+
+                # Make sure there is a match, if not then set as NA
+                matchingIndex <- current.row$id %>% `==`(odds.frame$matchID)
+                odds.results %<>% rbind(
+                  if (matchingIndex %>% any) {
+                    odds.frame[matchingIndex %>% which, ]
+                  } else {
+                    data.frame(
+                      matchID = current.row$id,
+                      homewin = NA,
+                      draw = NA,
+                      awaywin = NA,
+                      stringsAsFactors = FALSE
+                    )
+                  }
+                )
               } else {
                 next
               }
@@ -184,6 +204,7 @@ optimize_variables <- function(total.metrics,
             startTime <- Sys.time()
             xgb <- total.results %>%
               footballstats::method_xgboost(
+                odds.results = odds.results,
                 FOLD_DATA = FOLD_DATA,
                 XGB = XGB
               )
@@ -198,6 +219,7 @@ optimize_variables <- function(total.metrics,
             startTime <- Sys.time()
             nn <- scaled.results %>%
               footballstats::neural_network(
+                odds.results = odds.results,
                 FOLD_DATA = FOLD_DATA,
                 NN = NN,
                 LOGS = FALSE
@@ -227,9 +249,8 @@ optimize_variables <- function(total.metrics,
             head_write <- function(x, y) x %>% names %>% paste(collapse = ",") %>% write(file = y)
 
             # Put the different methods into a list
-            types <- c("neuralnetwork", "xgboost")
             allMethods <- list(xgb, nn)
-            for (z in 1:2) {
+            for (z in 1:(types %>% length)) {
               # Get average sensitivities
               sensD <- allMethods[[z]]$totD %>% mean
               sensL <- allMethods[[z]]$totL %>% mean

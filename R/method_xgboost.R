@@ -3,7 +3,7 @@
 #' @export
 
 
-method_xgboost <- function(total.results, FOLD_DATA, XGB) {
+method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
 
   # Convert to integer values
   new.results <- total.results
@@ -28,11 +28,15 @@ method_xgboost <- function(total.results, FOLD_DATA, XGB) {
   # Initialise confusion matrix stats
   totalStats <- footballstats::init_conf_stats()
 
+  # Start logging
+  cat(" ## XG CV :")
+
   # Build the model
   for (i in 1:(FOLD_DATA$PER + 1)) {
 
-    # Print out to see the progress
-    if (i == (FOLD_DATA$PER + 1)) cat("! \n") else if (i == 1) cat( "## NN CV : .") else cat(".")
+     # Print out to see the progress
+    cat(i, "/")
+    if (i == (FOLD_DATA$PER + 1)) cat("\n")
 
     # Which indexes of the folds to include
     filterTest <- seq(
@@ -42,10 +46,12 @@ method_xgboost <- function(total.results, FOLD_DATA, XGB) {
     )
 
     # Set up train and test data
-    train.data <- new.results[FOLD_DATA$FOLDS[foldInd[-filterTest]] %>%
-                         purrr::flatten_int(), ]
-    test.data <- new.results[FOLD_DATA$FOLDS[filterTest] %>%
-                        purrr::flatten_int(), ]
+    train.data <- new.results[
+      FOLD_DATA$FOLDS[foldInd[-filterTest]] %>% purrr::flatten_int(), ]
+    test.data <- new.results[
+      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+    new.odds <- odds.frame[
+      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
 
     # Create labels
     trainLabels <- train.data$res
@@ -82,6 +88,7 @@ method_xgboost <- function(total.results, FOLD_DATA, XGB) {
 
     # Get metrics from confusion table
     totalStats %<>% footballstats::append_conf_stats(
+      new.odds = new.odds,
       Actual.score = newLabels[testLabels %>% `+`(1)] %>% factor(levels = newLabels),
       Predicted.score = newLabels[p %>% `+`(1)] %>% factor(levels = newLabels)
     )
