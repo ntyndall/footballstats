@@ -13,7 +13,7 @@
 #' @export
 
 
-neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALSE) {
+neural_network <- function(totalData, FOLD_DATA, NN, LOGS = FALSE) {
 
   # Check what labels are available, and how many
   totalData$res %<>% as.character
@@ -34,14 +34,6 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
   labColSpace <- newLabels %>% length %>% `+`(1)
   names(dSet) <- newLabels %>% c(dSet[labColSpace:ncol(dSet)] %>% names)
 
-  # Create training folds for CV
-  holdFolds <- allFolds <- caret::createFolds(
-    y = totalData$res,
-    k = foldNum,
-    list = TRUE,
-    returnTrain = FALSE
-  )
-
   # Concat strings, create the formula by adding up for symbolic formula
   f <- paste0(
     newLabels %>% paste(collapse = ' + '), ' ~',
@@ -57,23 +49,16 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
     `+`(1)
 
   # How many folds per test set
-  foldGroupLen <- foldNum - foldPer
+  foldGroupLen <- FOLD_DATA$NUM - FOLD_DATA$PER
 
   # Initialise list of vectors to save
-  totalStats <- list(
-    totAcc = c(),
-    totAccL = c(),
-    totAccU = c(),
-    totD = c(),
-    totL = c(),
-    totW = c()
-  )
+  totalStats <- footballstats::init_conf_stats()
 
   # Build the neural network
-  for (i in 1:(foldPer + 1)) {
+  for (i in 1:(FOLD_DATA$PER + 1)) {
 
     # Print out to see the progress
-    if (i == (foldPer + 1)) cat("! \n") else if (i == 1) cat( "## NN CV : .") else cat(".")
+    if (i == (FOLD_DATA$PER + 1)) cat("! \n") else if (i == 1) cat( "## NN CV : .") else cat(".")
 
     # Which indexes of the folds to include
     filterTest <- seq(
@@ -83,12 +68,12 @@ neural_network <- function(totalData, NN, foldNum = 10, foldPer = 7, LOGS = FALS
     )
 
     # Loop through all the folds
-    foldInd <- 1:foldNum
+    foldInd <- 1:FOLD_DATA$NUM
 
     # Set up train and test data
-    train.data <- dSet[allFolds[foldInd[-filterTest]] %>%
+    train.data <- dSet[FOLD_DATA$FOLDS[foldInd[-filterTest]] %>%
       purrr::flatten_int(), ]
-    test.data <- dSet[allFolds[filterTest] %>%
+    test.data <- dSet[FOLD_DATA$FOLDS[filterTest] %>%
       purrr::flatten_int(), ]
 
     # Build the neural network with split data
