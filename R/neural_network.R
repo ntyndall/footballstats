@@ -72,7 +72,7 @@ neural_network <- function(totalData, odds.results, FOLD_DATA, NN, LOGS = FALSE)
 
     # Set up train and test data
     train.data <- dSet[
-      FOLD_DATA$FOLDS[foldInd[-filterTest]] %>% purrr::flatten_int(), ]
+      FOLD_DATA$FOLDS[-filterTest] %>% purrr::flatten_int(), ]
     test.data <- dSet[
       FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
     new.odds <- odds.results[

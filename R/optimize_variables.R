@@ -202,7 +202,7 @@ optimize_variables <- function(total.metrics,
 
             # Build XGBoost model using CV
             startTime <- Sys.time()
-            xgb <- total.results %>%
+            xgb <- scaled.results %>%
               footballstats::method_xgboost(
                 odds.results = odds.results,
                 FOLD_DATA = FOLD_DATA,

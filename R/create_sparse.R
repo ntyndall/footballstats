@@ -11,7 +11,7 @@ create_sparse <- function(my.data, boundLen) {
   myDimNames <- indI <- indJ <- c()
   allNames <- my.data %>%
     colnames %>%
-    `[`(1:(train.data %>% ncol %>% `-`(1)))
+    `[`(1:(my.data %>% ncol %>% `-`(1)))
   startLen <- 0
 
   for (k in 1:(my.data %>% ncol %>% `-`(1))) {
