@@ -142,7 +142,7 @@ optimize_variables <- function(total.metrics,
                 total.results %<>% rbind(result.dat)
 
                 # Make sure there is a match, if not then set as NA
-                matchingIndex <- current.row$id %>% `==`(odds.frame$matchID)
+                matchingIndex <- current.row$matchID %>% `==`(odds.frame$matchID)
                 odds.results %<>% rbind(
                   if (matchingIndex %>% any) {
                     odds.frame[matchingIndex %>% which, ]
