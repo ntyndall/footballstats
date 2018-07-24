@@ -15,7 +15,41 @@ append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.scor
 
   # Calculate odd information if it exists..
   if (new.odds %>% nrow %>% `>`(0)) {
-    # ...
+    correctlyMatched <- Actual.score %>% `==`(Predicted.score)
+    new.odds %<>% subset(correctlyMatched)
+    winners <- Actual.score[correctlyMatched] %>% as.character
+
+    # For each of win / draw / lose
+    resultType <- c("W", "D", "L")
+    totalRight <- totSum <- 0
+    for (i in 1:3) {
+      resultsMatched <- winners %>% `==`(resultType[i])
+      totSum %<>% `+`(
+        if (resultsMatched %>% any) {
+          new.odds[[i + 1]] %>%
+            as.numeric %>%
+            `[`(resultsMatched) %>%
+            sum
+        } else {
+          0
+        }
+      )
+
+      totalRight %<>% `+`(resultsMatched %>% sum)
+
+    }
+
+    # Lost money is just the sum of incorrect guesses
+    lostMoney <- Actual.score %>%
+      length %>%
+      `-`(totalRight)
+
+    # Net earnings
+    netWinnings <- totSum %>%
+      `-`(lostMoney)
+
+    # Bind to list
+    totalStats$netWinnings %<>% c(totSum %>% `-`(lostMoney))
   }
 
   # Any dud results, just skip the whole lot
@@ -47,7 +81,8 @@ init_conf_stats <- function() {
       totAccU = c(),
       totD = c(),
       totL = c(),
-      totW = c()
+      totW = c(),
+      netWinnings = c()
     )
   )
 }
