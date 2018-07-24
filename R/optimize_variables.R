@@ -148,7 +148,7 @@ optimize_variables <- function(total.metrics,
                     odds.frame[matchingIndex %>% which, ]
                   } else {
                     data.frame(
-                      matchID = current.row$id,
+                      matchID = current.row$matchID,
                       homewin = NA,
                       draw = NA,
                       awaywin = NA,
@@ -263,9 +263,11 @@ optimize_variables <- function(total.metrics,
                 gridBoundary = GRID_BOUND[k],
                 decay = DECAY[l],
                 totalPercentage = TOTAL_PERC[m],
-                profit = profit, # Still need to calculate this
-                `nn.threshold` = THRESH,
                 `accuracy` = allMethods[[z]]$totAcc %>% mean,
+                `profit` = allMethods[[z]]$netWinnings %>% mean,
+                `profit.sd` = allMethods[[z]]$netWinnings %>% stats::sd(),
+                `profit.min` = allMethods[[z]]$netWinnings %>% min,
+                `profit.max` = allMethods[[z]]$netWinnings %>% max,
                 `accuracy.sd` = allMethods[[z]]$totAcc %>% stats::sd(),
                 `accuracy.min` = allMethods[[z]]$totAcc %>% min,
                 `accuracy.max` = allMethods[[z]]$totAcc %>% max,
