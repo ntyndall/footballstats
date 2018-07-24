@@ -7,6 +7,7 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
 
   # Convert to integer values
   new.results <- total.results
+  new.results$res %<>% as.factor
   newLabels <- new.results$res %>% levels
   new.results$res %<>% as.factor %>% as.integer %>% `-`(1)
 
@@ -50,7 +51,7 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
       FOLD_DATA$FOLDS[foldInd[-filterTest]] %>% purrr::flatten_int(), ]
     test.data <- new.results[
       FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
-    new.odds <- odds.frame[
+    new.odds <- odds.results[
       FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
 
     # Create labels
