@@ -4,5 +4,6 @@
 \alias{create_plot}
 \title{Create Plot}
 \usage{
-create_plot(total.results, day, gridPoints, gridBoundary, decayFactor, totalPer)
+create_plot(total.results, day, gridPoints, gridBoundary, decayFactor, totalPer,
+  savePlot = TRUE)
 }

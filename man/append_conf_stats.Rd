@@ -4,5 +4,6 @@
 \alias{append_conf_stats}
 \title{Append confusion matrix}
 \usage{
-append_conf_stats(totalStats, Actual.score, Predicted.score, LOGS = FALSE)
+append_conf_stats(totalStats, new.odds, Actual.score, Predicted.score,
+  LOGS = FALSE)
 }

@@ -4,5 +4,5 @@
 \alias{method_xgboost}
 \title{Method XGBoost}
 \usage{
-method_xgboost(total.results, FOLD_DATA)
+method_xgboost(total.results, odds.results, FOLD_DATA, XGB)
 }
