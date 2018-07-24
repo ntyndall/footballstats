@@ -16,8 +16,33 @@ append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.scor
   # Calculate odd information if it exists..
   if (new.odds %>% nrow %>% `>`(0)) {
     correctlyMatched <- Actual.score %>% `==`(Predicted.score)
-    new.odds %<>% subset(correctlyMatched)
+    sub.odds <- new.odds %>% subset(correctlyMatched)
     winners <- Actual.score[correctlyMatched] %>% as.character
+
+    # subset out any NA's here OR empty strings
+    empt_or_na <- function(x) {
+      res <- x %>% is.na %>% `|`(x %>% `==`(""))
+      if (res %>% any) res %>% which else NA
+    }
+
+    # Vectorize and check if any odds are missing
+    toExclude <- lapply(
+      X = c("homewin", "draw", "awaywin"),
+      FUN = function (x) sub.odds[[x]] %>% empt_or_na()
+    ) %>%
+      purrr::flatten_int() %>%
+      unique
+
+    # If any are to be excluded then exclude them
+    if (toExclude %>% is.na %>% `!`()) {
+      lgcl <- TRUE %>% rep(sub.odds %>% nrow)
+      lgcl[toExclude] <- FALSE
+      sub.odds %<>% subset(lgcl)
+      winners %>% `[`(lgcl)
+      exclusions <- toExclude %>% length
+    } else {
+      exclusions <- 0
+    }
 
     # For each of win / draw / lose
     resultType <- c("W", "D", "L")
@@ -26,7 +51,7 @@ append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.scor
       resultsMatched <- winners %>% `==`(resultType[i])
       totSum %<>% `+`(
         if (resultsMatched %>% any) {
-          new.odds[[i + 1]] %>%
+          sub.odds[[i + 1]] %>%
             as.numeric %>%
             `[`(resultsMatched) %>%
             sum
@@ -34,14 +59,13 @@ append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.scor
           0
         }
       )
-
       totalRight %<>% `+`(resultsMatched %>% sum)
-
     }
 
     # Lost money is just the sum of incorrect guesses
     lostMoney <- Actual.score %>%
       length %>%
+      `-`(exclusions) %>%
       `-`(totalRight)
 
     # Net earnings
