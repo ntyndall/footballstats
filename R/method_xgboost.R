@@ -36,7 +36,7 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
   for (i in 1:(FOLD_DATA$PER + 1)) {
 
      # Print out to see the progress
-    cat(i, "/")
+    cat("", i, "/")
     if (i == (FOLD_DATA$PER + 1)) cat("\n")
 
     # Which indexes of the folds to include
