@@ -22,7 +22,7 @@ append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.scor
     # subset out any NA's here OR empty strings
     empt_or_na <- function(x) {
       res <- x %>% is.na %>% `|`(x %>% `==`(""))
-      if (res %>% any) res %>% which else NA
+      if (res %>% any) res %>% which else NULL
     }
 
     # Vectorize and check if any odds are missing
@@ -34,11 +34,11 @@ append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.scor
       unique
 
     # If any are to be excluded then exclude them
-    if (toExclude %>% is.na %>% `!`()) {
+    if (toExclude %>% length %>% `>`(0)) {
       lgcl <- TRUE %>% rep(sub.odds %>% nrow)
       lgcl[toExclude] <- FALSE
       sub.odds %<>% subset(lgcl)
-      winners %>% `[`(lgcl)
+      winners %<>% `[`(lgcl)
       exclusions <- toExclude %>% length
     } else {
       exclusions <- 0
@@ -54,6 +54,7 @@ append_conf_stats <- function(totalStats, new.odds, Actual.score, Predicted.scor
           sub.odds[[i + 1]] %>%
             as.numeric %>%
             `[`(resultsMatched) %>%
+            `-`(1) %>%
             sum
         } else {
           0
