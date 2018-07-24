@@ -71,10 +71,12 @@ neural_network <- function(totalData, odds.results, FOLD_DATA, NN, LOGS = FALSE)
     foldInd <- 1:FOLD_DATA$NUM
 
     # Set up train and test data
-    train.data <- dSet[FOLD_DATA$FOLDS[foldInd[-filterTest]] %>%
-      purrr::flatten_int(), ]
-    test.data <- dSet[FOLD_DATA$FOLDS[filterTest] %>%
-      purrr::flatten_int(), ]
+    train.data <- dSet[
+      FOLD_DATA$FOLDS[foldInd[-filterTest]] %>% purrr::flatten_int(), ]
+    test.data <- dSet[
+      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+    new.odds <- odds.results[
+      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
 
     # Build the neural network with split data
     if (LOGS) cat(' ## Building neural network ## \n')
@@ -116,33 +118,12 @@ neural_network <- function(totalData, odds.results, FOLD_DATA, NN, LOGS = FALSE)
     netRes <- predictions$net.result
     for (j in 1:(netRes %>% nrow)) predVec[j] <- newLabels[netRes[j, ] %>% which.max]
 
-    Actual.score <- realVec %>% factor(levels = newLabels)
-    Predicted.score <- predVec %>% factor(levels = newLabels)
-
-    # Build a table of results
-    resultTable <- table(Actual.score, Predicted.score)
-    rt <- caret::confusionMatrix(data = resultTable)
-
-    # Print confusion table out
-    if (LOGS) {
-      cat(' ## Confusion matrix ## \n')
-      print(rt)
-    }
-
-    # Get overall stats
-    oStats <- rt$overall[c('Accuracy', 'AccuracyLower', 'AccuracyUpper')] %>% as.double
-    oSens <-  rt$byClass[1:3, 'Sensitivity'] %>% as.double
-
-    # Any dud results, just skip the whole lot
-    if (oStats %>% is.na %>% any || oSens %>% is.na %>% any) next
-
-    # Append list results on
-    totalStats$totAcc %<>% c(oStats[1])
-    totalStats$totAccL %<>% c(oStats[2])
-    totalStats$totAccU %<>% c(oStats[3])
-    totalStats$totD %<>% c(oSens[1])
-    totalStats$totL %<>% c(oSens[2])
-    totalStats$totW %<>% c(oSens[3])
+    # Get metrics from confusion table
+    totalStats %<>% footballstats::append_conf_stats(
+      new.odds = new.odds,
+      Actual.score = realVec %>% factor(levels = newLabels),
+      Predicted.score = predVec %>% factor(levels = newLabels)
+    )
   }
 
   # Return neural network plus results
