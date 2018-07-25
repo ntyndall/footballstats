@@ -13,12 +13,7 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
 
   # Convert new results to integer values
   boundLen <- 4
-  bounds <- seq(0, 1, length.out = boundLen)
-  for (i in 1:(new.results %>% nrow)) {
-    for (j in 1:(new.results %>% ncol %>% `-`(1))) {
-      new.results[i, j] %<>% findInterval(bounds)
-    }
-  }
+  new.results %<>% footballstats::scaled_to_discrete(boundLen = boundLen)
 
   # How many folds per test set
   foldGroupLen <- FOLD_DATA$NUM - FOLD_DATA$PER
