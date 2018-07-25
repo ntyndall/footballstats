@@ -27,7 +27,6 @@ generate_predictions <- function(KEYS, fixtureList) {
     order, ]
 
   # Initialise arguments
-  dataScales <- footballstats::dataScales
   analysed <- nAnalysed <- correct <- todaysDate <- 0
   totalTxt <- c()
   fixtureRow <- fixtureList %>% nrow
@@ -54,79 +53,26 @@ generate_predictions <- function(KEYS, fixtureList) {
     # Take a single row slice of the fixture list
     singleFixture <- fixtureList[i, ]
 
-    # Get team information from fixture data frame
-    matchID <- singleFixture$id %>% as.integer
+    # Names of competing teams
     homeName <- singleFixture$localteam_name
     awayName <- singleFixture$visitorteam_name
-    teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
 
-    # Need a non-null frame to start with
-    matchMetrics <- data.frame(
-      matchID = matchID,
-      stringsAsFactors = FALSE
-    )
-
-    # Bind the commentaries together
-    matchMetrics %<>% cbind(
-      footballstats::project_commentaries(
-        KEYS = KEYS,
-        teamIDs = teamIDs,
-        matchDate = singleFixture$formatted_date,
-        matchID = matchID
+    # Call in here
+    predicted <- KEYS %>%
+      footballstats::classify_xg_setup(
+        singleFixture = singleFixture
       )
-    )
 
-    # Bind the form
-    matchMetrics %<>% cbind(
-      footballstats::project_form(
-        KEYS = KEYS,
-        teamIDs = teamIDs,
-        currentID = matchID
-      )
-    )
+    # Increment objects
+    analysed %<>% `+`(predicted$analysed)
+    nAnalysed %<>% `+`(predicted$nAnalysed)
 
-    # Figure out the standings
-    positions <- footballstats::feat_position(
-      KEYS = KEYS,
-      matchID = matchID,
-      teamIDs = teamIDs,
-      matchDate = singleFixture$formatted_date
-    )
+    # Skip if no predictions have been made
+    if (predicted$nAnalysed %>% `==`(1)) next
 
-    matchMetrics %<>% cbind(
-      data.frame(
-        `position.h` = positions$position.h,
-        `position.a` = positions$position.a,
-        stringsAsFactors = FALSE
-      )
-    )
-
-    # Go onto the next feature if any features arent present
-    if (matchMetrics %>% is.na %>% any) {
-      nAnalysed %<>% `+`(1)
-      next
-    } else {
-      matchMetrics$matchID <- NULL
-      analysed %<>% `+`(1)
-    }
-
-    # Scale the data as required
-    scled <- matchMetrics %>%
-      scale(
-        center = dataScales$sMin,
-        scale = dataScales$sMax - dataScales$sMin
-      ) %>% as.data.frame
-
-    # Make the prediction
-    result <- neuralnet::compute(
-      x = footballstats::nn$neural,
-      covariate = scled
-    )
-
-    # Get the home team result
-    resultsOrd <- c('D', 'L', 'W')
-    actualH <- resultsOrd[result$net.result[1, ] %>% which.max]
-    actualA <- if (actualH %>% `==`('W')) 'L' else if (actualH %>% `==`('L')) 'W' else 'D'
+    # Relabel predicted results
+    actualH <- predicted$home
+    actualA <- predicted$away
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
     fTime <- singleFixture$ft_score
@@ -183,7 +129,6 @@ generate_predictions <- function(KEYS, fixtureList) {
           slack = 'false'
         )
       )
-
 
       # Also push the match ID to a list
       "all_predictions" %>%
