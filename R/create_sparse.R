@@ -8,13 +8,22 @@
 
 
 create_sparse <- function(my.data, boundLen) {
-  myDimNames <- indI <- indJ <- c()
+
+  # (n-1) columns
+  featCols <- my.data %>%
+    ncol %>%
+    `-`(1)
+
+  # Get the feature names
   allNames <- my.data %>%
     colnames %>%
-    `[`(1:(my.data %>% ncol %>% `-`(1)))
+    `[`(1:featCols)
+
+  # Initialise the starting position and vectors
+  myDimNames <- indI <- indJ <- c()
   startLen <- 0
 
-  for (k in 1:(my.data %>% ncol %>% `-`(1))) {
+  for (k in 1:featCols) {
     for (j in 1:(my.data %>% nrow)) {
       indJ %<>% c(startLen + my.data[j, k])
       indI %<>% c(j)
@@ -23,14 +32,18 @@ create_sparse <- function(my.data, boundLen) {
     startLen %<>% `+`(boundLen)
   }
 
-  # Return the sparse matrix
-  # How do I ensure there are trailing zeros?
-  return(
-    Matrix::sparseMatrix(
-      i = indI,
-      j = indJ,
-      x = 1,
-      dimnames = list(NULL, myDimNames)
-    )
+  # Create a matrix, with a value of 2 in the right most column, to ensure all
+  # features are captured
+  m <- Matrix::sparseMatrix(
+    i = c(1, indI),
+    j = c(featCols %>% `*`(boundLen), indJ),
+    x = c(0, 1 %>% rep(indI %>% length)),
+    dimnames = list(NULL, myDimNames)
   )
+
+  # Finally, drop the zero in the last column
+  m %<>% Matrix::drop0()
+
+  # Return the sparse matrix
+  return(m)
 }
