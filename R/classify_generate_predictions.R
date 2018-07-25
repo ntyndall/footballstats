@@ -170,6 +170,7 @@ generate_predictions <- function(KEYS, fixtureList) {
         purrr::flatten_chr() %>%
         as.integer
 
+      # Create the hash of prediction information
       rredis::redisHMSet(
         key = paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':', month, ':', singleFixture$id),
         values = list(
@@ -182,6 +183,13 @@ generate_predictions <- function(KEYS, fixtureList) {
           slack = 'false'
         )
       )
+
+
+      # Also push the match ID to a list
+      "all_predictions" %>%
+        rredis::redisSAdd(
+          element = singleFixture$id %>% charToRaw()
+        )
     }
   }
 

@@ -24,12 +24,30 @@
 
 predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 
+  # Get all matchIDs from prediction keys
   readyToAnalyse <- readyToAnalyse %>%
     strsplit(split = '[:]') %>%
     purrr::map(5) %>%
     purrr::flatten_chr()
 
-  readyToAnalyse <- intersect(matches$id, readyToAnalyse)
+  # All predicted matchIDs
+  allPreds <- "all_predictions" %>%
+    rredis::redisSMembers()
+
+  # Make sure it isn't NULL before flattening
+  if (allPreds %>% is.null %>% `!`()) {
+    allPreds %<>% purrr::flatten_chr()
+
+    # Remove them from the set
+    for (i in 1:(allPreds %>% length)) {
+      "all_predictions" %>%
+        rredis::redisSRem(element = allPreds[i] %>% charToRaw())
+    }
+  }
+
+  # Get the intersection of ready to analyse
+  readyToAnalyse <- intersect(allPreds, readyToAnalyse)
+
   if (!identical(readyToAnalyse, character(0))) {
     readyLen <- readyToAnalyse %>% length
     cat(paste0(Sys.time(), ' | Checking off ', readyLen, ' already predicted matches. \n'))
