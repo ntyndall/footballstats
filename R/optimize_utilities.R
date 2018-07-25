@@ -54,9 +54,9 @@ optimize_positiongrid <- function(pos, gridPoints, mygrid, boundaries) {
 #' @export
 
 
-get_grid_matches <- function(existing.metrics, fullGrid, r = FALSE) {
+get_grid_matches <- function(existing.topscore, fullGrid, r = FALSE) {
   # Make sure the grid names matches up
-  names(fullGrid) <- names(existing.metrics)
+  names(fullGrid) <- names(existing.topscore)
 
   # Check for matches
   totMatches <- 0

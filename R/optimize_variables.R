@@ -177,7 +177,7 @@ optimize_variables <- function(total.metrics,
             # Create plots + get feature metrics
             feat.metrics <- scaled.results %>%
               footballstats::create_plot(
-                day = DAY[i],
+                day = DAYS[i],
                 gridPoints = GRID_PTS[j],
                 gridBoundary= GRID_BOUND[k],
                 decayFactor = DECAY[l],
