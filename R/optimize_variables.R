@@ -3,54 +3,58 @@
 #' @export
 
 
-optimize_variables <- function(total.metrics,
-                               overwrite = FALSE,
-                               DAYS = c(3, 4, 5),
-                               GRID_PTS = c(2, 4, 6),
-                               GRID_BOUND = c(0.1, 0.2),
-                               DECAY = c(1, 5000),
-                               TOTAL_PERC = seq(from = 0.0, to = 1.0, by = 1),
-                               REP = 1,
-                               THRESH = 0.18,
-                               types = c("neuralnetwork", "xgboost")) {
+optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
+                               overwrite = FALSE, types = c("xgboost", "neuralnetwork")) {
 
-  # Make sure the base directory exists
-  resultsDir <- getwd() %>% paste0("/results_optimization/")
-  if (resultsDir %>% dir.exists %>% `!`()) resultsDir %>% dir.create
+  # Redfine list from GRIDS
+  DAYS <- GRIDS$DAYS
+  GRID_PTS <- GRIDS$GRID_PTS
+  GRID_BOUND <- GRIDS$GRID_BOUND
+  DECAY <- GRIDS$DECAY
+  TOTAL_PERC <- GRIDS$TOTAL_PERC
 
-  # Read in the existing data frame of results here
-  resultsFile <- resultsDir %>% paste0("results.csv")
-  if (resultsFile %>% file.exists) {
+  # Only write to files if need be
+  if (optimizeModels) {
+    # Make sure the base directory exists
+    resultsDir <- getwd() %>% paste0("/results_optimization/")
+    if (resultsDir %>% dir.exists %>% `!`()) resultsDir %>% dir.create
 
-    # Read the CSV
-    existing.topscore <- read.csv2(
-      file = resultsFile,
-      header = TRUE,
-      sep = ',',
-      stringsAsFactors = FALSE
-    )[ , 1:5]
+    # Read in the existing data frame of results here
+    resultsFile <- resultsDir %>% paste0("results.csv")
+    if (resultsFile %>% file.exists) {
 
-    # Get matches with existing data frame
-    totMatches <- existing.topscore %>%
-      footballstats::get_grid_matches(
-        fullGrid = expand.grid(DAYS, GRID_PTS, GRID_BOUND, DECAY, TOTAL_PERC)
-      )
+      # Read the CSV
+      existing.topscore <- read.csv2(
+        file = resultsFile,
+        header = TRUE,
+        sep = ',',
+        stringsAsFactors = FALSE
+      )[ , 1:5]
+
+      # Get matches with existing data frame
+      totMatches <- existing.topscore %>%
+        footballstats::get_grid_matches(
+          fullGrid = expand.grid(DAYS, GRID_PTS, GRID_BOUND, DECAY, TOTAL_PERC)
+        )
+    } else {
+      totMatches <- 0
+    }
   } else {
-    totMatches <- 0
+    totalMatches <- 0
   }
 
   # Define neural network input list
   NN <- list(
-    REP = REP,
-    THRESH = THRESH
+    REP = GRIDS$NN_REP,
+    THRESH = GRIDS$NN_THRESH
   )
 
   # Define XGBoost input list
   XGB <- list(
-    ROUNDS = 50000,
-    DEPTH = 10,
-    ETA = 0.2,
-    GAMMA = 2
+    ROUNDS = GRIDS$XG_ROUNDS,
+    DEPTH = GRIDS$XG_DEPTH,
+    ETA = GRIDS$XG_ETA,
+    GAMMA = GRIDS$XG_GAMMA
   )
 
   # Initialise values for generating and tracking results
@@ -93,7 +97,7 @@ optimize_variables <- function(total.metrics,
             }
 
             icount %<>% `+`(1)
-            cat(' ## Analysing operation', icount, '/', totalOps, ' ')
+            cat(' ## Analysing operation', icount, '/', totalOps, '\n')
             odds.results <- total.results <- data.frame(stringsAsFactors = FALSE)
 
             # Now loop over all of total.metrics
@@ -136,8 +140,8 @@ optimize_variables <- function(total.metrics,
                 )
 
                 # Append positions on
-                result.dat$`position.h` <- current.row$`position.h`
-                result.dat$`position.a` <- current.row$`position.a`
+                result.dat$`position.h` <- current.row$`position.h` %>% `/`(current.row$til)
+                result.dat$`position.a` <- current.row$`position.a` %>% `/`(current.row$til)
                 result.dat$res <- current.row$result
                 total.results %<>% rbind(result.dat)
 
@@ -215,89 +219,99 @@ optimize_variables <- function(total.metrics,
             ) %>% format
             cat(" XGBoost took :", tDiff, "\n")
 
-            # Build neural network using CV
-            startTime <- Sys.time()
-            nn <- scaled.results %>%
-              footballstats::neural_network(
-                odds.results = odds.results,
-                FOLD_DATA = FOLD_DATA,
-                NN = NN,
-                LOGS = FALSE
-              )
-            endTime <- Sys.time()
-            tDiff <- difftime(
-              time1 = endTime,
-              time2 = startTime
-            ) %>% format
-            cat(" Nueral Network took :", tDiff, "\n")
-
-            # Store the best result + output to screen
-            nnCurrentResult <- nn$totAcc %>% mean
-            xgbCurrentResult <- xgb$totAcc %>% mean
-            biggest <- nnCurrentResult %>% max(xgbCurrentResult)
-
-            # Print to screen the best result so far
-            if (biggest %>% `>`(bestResult)) {
-              cat(
-                ' \n   -> New best result of :', biggest,
-                'from :', bestResult, '\n'
-              )
-              bestResult <- biggest
+            # Save the scales and booster data sets
+            if (!optimizeModels) {
+              xgModel <- xgb$model
+              xgScales <- dataScales
+              xgboost::xgb.save(xgModel, "xgModel")
+              save(xgScales, file = "xgScales.rda")
             }
 
-            # Write headers function
-            head_write <- function(x, y) x %>% names %>% paste(collapse = ",") %>% write(file = y)
+            if (optimizeModels) {
+              # Build neural network using CV
+              startTime <- Sys.time()
+              nn <- scaled.results %>%
+                footballstats::neural_network(
+                  odds.results = odds.results,
+                  FOLD_DATA = FOLD_DATA,
+                  NN = NN,
+                  LOGS = FALSE
+                )
+              endTime <- Sys.time()
+              tDiff <- difftime(
+                time1 = endTime,
+                time2 = startTime
+              ) %>% format
+              cat(" Nueral Network took :", tDiff, "\n")
 
-            # Put the different methods into a list
-            allMethods <- list(xgb, nn)
-            for (z in 1:(types %>% length)) {
-              # Get average sensitivities
-              sensD <- allMethods[[z]]$totD %>% mean
-              sensL <- allMethods[[z]]$totL %>% mean
-              sensW <- allMethods[[z]]$totW %>% mean
+              # Store the best result + output to screen
+              nnCurrentResult <- nn$totAcc %>% mean
+              xgbCurrentResult <- xgb$totAcc %>% mean
+              biggest <- nnCurrentResult %>% max(xgbCurrentResult)
 
-              # Store all results in a data frame
-              topscore.frame <- data.frame(
-                day = DAYS[i],
-                gridPoints = GRID_PTS[j],
-                gridBoundary = GRID_BOUND[k],
-                decay = DECAY[l],
-                totalPercentage = TOTAL_PERC[m],
-                `accuracy` = allMethods[[z]]$totAcc %>% mean,
-                `profit` = allMethods[[z]]$netWinnings %>% mean,
-                `profit.sd` = allMethods[[z]]$netWinnings %>% stats::sd(),
-                `profit.min` = allMethods[[z]]$netWinnings %>% min,
-                `profit.max` = allMethods[[z]]$netWinnings %>% max,
-                `accuracy.sd` = allMethods[[z]]$totAcc %>% stats::sd(),
-                `accuracy.min` = allMethods[[z]]$totAcc %>% min,
-                `accuracy.max` = allMethods[[z]]$totAcc %>% max,
-                `sensitivity.D` = allMethods[[z]]$totD %>% mean,
-                `sensitivity.D.min` = allMethods[[z]]$totD %>% min,
-                `sensitivity.D.max` = allMethods[[z]]$totD %>% max,
-                `sensitivity.L` = allMethods[[z]]$totL %>% mean,
-                `sensitivity.L.min` = allMethods[[z]]$totL %>% min,
-                `sensitivity.L.max` = allMethods[[z]]$totL %>% max,
-                `sensitivity.W` = allMethods[[z]]$totW %>% mean,
-                `sensitivity.W.min` = allMethods[[z]]$totW %>% min,
-                `sensitivity.W.max` = allMethods[[z]]$totW %>% max,
-                `sensitivity.sd` = c(sensD, sensL, sensW) %>% stats::sd(),
-                stringsAsFactors = FALSE
-              )
+              # Print to screen the best result so far
+              if (biggest %>% `>`(bestResult)) {
+                cat(
+                  ' \n   -> New best result of :', biggest,
+                  'from :', bestResult, '\n'
+                )
+                bestResult <- biggest
+              }
 
-              # Make sure the results file exists and write header information
-              scoreFile <- resultsDir %>% paste0(types[z], "_results.csv")
-              if (scoreFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = scoreFile)
+              # Write headers function
+              head_write <- function(x, y) x %>% names %>% paste(collapse = ",") %>% write(file = y)
 
-              # Write results to files line by line
-              topscore.frame %>% paste(collapse = ',') %>% write(file = scoreFile, append = T)
-            }
+              # Put the different methods into a list
+              allMethods <- list(xgb, nn)
+              for (z in 1:(types %>% length)) {
+                # Get average sensitivities
+                sensD <- allMethods[[z]]$totD %>% mean
+                sensL <- allMethods[[z]]$totL %>% mean
+                sensW <- allMethods[[z]]$totW %>% mean
 
-            # Make sure the metrics file exists and write header information
-            featureFile <- resultsDir %>% paste0("features.csv")
-            if (featureFile %>% file.exists %>% `!`()) feat.metrics %>% head_write(y = featureFile)
+                # Store all results in a data frame
+                topscore.frame <- data.frame(
+                  day = DAYS[i],
+                  gridPoints = GRID_PTS[j],
+                  gridBoundary = GRID_BOUND[k],
+                  decay = DECAY[l],
+                  totalPercentage = TOTAL_PERC[m],
+                  `accuracy` = allMethods[[z]]$totAcc %>% mean,
+                  `profit` = allMethods[[z]]$netWinnings %>% mean,
+                  `profit.sd` = allMethods[[z]]$netWinnings %>% stats::sd(),
+                  `profit.min` = allMethods[[z]]$netWinnings %>% min,
+                  `profit.max` = allMethods[[z]]$netWinnings %>% max,
+                  `accuracy.sd` = allMethods[[z]]$totAcc %>% stats::sd(),
+                  `accuracy.min` = allMethods[[z]]$totAcc %>% min,
+                  `accuracy.max` = allMethods[[z]]$totAcc %>% max,
+                  `sensitivity.D` = allMethods[[z]]$totD %>% mean,
+                  `sensitivity.D.min` = allMethods[[z]]$totD %>% min,
+                  `sensitivity.D.max` = allMethods[[z]]$totD %>% max,
+                  `sensitivity.L` = allMethods[[z]]$totL %>% mean,
+                  `sensitivity.L.min` = allMethods[[z]]$totL %>% min,
+                  `sensitivity.L.max` = allMethods[[z]]$totL %>% max,
+                  `sensitivity.W` = allMethods[[z]]$totW %>% mean,
+                  `sensitivity.W.min` = allMethods[[z]]$totW %>% min,
+                  `sensitivity.W.max` = allMethods[[z]]$totW %>% max,
+                  `sensitivity.sd` = c(sensD, sensL, sensW) %>% stats::sd(),
+                  stringsAsFactors = FALSE
+                )
 
-            for (feat in 1:(feat.metrics %>% nrow)) {
-              feat.metrics[feat, ] %>% paste(collapse = ',') %>% write(file = featureFile, append = T)
+                # Make sure the results file exists and write header information
+                scoreFile <- resultsDir %>% paste0(types[z], "_results.csv")
+                if (scoreFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = scoreFile)
+
+                # Write results to files line by line
+                topscore.frame %>% paste(collapse = ',') %>% write(file = scoreFile, append = T)
+              }
+
+              # Make sure the metrics file exists and write header information
+              featureFile <- resultsDir %>% paste0("features.csv")
+              if (featureFile %>% file.exists %>% `!`()) feat.metrics %>% head_write(y = featureFile)
+
+              for (feat in 1:(feat.metrics %>% nrow)) {
+                feat.metrics[feat, ] %>% paste(collapse = ',') %>% write(file = featureFile, append = T)
+              }
             }
           }
         }
