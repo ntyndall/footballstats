@@ -16,6 +16,9 @@
 
 analyse_and_predict <- function(deployed = FALSE) { # nocov start
 
+  # Make sure any new stats haven't been added since last call
+  footballstats::stats_from_yaml()
+
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,

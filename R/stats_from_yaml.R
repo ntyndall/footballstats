@@ -23,9 +23,8 @@ stats_from_yaml <- function() {
   # Connect to Redis
   footballstats::redis_con()
 
-  # Load data file
-  newData <- getwd() %>%
-    paste0('/missing_data/statistics.yaml') %>%
+  # Find the data from the package
+  newData <- system.file("extdata", "statistics.yaml", package = "footballstats") %>%
     yaml::yaml.load_file()
 
   # data names
@@ -76,4 +75,3 @@ stats_from_yaml <- function() {
     }
   }
 }
-

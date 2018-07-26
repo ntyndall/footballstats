@@ -4,5 +4,5 @@
 \alias{classify_xg_setup}
 \title{Classify XGBoost Setup}
 \usage{
-classify_xg_setup(KEYS, singleFixture)
+classify_xg_setup(KEYS, xgModel, xgScales, singleFixture)
 }
