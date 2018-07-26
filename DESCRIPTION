@@ -1,6 +1,6 @@
 Package: footballstats
 Title: Classify and predict football results
-Version: 1.4.0
+Version: 1.5.0
 Authors@R: person("Niall", "Tyndall", email = "ntyndall@gmail.com", role = c("aut", "cre"))
 Description: Classification of football matches
 Depends: R (>= 3.4.0)
@@ -26,7 +26,8 @@ Imports:
     caTools,
     caret,
     scales,
-    xgboost
+    xgboost,
+    yaml
 Suggests:
     knitr,
     rmarkdown,
