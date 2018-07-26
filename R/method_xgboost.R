@@ -5,6 +5,9 @@
 
 method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
 
+  # Initialise bestAcc
+  bestAcc <- 0
+
   # Convert to integer values
   new.results <- total.results
   new.results$res %<>% as.factor
@@ -88,9 +91,15 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
       Actual.score = newLabels[testLabels %>% `+`(1)] %>% factor(levels = newLabels),
       Predicted.score = newLabels[p %>% `+`(1)] %>% factor(levels = newLabels)
     )
+
+    # Save the best model
+    if (totalStats$totAcc[i] > bestAcc) {
+      bestAcc <- totalStats$totAcc[i]
+      bestXGB <- xgb
+    }
   }
 
   # Return neural network plus results
-  return(totalStats)
+  return(c(list(model = bestXGB), totalStats))
 }
 
