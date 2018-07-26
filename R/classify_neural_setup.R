@@ -57,7 +57,7 @@ classify_neural_setup <- function(KEYS, singleFixture) {
   )
 
   # Use data scales pre determined by scripts
-  dataScales <- footballstats::dataScales
+  dataScales <- footballstats::dataScales$nn
 
   # If any are missing then return early
   if (matchMetrics %>% is.na %>% any) {
