@@ -16,9 +16,6 @@
 
 analyse_and_predict <- function(deployed = FALSE) { # nocov start
 
-  # Build the XGBoost model (Too large for GIT)
-  if ("xgModel" %>% file.exists %>% `!`()) footballstats::optimize_features()
-
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
