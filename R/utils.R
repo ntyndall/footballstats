@@ -205,8 +205,9 @@ redis_con <- function(db = 1) { # nocov start
 
 
 allowed_comps <- function() { # nocov start
-  c('1204', '1205', '1221', '1229', '1269', '1352', '1425') %>%
-    return()
+  return(
+    c('1204', '1205', '1221', '1229', '1269', '1352', '1425', '1399', '1457')
+  )
 } # nocov end
 
 
@@ -222,8 +223,8 @@ allowed_comps <- function() { # nocov start
 
 teams_in_league <- function(compID) { # nocov start
   allLeagues <- list(
-    id = c('1204', '1205', '1221', '1229', '1269', '1352', '1425'),
-    teams = c(20, 24, 20, 18, 20, 18, 18)
+    id = c('1204', '1205', '1221', '1229', '1269', '1352', '1425', '1399', '1457'),
+    teams = c(20, 24, 20, 18, 20, 18, 18, 20, 20)
   )
   return(allLeagues$teams[allLeagues$id %>% `==`(compID) %>% which])
 } # nocov end

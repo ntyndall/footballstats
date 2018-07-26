@@ -1,22 +1,22 @@
 #' @title Plot Theme
-#' 
+#'
 #' @description Holds the theme for the plots to be used in the
 #'  README
 #'
-#' @param fontFamily A character string that defines the font 
+#' @param fontFamily A character string that defines the font
 #'  family to be used for the axis / title / legend etc.
 #'
 #' @export
 
 
-plot_theme <- function(fontFamily = 'Purisa') { # nocov start
+plot_theme <- function(fontFamily = 'Purisa', titleFont = 26) { # nocov start
   return(
     ggplot2::theme(
       plot.title =  ggplot2::element_text(
         family = 'Purisa',
         face = 'plain',
         colour = '#353535',
-        size = 30,
+        size = titleFont,
         hjust = 0.5
       ),
       legend.title = ggplot2::element_text(
@@ -37,7 +37,7 @@ plot_theme <- function(fontFamily = 'Purisa') { # nocov start
         face =  'plain',
         colour = '#353535',
         size = 12,
-        angle = 20, 
+        angle = 20,
         hjust = 1
       ),
       axis.text.y = ggplot2::element_text(

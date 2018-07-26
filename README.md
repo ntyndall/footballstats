@@ -21,6 +21,9 @@ cat(' ## Install Complete. \n\n')
 
 # Set up log directory
 footballstats::create_log_dir()
+
+# Build the XGBoost model on demand
+if (!file.exists("xgModel")) footballstats::optimize_features()
 ``` 
 
 #### Deployment

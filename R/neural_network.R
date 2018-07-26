@@ -13,14 +13,14 @@
 #' @export
 
 
-neural_network <- function(totalData) {
+neural_network <- function(totalData, odds.results, FOLD_DATA, NN, LOGS = FALSE) {
 
   # Check what labels are available, and how many
   totalData$res %<>% as.character
   unlabel <- totalData
   unlabel$res <- NULL
 
-  # Convert to integers (3 is the standard non-feature part of the data set)
+  # Convert to integers
   totCols <- ncol(unlabel)
   features <- unlabel[ , 1:totCols] %>% names
 
@@ -34,15 +34,7 @@ neural_network <- function(totalData) {
   labColSpace <- newLabels %>% length %>% `+`(1)
   names(dSet) <- newLabels %>% c(dSet[labColSpace:ncol(dSet)] %>% names)
 
-  # Create Split (any column is fine)
-  split.data <- dSet$W %>% caTools::sample.split(SplitRatio = 0.70)
-
-  # Split based off of split Boolean Vector
-  train.data <- dSet %>% subset(split.data %>% `==`(TRUE))
-  test.data <- dSet %>% subset(split.data %>% `==`(FALSE))
-
-  # Concatenate strings : Create the formula by adding
-  # them up and create symbolic formula
+  # Concat strings, create the formula by adding up for symbolic formula
   f <- paste0(
     newLabels %>% paste(collapse = ' + '), ' ~',
     paste(features, collapse = ' + ')) %>%
@@ -56,45 +48,88 @@ neural_network <- function(totalData) {
     round %>%
     `+`(1)
 
+  # How many folds per test set
+  foldGroupLen <- FOLD_DATA$NUM - FOLD_DATA$PER
+
+  # Initialise list of vectors to save
+  totalStats <- footballstats::init_conf_stats()
+
+  # Start logging
+  cat(" ## NN CV :")
+
   # Build the neural network
-  print(' ## Building neural network ## ')
-  nn <- neuralnet::neuralnet(
-    formula = f,
-    data = train.data,
-    hidden = neurons %>% rep(5),
-    rep = 10,
-    act.fct = "logistic",
-    linear.output = FALSE,
-    lifesign = 'minimal',
-    stepmax = 10000000
-  )
+  for (i in 1:(FOLD_DATA$PER + 1)) {
 
-  # Compute Predictions off Test Set
-  predictions <- neuralnet::compute(
-    x = nn,
-    covariate = test.data[(newLabels %>% length + 1):ncol(test.data)]
-  )
+    # Print out to see the progress
+    cat("", i, "/")
+    if (i == (FOLD_DATA$PER + 1)) cat("\n")
 
-  # Create vectors to measure accuracy
-  realVec <- predVec <- 0 %>% rep(test.data %>% nrow)
-  tot <- 0
-  for (i in 1:(newLabels %>% length)) {
-    current <- test.data[[newLabels[i]]]
-    realVec[current %>% `==`(1) %>% which] <- newLabels[i]
+    # Which indexes of the folds to include
+    filterTest <- seq(
+      from = i,
+      by = 1,
+      length.out = foldGroupLen
+    )
+
+    # Loop through all the folds
+    foldInd <- 1:FOLD_DATA$NUM
+
+    # Set up train and test data
+    train.data <- dSet[
+      FOLD_DATA$FOLDS[-filterTest] %>% purrr::flatten_int(), ]
+    test.data <- dSet[
+      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+    new.odds <- odds.results[
+      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+
+    # Build the neural network with split data
+    if (LOGS) cat(' ## Building neural network ## \n')
+
+    # Calculate the NN here
+    nn <- tryCatch({
+      neuralnet::neuralnet(
+        formula = f,
+        data = train.data,
+        hidden = neurons %>% rep(2),
+        rep = NN$REP,
+        threshold = NN$THRESH,
+        act.fct = "logistic",
+        linear.output = FALSE,
+        lifesign = if (LOGS) "full" else "none",
+        stepmax = 1000000 # Old = 10000000
+      )
+    }, warning = function(w) return(NULL)
+    )
+
+    # If the NN couldn't converge in time then move on
+    if (nn %>% is.null) next
+
+    # Compute Predictions off Test Set
+    predictions <- neuralnet::compute(
+      x = nn,
+      covariate = test.data[(newLabels %>% length + 1):ncol(test.data)]
+    )
+
+    # Create vectors to measure accuracy
+    realVec <- predVec <- 0 %>% rep(test.data %>% nrow)
+    tot <- 0
+    for (i in 1:(newLabels %>% length)) {
+      current <- test.data[[newLabels[i]]]
+      realVec[current %>% `==`(1) %>% which] <- newLabels[i]
+    }
+
+    # Check the max values per row for the predictions
+    netRes <- predictions$net.result
+    for (j in 1:(netRes %>% nrow)) predVec[j] <- newLabels[netRes[j, ] %>% which.max]
+
+    # Get metrics from confusion table
+    totalStats %<>% footballstats::append_conf_stats(
+      new.odds = new.odds,
+      Actual.score = realVec %>% factor(levels = newLabels),
+      Predicted.score = predVec %>% factor(levels = newLabels)
+    )
   }
 
-  # Check the max values per row for the predictions
-  netRes <- predictions$net.result
-  for (j in 1:(netRes %>% nrow)) predVec[j] <- newLabels[netRes[j, ] %>% which.max]
-
-  Actual.score <- realVec %>% factor(levels = newLabels)
-  Predicted.score <- predVec %>% factor(levels = newLabels)
-
-  # Build a table of results
-  resultTable <- table(Actual.score, Predicted.score)
-  print(' ## Confusion matrix ##')
-  print(caret::confusionMatrix(data = resultTable))
-
-  # Return the neural network
-  return(nn)
+  # Return neural network plus results
+  return(c(totalStats, list(neural = nn)))
 }

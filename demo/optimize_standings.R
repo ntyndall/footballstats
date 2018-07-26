@@ -16,9 +16,9 @@ for (j in 1:(uniqueComps %>% length)) {
   testData <- totalData %>% subset(totalData$comp_id == uniqueComps[j])
   subComp <- competitions %>% subset(competitions$id == uniqueComps[j])
   singleLeague <- paste0(subComp$name, ' :: ', subComp$region)
-  KEYS$COMP <- uniqueComps[j]
-  KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
+  KEYS$TIL <- uniqueComps[j] %>% footballstats::teams_in_league()
   KEYS$COMP_NAME <- subComp$name
+
 
   # Run to generate the fixtures (only the first 10 for now!)
   analysis <- KEYS %>% footballstats::generate_predictions(
@@ -27,7 +27,7 @@ for (j in 1:(uniqueComps %>% length)) {
 
   per <- analysis$correct %>% `/`(testData %>% nrow %>% `-`(analysis$notAnalysed)) %>% scales::percent()
   cat('\n  ## ', singleLeague, '::', per, ' \n')
-  totalCorrect %<>% `+`(correct)
+  #totalCorrect %<>% `+`(correct)
 
   # Save the total summary Statistics
   summaryStats %<>% rbind(

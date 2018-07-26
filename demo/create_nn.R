@@ -6,7 +6,7 @@ library(magrittr)
 #
 
 # Define the season when building the model
-seasonStarting <- 2017
+#seasonStarting <- 2017
 
 # Define a single competitionID if only one is to be used
 #competitionID <- 1204
@@ -14,15 +14,11 @@ seasonStarting <- 2017
 # Get allowed competitions
 comps <- footballstats::allowed_comps()
 
-# Start up redis
-footballstats::redis_con()
-
 # Get all the data first
 cat(paste0(Sys.time(), ' | Recreating match data. \n'))
 totalData <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:(comps %>% length)) {
 
-  print(paste0('Comp ', i, ' / ', comps %>% length))
   # Define the keys for each recreation
   KEYS$COMP <- comps[i]
   KEYS$SEASON <- seasonStarting
@@ -74,8 +70,6 @@ for (i in 1:loops) {
   original.data %<>% rbind(totalData[lower:upper, ] %>% footballstats::calculate_data())
 }
 
-#big.original.data <- original.data
-
 # Only look at complete rows!
 original.data %<>% subset(original.data %>% stats::complete.cases())
 
@@ -96,9 +90,10 @@ save(dataScales, file = getwd() %>% paste0('/data/dataScales.rda'))
 # Scale the original data set
 original.data %<>% footballstats::scale_data(dataScales = dataScales)
 
+NN <- list(REP = 2, THRESH = 0.1)
 # Build the neural network with scaled data
 cat(paste0(Sys.time(), ' | Building Neural Network. \n'))
-nn <- original.data %>% footballstats::neural_network()
+nn <- original.data %>% footballstats::neural_network(NN = NN)
 
 # Check ALL the data!!
 check.data <- original.data
@@ -107,7 +102,7 @@ newLabels <- original.data$res %>% unique %>% sort %>% as.character
 check.data$res <- NULL
 
 predictions <- neuralnet::compute(
-  x = nn,
+  x = footballstats::nn,
   covariate = check.data
 )
 

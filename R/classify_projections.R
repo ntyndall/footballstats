@@ -37,7 +37,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
   commKey <- paste0('cmt_commentary:', KEYS$COMP)
 
   # Get the commentary names
-  commentaryNames <- footballstats::dataScales$commentaries %>%
+  commentaryNames <- footballstats::dataScales$nn$commentaries %>%
     strsplit(split = '[.]') %>%
     purrr::map(1) %>%
     purrr::flatten_chr() %>%
@@ -53,19 +53,20 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
   # Loop over both teams
   for (j in 1:2) {
-    commentaryKeys <- paste0(commKey, ':*:', teamIDs[j]) %>%
+    allCommentaryKeys <- paste0(commKey, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
-    if (commentaryKeys %>% is.null) break else commentaryKeys %<>% as.character
+    if (allCommentaryKeys %>% is.null) break else allCommentaryKeys %<>% as.character
 
     # If it does then continue on
-    commentaryKeys <- KEYS %>% footballstats::order_commentaries(
-      commentaryKeys = commentaryKeys
+    allCommentaryKeys <- KEYS %>% footballstats::order_commentaries(
+      commentaryKeys = allCommentaryKeys
     ) %>% rev
 
     # Get all the relative positions
-    matchIDs <- commentaryKeys %>%
+    matchIDs <- allCommentaryKeys %>%
       footballstats::flatt(y = 3)
 
+    commentaryKeys <- allCommentaryKeys
     bigger <- matchID %>% `>`(matchIDs)
     if (bigger %>% sum %>% `>`(4)) commentaryKeys %<>% `[`(bigger %>% which %>% `[`(1:4)) else next
 
@@ -76,30 +77,84 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     newMatchIDs <- commentaryKeys %>%
       footballstats::flatt(y = 3) %>%
       as.integer
+    calcPos <- data.frame()
+    concede <- goals <- 0
+    totOppData <- c()
     commKey <- paste0('cmt_commentary:', KEYS$COMP)
-    for (k in 1:(commentaryKeys %>% length)) {
 
-      # Get the other team from the matchID
-      bothIDs <- paste0(commKey, ':', newMatchIDs[k], ':*') %>%
-        rredis::redisKeys() %>%
-        footballstats::flatt(y = 4)
+    for (k in 1:(allCommentaryKeys %>% length)) {
+      if (totOppData %>% length %>% `==`(KEYS$DAYS)) next
 
-      if (teamIDs[j] %>% `==`(bothIDs) %>% which %>% `==`(2)) bothIDs %<>% rev
+      # Get the other information from the csm key
+      oppResults <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs[k]) %>%
+        rredis::redisHMGet(fields = c('formatted_date', 'localteam_id', 'visitorteam_id', 'localteam_score', 'visitorteam_score')) %>%
+        as.character
 
-      # Get the positions from
-      currentPos <- KEYS %>% footballstats::feat_position(
-        matchID = newMatchIDs[k],
-        teamIDs = bothIDs
+      if ("NULL" %in% oppResults) next
+
+      twoIDs <- oppResults[c(2, 3)]
+      if (oppResults %>% `==`(teamIDs[j]) %>% which %>% `==`(2)) {
+        oth <- oppResults[3]
+        goals %<>% `+`(oppResults[4] %>% as.integer)
+        concede %<>% `+`(oppResults[5] %>% as.integer)
+      } else {
+        oth <- oppResults[2]
+        goals %<>% `+`(oppResults[5] %>% as.integer)
+        concede %<>% `+`(oppResults[4] %>% as.integer)
+      }
+      oppFrame <- footballstats::feat_position(
+        KEYS = KEYS,
+        matchID = matchIDs[k],
+        teamIDs = c(oth, teamIDs[j])
       )
 
-      # Bind to a total data frame
-      totalPositions %<>% rbind(currentPos)
+      calcPos %<>% rbind(oppFrame)
+      totOppData %<>% c(oppFrame$position.h)
     }
 
-    # Other team info
-    recentOp <- totalPositions$position.a
 
-    if (j == 2) positions %<>% rev
+
+
+
+    # Look for home games!!
+    if (j == 1) {
+      scoreVenue <- concedeVenue <- c()
+      for (k in 1:(allCommentaryKeys %>% length)) {
+        if (scoreVenue %>% length %>% `==`(KEYS$DAYS)) next
+        someStats <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs[k]) %>%
+          rredis::redisHMGet(fields = c('localteam_id', 'localteam_score', 'visitorteam_score')) %>%
+          as.character %>%
+          as.integer
+        if (teamIDs[j] == someStats[1]) {
+          scoreVenue %<>% c(someStats[2])
+          concedeVenue %<>% c(someStats[3])
+        }
+      }
+    } else {
+      scoreVenue <- concedeVenue <- c()
+      for (k in 1:(allCommentaryKeys %>% length)) {
+        if (scoreVenue %>% length %>% `==`(KEYS$DAYS)) next
+        someStats <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs[k]) %>%
+          rredis::redisHMGet(fields = c('visitorteam_id', 'visitorteam_score', 'localteam_score')) %>%
+          as.character
+
+        if ("NULL" %in% someStats) next else someStats %<>% as.integer
+        if (teamIDs[j] == someStats[1]) {
+          scoreVenue %<>% c(someStats[2])
+          concedeVenue %<>% c(someStats[3])
+        }
+      }
+    }
+
+    if (scoreVenue %>% length %>% `!=`(KEYS$DAYS)) next
+
+
+
+
+
+
+
+
 
     # Get data frame of commentary metrics
     comMetrics <- commentaryKeys %>%
@@ -119,20 +174,16 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     # Only take the average of the last 4 matches!
     if (comMetrics %>% nrow %>% `<`(KEYS$DAYS)) next
     comMetrics <- comMetrics[1:KEYS$DAYS, ]
-    recentOp %<>% `[`(c(1:KEYS$DAYS))
+    totOppData %<>% `[`(c(1:KEYS$DAYS))
 
     # Get mean and standard deviation for all metrics
     comMean <- apply(comMetrics, 2, mean)
-    comSD <- apply(comMetrics, 2, stats::sd)
+    clinical <- goals %>% `/`(comMetrics$shots_ongoal %>% sum) %>% `*`(100)
+    concede <- concede %>% `/`(oShots) %>% `*`(100)
 
     # Calculate the average (and possible the standard deviation?)
     resList %<>% c(
-      c(
-        apply(comMetrics, 2, mean),
-        apply(comMetrics, 2, stats::sd),
-        recentOp %>% mean,
-        recentOp %>% stats::sd()
-      ) %>%
+      c(comMean, totOppData %>% mean, clinical, concede, scoreVenue %>% sum, concedeVenue %>% sum) %>%
         as.double %>% list
     )
   }
@@ -140,10 +191,9 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
   # Define the commentary frame names here
   allNames <- c(
     commentaryNames %>% paste0('.h'),
-    commentaryNames %>% paste0('.sdh'),
+    c('strength.h', 'clinical.h', 'defensive.h', 'scored.h', 'concede.h'),
     commentaryNames %>% paste0('.a'),
-    commentaryNames %>% paste0('.sda'),
-    c('strength.h', 'strength.sdh', 'strength.a', 'strength.sda')
+    c('strength.a', 'clinical.a', 'defensive.a', 'scored.a', 'concede.a')
   )
 
   # Return a mini frame containing commentary information
@@ -208,7 +258,7 @@ project_form <- function(KEYS, teamIDs, currentID) {
     matchData <- data.frame(stringsAsFactors = FALSE)
 
     # Loop over all match info
-    for (k in (cLen - 2):cLen) {
+    for (k in (cLen - 3):cLen) {
       matchData %<>% rbind(
         csmIDs[k] %>%
         rredis::redisHGetAll() %>%
@@ -233,6 +283,7 @@ project_form <- function(KEYS, teamIDs, currentID) {
   )
 }
 
+
 #' @title Handle Projections
 #'
 #' @description A function that is used to handle empty data
@@ -254,7 +305,11 @@ handle_projections <- function(frameNames, resList) {
   toFrame <- if (resList %>% length %>% `!=`(2)) {
     NA %>% rep(frameNames %>% length) %>% t
   } else {
-    resList %>% purrr::flatten_dbl() %>% t
+    #if (frameNames == c('form.h', 'form.a')) {
+    #  resList %>% purrr::flatten_chr() %>% t
+    #} else {
+      resList %>% purrr::flatten_dbl() %>% t
+    #}
   }
 
   dF <- toFrame %>% data.frame(stringsAsFactors = FALSE)

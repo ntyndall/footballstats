@@ -65,10 +65,10 @@ form_from_matchdata <- function(teamID, matchData) {
     teamID = teamID
   )
 
-  # Return the LAST 3 form and calculate integer score
+  # Return the LAST 4 form and calculate integer score
   return(
     formResults$form %>%
-      utils::tail(3) %>%
+      utils::tail(4) %>%
       rev %>%
       paste(collapse = '') %>%
       footballstats::form_to_int()
