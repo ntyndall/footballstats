@@ -37,14 +37,25 @@ stats_from_yaml <- function() {
       purrr::map(length) %>%
       as.integer
 
+    # If some items are missing, let me know
     if (7 %>% `==`(datLens) %>% all %>% `!`()) {
+      cat(' ## Check entry for ID :', dNames[i], '\n')
       next
-      cat(' ## Check entry for ID :', dNames[i])
     }
 
-    statsKey <- "csm:*:" %>%
+    # Get basic stat key
+    basicKeyName <-  "csm:*:" %>%
       paste0(dNames[i]) %>%
-      rredis::redisKeys() %>%
+      rredis::redisKeys()
+
+    # If basic stats are missing then we have a serious problem!
+    if (basicKeyName %>% is.null) {
+      cat(' ## Check CSM entry for ID :', dNames[i],'\n')
+      next
+    }
+
+    # Split it up to get the new key names
+    statsKey <- basicKeyName %>%
       strsplit(split = ':') %>%
       purrr::flatten_chr()
 
