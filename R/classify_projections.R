@@ -37,7 +37,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
   commKey <- paste0('cmt_commentary:', KEYS$COMP)
 
   # Get the commentary names
-  commentaryNames <- footballstats::dataScales$commentaries %>%
+  commentaryNames <- footballstats::dataScales$nn$commentaries %>%
     strsplit(split = '[.]') %>%
     purrr::map(1) %>%
     purrr::flatten_chr() %>%
