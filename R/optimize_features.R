@@ -9,7 +9,26 @@
 #' @export
 
 
-optimize_features <- function(data.set) {
+optimize_features <- function(optimizeModels = FALSE) {
+
+  # Optimize creates a grid, whereas a single run just saves a model
+  GRIDS <- if (optimizeModels) {
+    footballstats::initialize_ml_grid()
+  } else {
+    list(
+      DAYS = 3,
+      GRID_PTS = 2,
+      GRID_BOUND = 0.1,
+      DECAY = 1,
+      TOTAL_PERC = 0.5,
+      NN_REP = 1,
+      NN_THRESH = 0.18,
+      XG_ROUNDS = 5000,
+      XG_DEPTH = 10,
+      XG_ETA = 0.2,
+      XG_GAMMA = 2
+    )
+  }
 
   # Connect redis
   footballstats::redis_con()
@@ -115,5 +134,8 @@ optimize_features <- function(data.set) {
 
   # Start to optimize this data set
   total.metrics %>%
-    footballstats::optimize_variables()
+    footballstats::optimize_variables(
+      optimizeModels = optimizeModels,
+      GRIDS = GRIDS
+    )
 }
