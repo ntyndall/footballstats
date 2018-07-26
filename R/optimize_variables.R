@@ -40,7 +40,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
       totMatches <- 0
     }
   } else {
-    totalMatches <- 0
+    totMatches <- 0
   }
 
   # Define neural network input list
