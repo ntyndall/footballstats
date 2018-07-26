@@ -4,8 +4,6 @@
 \alias{optimize_variables}
 \title{Optimize Variables}
 \usage{
-optimize_variables(total.metrics, overwrite = FALSE, DAYS = c(3, 4, 5),
-  GRID_PTS = c(2, 4, 6), GRID_BOUND = c(0.1, 0.2), DECAY = c(1, 5000),
-  TOTAL_PERC = seq(from = 0, to = 1, by = 1), REP = 1, THRESH = 0.18,
-  types = c("neuralnetwork", "xgboost"))
+optimize_variables(total.metrics, GRIDS, optimizeModels = TRUE,
+  overwrite = FALSE, types = c("xgboost", "neuralnetwork"))
 }

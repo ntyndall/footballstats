@@ -4,7 +4,7 @@
 \alias{optimize_features}
 \title{Optimize Features}
 \usage{
-optimize_features(data.set)
+optimize_features(optimizeModels = FALSE)
 }
 \description{
 A function used to optimize data set features.
