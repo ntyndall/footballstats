@@ -59,7 +59,8 @@ generate_predictions <- function(KEYS, fixtureList) {
 
     # Call in here
     predicted <- KEYS %>%
-      footballstats::classify_xg_setup(
+      footballstats::classify_method_selection(
+        method = "xgboost",
         singleFixture = singleFixture
       )
 
