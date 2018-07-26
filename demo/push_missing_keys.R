@@ -34,11 +34,11 @@ for (i in 1:(updateComps %>% length)) {
     purrr::flatten_chr()
 
   # Any actually not on the server?
-  mismatch <- setdiff(localKeys, extKeys)
+  mismatch <- localKeys %>% setdiff(extKeys)
   if (mismatch %>% length %>% `==`(0)) next
 
   # Get ALL the key types
-  typesOfKeys <- localKeys %>%
+  typesOfKeys <- mismatch %>%
     strsplit(split = ':') %>%
     purrr::map(1) %>%
     purrr::flatten_chr()

@@ -27,7 +27,7 @@ cat('\n ## Inserting missing statistics from `statistics.yaml` to redis \n\n')
 footballstats::stats_from_yaml()
 
 # Build the XGBoost model on demand
-cat('\n ## Building the XGBoost model')
+cat('\n ## Building the XGBoost model \n')
 if (!file.exists("xgModel")) footballstats::optimize_features()
 ``` 
 
