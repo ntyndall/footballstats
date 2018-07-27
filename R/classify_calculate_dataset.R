@@ -442,10 +442,24 @@ feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
     rredis::redisHGetAll() %>%
     lapply(as.integer)
 
+  # For play offs, positions may not exist (This will be a rough guide!)
+  posH <- positions[[teamIDs[1]]]
+  posA <- positions[[teamIDs[2]]]
+
+  increm <- 1
+  if (posH %>% is.null) {
+    posH <- KEYS$TIL %>% `+`(increm)
+    increm %<>% `+`(1)
+  }
+
+  if (posA %>% is.null) {
+    posA <- KEYS$TIL %>% `+`(increm)
+  }
+
   # Determine & Return relative position as a data.frame
   data.frame(
-    `position.h` = positions[[teamIDs[1]]],
-    `position.a` = positions[[teamIDs[2]]],
+    `position.h` = posH,
+    `position.a` = posA,
     stringsAsFactors = FALSE
   ) %>% return()
 }
