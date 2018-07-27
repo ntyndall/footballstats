@@ -1,3 +1,16 @@
+print('Inside testthat.R')
+
+library(redux)
+
+print('attempt to use installed version of redux..')
+
+myR <- redux::hiredis()
+myR$SET(key = 'test', value = 'one')
+result <- myR$GET(key = 'test')
+
+print('The result is')
+print(result)
+
 library(magrittr)
 library(testthat)
 library(footballstats)
@@ -21,7 +34,7 @@ rredis::redisFlushDB()
 KEYS <<- footballstats::keys_for_testing()
 
 results <- testthat::test_dir(
-  path = "tests/testthat",
+  path = "testthat",
   reporter = "summary"
 )
 
