@@ -91,8 +91,8 @@ optimize_features <- function(optimizeModels = FALSE) {
       )
 
       # Get commentary information
-      for (i in 1:2) {
-        cInfo <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[i]) %>%
+      for (j in 1:2) {
+        cInfo <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[j]) %>%
           rredis::redisHMGet(fields = allowedCommentaries) %>%
           lapply(as.character)
 
@@ -102,7 +102,7 @@ optimize_features <- function(optimizeModels = FALSE) {
 
         # Rename this new data frame and bind it to the metrics row
         cInfo %<>% data.frame(stringsAsFactors = FALSE)
-        names(cInfo) <- paste0(allowedCommentaries, if (i == 1) '.h' else '.a')
+        names(cInfo) <- paste0(allowedCommentaries, if (j == 1) '.h' else '.a')
         matchMetrics %<>% cbind(cInfo)
       }
 
