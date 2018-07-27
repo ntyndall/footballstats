@@ -27,7 +27,8 @@ Imports:
     caret,
     scales,
     xgboost,
-    yaml
+    yaml,
+    redux
 Suggests:
     knitr,
     rmarkdown,
