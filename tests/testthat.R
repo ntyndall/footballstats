@@ -5,6 +5,7 @@ library(covr)
 library(purrr)
 library(utils)
 library(rredis)
+library(redux)
 
 #rredis::redisClose()
 
@@ -17,11 +18,13 @@ rredis::redisConnect(
 rredis::redisSelect(3)
 rredis::redisFlushDB()
 
+testCon <<- redux::hiredis(db = 3)
+
 # Set up enough keys for testing
 KEYS <<- footballstats::keys_for_testing()
 
 results <- testthat::test_dir(
-  path = "tests/testthat",
+  path = "testthat",
   reporter = "summary"
 )
 

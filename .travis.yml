@@ -8,6 +8,7 @@ addons:
        - libgsl0-dev
        - libxml2-dev
        - libhiredis-dev
+       - libgit2-dev
 services: 
    - redis-server
 #script: 
