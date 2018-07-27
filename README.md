@@ -12,7 +12,7 @@ cat(' ## Installing footballstats \n ## ')
 library(devtools)
 
 devtools::install_github(
-  repo = "niallbenj/footballstats"
+  repo = "ntyndall/footballstats"
 )
 
 library(footballstats)
