@@ -54,10 +54,27 @@ optimize_features <- function(optimizeModels = FALSE) {
 
     cat(' ##', comp, '/', allComps %>% length, '\n')
     subs.data <- data.set %>% subset(allComps[comp] == data.set$comp_id)
+
+    # Set up a progress bar here
+    pb <- utils::txtProgressBar(
+      min = 0,
+      max = subs.data %>% nrow,
+      style = 3
+    )
+
     # Now look at subs.data
     for (i in 1:(subs.data %>% nrow)) {
+
+      # Update the progress bar
+      utils::setTxtProgressBar(
+        pb = pb,
+        value = i
+      )
+
       # Take a single row slice of the fixture list
       single.row <- subs.data[i, ]
+
+
 
       # Set up new keys
       KEYS$COMP <- single.row$comp_id
