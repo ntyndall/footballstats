@@ -172,8 +172,8 @@ classify_xg_setup <- function(KEYS, singleFixture) {
   )
 
   # Append them on
-  result.dat$`position.h` <- positions$`position.h`
-  result.dat$`position.a` <- positions$`position.a`
+  result.dat$`position.h` <- positions$`position.h` %>% `/`(KEYS$TIL)
+  result.dat$`position.a` <- positions$`position.a` %>% `/`(KEYS$TIL)
   result.dat$res <-'U'
 
   # If any are missing then return early
@@ -182,7 +182,6 @@ classify_xg_setup <- function(KEYS, singleFixture) {
   } else {
     predicted$analysed %<>% `+`(1)
 
-    print(result.dat)
     # Scale the results
     scaled.results <- result.dat %>%
       footballstats::scale_data(
@@ -190,9 +189,10 @@ classify_xg_setup <- function(KEYS, singleFixture) {
       )
 
     # Determine boundaries
-    scaled.results %<>% scaled_to_discrete(
+    scaled.results %<>% footballstats::scaled_to_discrete(
       boundLen = 4
     )
+
     # Create a sparse matrix
     sparse.test <- scaled.results %>%
       footballstats::create_sparse(
@@ -204,7 +204,7 @@ classify_xg_setup <- function(KEYS, singleFixture) {
 
     # Get the home team result
     resultsOrd <- c('D', 'L', 'W')
-    predicted$home <- resultsOrd[result]
+    predicted$home <- resultsOrd[result %>% `+`(1)]
     predicted$away <- predicted$home %>% footballstats::other_score()
   }
 
