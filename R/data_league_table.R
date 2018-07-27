@@ -28,7 +28,7 @@ create_table <- function(matchData) {
   competitionID <- matchData$comp_id %>%
     unique
 
-  # Get the unique season
+  # Get the unique season (should probably get this from KEYS!!!)
   seasonStarting <- matchData$season %>%
     unique %>%
     strsplit(split = '/') %>%
