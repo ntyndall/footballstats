@@ -8,8 +8,27 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    redux,
-    testthat
+    dplyr,
+    httr,
+    jsonlite,
+    stringr,
+    testthat,
+    rredis,
+    slackr,
+    purrr,
+    e1071,
+    hashmap,
+    shiny,
+    tcltk,
+    magrittr,
+    neuralnet,
+    nnet,
+    caTools,
+    caret,
+    scales,
+    xgboost,
+    yaml,
+    redux
 Suggests:
     knitr,
     rmarkdown,
