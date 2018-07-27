@@ -136,6 +136,8 @@ commentary_from_redis <- function(keyName, returnItems) {
 
 scale_data <- function(mDat, dataScales) {
 
+  print("Check the scales out, why won't it work!")
+  print(dataScales)
   scaled.data <- mDat[ , 1:dataScales$cols] %>% scale(
     center = dataScales$sMin,
     scale = dataScales$sMax - dataScales$sMin

@@ -3,7 +3,7 @@
 #' @export
 
 
-classify_xg_setup <- function(KEYS, xgModel, xgScales, singleFixture) {
+classify_xg_setup <- function(KEYS, singleFixture) {
 
   # Initialise list here
   predicted <- list(
@@ -182,10 +182,11 @@ classify_xg_setup <- function(KEYS, xgModel, xgScales, singleFixture) {
   } else {
     predicted$analysed %<>% `+`(1)
 
+    print(result.dat)
     # Scale the results
     scaled.results <- result.dat %>%
       footballstats::scale_data(
-        dataScales = xgScales
+        dataScales = footballstats::xgScales
       )
 
     # Determine boundaries
@@ -199,7 +200,7 @@ classify_xg_setup <- function(KEYS, xgModel, xgScales, singleFixture) {
       )
 
     # Make the prediction
-    result <- predict(xgModel, sparse.test)
+    result <- predict(footballstats::xgModel, sparse.test)
 
     # Get the home team result
     resultsOrd <- c('D', 'L', 'W')
