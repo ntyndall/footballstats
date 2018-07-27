@@ -13,7 +13,7 @@
 #' @export
 
 
-neural_network <- function(totalData, odds.results, FOLD_DATA, NN, LOGS = FALSE) {
+neural_network <- function(totalData, odds.results = NULL, FOLD_DATA, NN, LOGS = FALSE) {
 
   # Check what labels are available, and how many
   totalData$res %<>% as.character
@@ -79,8 +79,13 @@ neural_network <- function(totalData, odds.results, FOLD_DATA, NN, LOGS = FALSE)
       FOLD_DATA$FOLDS[-filterTest] %>% purrr::flatten_int(), ]
     test.data <- dSet[
       FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
-    new.odds <- odds.results[
-      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+
+    new.odds <- if (odds.results %>% is.null %>% `!`()) {
+      odds.results[
+        FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+    } else {
+      data.frame()
+    }
 
     # Build the neural network with split data
     if (LOGS) cat(' ## Building neural network ## \n')

@@ -16,6 +16,6 @@ test_that("Check the keys are as they should be by adding match data", {
     as.integer %>%
     sort
 
-  expect_equal( matchData$id %>% as.integer %>% sort, matchIDs )
+  expect_equal( newMatchData$id %>% as.integer %>% sort, matchIDs )
 
 })

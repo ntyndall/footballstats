@@ -189,20 +189,9 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 savePlot = FALSE
               )
 
-            # Calculate folds for all methods
-            myFolds <- caret::createFolds(
-              y = total.results$res,
-              k = 10,
-              list = TRUE,
-              returnTrain = FALSE
-            )
-
-            # Create fold data information
-            FOLD_DATA <- list(
-              FOLDS = myFolds,
-              NUM = 10,
-              PER = 7
-            )
+            # Create Fold Data
+            FOLD_DATA <- total.results$res %>%
+              footballstats::create_folds()
 
             # Build XGBoost model using CV
             startTime <- Sys.time()

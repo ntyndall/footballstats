@@ -6,6 +6,8 @@ library(purrr)
 library(utils)
 library(rredis)
 
+#rredis::redisClose()
+
 # Connect to DB 3 (away from production)
 rredis::redisConnect(
   host = 'localhost',
@@ -13,14 +15,18 @@ rredis::redisConnect(
   nodelay = FALSE
 )
 rredis::redisSelect(3)
+rredis::redisFlushDB()
 
 # Set up enough keys for testing
 KEYS <<- footballstats::keys_for_testing()
 
 results <- testthat::test_dir(
-  path = "testthat",
+  path = "tests/testthat",
   reporter = "summary"
 )
+
+# Remove keys for good measure
+rredis::redisFlushDB()
 
 totalError <- 0
 for(i in 1:length(results)) {

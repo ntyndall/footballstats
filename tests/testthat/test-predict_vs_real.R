@@ -14,6 +14,12 @@ test_that("Test a predicted result can be recorded as true or false.", {
     values = list(home = 'W', away = 'L', prediction = '-')
   )
 
+  # Need to add the match ID to the Redis set
+  "all_predictions" %>% rredis::redisSAdd(
+    element = matchData$id %>% charToRaw()
+  )
+
+  # Not check off the matchID
   readyToAnalyse <- actualKey %>% rredis::redisKeys()
   KEYS %>% footballstats::predict_vs_real(
     readyToAnalyse = readyToAnalyse,
@@ -23,8 +29,10 @@ test_that("Test a predicted result can be recorded as true or false.", {
   result <- rredis::redisHGet(
     key = actualKey,
     field = 'prediction'
-  ) %>% as.character
+  ) %>%
+    as.character
 
+  expect_null( "all_predictions" %>% rredis::redisSMembers() )
   expect_equal( result, 'T' )
 
 })
