@@ -257,12 +257,14 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
 
 
 amatch_info <- function(KEYS) {
-  valuesToRetain <- c("id", "comp_id", "formatted_date", "season",
-                      "week", "venue", "venue_id", "venue_city",
-                      "status", "timer", "time", "localteam_id",
-                      "localteam_name", "localteam_score", "visitorteam_id",
-                      "visitorteam_name", "visitorteam_score", "ht_score",
-                      "ft_score", "et_score", "penalty_local", "penalty_visitor")
+  valuesToRetain <- c(
+    "id", "comp_id", "formatted_date", "season",
+    "week", "venue", "venue_id", "venue_city",
+    "status", "timer", "time", "localteam_id",
+    "localteam_name", "localteam_score", "visitorteam_id",
+    "visitorteam_name", "visitorteam_score", "ht_score",
+    "ft_score", "et_score", "penalty_local", "penalty_visitor"
+  )
 
   matches <-if (KEYS$TEST) {
     footballstats::matchData
@@ -279,45 +281,68 @@ amatch_info <- function(KEYS) {
     # If getting match info - make sure all matches have actually ended and been played!
     matches %<>% subset(matches$status %>% `==`('FT'))
 
-    uniqueTeams <- c(matches$localteam_id, matches$visitorteam_id) %>% unique
-    for (i in 1:(uniqueTeams %>% length)) {
-      # Push teamID to List to analyse later
-      rredis::redisLPush(
-        key = 'analyseTeams',
-        value = uniqueTeams[i] %>% as.character %>% charToRaw()
+    # Push unique team ID's to a list for analysis later
+    KEYS$RED$pipeline(
+      .commands = lapply(
+        X = c(matches$localteam_id, matches$visitorteam_id) %>% unique,
+        FUN = function(x) "analyseTeams" %>% KEYS$PIPE$LPUSH(x)
+      )
+    )
+
+    # Define all the matchIDs
+    matchIDs <- matches$id
+
+    # Push matches that have already been predicted to a set
+    predictionsExist <- KEYS$RED$pipeline(
+      .commands = lapply(
+        X = paste0('c:', KEYS$COMP, ':pred:', matchIDs),
+        FUN = function(x) x %>% KEYS$PIPE$EXISTS()
+      )
+    ) %>%
+      purrr::flatten_int() %>%
+      as.logical
+
+    # Push to a `ready` set for other functions to pick up
+    if (predictionsExist %>% any) {
+      paste0('c:', KEYS$COMP, ':ready') %>% KEYS$RED$SADD(
+        member = matchIDs %>% `[`(predictionsExist)
       )
     }
 
-    # Loop over all match data
-    for (i in 1:nrow(matches)) {
-      single <- matches[i, ]
-      matchItems <- single[ ,valuesToRetain]
+    # See if any matches belong to the set already analysed
+    addMatches <- KEYS$RED$pipeline(
+      .commands = lapply(
+        X = matches$id,
+        FUN = function(x) paste0('c_matchSetInfo:', KEYS$COMP) %>% KEYS$PIPE$SADD(x)
+      )
+    ) %>%
+      purrr::flatten_int() %>%
+      as.logical
 
-      # Check if match belongs to set
-      matchInSet <- rredis::redisSAdd(
-        set = paste0('c_matchSetInfo:', KEYS$COMP),
-        element = matchItems$id %>% as.character %>% charToRaw()
-      ) %>% as.integer %>% as.logical
+    # If any addMatches then subset the data frame
+    if (addMatches %>% any) {
+      # Only those that haven't been added
+      matches %<>% subset(
+        subset = addMatches,
+        select = valuesToRetain
+      )
 
-      if (matchInSet) {
-        matchKey <- paste0(
-          "csm:", matchItems$comp_id, ":",
-          KEYS$SEASON, ":", matchItems$id
-        )
+      # Define the redis matchKey
+      matchKeys <- paste0(
+        "csm:", KEYS$COMP, ":",
+        KEYS$SEASON, ":", matches$id
+      )
 
-        rredis::redisHMSet(
-          key = matchKey,
-          values = matchItems
-        )
-
-        # Push matches that have already been predicted to a set
-        if (paste0('c:', KEYS$COMP, ':pred:', matchItems$id) %>% rredis::redisExists()) {
-          rredis::redisSAdd(
-            set = paste0('c:', KEYS$COMP, ':ready'),
-            element = matchItems$id %>% as.character %>% charToRaw()
+      # Push data to redis
+      KEYS$RED$pipeline(
+        .commands = lapply(
+          X = matchKeys,
+          FUN = function(x) x %>% KEYS$PIPE$HMSET(
+            field = valuesToRetain,
+            value = matches[i, ]
           )
-        }
-      }
+        )
+      )
     }
     return(matches)
   } else {
