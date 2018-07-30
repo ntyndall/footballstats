@@ -508,77 +508,179 @@ aplayer_info <- function(KEYS, playerLength) {
 
 
 ateam_info <- function(KEYS, teamListLength) {
-  valuesToRetain <- c("team_id", "is_national", "name", "country",
-                      "founded", "leagues", "venue_name", "venue_id",
-                      "venue_surface", "venue_address", "venue_city",
-                      "venue_capacity", "coach_name", "coach_id")
-
-  # Set the progress bar
-  progressBar <- utils::txtProgressBar(
-    min = 0,
-    max = teamListLength,
-    style = 3
+  valuesToRetain <- c(
+    "team_id", "is_national", "name", "country",
+    "founded", "leagues", "venue_name", "venue_id",
+    "venue_surface", "venue_address", "venue_city",
+    "venue_capacity", "coach_name", "coach_id"
   )
 
-  for (i in 1:teamListLength) {
-    utils::setTxtProgressBar(progressBar, i)
+  # Set the progress bar
+  #progressBar <- utils::txtProgressBar(
+  #  min = 0,
+  #  max = teamListLength,
+  #  style = 3
+  #)
 
-    teamID <- 'analyseTeams' %>% rredis::redisLPop()
+  # Pop off all TeamIDs
+  teamIDs <- KEYS$RED$pipeline(
+    .commands = lapply(
+      X = 1:teamListLength,
+      FUN = function(x) "analyseTeams" %>% KEYS$PIPE$LPOP()
+    )
+  ) %>%
+    purrr::flatten_chr()
 
-    teamData <- if (KEYS$TEST) {  # nocov start
-      footballstats::teamData
-    } else {
-      footballstats::get_data(
-        endpoint = paste0("/team/", teamID, "?"),
-        KEYS = KEYS
+  teamData <- if (KEYS$TEST) {  # nocov start
+    footballstats::teamData %>% list
+  } else {
+    KEYS$RED$pipeline(
+      .commands = lapply(
+        X = paste0("/team/", teamIDs[x], "?") ,
+        FUN = function(x) x %>% footballstats::get_data(
+          KEYS = KEYS
+        )
       )
-    }  # nocov end
+    )
+  }  # nocov end
 
-    if (teamData %>% is.null) next
+  # Filter out nulls
+  tIndex <- teamData %>%
+    purrr::map(is.null) %>%
+    purrr::flatten_lgl()
 
-    basic <- paste0("ct_basic:", KEYS$COMP, ":", teamData$team_id)
-    stats <- paste0("ct_stats:", KEYS$COMP, ":", teamData$team_id)
-    squad <- paste0("ctp:", KEYS$COMP, ":", teamData$team_id)
+  # Realign indexes
+  if (tIndex %>% any) {
+    tIndex %<>% `!`() # Reverse for subsetting
+    teamIDs %>% `[`(tIndex)
+    teamData %<>% purrr::compact()
+  }
 
-    basicData <- teamData[valuesToRetain]
-    rredis::redisHMSet(
-      key = basic,
-      values = basicData
+  # Analyse data
+  if (teamData %>% length %>% `>`(0)) {
+    kNames <- lapply(teamIDs, function(x) paste0(base, x))
+
+    # Map + flatten
+    mf <- function(x, y) x %>% purrr::map(y) %>% purrr::flatten_chr()
+
+    # A named list of all the keys to be inserted
+    allKeys <- list(
+      basic = kNames %>% mf(1),
+      stats = kNames %>% mf(2),
+      squad = kNames %>% mf(3)
     )
 
-    squadInfo <- teamData$squad
-    if (squadInfo %>% length %>% `<`(1)) next
+    # 1) Push all basic data first (subset the values to retain)
+    tBasic <- teamData %>%
+      purrr::map(function(x) x %>% `[`(valuesToRetain) %>% as.character)
 
-    for (k in 1:nrow(squadInfo)) {
-      playerID <- squadInfo$id[k]
-      squadPlayer <- paste0(squad, ":", playerID)
-      rredis::redisHMSet(
-        key = squadPlayer,
-        values = squadInfo[k, ]
+    KEYS$RED$pipeline(
+      .commands = lapply(
+        X = 1:(tBasic %>% length),
+        FUN = function(x) {
+          allKeys$basic[x] %>% KEYS$PIPE$HMSET(
+            field = valuesToRetain,
+            value = tBasic[[x]]
+          )
+        }
       )
+    )
 
-      # Check if player has been added to the set for analysis later.
-      # Or if it is ready to be updated after another match has been played.
-      newPlayers <- rredis::redisSAdd(
-        set = paste0('c_playerSetInfo'),
-        element = playerID %>% as.character() %>% charToRaw()
-      ) %>% as.integer %>% as.logical
+    # 2) Push all statistics data
+    tStats <- teamData %>%
+      purrr::map(function(x) x %>% `[[`('statistics'))
 
-      if (newPlayers) {
-        rredis::redisLPush(
-          key = 'analysePlayers',
-          value = playerID %>% as.character() %>% charToRaw()
-        )
-      }
+    # Just make sure none are NULL
+    sNull <- tStats %>%
+      purrr::map(is.null) %>%
+      purrr::flatten_lgl()
+
+    if (sNull %>% any) {
+      sNull %<>% `!`()
+      allKeys$stats %<>% `[`(sNull)
+      tStats %<>% purrr::compact()
     }
 
-    rredis::redisHMSet(
-      key = stats,
-      values = teamData$statistics
-    )
+    # Then push all statistics
+    if (tStats %>% length %>% `>`(0)) {
+      KEYS$RED$pipeline(
+        .commands = lapply(
+          X = 1:(tStats %>% length),
+          FUN = function(x) {
+            allKeys$stats[x] %>% KEYS$PIPE$HMSET(
+              field = tStats[[x]] %>% names,
+              value = tStats[[x]] %>% as.character
+            )
+          }
+        )
+      )
+    }
 
+    # 3) Push all squad data
+    sData <- teamData %>%
+      purrr::map(function(x) x %>% `[[`('squad'))
+
+    # Just make sure none are NULL
+    sNull <- sData %>%
+      purrr::map(is.null) %>%
+      purrr::flatten_lgl()
+
+    if (sNull %>% any) {
+      sNull %<>% `!`()
+      allKeys$squad %<>% `[`(sNull)
+      sData %<>% purrr::compact()
+    }
+
+    # Now add layered player data
+    if (sData %>% length %>% `>`(0)) {
+
+      lapply(
+        X = 1:(sData %>% length),
+        FUN = function(x) {
+
+          # Define all objects first
+          singleDF <- sData[[x]] %>% lapply(as.character)
+          playerIDs <- singleDF$id
+          sqKeys <- paste0(allKeys$squad, ":", playerIDs)
+          fieldNames <- singleDF %>% names
+
+          # A) Check if player has been added for the first time
+          newPlayers <- KEYS$RED$pipeline(
+            .commands = lapply(
+              X = playerIDs,
+              FUN = function(z) "c_playerSetInfo" %>% KEYS$PIPE$SADD(z)
+            )
+          ) %>%
+            purrr::flatten_int() %>%
+            as.logical
+
+          # B) If they are new then analyse them later
+          if (newPlayers %>% any) {
+            playerIDs %<>% `[`(newPlayers)
+            KEYS$RED$pipeline(
+              .commands = lapply(
+                X = playerIDs,
+                FUN = function(z) "analysePlayers" %>% KEYS$PIPE$LPUSH(z)
+              )
+            )
+          }
+
+          # C) Add all squad information data
+          KEYS$RED$pipeline(
+            .commands = lapply(
+              X = 1:(sqKeys %>% length),
+              FUN = function(y) {
+                sqKeys[y] %>% KEYS$PIPE$HMSET(
+                  field = fieldNames,
+                  value = dfList %>% purrr::map(y) %>% as.character
+                )
+              }
+            )
+          )
+        }
+      )
+    }
   }
-  close(progressBar)
 }
 
 #' @title Commentary Sub-function
