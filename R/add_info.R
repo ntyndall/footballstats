@@ -27,48 +27,82 @@
 
 acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
 
-  # Load static data set for testing
-  if (KEYS$TEST) fullCommentary <- footballstats::fullCommentary
+  # Check if the commentary already exists for both teams for all IDs
+  comExists <- KEYS$RED$pipeline(
+    .commands = lapply(
+      X = paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs, ":*"),
+      FUN = function(x) x %>% KEYS$PIPE$KEYS()
+    )
+  ) %>%
+    purrr::map(length) %>%
+    purrr::flatten_int() %>%
+    `!=`(2)
 
-  for (i in 1:length(matchIDs)) {
+  # I should also check if the lineups exist too
+  # ...
 
-    # Check if the commentary already exists for both teams
-    rKeys <- paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs[i], ":*") %>%
-      rredis::redisKeys()
-    if (rKeys %>% length %>% `==`(2)) next
+  # Subset down to what needs analysed
+  if (comExists %>% any) {
+    matchIDs %<>% `[`(comExists)
+    localteam %<>% `[`(comExists)
+    visitorteam %<>% `[`(comExists)
 
-    commentary <- if (KEYS$TEST) {
-      fullCommentary[[i]]
-    } else {  # nocov start
-      footballstats::get_data(
-        endpoint = paste0("/commentaries/", matchIDs[i], "?"),
-        KEYS = KEYS
+    # Get all commentaries here and only take the non-null elements
+    commentaries <- if (KEYS$TEST) {
+      footballstats::fullCommentary[[1]] %>% list
+    } else {
+      lapply(
+        X = paste0("/commentaries/", matchIDs, "?"),
+        FUN = function(x) x %>% footballstats::get_data(
+          KEYS = KEYS
+        )
       )
-    }  # nocov end
+    }
 
+    # Figure out which commentaries are null
+    nullCom <- commentaries %>%
+      purrr::map(is.null) %>%
+      purrr::flatten_lgl()
+
+    # If any are null then subset everything
+    if (nullCom %>% any) {
+      nullCom %<>% `!`()
+      matchIDs %<>% `[`(nullCom)
+      localteam %<>% `[`(nullCom)
+      visitorteam %<>% `[`(nullCom)
+      commentaries %<>% purrr::compact() # Compact the NULL's out
+    }
+
+    # Define named types of match commentaries
     localAway <- c('localteam', 'visitorteam')
-    teamIDs <- c(localteam[i], visitorteam[i])
 
-    # Make sure commentary exists
-    if (commentary %>% is.null) next
+    # ... continue on here
+    if (commentaries %>% length %>% `>`(0)) {
+      sapply(
+        X = 1:(commentaries %>% length),
+        FUN = function(x) {
+          teamStats <- commentaries[[x]]$match_stats
+          if (teamStats %>% length %>% `==`(2)) {
+            teamIDs <- c(localteam[x], visitorteam[x])
+            # Loop over both teams
 
-    teamStats <- commentary$match_stats
-    if (teamStats %>% length %>% `!=`(2)) next
-
-    for (j in 1:length(localAway)) {
-      singleTeamStats <- teamStats[[localAway[j]]]
-      if (singleTeamStats %>% is.null) next
-
-      rKey <- paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs[i], ":", teamIDs[j])
-      if (rKey %>% rredis::redisExists()) next
-
-      # Add the commentary information
-      footballstats::commentary_sub(
-        competitionID = KEYS$COMP,
-        matchID = matchIDs[i],
-        teamID = teamIDs[j],
-        teamStats = singleTeamStats,
-        commentary = commentary$player_stats[[localAway[j]]]
+            # Add the commentary information
+            sapply(
+              X = 1:2,
+              FUN = function(z) {
+                singleTeamStats <- teamStats[[localAway[z]]]
+                if (singleTeamStats %>% is.null %>% `!`()) {
+                  KEYS %>% footballstats::commentary_sub(
+                    matchID = matchIDs[x],
+                    teamID = teamIDs[z],
+                    teamStats = singleTeamStats,
+                    commentary = commentaries[[x]]$player_stats[[localAway[z]]]
+                  )
+                }
+              }
+            )
+          }
+        }
       )
     }
   }
@@ -573,23 +607,37 @@ ateam_info <- function(KEYS, teamListLength) {
 #' @export
 
 
-commentary_sub <- function(competitionID, matchID, teamID, teamStats, commentary) {
-  rredis::redisHMSet(
-    key = paste0("cmt_commentary:", competitionID, ":", matchID, ":", teamID),
-    values = teamStats
-  )
-  playerStats <- commentary$player %>% purrr::when(
-    is.null(.) ~ data.frame(), ~ .
-  )
+commentary_sub <- function(KEYS, matchID, teamID, teamStats, commentary) {
+
+  # Insert commentary here
+  paste0("cmt_commentary:", KEYS$COMP, ":", matchID, ":", teamID) %>%
+    KEYS$RED$HMSET(
+      field = teamStats %>% names,
+      value = teamStats %>% as.character
+    )
+
+  # Check if player stats exist
+  playerStats <- commentary$player %>%
+    purrr::when(is.null(.) ~ data.frame(), ~ .)
 
   # If any player stats exists then analyse them
   pRow <- playerStats %>% nrow
   if (pRow > 0) {
-    for (j in 1:pRow) {
-      rredis::redisHMSet(
-        key = paste0("cmp:", competitionID, ":", matchID, ":", playerStats[j, ]$id),
-        values = playerStats[j, ]
+    # column names
+    hashNames <- playerStats %>% names
+    keyNames <- paste0("cmp:", KEYS$COMP, ":", matchID, ":", playerStats$id)
+
+    # Insert all player information
+    KEYS$RED$pipeline(
+      .commands = lapply(
+        X = 1:(keyNames %>% length),
+        FUN = function(x) {
+          keyNames[x] %>% KEYS$PIPE$HMSET(
+            field = hashNames,
+            value = playerStats[x, ]
+          )
+        }
       )
-    }
+    )
   }
 }
