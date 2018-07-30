@@ -4,12 +4,9 @@
 \alias{commentary_sub}
 \title{Commentary Sub-function}
 \usage{
-commentary_sub(competitionID, matchID, teamID, teamStats, commentary)
+commentary_sub(KEYS, matchID, teamID, teamStats, commentary)
 }
 \arguments{
-\item{competitionID}{A character string representing the competitionID
-that is under investigation.}
-
 \item{matchID}{An integer ID representing a single match
 as defined by the API.}
 
@@ -21,6 +18,9 @@ statistics.}
 
 \item{commentary}{A list object that contains multiple items, including
 the player information.}
+
+\item{competitionID}{A character string representing the competitionID
+that is under investigation.}
 }
 \description{
 A function that is an abstraction from \code{acommentary_info} that
