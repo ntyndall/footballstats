@@ -18,8 +18,6 @@ rredis::redisConnect(
 rredis::redisSelect(3)
 rredis::redisFlushDB()
 
-testCon <<- redux::hiredis(db = 3)
-
 # Set up enough keys for testing
 KEYS <<- footballstats::keys_for_testing()
 
