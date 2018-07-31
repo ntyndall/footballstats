@@ -1,7 +1,7 @@
 context("test-ateam_info.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Check the keys are as they should be by adding team data", {
 
