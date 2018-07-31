@@ -136,7 +136,7 @@ acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
 
 acomp_info <- function(KEYS) {
 
-  competitionIDs <- if (KEYS$TEST) {
+  comps <- if (KEYS$TEST) {
     footballstats::compData
   } else {  # nocov start
     footballstats::get_data(
@@ -145,18 +145,20 @@ acomp_info <- function(KEYS) {
     )
   }  # nocov end
 
-  if (competitionIDs %>% is.null %>% `!`()) {
-    total <- 0
-    for (i in 1:nrow(competitionIDs)) {
-      seasonID <- competitionIDs$id[[i]]
-      compExists <- rredis::redisSAdd(
-        set = 'competition:set',
-        element = seasonID %>% as.character %>% charToRaw()
+  # If competitions exist then add them to redis
+  if (comps %>% is.null %>% `!`()) {
+    # Add all ID's to set
+    cAdded <- KEYS$RED$pipeline(
+      .commands = lapply(
+        X = comps$id,
+        FUN = function(x) "competition:set" %>% KEYS$PIPE$SADD(x)
       )
+    ) %>%
+      purrr::flatten_int() %>%
+      as.logical %>%
+      sum
 
-      if (compExists == 1) total %<>% `+`(1)
-    }
-    cat(paste0(Sys.time(), ' | Successfully added ', total, ' new competition IDs to Redis. \n'))
+    cat(paste0(Sys.time(), ' | Successfully added ', cAdded, ' new competition IDs to Redis. \n'))
     return(competitionIDs)
   }
 }
