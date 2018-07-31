@@ -31,20 +31,16 @@
 
 add_all <- function(KEYS) { # nocov start
 
-  # Add competition standing
-  KEYS %>% footballstats::acomp_standings()
-
   # Lookup request timings
-  startingRequests <- 'requestLimit' %>% rredis::redisGet() %>% as.integer
-  startingTime <- 'requestLimit' %>% rredis::redisTTL()
+  startingRequests <- "requestLimit" %>% KEYS$RED$GET() %>% as.integer
+  startingTime <- "requestLimit" %>% KEYS$RED$TTL()
 
-  # Add match information
+  # Add match information and order it
   cat(paste0(Sys.time(), ' | Matches ...'))
-  matches <- KEYS %>% footballstats::amatch_info()
+  matches <- KEYS %>%
+    footballstats::amatch_info() %>%
+    footballstats::order_matchdata()
   cat(' complete \n')
-
-  # Convert formatted date...
-  matches %<>% footballstats::order_matchdata()
 
   # Build league table
   cat(paste0(Sys.time(), ' | Creating the league table ... \n'))
