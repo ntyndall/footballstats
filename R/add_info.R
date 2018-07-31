@@ -300,7 +300,7 @@ amatch_info <- function(KEYS) {
     "ft_score", "et_score", "penalty_local", "penalty_visitor"
   )
 
-  matches <-if (KEYS$TEST) {
+  matches <- if (KEYS$TEST) {
     footballstats::matchData
   } else {  # nocov start
     footballstats::get_data(
@@ -373,7 +373,7 @@ amatch_info <- function(KEYS) {
           X = matchKeys,
           FUN = function(x) x %>% KEYS$PIPE$HMSET(
             field = valuesToRetain,
-            value = matches[i, ]
+            value = matches[x, ]
           )
         )
       )
@@ -413,63 +413,97 @@ amatch_info <- function(KEYS) {
 
 
 aplayer_info <- function(KEYS, playerLength) {
-  valuesToRetain <- c("id", "common_name", "name", "firstname",
-                      "lastname", "team", "teamid", "nationality",
-                      "birthdate", "age", "birthcountry",
-                      "birthplace", "position", "height", "weight")
-
-  # Set the progress bar
-  progressBar <- utils::txtProgressBar(
-    min = 0,
-    max = playerLength,
-    style = 3
+  valuesToRetain <- c(
+    "id", "common_name", "name", "firstname",
+    "lastname", "team", "teamid", "nationality",
+    "birthdate", "age", "birthcountry",
+    "birthplace", "position", "height", "weight"
   )
 
-  sapply(1:playerLength, function(i) {
-    playerID <- 'analysePlayers' %>% rredis::redisLPop()
+  # Get all the player ID's
+  playerIDs <- KEYS$RED$pipeline(
+    .commands = lapply(
+      X = 1:playerLength,
+      FUN = function(x) "analysePlayers" %>% KEYS$PIPE$LPOP()
+    )
+  ) %>%
+    purrr::flatten_chr()
 
-    playerData <- if (KEYS$TEST) {  # nocov start
-      footballstats::playerData
-    } else {
-      footballstats::get_data(
-        endpoint = paste0("/player/", playerID, "?"),
+  # Get the matching data set
+  playerData <- if (KEYS$TEST) {  # nocov start
+    footballstats::playerData %>% list
+  } else {
+    lapply(
+      X =  paste0("/player/", playerID, "?"),
+      FUN = function(x) x %>% footballstats::get_data(
         KEYS = KEYS
       )
-    }  # nocov end
+    )
+  }  # nocov end
 
-    if (playerData %>% is.null %>% `!`()) {
-      stats <- playerData$player_statistics
-      statNames <- names(stats)
-      sapply(1:length(statNames), function(j) {
-        statData <- stats[[statNames[j]]]
-        if (length(statData) != 0 || is.data.frame(statData)) {
-          sapply(1:nrow(statData), function(k) {
-            currentStat <- statData[k, ]
-            season <- substr(currentStat$season, 1, 4)
+  # Make sure no player information is null
+  pIndex <- playerData %>%
+    purrr::map(is.null) %>%
+    purrr::flatten_lgl()
 
-            seasonInt <- ifelse(
-              test = season %>% nchar %>% `==`(4),
-              yes = season %>% as.integer,
-              no = 0
-            )
+  if (pIndex %>% any) {
+    playerIDs %<>% `[`(pIndex %>% `!`())
+    playerData %<>% purrr::compact()
+  }
 
-            if (seasonInt == KEYS$SEASON) {
-              statKeyName <- paste0(
-                'ctps_', statNames[j], ':', currentStat$league_id, ':',
-                currentStat$id, ':', playerData$id, ':', season
+  # If data exists then analyse it
+  if (playerData %>% length %>% `>`(0)) {
+
+    lapply(
+      X = 1:(playerData %>% length),
+      FUN = function(x) {
+
+        # Set up basic information
+        playerStats <- playerData[[x]]$player_statistics %>%
+          purrr::compact()
+        playerTypes <- playerStats %>%
+          names
+        playerID <- playerIDs[x]
+
+        lapply(
+          X = 1:(playerTypes %>% length),
+          FUN = function(y) {
+            cData <- playerStats %>% `[[`(playerTypes[y])
+
+            # Get matching seasons
+            cData %<>% subset(cData$season %>% substr(start = 1, stop = 4) %>% `==`(KEYS$SEASON))
+
+            # How many data Rows
+            datRows <- cData %>% nrow
+
+            # If there are any then add the information to redis
+            if (datRows %>% `>`(0)) {
+
+              # Get all the key names (before flattening data frame)
+              keyNames <- paste0(
+                'ctps_', playerTypes[y], ':', cData$league_id, ':',
+                cData$id, ':', playerID, ':', KEYS$SEASON
               )
-              rredis::redisHMSet(
-                key = statKeyName,
-                values = currentStat
+
+              # Insert all redis hash information
+              cData %<>% lapply(as.character)
+              KEYS$RED$pipeline(
+                .commands = lapply(
+                  X = 1:datRows,
+                  FUN = function(z) {
+                    keyNames[z] %>% KEYS$PIPE$HMSET(
+                      field = cData %>% names,
+                      value = cData %>% purrr::map(z)
+                    )
+                  }
+                )
               )
             }
-          })
-        }
-      })
-    }
-    utils::setTxtProgressBar(progressBar, i)
-  })
-  close(progressBar)
+          }
+        )
+      }
+    )
+  }
 }
 
 
@@ -534,12 +568,10 @@ ateam_info <- function(KEYS, teamListLength) {
   teamData <- if (KEYS$TEST) {  # nocov start
     footballstats::teamData %>% list
   } else {
-    KEYS$RED$pipeline(
-      .commands = lapply(
-        X = paste0("/team/", teamIDs[x], "?") ,
-        FUN = function(x) x %>% footballstats::get_data(
-          KEYS = KEYS
-        )
+    lapply(
+      X = paste0("/team/", teamIDs[x], "?") ,
+      FUN = function(x) x %>% footballstats::get_data(
+        KEYS = KEYS
       )
     )
   }  # nocov end
@@ -558,7 +590,12 @@ ateam_info <- function(KEYS, teamListLength) {
 
   # Analyse data
   if (teamData %>% length %>% `>`(0)) {
-    kNames <- lapply(teamIDs, function(x) paste0(base, x))
+    kNames <- lapply(
+      X = teamIDs,
+      FUN = function(x) {
+        paste0(c("ct_basic:", "ct_stats:", "ctp:"), KEYS$COMP, ":", x)
+      }
+    )
 
     # Map + flatten
     mf <- function(x, y) x %>% purrr::map(y) %>% purrr::flatten_chr()
@@ -672,7 +709,7 @@ ateam_info <- function(KEYS, teamListLength) {
               FUN = function(y) {
                 sqKeys[y] %>% KEYS$PIPE$HMSET(
                   field = fieldNames,
-                  value = dfList %>% purrr::map(y) %>% as.character
+                  value = singleDF %>% purrr::map(y) %>% as.character
                 )
               }
             )
