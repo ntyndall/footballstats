@@ -236,29 +236,72 @@ acomp_standings <- function(KEYS) {
 
 
 aevent_info <- function(KEYS, matchIDs, matchEvents) {
-  for (i in 1:length(matchEvents)) {
-    eventsPerMatch <- matchEvents[[i]]
-    matchID <- matchIDs[i]
 
-    # Check there are events in a match
-    if (eventsPerMatch %>% length %>% `<`(1)) next
-    for (j in 1:nrow(eventsPerMatch)) {
-      event <- eventsPerMatch[j, ]
-      inSet <- rredis::redisSAdd(
-        set = paste0("c_eventInSet:", KEYS$COMP),
-        element = event$id %>% as.character %>% charToRaw()
-      ) %>% as.integer %>% as.logical
+  # Set up the key name
+  kName <- paste0("c_eventInSet:", KEYS$COMP)
 
-      # Make sure the event is new
-      if (inSet %>% `!`()) next
-      rredis::redisHMSet(
-        key = paste0("cme:", KEYS$COMP, ":", matchID, ":", event$id),
-        values = event
-      )
-    }
+  # Are any events null?
+  eNull <- matchEvents %>%
+    purrr::map(is.null) %>%
+    purrr::flatten_lgl()
+
+  # Filter out just in case
+  if (eNull %>% any) {
+    matchIDs %<>% `[`(eNull %>% `!`())
+    matchEvents %<>% purrr::compact()
   }
-}
 
+  # AGet all the eventIDs
+  allEventIDs <- matchEvents %>%
+    purrr::map(`[`('id'))
+
+  lapply(
+    X = 1:(matchIDs %>% length),
+    FUN = function(x) {
+
+      # Have the ID's been added?
+      alreadyAdded <- KEYS$RED$pipeline(
+        .commands = lapply(
+          X = allEventIDs[[x]],
+          FUN = function(y) kName %>% KEYS$PIPE$SADD(y)
+        )
+      ) %>%
+        purrr::flatten_int() %>%
+        as.logical
+
+      # Subset those that have been added for the first time
+      if (alreadyAdded %>% any) {
+        # Subset the eventIDs
+        eventIDs <- allEventIDs[[x]] %>%
+          `[`(alreadyAdded)
+
+        # Subset the events
+        events <- matchEvents[[x]] %>%
+          subset(alreadyAdded) %>%
+          lapply(as.character)
+
+        # event title names
+        eventTitles <- events %>% names
+
+        # Set up redis keys
+        rKeys <- paste0("cme:", KEYS$COMP, ":", matchIDs[x], ":", eventIDs)
+
+        # Add to redis
+        KEYS$RED$pipeline(
+          .commands = lapply(
+            X = 1:(eventIDs %>% length),
+            FUN = function(y) {
+              rKeys[y] %>% KEYS$PIPE$HMSET(
+                field = eventTitles,
+                value = events %>% purrr::map(y) %>% as.character
+              )
+            }
+          )
+        )
+      }
+    }
+  )
+}
 
 #' @title amatch_info
 #'
@@ -548,13 +591,6 @@ ateam_info <- function(KEYS, teamListLength) {
     "venue_surface", "venue_address", "venue_city",
     "venue_capacity", "coach_name", "coach_id"
   )
-
-  # Set the progress bar
-  #progressBar <- utils::txtProgressBar(
-  #  min = 0,
-  #  max = teamListLength,
-  #  style = 3
-  #)
 
   # Pop off all TeamIDs
   teamIDs <- KEYS$RED$pipeline(
