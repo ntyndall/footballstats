@@ -164,54 +164,6 @@ acomp_info <- function(KEYS) {
 }
 
 
-#' @title acomp_standings
-#'
-#' @description A function that takes a KEYS$COMP and returns the current
-#'  table information.
-#'
-#' @details API endpoints;
-#'   \itemize{
-#'     \item{\emph{"/standings/{comp_id}?Authorization={auth_id}"}}
-#'   }
-#'
-#'  Redis Keys used;
-#'   \itemize{
-#'     \item{\strong{[HASH]} :: \code{comp:season:_standing_:{comp_id}:{season}}}
-#'   }
-#'
-#' @param KEYS A list containing options such as testing / prediction /
-#'  important variables and information. Also contains API information.
-#'
-#' @return Returns nothing, a redis hash map is set with the competition
-#'  standing information.
-#'
-#' @export
-
-
-acomp_standings <- function(KEYS) {
-
-  standings <- if (KEYS$TEST) {
-    footballstats::standingData
-  } else {  # nocov start
-    footballstats::get_data(
-      endpoint = paste0("/standings/", KEYS$COMP, "?"),
-      KEYS = KEYS
-    )
-  }  # nocov end
-
-  if (standings %>% is.null %>% `!`()) {
-    for (i in 1:nrow(standings)) {
-      singleTable <- standings[i, ]
-      standingKey <- paste0("comp:season:_standing_:", KEYS$COMP, ':', singleTable$season)
-      rredis::redisHMSet(
-        key = standingKey,
-        values = singleTable
-      )
-    }
-  }
-}
-
-
 #' @title aevent_info
 #'
 #' @description A function that takes a KEYS$COMP, matchID's, and
