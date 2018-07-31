@@ -22,107 +22,117 @@
 #' @export
 
 
-create_table <- function(matchData) {
+create_table2 <- function(KEYS, matchData) {
 
-  # Get the competitionID first
-  competitionID <- matchData$comp_id %>%
-    unique
+  # Get the start date
+  startDate <- dateKey %>%
+    KEYS$RED$GET()
 
-  # Get the unique season (should probably get this from KEYS!!!)
-  seasonStarting <- matchData$season %>%
-    unique %>%
-    strsplit(split = '/') %>%
-    purrr::map(1) %>%
-    purrr::flatten_chr()
-
-  # SET the very first date if it doesn't exist!
-  firstDate <- paste0('c_startDate:', competitionID, ':', seasonStarting)
-  if (firstDate %>% rredis::redisExists() %>% `!`()) {
-    firstElement <- matchData[1, ]$formatted_date %>%
-      as.integer %>%
-      as.character %>%
-      charToRaw()
-    firstDate %>% rredis::redisSet(value = firstElement)
+  # If it doesn't exist then create it
+  if (startDate %>% is.null) {
+    startDate <- matchData$formatted_date %>% as.integer %>% min
+    paste0('c_startDate:', KEYS$COMP, ':', KEYS$SEASON) %>%
+      KEYS$RED$SET(
+        value = startDate
+      )
   }
 
-  # GET the starting date
-  startDate <- firstDate %>%
-    rredis::redisGet() %>%
-    as.integer
+  matchList <- matchData %>% as.list
+  matchList[c("formatted_date", "localteam_score", "visitorteam_score")] %<>% lapply(as.integer)
 
-  # Loop over all match data
-  for (i in 1:(matchData %>% nrow)) {
+  # Get all unique teamIDs
+  uniqueTeams <- c(matchList$localteam_id, matchList$visitorteam_id) %>%
+    unique
 
-    # Break match data down to individual slices
-    slice <- matchData[i, ]
-    matchID <- slice$id
-    currentDate <- slice$formatted_date %>% as.integer
-    teamIDs <- c(slice$localteam_id, slice$visitorteam_id)
-    teamNames <- c(slice$localteam_name, slice$visitorteam_name)
-    teamScore <- slice$ft_score %>% footballstats::prs_ftscore()
+  uniqueNames <- c(matchList$localteam_name, matchList$visitorteam_name) %>%
+    unique
 
-    if (teamScore %>% is.na %>% any) next
-    scoreDiff <- teamScore[1] - teamScore[2]
+  # Get all the previous keys
+  prevKeys <- paste0('cwt_l:', KEYS$COMP, ':', KEYS$SEASON, ':*') %>%
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr()
 
-    # Calculate the `on the fly` week number based on date away from first game!
-    weekNum <- currentDate %>% `-`(startDate) %>% `/`(7) %>% floor %>% `+`(1)
+  # Get previous week for EVERY
+  lastData <- KEYS %>% get_last_week(uniqueTeams = uniqueTeams)
 
-    if (scoreDiff > 0) {
-      hPts <- 3; aPts <- 0
-    } else if (scoreDiff == 0) {
-      hPts <- aPts <- 1
+  scores <- c(matchList$localteam_score, matchList$visitorteam_score)
+
+  # Get points from result
+  res <- matchList$localteam_score - matchList$visitorteam_score
+
+  # Stack useful vectorc
+  allInfo <- list(
+    ids = matchList$id %>% rep(2),
+    tids = c(matchList$localteam_id, matchList$visitorteam_id),
+    teams = c(matchList$localteam_name, matchList$visitorteam_name),
+    pts = c(
+      sapply(res, FUN = function(x) if (x > 0) 3 else if (x < 0) 0 else 1),
+      sapply(res, FUN = function(x) if (x > 0) 0 else if (x < 0) 3 else 1)
+    ),
+    gf = scores,
+    ga = scores %>% rev,
+    week = matchList$formatted_date %>% `-`(startDate) %>% `/`(7) %>% floor %>% `+`(1) %>% rep(2)
+  )
+
+  # Now get rid of indexes that have actually been investigated
+  alreadyAdded <- KEYS$RED$pipeline(
+    .commands = lapply(
+      X = paste0(allInfo$ids, ":", allInfo$tids),
+      FUN = function(x) "leagueMatchSet" %>% KEYS$PIPE$SADD(x)
+    )
+  ) %>%
+    purrr::flatten_int() %>%
+    as.logical %>%
+    `!`()
+
+  # Filter out data if it has already been added before
+  if (alreadyAdded %>% any) {
+    if (alreadyAdded %>% all) {
+      allInfo <- NULL
     } else {
-      hPts <- 0; aPts <- 3
+      allInfo %<>% purrr::map(function(x) x %>% `[`(alreadyAdded %>% `!`()))
     }
+  }
 
-    for (j in 1:2) {
-      redisKey <- paste0('cwt_l:', competitionID, ':', seasonStarting, ':', weekNum, ':', teamIDs[j])
+  # If data is to be added, loop over unique teamIDs
+  if (allInfo %>% is.null %>% `!`()) {
+    newUniques <- allInfo$tids %>% unique
+    allInfo$allKeys <- paste0('cwt_l:', KEYS$COMP, ':', KEYS$SEASON, ':', allInfo$week, ':', allInfo$tids)
 
-      pointsToAdd <- 'leagueMatchSet' %>% rredis::redisSAdd(
-         element = paste0(matchID, ':', teamIDs[j]) %>% charToRaw()
-        ) %>% as.integer %>% as.logical
+    # Lapply over every uniqueTeam now and create new (filter if they have been analysed already)
+    lapply(
+      X = 1:(newUniques %>% length),
+      FUN = function(x) {
 
-      # Create the key if it doesnt exist
-      if (pointsToAdd) {
+        # Only look at one team at a time
+        singleTeam <- allInfo %>%
+          purrr::map(function(z) z %>% `[`(newUniques[x] %>% `==`(allInfo$tids)))
 
-        prevKey <- paste0('cwt_l:', competitionID, ':', seasonStarting, ':*:', teamIDs[j]) %>%
-          rredis::redisKeys()
+        # Order by week so I can accumulate easily
+        singleTeam %>% purrr::map(function(x) x %>% `[`(singleTeam$week %>% order))
 
-        if (weekNum %>% `!=`(1) && prevKey %>% is.null %>% `!`()) {
-          # Get last match info
-          oneTeamWeeks <- prevKey %>% footballstats::get_weeks()
-          prevWeek <- prevKey %>%
-            `[`(weekNum %>%
-                  `-`(oneTeamWeeks) %>%
-                  abs %>% which.min
-            )
+        # Get team name
+        tName <- singleTeam$teams %>% unique
 
-          pRes <- prevWeek %>%
-            rredis::redisHGetAll()
-          pRes$TEAM <- NULL
-          pRes %<>% lapply(as.integer)
-        } else {
-          pRes <- list(PTS = 0, GF = 0, GD = 0)
-        }
+        # Create
+        cPts <- c(lastData$table[[newUniques[x]]]$PTS %>% as.integer, singleTeam$pts) %>% cumsum %>% `[`(-1)
+        cGf <- c(lastData$table[[newUniques[x]]]$GF %>% as.integer, singleTeam$gf) %>% cumsum %>% `[`(-1)
+        cGd <- c(lastData$table[[newUniques[x]]]$GD %>% as.integer, singleTeam$ga) %>% cumsum %>% `[`(-1)
 
-        # j = 1 for home, else away team stats
-        toAdd <- if (j == 1) {
-          list(pts = hPts, score = teamScore[1], diff = scoreDiff)
-        } else {
-          list(pts = aPts, score = teamScore[2], diff = -scoreDiff)
-        }
-
-        # Add the results to the hash
-        redisKey %>% rredis::redisHMSet(
-          values = list(
-            TEAM = teamNames[j],
-            PTS = pRes$PTS %>% `+`(toAdd$pts) %>% as.character %>% charToRaw(),
-            GF = pRes$GF %>% `+`(toAdd$score) %>% as.character %>% charToRaw(),
-            GD = pRes$GD %>% `+`(toAdd$diff) %>% as.character %>% charToRaw()
+        # Start to create new keys
+        KEYS$RED$pipeline(
+          .commands = lapply(
+            X = 1:(singleTeam$allKeys %>% length),
+            FUN = function(y) {
+              singleTeam$allKeys[y] %>% KEYS$PIPE$HMSET(
+                field = c("TEAM", "PTS", "GF", "GD"),
+                value = c(tName, cPts[y], cGf[y], cGd[y])
+              )
+            }
           )
         )
       }
-    }
+    )
   }
 }
 
