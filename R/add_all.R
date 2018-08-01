@@ -44,17 +44,21 @@ add_all <- function(KEYS) { # nocov start
 
   # Build league table
   cat(paste0(Sys.time(), ' | Creating the league table ... \n'))
-  matches %>% footballstats::create_table()
+  KEYS %>% footballstats::create_table(
+    matchData = matches
+  )
 
   # Store positions on a weekly basis
   cat(paste0(Sys.time(), ' | Storing weekly positions ... \n'))
   KEYS %>% footballstats::weekly_positions()
 
   # Store predicted vs. real outcomes
-  readyToAnalyse <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*') %>% rredis::redisKeys()
-  if (!(readyToAnalyse %>% is.null)) {
+  readyToAnalyse <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*') %>%
+    KEYS$RED$KEYS()
+
+  if (readyToAnalyse %>% length %>% `>`(0)) {
     KEYS %>% footballstats::predict_vs_real(
-      readyToAnalyse = readyToAnalyse,
+      readyToAnalyse = readyToAnalyse %>% purrr::flatten_chr(),
       matches = matches
     )
   }
@@ -81,8 +85,8 @@ add_all <- function(KEYS) { # nocov start
   cat(' complete \n')
 
   # Add team information
-  teamListLength <- 'analyseTeams' %>% rredis::redisLLen() %>% as.integer
-  plBef <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
+  teamListLength <- 'analyseTeams' %>% KEYS$RED$LLEN()
+  plBef <- 'analysePlayers' %>% KEYS$RED$LLEN()
 
   cat(paste0(Sys.time(), ' | Teams ... \n'))
   # Add the team information
@@ -92,14 +96,14 @@ add_all <- function(KEYS) { # nocov start
     )
   }
   cat(' complete. \n\n')
-  plAft <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
+  plAft <- 'analysePlayers' %>% KEYS$RED$LLEN()
 
   # Count the number of GET requests made. 2 for competition standing and match information
   uniqueRequests <- 2
   totalRequests <- uniqueRequests + teamListLength
   cat(paste0(Sys.time(), ' . ----------------{-S-U-M-M-A-R-Y-}------------------ \n'))
   cat(paste0(Sys.time(), ' | Analysed ', totalRequests, ' unique GET requests. \n'))
-  cat(paste0(Sys.time(), ' | Analysed ', length(matches$events), ' matches/events. \n'))
+  cat(paste0(Sys.time(), ' | Analysed ', matches$events %>% length, ' matches/events. \n'))
   cat(paste0(Sys.time(), ' | Analysed ', teamListLength, ' teams. \n'))
   cat(paste0(Sys.time(), ' | Players to be analysed : ', plBef, ' -> ', plAft, '. \n'))
   cat(paste0(Sys.time(), ' ` -------------------------------------------------- \n\n'))
