@@ -22,7 +22,7 @@
 #' @export
 
 
-create_table2 <- function(KEYS, matchData) {
+create_table <- function(KEYS, matchData) {
 
   # Get the start date
   startDate <- dateKey %>%
@@ -35,6 +35,8 @@ create_table2 <- function(KEYS, matchData) {
       KEYS$RED$SET(
         value = startDate
       )
+  } else {
+    startDate %<>% as.integer
   }
 
   matchList <- matchData %>% as.list
@@ -69,16 +71,19 @@ create_table2 <- function(KEYS, matchData) {
       sapply(res, FUN = function(x) if (x > 0) 3 else if (x < 0) 0 else 1),
       sapply(res, FUN = function(x) if (x > 0) 0 else if (x < 0) 3 else 1)
     ),
-    gf = scores,
-    ga = scores %>% rev,
+    gf = c(matchList$localteam_score, matchList$visitorteam_score),
+    ga = c(matchList$visitorteam_score, matchList$localteam_score),
     week = matchList$formatted_date %>% `-`(startDate) %>% `/`(7) %>% floor %>% `+`(1) %>% rep(2)
   )
+
+  # Define set key
+  sKey <- paste0("leagueMatchSet:", KEYS$SEASON)
 
   # Now get rid of indexes that have actually been investigated
   alreadyAdded <- KEYS$RED$pipeline(
     .commands = lapply(
       X = paste0(allInfo$ids, ":", allInfo$tids),
-      FUN = function(x) "leagueMatchSet" %>% KEYS$PIPE$SADD(x)
+      FUN = function(x) sKey %>% KEYS$PIPE$SADD(x)
     )
   ) %>%
     purrr::flatten_int() %>%
@@ -109,15 +114,19 @@ create_table2 <- function(KEYS, matchData) {
           purrr::map(function(z) z %>% `[`(newUniques[x] %>% `==`(allInfo$tids)))
 
         # Order by week so I can accumulate easily
-        singleTeam %>% purrr::map(function(x) x %>% `[`(singleTeam$week %>% order))
+        singleTeam %<>%
+          purrr::map(function(x) x %>% `[`(singleTeam$week %>% order))
 
         # Get team name
         tName <- singleTeam$teams %>% unique
 
+        # Get cumulative sum
+        csum <- function(x) x %>% cumsum %>% `[`(-1)
+
         # Create
-        cPts <- c(lastData$table[[newUniques[x]]]$PTS %>% as.integer, singleTeam$pts) %>% cumsum %>% `[`(-1)
-        cGf <- c(lastData$table[[newUniques[x]]]$GF %>% as.integer, singleTeam$gf) %>% cumsum %>% `[`(-1)
-        cGd <- c(lastData$table[[newUniques[x]]]$GD %>% as.integer, singleTeam$ga) %>% cumsum %>% `[`(-1)
+        cPts <- c(lastData$table[[newUniques[x]]]$PTS %>% as.integer, singleTeam$pts) %>% csum()
+        cGf <- c(lastData$table[[newUniques[x]]]$GF %>% as.integer, singleTeam$gf) %>% csum()
+        cGd <- c(lastData$table[[newUniques[x]]]$GD %>% as.integer, (singleTeam$gf - singleTeam$ga)) %>% csum()
 
         # Start to create new keys
         KEYS$RED$pipeline(
