@@ -41,12 +41,14 @@ sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  #
     return(
       list(
         FS_HOST = fsHost,
-        FS_APIKEY= fsApikey,
+        FS_APIKEY = fsApikey,
         FS_SLACK = fsSlack,
         SLACK_PRNT = printToSlack,
         TEST = testing,
         LOGGING = printToScreen,
         LOG_PRED = storePred,
+        RED = redux::hiredis(db = 1),
+        PIPE = redux::redis,
         DAYS = 4,
         STAND = 0.075
       )
@@ -143,21 +145,20 @@ start_season <- function() {
 #' @export
 
 
-request_limit <- function(requestsAllowed = 1000, timePeriod = 60 * 60) {
+request_limit <- function(KEYS, requestsAllowed = 1000, timePeriod = 60 * 60) {
 
-  requestCount <- "requestLimit" %>% rredis::redisIncr() %>% as.integer
+  # Increment by 1, and also create the key
+  requestCount <- "requestLimit" %>%
+    KEYS$RED$INCR()
+
   if (requestCount == 1) {
-    rredis::redisExpire(
-      key = "requestLimit",
-      seconds = timePeriod - 1
-    )
+    "requestLimit" %>%
+      KEYS$RED$EXPIRE(timePeriod - 1)
   } else {
     if (requestCount > requestsAllowed - 100) {
       cat(paste0(' { requests low. Sleeping for ', timePeriod, ' seconds. } '))
-      rredis::redisSet(
-        key = 'requestLimit',
-        value = "0" %>% charToRaw()
-      )
+      "requestLimit" %>%
+        KEYS$RED$SET(value = 0)
       Sys.sleep(timePeriod)
     }
   }

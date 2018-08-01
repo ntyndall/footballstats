@@ -1,7 +1,7 @@
 context("test-acomp_info.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Save competition IDs from /competitions/ into a set", {
 

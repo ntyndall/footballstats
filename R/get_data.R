@@ -29,7 +29,7 @@ get_data <- function(endpoint, KEYS) { # nocov start
   })
 
   # Increment the request limit
-  footballstats::request_limit()
+  KEYS %>% footballstats::request_limit()
 
   # Record the bad request
   if (rawContent$status_code != 200) print(paste0(' ## WARNING : Could not resolve ', getUrl))
