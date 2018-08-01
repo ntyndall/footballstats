@@ -32,79 +32,82 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 
   # All predicted matchIDs
   allPreds <- "all_predictions" %>%
-    rredis::redisSMembers()
+    KEYS$RED$SMEMBERS()
 
   # Make sure it isn't NULL before flattening
-  if (allPreds %>% is.null %>% `!`()) {
+  if (allPreds %>% length %>% `>`(0)) {
     allPreds %<>% purrr::flatten_chr()
 
     # Remove them from the set
-    for (i in 1:(allPreds %>% length)) {
-      "all_predictions" %>%
-        rredis::redisSRem(element = allPreds[i] %>% charToRaw())
-    }
+    KEYS$RED$pipeline(
+      .commands = lapply(
+        X = allPreds,
+        FUN = function(x) "all_predictions" %>% KEYS$PIPE$SREM(x)
+      )
+    )
   }
 
   # Get the intersection of ready to analyse
-  readyToAnalyse <- intersect(allPreds, readyToAnalyse)
+  matchIDs <- intersect(allPreds, readyToAnalyse)
 
-  if (!identical(readyToAnalyse, character(0))) {
-    readyLen <- readyToAnalyse %>% length
+  if (matchIDs %>% length %>% `>`(0)) {
+    readyLen <- matchIDs %>% length
     cat(paste0(Sys.time(), ' | Checking off ', readyLen, ' already predicted matches. \n'))
 
-    for (i in 1:readyLen) {
-      matchID <- readyToAnalyse[i]
-      resultKey <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchID)
-      resultKey %<>% rredis::redisKeys()
+    # MatchIDs
+    resultKeys <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchIDs)
 
-      # Should really delete unused / postponed games here!
-      #resultLen <- resultKey %>% length
-      #if (resultLen %>% `>`(1)) {
-      #  for (j in 1:(resultLen - 1)) {
-      #
-      #  }
-      #}
-      resultKey %<>% `[`(resultKey %>% length)
-      predicted <- resultKey %>% rredis::redisHGetAll()
-      pre <- predicted$prediction %>% as.character
+    # Get all the keys to be updated
+    redKeys <- KEYS$RED$pipeline(
+      .commands = lapply(
+        X = paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchIDs),
+        FUN = function(x) x %>% KEYS$PIPE$KEYS()
+      )
+    ) %>%
+      purrr::map(1) %>%
+      purrr::flatten_chr()
 
-      # Make sure the prediction is currently empty!
-      if (pre %>% `==`('-')) {
+    # Now get all current redis information
+    currentData <- KEYS$RED$pipeline(
+      .commands = lapply(
+        X = redKeys,
+        FUN = function(x) x %>% KEYS$PIPE$HGETALL()
+      )
+    ) %>%
+      lapply(footballstats::create_hash)
 
-        # Convert data to something meaningful
-        home <- predicted$home %>% as.character
-        away <- predicted$away %>% as.character
+    # Which values should be predicted
+    toPredict <- sapply(
+      X = 1:(currentData %>% length),
+      FUN = function(x) currentData[[x]]$prediction %>% `==`("-")
+    )
 
-        actual <- matches[which(matches$id == matchID), ]
-        hm <- actual$localteam_score %>% as.integer
-        aw <- actual$visitorteam_score %>% as.integer
+    # Filter out if predictions are to be made
+    if (toPredict %>% any) {
+      currentData %<>% `[`(toPredict)
+      matchIDs %<>% `[`(toPredict)
+      redKeys %<>% `[`(toPredict)
 
-        cond <- function(h, a) {
-         return(
-           ifelse(
-             test = home == h && away == a,
-             yes = TRUE,
-             no = FALSE
+      # Now reshape the matchData coming in and match with currentData
+      get_res <- function(x) if (x > 0) "W" else if (x < 0) "L" else "D"
+      matchList <- matchData[c("id", "localteam_score", "visitorteam_score")] %>% lapply(as.integer)
+      matchList$homeres <- matchList$localteam_score %>% `-`(matchList$visitorteam_score) %>% get_res()
+
+      # Now match with the current matchIDs
+      matchList %<>%
+        purrr::map(function(x) x %>% `[`(matchIDs %in% matchList$id))
+
+      KEYS$RED$pipeline(
+        .commands = lapply(
+          X = 1:(currentData %>% length),
+          FUN = function(x) {
+            redKeys[x] %>% KEYS$PIPE$HSET(
+              field = "prediction",
+              value = if (currentData[[x]]$home %>% `==`(matchList$homeres[x])) "T" else "F"
             )
-          )
-        }
-
-        # Was the prediction correct?
-        correct <- if (hm > aw) {
-          cond(h = 'W', a = 'L')
-        } else if (hm == aw) {
-          cond(h = 'D', a = 'D')
-        } else {
-          cond(h = 'L', a = 'W')
-        }
-
-        # Update hash with the results of the prediction
-        rredis::redisHSet(
-          key = resultKey,
-          field = 'prediction',
-          value =  ifelse(test = correct, yes = 'T', no = 'F') %>% charToRaw()
+          }
         )
-      }
+      )
     }
   }
 }
@@ -133,9 +136,11 @@ monthly_report <- function(KEYS, month, year) {
   totalTxt <- c()
 
   # Get all predictions
-  allPredictions <- paste0('csdm*:', year, ':', month, ':*') %>% rredis::redisKeys()
+  allPredictions <- paste0('csdm*:', year, ':', month, ':*') %>%
+    KEYS$RED$KEYS()
 
-  if (allPredictions %>% is.null %>% `!`()) {
+  if (allPredictions %>% length %>% `>`(0)) {
+    allPredictions %<>% purrr::flatten_chr()
 
     totalTxt %<>% paste(c('*Looking at predictions for', month.abb[month], '*'), collapse = '')
     # Get all unique competitionIDs
@@ -149,9 +154,11 @@ monthly_report <- function(KEYS, month, year) {
     compInfo <- footballstats::compInfo
 
     # Create a list of each competition
-    uniqComps <- sapply(1:(competitionIDs %>% length), function(i) {
-      allPredictions[paste0(':', competitionIDs[i], ':') %>% grepl(x = allPredictions)]
-    })
+    uniqComps <- lapply(
+      X = competitionIDs,
+      FUN = function(i) allPredictions[paste0(':', i, ':') %>% grepl(x = allPredictions)]
+    ) %>%
+      purrr::flatten_chr()
 
     # Loop over unique competitions
     for (i in 1:(uniqComps %>% length)) {
@@ -167,26 +174,31 @@ monthly_report <- function(KEYS, month, year) {
       cInfo <- paste0('_', compInfo$region[info], ' - ', compInfo$name[info], '_ :: ')
 
       # Get the results
-      result <- lapply(1:(singleComp %>% length), function(j) {
-        vals <- singleComp[j] %>% rredis::redisHGetAll()
-        return(vals$prediction %>% as.character)
-      }) %>% purrr::flatten_chr()
+      result <- KEYS$RED$pipeline(
+        .commands = lapply(
+          X = singleComp,
+          FUN = function(j) j %>% KEYS$PIPE$HGET("prediction")
+        )
+      ) %>%
+        purrr::flatten_chr()
 
       # Subset for complete results only!
-      result %<>% subset(result %>% `!=`('-'))
+      result %<>% subset(result %>% `!=`(''))
 
       # Add to vector for slack
       totalTxt %<>% c(
-        if (result %>% identical(character(0))) {
-          paste0(cInfo, ' None')
-        } else {
-         per <- result %>%
-           `==`('T') %>%
-           sum %>%
-           `/`(result %>% length) %>%
-           scales::percent()
-         paste0(cInfo, per)
-        }
+        paste0(
+          cInfo,
+          if (result %>% length %>% `==`(0)) {
+            " None"
+          } else {
+            result %>%
+              `==`('T') %>%
+              sum %>%
+              `/`(result %>% length) %>%
+              scales::percent()
+          }
+        )
       )
     }
 
