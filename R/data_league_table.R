@@ -168,7 +168,8 @@ weekly_positions <- function(KEYS) {
 
   # Get all possible keys
   redisKeys <- paste0('cwt_l:', KEYS$COMP, ':', KEYS$SEASON, '*') %>%
-    rredis::redisKeys()
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr()
 
   # Get all unique teamIDs as a reference
   allTeams <- redisKeys %>%
@@ -196,7 +197,7 @@ weekly_positions <- function(KEYS) {
     if (subKeys %>% identical(character(0))) next
 
     # If the keys already exist
-    if (paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>% rredis::redisExists()) next
+    if (paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>% KEYS$RED$EXISTS() %>% as.logical) next
 
     # Get the teamIDs
     teamIDs <- subKeys %>%
@@ -213,15 +214,20 @@ weekly_positions <- function(KEYS) {
       lookPrevious <- allTeams %>% subset(allPlayed %>% `!`())
       for (j in 1:(lookPrevious %>% length)) {
         prevWeeks <- paste0('cwt_l:', KEYS$COMP, ':', KEYS$SEASON, ':*:', lookPrevious[j]) %>%
-          rredis::redisKeys()
+          KEYS$RED$KEYS() %>%
+          purrr::flatten_chr()
+
         oneTeamWeeks <- prevWeeks %>% footballstats::get_weeks()
         prevWeek <- prevWeeks %>%
-          `[`(uniqKeys[i] %>%
-                `-`(oneTeamWeeks) %>%
-                abs %>% which.min
-            )
+          `[`(
+            uniqKeys[i] %>%
+              `-`(oneTeamWeeks) %>%
+              abs %>%
+              which.min
+          )
         subFrame <- prevWeek %>%
-          rredis::redisHGetAll()
+          KEYS$RED$HGETALL() %>%
+          footballstats::create_hash()
 
         subFrame$TEAM <- NULL
         subFrame %<>%
@@ -237,7 +243,8 @@ weekly_positions <- function(KEYS) {
     for (j in 1:subKeyLen) {
       # At this point I need to order them by something!
       subFrame <- subKeys[j] %>%
-        rredis::redisHGetAll()
+        KEYS$RED$HGETALL() %>%
+        footballstats::create_hash()
 
       subFrame$TEAM <- NULL
       subFrame %<>%
@@ -257,16 +264,12 @@ weekly_positions <- function(KEYS) {
         decreasing = TRUE
       ), ]
 
-    position <- c(1:(singleWeek %>% nrow)) %>%
-      as.character %>%
-      sapply(charToRaw)
-    names(position) <- singleWeek$teamID
-
     # Push list of positions to the cw_pl hashmap ...
     paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>%
-    rredis::redisHMSet(
-      values = position
-    )
+      KEYS$RED$HMSET(
+        field = singleWeek$teamID,
+        value = c(1:(singleWeek %>% nrow))
+      )
   }
 }
 
