@@ -1,7 +1,7 @@
 context("test-predict_vs_real.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Test a predicted result can be recorded as true or false.", {
 
@@ -9,39 +9,45 @@ test_that("Test a predicted result can be recorded as true or false.", {
   keyType <-  paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':')
 
   actualKey <- paste0(keyType, '1:', matchData$id)
-  rredis::redisHMSet(
-    key = actualKey,
-    values = list(home = 'W', away = 'L', prediction = '-')
+  actualKey %>% KEYS$RED$HMSET(
+    field = c("home", "away", "prediction"),
+    value = list("W", "L", "-")
   )
 
   # Need to add the match ID to the Redis set
-  "all_predictions" %>% rredis::redisSAdd(
-    element = matchData$id %>% charToRaw()
+  "all_predictions" %>% KEYS$RED$SADD(
+    member = matchData$id
   )
 
   # Not check off the matchID
-  readyToAnalyse <- actualKey %>% rredis::redisKeys()
+  readyToAnalyse <- actualKey %>%
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr()
+
   KEYS %>% footballstats::predict_vs_real(
     readyToAnalyse = readyToAnalyse,
     matches = matchData
   )
 
-  result <- rredis::redisHGet(
-    key = actualKey,
-    field = 'prediction'
-  ) %>%
-    as.character
+  result <- actualKey %>% KEYS$RED$HGET(
+    field = "prediction"
+  )
 
-  expect_null( "all_predictions" %>% rredis::redisSMembers() )
-  expect_equal( result, 'T' )
+  expect_equal( "all_predictions" %>% KEYS$RED$SMEMBERS() %>% length, 0 )
+  expect_equal( result, "T" )
+
+  # Add a new
 
 })
 
 test_that("Really simple check that a report can be generated", {
 
+  KEYS$RED$FLUSHDB()
+
   # Set a dummy key
-  'csdm_pred:1204:2017:2:1' %>% rredis::redisHMSet(
-    values = list(prediction = 'T')
+  'csdm_pred:1204:2017:2:1' %>% KEYS$RED$HSET(
+    field = "prediction",
+    value = "T"
   )
 
   res <- KEYS %>% footballstats::monthly_report(
