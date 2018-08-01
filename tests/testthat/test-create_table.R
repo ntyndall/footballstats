@@ -1,12 +1,15 @@
 context('test-create_table.R')
 
+# Flush db
+KEYS$RED$FLUSHDB()
+
 test_that("Create a table from match data", {
 
   # Order the match data first
   matchData <- footballstats::matchData %>%
     footballstats::order_matchdata()
 
-  KEYS %>% create_table2(
+  KEYS %>% footballstats::create_table(
     matchData = matchData
   )
 
@@ -20,7 +23,7 @@ test_that("Create a table from match data", {
 
     # Check basic key lengths
     expect_equal( "*" %>% KEYS$RED$KEYS() %>% length, 138 )
-    expect_equal( "leagueMatchSet" %>% KEYS$RED$SMEMBERS() %>% length, 140 )
+    expect_equal( "leagueMatchSet:2017" %>% KEYS$RED$SMEMBERS() %>% length, 140 )
 
     # Create function for mapping and flattening
     mf <- function(x, y) x %>% purrr::map(y) %>% purrr::flatten_chr()
@@ -54,10 +57,26 @@ test_that("Create a table from match data", {
   KEYS %>% check_table()
 
   # Run again
-  KEYS %>% create_table(
+  KEYS %>% footballstats::create_table(
     matchData = matchData
   )
 
   # Check results haven't changed
   KEYS %>% check_table()
+  KEYS$RED$FLUSHDB()
+
+  # Make sure I can overlap the match data and it still works the same
+  loI <- c(1, 3, 34, 39)
+  upI <- c(2, 40, 40, 70)
+  for (i in 1:(loI %>% length)) {
+    KEYS %>% footballstats::create_table(
+      matchData = matchData[loI[i]:upI[i], ]
+    )
+  }
+
+  KEYS %>% check_table()
+  KEYS$RED$FLUSHDB()
+
 })
+
+
