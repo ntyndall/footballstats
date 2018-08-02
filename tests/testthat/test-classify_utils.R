@@ -1,19 +1,22 @@
 context("test-classify_utils.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Test that match data can be recreated easily.", {
 
   # Test no data returns a null data frame
-  recreated <- KEYS %>% footballstats::recreate_matchdata()
+  recreated <- KEYS %>%
+    footballstats::recreate_matchdata()
 
   expect_equal( recreated %>% nrow, 0 )
 
   # Put the test data into Redis
-  matchData <- KEYS %>% footballstats::amatch_info()
+  matchData <- KEYS %>%
+    footballstats::amatch_info()
 
-  recreated <- KEYS %>% footballstats::recreate_matchdata()
+  recreated <- KEYS %>%
+    footballstats::recreate_matchdata()
 
   expect_equal( matchData %>% nrow, recreated %>% nrow )
   expect_equal( recreated %>% names, matchData %>% names %>% setdiff('events') )
