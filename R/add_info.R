@@ -370,7 +370,7 @@ amatch_info <- function(KEYS) {
           X = matchKeys,
           FUN = function(x) x %>% KEYS$PIPE$HMSET(
             field = valuesToRetain,
-            value = matches[x, ]
+            value = matches[x, ] %>% as.character
           )
         )
       )
