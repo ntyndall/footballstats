@@ -1,7 +1,7 @@
 context('test-classify_claculate_data.R')
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that('Calculate data set built from features', {
 

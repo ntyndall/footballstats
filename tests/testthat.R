@@ -7,8 +7,6 @@ library(utils)
 library(rredis)
 library(redux)
 
-#rredis::redisClose()
-
 # Connect to DB 3 (away from production)
 rredis::redisConnect(
   host = 'localhost',

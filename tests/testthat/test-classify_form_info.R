@@ -1,7 +1,7 @@
 context('test-classify_form_info.R')
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that('Calculate score based on vector of forms', {
 
