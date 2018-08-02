@@ -78,5 +78,3 @@ test_that("Create a table from match data", {
   KEYS$RED$FLUSHDB()
 
 })
-
-

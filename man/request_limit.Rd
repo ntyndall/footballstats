@@ -4,7 +4,7 @@
 \alias{request_limit}
 \title{Check Request Limit}
 \usage{
-request_limit(requestsAllowed = 1000, timePeriod = 60 * 60)
+request_limit(KEYS, requestsAllowed = 1000, timePeriod = 60 * 60)
 }
 \arguments{
 \item{requestsAllowed}{An integer value that defines the number of requests

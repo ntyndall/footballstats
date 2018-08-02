@@ -24,6 +24,9 @@
 
 create_table <- function(KEYS, matchData) {
 
+  # Get the date key
+  dateKey <- paste0('c_startDate:', KEYS$COMP, ':', KEYS$SEASON)
+
   # Get the start date
   startDate <- dateKey %>%
     KEYS$RED$GET()
@@ -31,7 +34,7 @@ create_table <- function(KEYS, matchData) {
   # If it doesn't exist then create it
   if (startDate %>% is.null) {
     startDate <- matchData$formatted_date %>% as.integer %>% min
-    paste0('c_startDate:', KEYS$COMP, ':', KEYS$SEASON) %>%
+    dateKey %>%
       KEYS$RED$SET(
         value = startDate
       )
