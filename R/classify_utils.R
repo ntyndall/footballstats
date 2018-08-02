@@ -86,36 +86,41 @@ order_matchdata <- function(matchData) {
 
 commentary_from_redis <- function(keyName, returnItems) {
   # Get all commentary items
-  results <- keyName %>% rredis::redisHMGet(
-    fields = returnItems
-  )
-  hashNames <- results %>% names
-  hashLen <- hashNames %>% length
+  results <- keyName %>%
+    KEYS$RED$HMGET(
+      field = returnItems
+    )
+  names(results) <- returnItems
 
-  # Make sure something exists in the requested fields
-  vec <- c()
-  for (j in 1:hashLen) {
-    single <- results[[hashNames[j]]]
-    vec %<>% c(
-      if (hashNames[j] %>% `==`('possesiontime')) {
-        single %>% gsub(
-          pattern = "%",
-          replacement = ""
-        ) %>% as.double
-      } else if (single %>% is.null) {
-        NA
-      } else if (single %>% is.na) {
-        NA
-      } else {
-        if (single %>% `==`('')) 0 else single %>% as.double
-      }
+  # Replace possesiontime here
+  if ("possesiontime" %in% returnItems) {
+    results$possesiontime %<>% gsub(
+      pattern = "%",
+      replacement = ""
     )
   }
 
-  # Make sure the items returned is the same length as requested
-  return(
-    if (vec %>% stats::na.omit() %>% as.double %>% length %>% `==`(hashLen)) vec else NULL
+  # Filter out items that don't exist
+   nonNull <- results %>%
+     lapply(length) %>%
+     purrr::flatten_int() %>%
+     as.logical
+
+  # Vectorise and convert to doubles where  necessarcy
+  vec <- sapply(
+    X = 1:(results %>% length),
+    FUN = function(x) {
+      it <- results[[x]]
+      if (nonNull[x]) {
+        if (it == "") 0 else it %>% as.double
+      } else {
+        NA
+      }
+    }
   )
+
+  # Make sure the items returned is the same length as requested
+  return(if (vec %>% anyNA) NULL else vec)
 }
 
 #' @title Scale Data
