@@ -367,8 +367,8 @@ amatch_info <- function(KEYS) {
       # Push data to redis
       KEYS$RED$pipeline(
         .commands = lapply(
-          X = matchKeys,
-          FUN = function(x) x %>% KEYS$PIPE$HMSET(
+          X = 1:(matchKeys %>% length),
+          FUN = function(x) matchKeys[x] %>% KEYS$PIPE$HMSET(
             field = valuesToRetain,
             value = matches[x, ] %>% as.character
           )
