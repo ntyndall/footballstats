@@ -20,32 +20,31 @@ recreate_matchdata <- function(KEYS) {
 
   # Get all the redis match keys
   allMatches <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, '*') %>%
-    rredis::redisKeys()
-  matchData <- data.frame(stringsAsFactors = FALSE)
-  if (!(allMatches %>% is.null))   {
-    for (i in 1:length(allMatches)) {
-      # Get basic match info for each match
-      singleMatch <- allMatches[i] %>%
-        rredis::redisHGetAll()
+    KEYS$RED$KEYS()
 
-      # Recreate the data frame
-      matchID <- data.frame(
-        singleMatch %>% as.character %>% t,
-        stringsAsFactors = FALSE
+  # If keys exist then create a data frame
+  if (allMatches %>% length %>% `>`(0)) {
+    matchRes <- KEYS$RED$pipeline(
+      .commands = lapply(
+        X = allMatches %>% purrr::flatten_chr(),
+        FUN = function(x) x %>% KEYS$PIPE$HGETALL()
       )
-      matchIDName <- singleMatch[c(TRUE, FALSE)]
-      names(matchID) <- names(singleMatch)
-      matchData %<>% rbind(matchID)
-    }
+    ) %>%
+      lapply(footballstats::create_hash)
+
+    matchData <- lapply(
+      X = 1:(matchRes %>% length),
+      FUN = function(x) {
+        matchRes[[x]] %>% data.frame(stringsAsFactors = FALSE)
+      }
+    ) %>%
+      purrr::reduce(rbind) %>%
+      footballstats::order_matchdata()
+  } else {
+    print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
+    matchData <- data.frame()
   }
 
-  # Only look back at the previous `x` matches.
-  if (`<`(matchData %>% nrow(), 1)) {
-    print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
-  } else {
-    # Re-order the dataframe by date.
-    matchData %<>% footballstats::order_matchdata()
-  }
   return(matchData)
 }
 
