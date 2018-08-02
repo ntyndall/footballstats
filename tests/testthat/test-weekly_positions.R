@@ -43,6 +43,7 @@ test_that("Create a table from match data", {
       purrr::flatten_chr() %>%
       as.integer
 
+    print(positions)
     expect_equal( positions, c(5, 6, 10, 7, 9, 10, 11) )
   }
 

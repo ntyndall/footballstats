@@ -158,7 +158,7 @@ acomp_info <- function(KEYS) {
       as.logical %>%
       sum
 
-    cat(paste0(Sys.time(), ' | Successfully added ', cAdded, ' new competition IDs to Redis. \n'))
+    if (KEYS$LOGGING) cat(paste0(Sys.time(), ' | Successfully added ', cAdded, ' new competition IDs to Redis. \n'))
     return(comps)
   }
 }

@@ -52,7 +52,7 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 
   if (matchIDs %>% length %>% `>`(0)) {
     readyLen <- matchIDs %>% length
-    cat(paste0(Sys.time(), ' | Checking off ', readyLen, ' already predicted matches. \n'))
+    if (KEYS$LOGGING) cat(paste0(Sys.time(), ' | Checking off ', readyLen, ' already predicted matches. \n'))
 
     # MatchIDs
     resultKeys <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchIDs)
@@ -90,8 +90,9 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 
       # Now reshape the matchData coming in and match with currentData
       get_res <- function(x) if (x > 0) "W" else if (x < 0) "L" else "D"
-      matchList <- matchData[c("id", "localteam_score", "visitorteam_score")] %>% lapply(as.integer)
+      matchList <- matches[c("id", "localteam_score", "visitorteam_score")] %>% lapply(as.integer)
       matchList$homeres <- matchList$localteam_score %>% `-`(matchList$visitorteam_score) %>% get_res()
+
 
       # Now match with the current matchIDs
       matchList %<>%
@@ -216,7 +217,7 @@ monthly_report <- function(KEYS, month, year) {
         username = 'report'
       )
     } else { # nocov end
-      cat(totalTxt %>% paste(collapse = '\n'))
+      if (KEYS$LOGGING) cat(totalTxt %>% paste(collapse = '\n'))
     }
   }
 }
