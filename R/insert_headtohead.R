@@ -4,6 +4,14 @@
 
 
 insert_headtohead <- function(KEYS) {
+
+  # Set the very first date
+  "c_startDate:1204:2017" %>%
+    KEYS$RED$SET(
+      value = "17389"
+    )
+
+  # Rename data set
   dat <- footballstats::headtohead
 
   # Set up commentary data
