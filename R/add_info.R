@@ -210,7 +210,7 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
     purrr::map(`[`('id'))
 
   lapply(
-    X = 1:(matchIDs %>% length),
+    X = 1:(allEventIDs %>% length),
     FUN = function(x) {
 
       # Have the ID's been added?
