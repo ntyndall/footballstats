@@ -39,18 +39,24 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
     boundaries <- c(1, til + 1)
   }
 
+  # Get basic metrics back
+  mets <- lapply(
+    X = 1:2,
+    FUN = function(x) {
+      # Select correct frame
+      if (x == 1) {
+        cFrame <- frameList[[1]]
+        oFrame <- frameList[[2]]
+      } else {
+        oFrame <- frameList[[3]]
+        cFrame <- frameList[[4]]
+      }
 
-  # Loop over each type of data
-  for (i in 1:(frameList %>% length)) {
-
-    # Get the current frame
-    cFrame <- frameList[[i]]
-
-    # Set up conditions for each type first
-    if (i == 1) {
-
-      # Create feature data set
-      analyse.data <- cFrame %>% footballstats::create_feature_data()
+      # Get metric data
+      analyse.data <- cFrame %>%
+        footballstats::create_feature_data(
+          type = if (x == 1) "h" else "a"
+        )
 
       # Get position list
       positions <- list(
@@ -58,8 +64,8 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
         posA = cFrame$position.a
       )
 
-      # Just home
-      first <- positions %>%
+      # Just home or away depending on team
+      agg.data <- positions %>%
         footballstats::optimize_get_data(
           cData = analyse.data,
           gridPoints = gridPoints,
@@ -68,58 +74,27 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
           decayFactor = decayFactor
         )
 
-      # Home and away
+      # Create combination of home and away
       if (totalPer > 0.01) {
-        haDat <- footballstats::optimize_sort_ha(
+        ha.dat <- footballstats::optimize_sort_ha(
           homeDat = cFrame,
-          awayDat = frameList[[2]],
+          awayDat = oFrame,
           gridPoints = gridPoints,
           mygrid = mygrid,
           boundaries = boundaries,
+          ha = if (x == 1) "h" else "a",
           decayFactor = decayFactor
         )
-        mets <- haDat %>% `*`(totalPer) %>% `+`(first * (1 - totalPer))
-      } else {
-        mets <- first
+        agg.data <- ha.dat %>% `*`(totalPer) %>% `+`(agg.data * (1 - totalPer))
       }
-    } else if (i == 2) {
-      next
-    } else if (i == 3) {
-      next
-    } else {
-      # Create feature data set
-      analyse.data <- cFrame %>% footballstats::create_feature_data(type = 'a')
 
-      # Just away
-      second <- positions %>%
-        footballstats::optimize_get_data(
-          cData = analyse.data,
-          gridPoints = gridPoints,
-          mygrid = mygrid,
-          boundaries = boundaries,
-          decayFactor = decayFactor
-        )
-
-      # Home and away
-      if (totalPer > 0.01) {
-        haDat <- footballstats::optimize_sort_ha(
-          homeDat = frameList[[3]],
-          awayDat = cFrame,
-          gridPoints = gridPoints,
-          mygrid = mygrid,
-          boundaries = boundaries,
-          ha = 'a',
-          decayFactor = decayFactor
-        )
-        mets %<>% cbind(haDat %>% `*`(totalPer) %>% `+`(second * (1 - totalPer)))
-      } else {
-        mets %<>% cbind(second)
-      }
+      # Return from lapply
+      return(agg.data)
     }
-  }
+  )
 
   # Return row of data frame here
-  return(mets)
+  return(mets %>% purrr::reduce(cbind))
 }
 
 #' @title Optimize Get Dat
