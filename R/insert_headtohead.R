@@ -7,7 +7,6 @@ insert_headtohead <- function(KEYS) {
   dat <- footballstats::headtohead
 
   # Set up commentary data
-  dat$commentaryData %<>% lapply(as.character)
   comNames <- dat$commentaryData %>% names
 
   # Add all commentary data
@@ -24,7 +23,6 @@ insert_headtohead <- function(KEYS) {
   )
 
   # Set up basic data
-  dat$matches %<>% lapply(as.character)
   basNames <- dat$matches %>% names
   basicKeys <- paste0("csm:1204:2017:", dat$matches$id)
 

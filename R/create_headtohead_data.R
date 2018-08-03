@@ -30,10 +30,6 @@ create_headtohead_data <- function(KEYS) {
   commKeys <- paste0("cmt_commentary:", KEYS$COMP, ":", data.set$id, ":")
   allCommentaries <- c(paste0(commKeys, data.set$localteam_id),  paste0(commKeys, data.set$visitorteam_id))
 
-  #%>%
-    lapply(FUN = function(x) x %>% paste0(bothTeams)) %>%
-    purrr::flatten_chr()
-
   MYDB <- redux::hiredis(db = 1)
   # Retrieve all the commentaries from redis
   MYDB$HGETALL(allCommentaries[1])
@@ -51,8 +47,6 @@ create_headtohead_data <- function(KEYS) {
     )
   )
 
-
-
   # Create a data frame here??
   commentaryData <- lapply(
     X = 1:(comm %>% length),
@@ -64,8 +58,8 @@ create_headtohead_data <- function(KEYS) {
       )
       res
     }
-  ) %>% purrr::reduce(rbind)
-
+  ) %>%
+    purrr::reduce(rbind)
 
   headtohead$commentaryData <- commentaryData
   headtohead$commentaryKeys <- allCommentaries
@@ -80,11 +74,16 @@ create_headtohead_data <- function(KEYS) {
       X = posKeys,
       FUN = function(x) x %>% KEYS$PIPE$HGETALL()
     )
-  ) %>% lapply(footballstats::create_hash)
+  ) %>%
+    lapply(footballstats::create_hash)
 
   names(positions) <- posKeys
 
   headtohead$positions <- positions
-getwd()
+
+  # Make sure everything is formatted correctly
+  headtohead$matches$formatted_date %<>% format('%d.%m.%Y')
+  headtohead$matches %<>% lapply(as.character)
+  headtohead$commentaryData %<>% lapply(as.character)
   save(headtohead, file = "/home/niall/Desktop/football-project/footballstats/data/headtohead.rda")
 }
