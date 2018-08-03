@@ -12,7 +12,7 @@
 #' @export
 
 
-stats_from_yaml <- function() {
+stats_from_yaml <- function(KEYS) {
 
   # Data named values
   dValues <- c(
@@ -46,12 +46,14 @@ stats_from_yaml <- function() {
     # Get basic stat key
     basicKeyName <-  "csm:*:" %>%
       paste0(dNames[i]) %>%
-      rredis::redisKeys()
+      KEYS$RED$KEYS()
 
     # If basic stats are missing then we have a serious problem!
     if (basicKeyName %>% is.null) {
       cat(' ## Check CSM entry for ID :', dNames[i],'\n')
       next
+    }else {
+      basicKeyName %<>% purrr::flatten_chr()
     }
 
     # Split it up to get the new key names
@@ -63,11 +65,11 @@ stats_from_yaml <- function() {
     comKey <- paste0("cmt_commentary:", statsKey[2], ":", dNames[i], ":")
 
     # If 2 don't exist, then populate redis
-    if (comKey %>% paste0('*') %>% rredis::redisKeys() %>% length %>% `!=`(2)) {
+    if (comKey %>% paste0('*') %>% KEYS$RED$KEYS() %>% length %>% `!=`(2)) {
       # Get the teamIDs
       teamIDs <- statsKey %>%
         paste(collapse = ':') %>%
-        rredis::redisHMGet(field = c('localteam_id', 'visitorteam_id')) %>%
+        KEYS$RED$HMGET(field = c("localteam_id", "visitorteam_id")) %>%
         lapply(as.integer) %>%
         purrr::flatten_int()
 
@@ -76,11 +78,11 @@ stats_from_yaml <- function() {
 
       # Insert both teamID information
       for (j in 1:2) {
-        input <- newData[[i]][[j]] %>% as.list
-        names(input) <- dValues
-        input$possesiontime %<>% paste0('%')
-        comKey[j] %>% rredis::redisHMSet(
-          values = input
+        input <- newData[[i]][[j]] %>% as.character
+        input[3] %<>% paste0('%')
+        comKey[j] %>% KEYS$RED$HMSET(
+          field = dValues,
+          value = input
         )
       }
     }
