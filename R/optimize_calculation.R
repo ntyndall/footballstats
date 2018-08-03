@@ -214,13 +214,13 @@ optimize_sort_ha <- function(homeDat, awayDat, gridPoints, mygrid, boundaries, h
 
 
 flip_res <- function(x) {
-  # Readjust results...
-  cRes <- x
-  newRes <- c()
-  for (i in 1:(cRes %>% length)) {
-    newRes %<>% c(if (cRes[i] == 'W') 'L' else if (cRes[i] == 'L') 'W' else 'D')
-  }
-  return(newRes)
+  return(
+    lapply(
+      X = x,
+      FUN = function(y) if (y == "W") "L" else if (y == "L") "W" else "D"
+    ) %>%
+      purrr::flatten_chr()
+  )
 }
 
 #' @title Create Feature Data
@@ -257,11 +257,13 @@ create_feature_data <- function(cFrame, type = 'h') {
 
 
 formint_2 <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0) {
-  newForms <- c()
-  for (p in 1:(oldForms %>% length)) {
-    newForms %<>% c(if (oldForms[p] == 'W') 2 else if (oldForms[p] == 'D') 1 else 0)
-  }
-  return(newForms)
+  return(
+    lapply(
+      X = oldForms,
+      FUN = function(x) if (x == "W") winPoints else if (x == "D") drawPoints else losePoints
+    ) %>%
+      purrr::flatten_dbl()
+  )
 }
 
 
