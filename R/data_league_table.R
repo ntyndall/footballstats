@@ -58,7 +58,7 @@ create_table <- function(KEYS, matchData) {
     purrr::flatten_chr()
 
   # Get previous week for EVERY
-  lastData <- KEYS %>% get_last_week(uniqueTeams = uniqueTeams)
+  lastData <- KEYS %>% footballstats::get_last_week(uniqueTeams = uniqueTeams)
 
   scores <- c(matchList$localteam_score, matchList$visitorteam_score)
 
@@ -121,7 +121,7 @@ create_table <- function(KEYS, matchData) {
           purrr::map(function(x) x %>% `[`(singleTeam$week %>% order))
 
         # Get team name
-        tName <- singleTeam$teams %>% unique
+        tName <- singleTeam$teams %>% unique %>% `[`(1)
 
         # Get cumulative sum
         csum <- function(x) x %>% cumsum %>% `[`(-1)
