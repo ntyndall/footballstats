@@ -3,10 +3,13 @@ library(yaml)
 library(purrr)
 library(magrittr)
 
+# Set up working directory
 dir <- getwd()
 
-descFile <- yaml::yaml.load_file(
-  input = paste0(dir, '/DESCRIPTION'))
+# Load the DESCRIPTION YAML file
+descFile <- dir %>%
+  paste0("/DESCRIPTION") %>%
+  yaml::yaml.load_file()
 
 descFileNames <- names(descFile)
 if (descFileNames %>% purrr::has_element('Version')) {
@@ -21,8 +24,9 @@ current <- 'git tag' %>%
   system(intern = TRUE) %>%
     gsub(
       pattern = 'v',
-      replacement = '')
-current <- current[current %>% length]
+      replacement = ''
+    )
+current %<>% `[`(current %>% length)
 
 # Split version in description
 verSplit <- ver %>%
@@ -37,18 +41,21 @@ currentSplit <- current %>%
 # Get their respective lengths
 verLen <- verSplit %>% length
 currentLen <- currentSplit %>% length
+diffLen <- verLen %>%
+  `-`(currentLen) %>%
+  abs
 
 # Align the lengths if they are off by major . minor . path versioning style
-if (verLen > currentLen) {
-  currentSplit <- c(currentSplit, rep(0, (verLen - currentLen)))
-} else if (verLen < currentLen) {
-  verSplit <- c(verSplit, rep(0, (currentLen - verLen)))
+if (diffLen != 0) {
+  appendVals <- "0" %>% rep(diffLen %>% abs)
+  if (verLen > currentLen) currentSplit %<>% c(appendVals) else verSplit %<>% c(appendVals)
 }
 
 # Compare the two once they have been cleaned up
 compare <- utils::compareVersion(
   a = paste(verSplit, collapse = '.'),
-  b = paste(currentSplit, collapse = '.'))
+  b = paste(currentSplit, collapse = '.')
+)
 
 # Print to screen what is about to happen
 if (compare == 0) {
@@ -62,17 +69,20 @@ if (compare == 0) {
 # Once versioning has been approved by the checks then create the tar and move it to /tagged/
 devtools::build(
   pkg = dir,
-  binary = TRUE)
+  binary = TRUE
+)
 
 # ... find the built tar
 latestRelease <- list.files(
   path = '../',
-  pattern = '*.tar.gz')
+  pattern = '*.tar.gz'
+)
 
 # ... rename file to latest release and move to /tagged/
 renameSuccess <- file.rename(
   from = paste0('../', latestRelease),
-  to = paste0('tagged/', latestRelease))
+  to = paste0('tagged/', latestRelease)
+)
 
 # If successful then print to screen
 if (renameSuccess) {

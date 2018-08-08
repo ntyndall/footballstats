@@ -7,18 +7,10 @@ library(utils)
 library(rredis)
 library(redux)
 
-# Connect to DB 3 (away from production)
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379,
-  nodelay = FALSE
-)
-rredis::redisSelect(3)
-rredis::redisFlushDB()
-
 # Set up enough keys for testing
 KEYS <<- footballstats::keys_for_testing()
 
+# Run the tests
 results <- testthat::test_dir(
   path = "testthat",
   reporter = "summary"

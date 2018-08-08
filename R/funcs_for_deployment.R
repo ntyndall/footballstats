@@ -25,8 +25,7 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   )
 
   # Set up additional keys required for the main flow
-  #KEYS$SEASON <- footballstats::start_season()
-  KEYS$SEASON <- 2017
+  KEYS$SEASON <- footballstats::start_season()
   KEYS$DATE_FROM <- paste0('31.07.', KEYS$SEASON)
   KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
 

@@ -14,7 +14,7 @@ test_that("Can a single event be added to redis", {
   )
 
   # Get all event ID's from set
-  eventsInRedis <- "c_eventInSet:1204" %>%
+  eventsInRedis <- "c_eventInSet:1204:2017" %>%
     KEYS$RED$SMEMBERS() %>%
     purrr::flatten_chr()
 
@@ -56,7 +56,7 @@ test_that("Adding multiple events to redis", {
     sum
 
   # Get all event ID's from set
-  eventsInRedis <- "c_eventInSet:1204" %>%
+  eventsInRedis <- "c_eventInSet:1204:2017" %>%
     KEYS$RED$SMEMBERS() %>%
     purrr::flatten_chr()
 
