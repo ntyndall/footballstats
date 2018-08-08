@@ -192,7 +192,7 @@ acomp_info <- function(KEYS) {
 aevent_info <- function(KEYS, matchIDs, matchEvents) {
 
   # Set up the key name
-  kName <- paste0("c_eventInSet:", KEYS$COMP)
+  kName <- paste0("c_eventInSet:", KEYS$COMP, ":", KEYS$SEASON)
 
   # Are any events null?
   eNull <- matchEvents %>%
@@ -205,56 +205,58 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
     matchEvents %<>% purrr::compact()
   }
 
-  # AGet all the eventIDs
-  allEventIDs <- matchEvents %>%
-    purrr::map(`[`('id'))
+  if (eNull %>% all %>% `!`()) {
+    # Get all the eventIDs
+    allEventIDs <- matchEvents %>%
+      purrr::map(`[`('id'))
 
-  lapply(
-    X = 1:(allEventIDs %>% length),
-    FUN = function(x) {
+    lapply(
+      X = 1:(allEventIDs %>% length),
+      FUN = function(x) {
 
-      # Have the ID's been added?
-      alreadyAdded <- KEYS$RED$pipeline(
-        .commands = lapply(
-          X = allEventIDs[[x]],
-          FUN = function(y) kName %>% KEYS$PIPE$SADD(y)
-        )
-      ) %>%
-        purrr::flatten_int() %>%
-        as.logical
-
-      # Subset those that have been added for the first time
-      if (alreadyAdded %>% any) {
-        # Subset the eventIDs
-        eventIDs <- allEventIDs[[x]] %>%
-          `[`(alreadyAdded)
-
-        # Subset the events
-        events <- matchEvents[[x]] %>%
-          subset(alreadyAdded) %>%
-          lapply(as.character)
-
-        # event title names
-        eventTitles <- events %>% names
-
-        # Set up redis keys
-        rKeys <- paste0("cme:", KEYS$COMP, ":", matchIDs[x], ":", eventIDs)
-
-        # Add to redis
-        KEYS$RED$pipeline(
+        # Have the ID's been added?
+        alreadyAdded <- KEYS$RED$pipeline(
           .commands = lapply(
-            X = 1:(eventIDs %>% length),
-            FUN = function(y) {
-              rKeys[y] %>% KEYS$PIPE$HMSET(
-                field = eventTitles,
-                value = events %>% purrr::map(y) %>% as.character
-              )
-            }
+            X = allEventIDs[[x]],
+            FUN = function(y) kName %>% KEYS$PIPE$SADD(y)
           )
-        )
+        ) %>%
+          purrr::flatten_int() %>%
+          as.logical
+
+        # Subset those that have been added for the first time
+        if (alreadyAdded %>% any) {
+          # Subset the eventIDs
+          eventIDs <- allEventIDs[[x]] %>%
+            `[`(alreadyAdded)
+
+          # Subset the events
+          events <- matchEvents[[x]] %>%
+            subset(alreadyAdded) %>%
+            lapply(as.character)
+
+          # event title names
+          eventTitles <- events %>% names
+
+          # Set up redis keys
+          rKeys <- paste0("cme:", KEYS$COMP, ":", matchIDs[x], ":", eventIDs)
+
+          # Add to redis
+          KEYS$RED$pipeline(
+            .commands = lapply(
+              X = 1:(eventIDs %>% length),
+              FUN = function(y) {
+                rKeys[y] %>% KEYS$PIPE$HMSET(
+                  field = eventTitles,
+                  value = events %>% purrr::map(y) %>% as.character
+                )
+              }
+            )
+          )
+        }
       }
-    }
-  )
+    )
+  }
 }
 
 #' @title amatch_info
@@ -353,7 +355,7 @@ amatch_info <- function(KEYS) {
     # If any addMatches then subset the data frame
     if (addMatches %>% any) {
       # Only those that haven't been added
-      matches %<>% subset(
+      matchesToAdd <- matches %>% subset(
         subset = addMatches,
         select = valuesToRetain
       )
@@ -361,7 +363,7 @@ amatch_info <- function(KEYS) {
       # Define the redis matchKey
       matchKeys <- paste0(
         "csm:", KEYS$COMP, ":",
-        KEYS$SEASON, ":", matches$id
+        KEYS$SEASON, ":", matchesToAdd$id
       )
 
       # Push data to redis
@@ -370,7 +372,7 @@ amatch_info <- function(KEYS) {
           X = 1:(matchKeys %>% length),
           FUN = function(x) matchKeys[x] %>% KEYS$PIPE$HMSET(
             field = valuesToRetain,
-            value = matches[x, ] %>% as.character
+            value = matchesToAdd[x, ] %>% as.character
           )
         )
       )
@@ -559,7 +561,7 @@ ateam_info <- function(KEYS, teamListLength) {
     footballstats::teamData %>% list
   } else {
     lapply(
-      X = paste0("/team/", teamIDs[x], "?") ,
+      X = paste0("/team/", teamIDs, "?"),
       FUN = function(x) x %>% footballstats::get_data(
         KEYS = KEYS
       )
