@@ -44,7 +44,7 @@ stats_from_yaml <- function(KEYS) {
     }
 
     # Get basic stat key
-    basicKeyName <-  "csm:*:" %>%
+    basicKeyName <- "csm:*:" %>%
       paste0(dNames[i]) %>%
       KEYS$RED$KEYS()
 
