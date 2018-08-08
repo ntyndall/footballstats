@@ -4,7 +4,6 @@ library(footballstats)
 library(covr)
 library(purrr)
 library(utils)
-library(rredis)
 library(redux)
 
 # Set up enough keys for testing
@@ -17,7 +16,7 @@ results <- testthat::test_dir(
 )
 
 # Remove keys for good measure
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 totalError <- 0
 for(i in 1:length(results)) {
