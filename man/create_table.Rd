@@ -4,7 +4,7 @@
 \alias{create_table}
 \title{Create weekly points}
 \usage{
-create_table(matchData)
+create_table(KEYS, matchData)
 }
 \arguments{
 \item{matchData}{A data frame that contains rows of single matches

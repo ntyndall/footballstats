@@ -1,15 +1,17 @@
 context("test-amatch_info.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Check the keys are as they should be by adding match data", {
 
-  newMatchData <- KEYS %>% footballstats::amatch_info( )
+  # Add match data from footballstats data source *controlled by KEYS$TEST*
+  newMatchData <- KEYS %>%
+    footballstats::amatch_info()
 
   # Check redis for expected output
-  matchIDs <- rredis::redisKeys(
-    pattern = 'csm:*') %>%
+  matchIDs <- "csm:*" %>% KEYS$RED$KEYS() %>%
+    purrr::flatten_chr() %>%
     strsplit(split = ':') %>%
     purrr::map(4) %>%
     purrr::flatten_chr() %>%

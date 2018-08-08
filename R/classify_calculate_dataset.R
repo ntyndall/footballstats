@@ -404,14 +404,13 @@ feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
 
   # Get the start date
   startDate <- paste0('c_startDate:', KEYS$COMP, ':', KEYS$SEASON) %>%
-    rredis::redisGet() %>%
+    KEYS$RED$GET() %>%
     as.integer
 
   # Get the current date
   currentDate <- if (matchDate %>% is.null) {
     paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchID) %>%
-      rredis::redisHGet(field = 'formatted_date') %>%
-      as.character %>%
+      KEYS$RED$HGET(field = 'formatted_date') %>%
       as.Date(format = '%d.%m.%Y') %>%
       as.integer
   } else {
@@ -433,13 +432,15 @@ feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
   # Get the last known position of the two teams
   weekKeys <- posKey %>%
     paste0('*') %>%
-    rredis::redisKeys() %>%
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr() %>%
     footballstats::get_weeks()
 
   # Get the positions from the week being investigated
   positions <- posKey %>%
     paste0(weekKeys %>% `[`(weekNum %>% `-`(weekKeys) %>% abs %>% which.min)) %>%
-    rredis::redisHGetAll() %>%
+    KEYS$RED$HGETALL() %>%
+    footballstats::create_hash() %>%
     lapply(as.integer)
 
   # For play offs, positions may not exist (This will be a rough guide!)
@@ -457,9 +458,11 @@ feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
   }
 
   # Determine & Return relative position as a data.frame
-  data.frame(
-    `position.h` = posH,
-    `position.a` = posA,
-    stringsAsFactors = FALSE
-  ) %>% return()
+  return(
+    data.frame(
+      `position.h` = posH,
+      `position.a` = posA,
+      stringsAsFactors = FALSE
+    )
+  )
 }

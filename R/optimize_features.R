@@ -74,8 +74,6 @@ optimize_features <- function(optimizeModels = FALSE) {
       # Take a single row slice of the fixture list
       single.row <- subs.data[i, ]
 
-
-
       # Set up new keys
       KEYS$COMP <- single.row$comp_id
       KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
@@ -107,21 +105,15 @@ optimize_features <- function(optimizeModels = FALSE) {
         stringsAsFactors = FALSE
       )
 
-      # Get commentary information
-      for (j in 1:2) {
-        cInfo <- paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs[j]) %>%
-          rredis::redisHMGet(fields = allowedCommentaries) %>%
-          lapply(as.character)
+      # Add commentary information on
+      cInfo <- lapply(
+        X = paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs),
+        FUN = function(x) x %>% footballstats::commentary_from_redis(returnItems = allowedCommentaries)
+      ) %>%
+        purrr::flatten_dbl()
+      names(cInfo) <- sapply(c(".h", ".a"), function(x) allowedCommentaries %>% paste0(x)) %>% as.character
+      matchMetrics %<>% cbind(cInfo)
 
-        # Any items that don't exist in redis will have zero length, replace with NA
-        cLengths <- cInfo %>% lapply(length) %>% purrr::flatten_int() %>% `==`(0)
-        if (cLengths %>% any) cInfo[cLengths %>% which] <- NA
-
-        # Rename this new data frame and bind it to the metrics row
-        cInfo %<>% data.frame(stringsAsFactors = FALSE)
-        names(cInfo) <- paste0(allowedCommentaries, if (j == 1) '.h' else '.a')
-        matchMetrics %<>% cbind(cInfo)
-      }
 
       # Bind the positions on
       matchMetrics %<>% cbind(

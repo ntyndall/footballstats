@@ -1,7 +1,7 @@
 context('test-classify_all.R')
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that('Classify all - end to end from adding data to classifying and predicting.', {
 

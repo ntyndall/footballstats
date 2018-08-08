@@ -7,8 +7,6 @@ library(utils)
 library(rredis)
 library(redux)
 
-#rredis::redisClose()
-
 # Connect to DB 3 (away from production)
 rredis::redisConnect(
   host = 'localhost',
@@ -17,8 +15,6 @@ rredis::redisConnect(
 )
 rredis::redisSelect(3)
 rredis::redisFlushDB()
-
-testCon <<- redux::hiredis(db = 3)
 
 # Set up enough keys for testing
 KEYS <<- footballstats::keys_for_testing()

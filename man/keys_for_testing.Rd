@@ -4,7 +4,7 @@
 \alias{keys_for_testing}
 \title{Keys For Testing}
 \usage{
-keys_for_testing()
+keys_for_testing(dbnum = 3)
 }
 \value{
 A list of important key values, accessible through KEYS$...

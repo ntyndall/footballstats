@@ -27,19 +27,20 @@ order_commentaries <-function(KEYS, commentaryKeys) {
   matchIDs <- commentaryKeys %>%
     footballstats::flatt(y = 3)
 
-  csmIDs <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs)
-
-  # Get formatted dates as a vector
-  dates <- csmIDs %>%
-    lapply(function(x) x %>% rredis::redisHGet(field = 'formatted_date')) %>%
-    lapply(as.character) %>%
-    purrr::flatten_chr()
+  # Get formatted dates from redis as a vector
+  dates <- KEYS$RED$pipeline(
+    .commands = lapply(
+      X = paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs),
+      FUN = function(x) x %>% KEYS$PIPE$HGET("formatted_date")
+    )
+  ) %>%
+    purrr::flatten_chr() %>%
+    as.Date('%d.%m.%Y') %>%
+    as.integer %>%
+    order
 
   # Order keys by the formatted date
-  return(
-    commentaryKeys %>%
-      `[`(dates %>% as.Date('%d.%m.%Y') %>% as.integer %>% order)
-  )
+  return(commentaryKeys %>% `[`(dates))
 }
 
 #' @title Form From MatchData

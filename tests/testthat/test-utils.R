@@ -1,44 +1,36 @@
 context("test-utils.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that('test the request limitations can be implemented', {
 
   allowedRequests <- 200
   timePeriod <- 10
 
-  footballstats::request_limit(
+  KEYS %>% footballstats::request_limit(
     requestsAllowed = allowedRequests,
     timePeriod = timePeriod
   )
 
-  timeout <- 'requestLimit' %>%
-    rredis::redisTTL() %>%
-    as.character %>%
-    as.integer
+  timeout <- "requestLimit" %>%
+    KEYS$RED$TTL()
 
   exceeded <- timePeriod %>% `/`(2)
-  print(exceeded)
 
   expect_gt( 4, 3 )
-
   expect_gt( timeout, exceeded )
 
   # Remove the key to disable the expiry
-  'requestLimit' %>% rredis::redisDelete()
+  "requestLimit" %>% KEYS$RED$DEL()
+  "requestLimit" %>% KEYS$RED$SET(200)
 
-  rredis::redisSet(
-    key = 'requestLimit',
-    value = 200 %>% as.character %>% charToRaw()
-  )
-
-  footballstats::request_limit(
+  KEYS %>% footballstats::request_limit(
     requestsAllowed = 210,
     timePeriod = 1
   )
 
-  expect_equal( rredis::redisGet(key = 'requestLimit') %>% as.character %>% as.integer, 0 )
+  expect_equal( KEYS$RED$GET(key = "requestLimit") %>% as.integer, 0 )
 
 })
 

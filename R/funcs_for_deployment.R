@@ -16,9 +16,6 @@
 
 analyse_and_predict <- function(deployed = FALSE) { # nocov start
 
-  # Make sure any new stats haven't been added since last call
-  footballstats::stats_from_yaml()
-
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
@@ -28,12 +25,10 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   )
 
   # Set up additional keys required for the main flow
-  KEYS$SEASON <- footballstats::start_season()
+  #KEYS$SEASON <- footballstats::start_season()
+  KEYS$SEASON <- 2017
   KEYS$DATE_FROM <- paste0('31.07.', KEYS$SEASON)
   KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
-
-  # Make a connection to redis for storing data
-  footballstats::redis_con()
 
   # Load competitions and run the functionality below.
   competitions <- KEYS %>% footballstats::acomp_info()
@@ -55,6 +50,9 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
     KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
     KEYS %>% footballstats::add_all()
   }
+
+  # --- Make sure any new stats haven't been added since last call -- #
+  KEYS %>% footballstats::stats_from_yaml()
 
   # --- Now predict matches --- #
   cat('\n\n *** Beginning predictions *** \n\n')
@@ -121,14 +119,11 @@ analyse_players <- function(deployed = FALSE) { # nocov start
   # Store additional KEY information
   KEYS$SEASON <- footballstats::start_season()
 
-  # Make a connection to redis for storing data
-  footballstats::redis_con()
-
   # Create the sink for output
   if (deployed) 'summary_players' %>% footballstats::create_sink()
 
   # Add player information
-  playerLength <- 'analysePlayers' %>% rredis::redisLLen() %>% as.integer
+  playerLength <- 'analysePlayers' %>% KEYS$RED$LLEN()
   if (playerLength > 0) {
     cat(paste(' ## Analysing a total of ', playerLength, ' unique players. \n'))
     tNow <- Sys.time()
@@ -140,7 +135,7 @@ analyse_players <- function(deployed = FALSE) { # nocov start
   }
 
   # Only complete - delete the analysePlayers key (if it exists..)
-  if (rredis::redisExists(key = 'analysePlayers')) 'analysePlayers' %>% rredis::redisDelete()
+  if ("analysePlayers" %>% KEYS$RED$EXISTS() %>% as.logical) "analysePlayers" %>% KEYS$RED$DEL()
 
 } # nocov end
 
@@ -153,12 +148,10 @@ analyse_players <- function(deployed = FALSE) { # nocov start
 #' @export
 
 
-send_report <- function() { # nocov start
-
-  # Re-establish redis if necessary
-  footballstats::redis_con()
+send_report <- function(KEYS) { # nocov start
 
   # Not sure I can properly get the year...
+  # ...
 
   # Get the month and year for LAST month (i.e. the report to be created)
   month <- Sys.Date() %>% `-`(30) %>% format('%m') %>% as.integer

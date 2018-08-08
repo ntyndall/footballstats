@@ -1,7 +1,7 @@
 context("test-add_info.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Send in a single commentary to see it is stored correctly", {
 
@@ -18,10 +18,11 @@ test_that("Send in a single commentary to see it is stored correctly", {
     visitorteam = visitorteam
   )
 
-  playerInfo <- 'cmp:*' %>% rredis::redisKeys()
+  playerInfo <- "cmp:*" %>% KEYS$RED$KEYS()
   expect_equal( playerInfo %>% length, 33 )
 
   singleMatch <- playerInfo %>%
+    purrr::flatten_chr() %>%
     strsplit(split = ':') %>%
     purrr::map(3) %>%
     purrr::flatten_chr() %>%
@@ -30,17 +31,21 @@ test_that("Send in a single commentary to see it is stored correctly", {
   expect_equal( singleMatch %>% length, 1 )
   expect_equal( singleMatch, matchID )
 
-  checkPlayerExists <- rredis::redisHMGet(
-    key = paste0('cmp:', KEYS$COMP, ':', matchID, ':724'),
-    fields = 'name'
-  )
 
-  expect_equal( checkPlayerExists$name %>% as.character %>% tolower, 'artur boruc' )
+  checkPlayerExists <- paste0('cmp:', KEYS$COMP, ':', matchID, ':724') %>%
+    KEYS$RED$HMGET(
+      field = 'name'
+    ) %>%
+    purrr::flatten_chr()
+
+  expect_equal( checkPlayerExists %>% tolower, 'artur boruc' )
 
   # Get the general match commentaries
-  teamCommentaries <- 'cmt_commentary:*' %>% rredis::redisKeys()
+  teamCommentaries <- "cmt_commentary:*" %>%
+    KEYS$RED$KEYS()
 
   teamIDs <- teamCommentaries %>%
+    purrr::flatten_chr() %>%
     strsplit(split = ':') %>%
     purrr::map(4) %>%
     purrr::flatten_chr() %>%
@@ -50,7 +55,10 @@ test_that("Send in a single commentary to see it is stored correctly", {
   expect_equal( teamIDs, c(visitorteam, localteam) %>% as.integer %>% sort )
 
   index <- grepl(teamIDs[1], teamCommentaries) %>% which
-  teamDetails <-  teamCommentaries[index] %>% rredis::redisHGetAll()
+  teamDetails <- teamCommentaries[index] %>%
+    KEYS$RED$HGETALL() %>%
+    footballstats::create_hash()
+
 
   cToI <- function(x) x %>% as.character %>% as.integer
 

@@ -55,14 +55,14 @@ neural_network <- function(totalData, odds.results = NULL, FOLD_DATA, NN, LOGS =
   totalStats <- footballstats::init_conf_stats()
 
   # Start logging
-  cat(" ## NN CV :")
+  if (LOGS) cat(" ## NN CV :")
 
   # Build the neural network
   for (i in 1:(FOLD_DATA$PER + 1)) {
 
     # Print out to see the progress
-    cat("", i, "/")
-    if (i == (FOLD_DATA$PER + 1)) cat("\n")
+    if (LOGS) cat("", i, "/")
+    if (i == (FOLD_DATA$PER + 1) && LOGS) cat("\n")
 
     # Which indexes of the folds to include
     filterTest <- seq(

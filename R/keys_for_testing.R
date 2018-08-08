@@ -9,7 +9,7 @@
 #' @export
 
 
-keys_for_testing <- function() {
+keys_for_testing <- function(dbnum = 3) {
   return(
     list(
       COMP = 1204,
@@ -23,7 +23,9 @@ keys_for_testing <- function() {
       LOGGING = FALSE,
       DAYS = 4,
       STAND = 0.5,
-      TIL = 20
+      TIL = 20,
+      RED = redux::hiredis(db = dbnum),
+      PIPE = redux::redis
     )
   )
 }

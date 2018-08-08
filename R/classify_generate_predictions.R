@@ -118,24 +118,16 @@ generate_predictions <- function(KEYS, fixtureList) {
         as.integer
 
       # Create the hash of prediction information
-      rredis::redisHMSet(
-        key = paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':', month, ':', singleFixture$id),
-        values = list(
-          localteam = homeName,
-          visitorteam = awayName,
-          home = actualH,
-          away = actualA,
-          week = cDate,
-          prediction = '-',
-          slack = 'false'
+      paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':', month, ':', singleFixture$id) %>%
+        KEYS$RED$HMSET(
+          field = c("localteam", "visitorteam", "home", "away", "week", "prediction", "slack"),
+          value = c(homeName, awayName, actualH, actualA, cDate, "-", "false")
         )
-      )
 
       # Also push the match ID to a list
-      "all_predictions" %>%
-        rredis::redisSAdd(
-          element = singleFixture$id %>% charToRaw()
-        )
+      "all_predictions" %>% KEYS$RED$SADD(
+        member = singleFixture$id
+      )
     }
   }
 

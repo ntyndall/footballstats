@@ -20,32 +20,31 @@ recreate_matchdata <- function(KEYS) {
 
   # Get all the redis match keys
   allMatches <- paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, '*') %>%
-    rredis::redisKeys()
-  matchData <- data.frame(stringsAsFactors = FALSE)
-  if (!(allMatches %>% is.null))   {
-    for (i in 1:length(allMatches)) {
-      # Get basic match info for each match
-      singleMatch <- allMatches[i] %>%
-        rredis::redisHGetAll()
+    KEYS$RED$KEYS()
 
-      # Recreate the data frame
-      matchID <- data.frame(
-        singleMatch %>% as.character %>% t,
-        stringsAsFactors = FALSE
+  # If keys exist then create a data frame
+  if (allMatches %>% length %>% `>`(0)) {
+    matchRes <- KEYS$RED$pipeline(
+      .commands = lapply(
+        X = allMatches %>% purrr::flatten_chr(),
+        FUN = function(x) x %>% KEYS$PIPE$HGETALL()
       )
-      matchIDName <- singleMatch[c(TRUE, FALSE)]
-      names(matchID) <- names(singleMatch)
-      matchData %<>% rbind(matchID)
-    }
+    ) %>%
+      lapply(footballstats::create_hash)
+
+    matchData <- lapply(
+      X = 1:(matchRes %>% length),
+      FUN = function(x) {
+        matchRes[[x]] %>% data.frame(stringsAsFactors = FALSE)
+      }
+    ) %>%
+      purrr::reduce(rbind) %>%
+      footballstats::order_matchdata()
+  } else {
+    print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
+    matchData <- data.frame()
   }
 
-  # Only look back at the previous `x` matches.
-  if (`<`(matchData %>% nrow(), 1)) {
-    print(paste0(Sys.time(), ' : No match data found for the providing input parameters.'))
-  } else {
-    # Re-order the dataframe by date.
-    matchData %<>% footballstats::order_matchdata()
-  }
   return(matchData)
 }
 
@@ -87,36 +86,41 @@ order_matchdata <- function(matchData) {
 
 commentary_from_redis <- function(keyName, returnItems) {
   # Get all commentary items
-  results <- keyName %>% rredis::redisHMGet(
-    fields = returnItems
-  )
-  hashNames <- results %>% names
-  hashLen <- hashNames %>% length
+  results <- keyName %>%
+    KEYS$RED$HMGET(
+      field = returnItems
+    )
+  names(results) <- returnItems
 
-  # Make sure something exists in the requested fields
-  vec <- c()
-  for (j in 1:hashLen) {
-    single <- results[[hashNames[j]]]
-    vec %<>% c(
-      if (hashNames[j] %>% `==`('possesiontime')) {
-        single %>% gsub(
-          pattern = "%",
-          replacement = ""
-        ) %>% as.double
-      } else if (single %>% is.null) {
-        NA
-      } else if (single %>% is.na) {
-        NA
-      } else {
-        if (single %>% `==`('')) 0 else single %>% as.double
-      }
+  # Replace possesiontime here
+  if ("possesiontime" %in% returnItems) {
+    results$possesiontime %<>% gsub(
+      pattern = "%",
+      replacement = ""
     )
   }
 
-  # Make sure the items returned is the same length as requested
-  return(
-    if (vec %>% stats::na.omit() %>% as.double %>% length %>% `==`(hashLen)) vec else NULL
+  # Filter out items that don't exist
+   nonNull <- results %>%
+     lapply(length) %>%
+     purrr::flatten_int() %>%
+     as.logical
+
+  # Vectorise and convert to doubles where  necessarcy
+  vec <- sapply(
+    X = 1:(results %>% length),
+    FUN = function(x) {
+      it <- results[[x]]
+      if (nonNull[x]) {
+        if (it == "") 0 else it %>% as.double
+      } else {
+        NA
+      }
+    }
   )
+
+  # Make sure the items returned is the same length as requested
+  return(if (vec %>% anyNA) NULL else vec)
 }
 
 #' @title Scale Data

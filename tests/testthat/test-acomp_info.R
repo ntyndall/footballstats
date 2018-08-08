@@ -1,7 +1,7 @@
 context("test-acomp_info.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Save competition IDs from /competitions/ into a set", {
 
@@ -9,13 +9,14 @@ test_that("Save competition IDs from /competitions/ into a set", {
     as.Date(origin = '1970-01-01') %>%
     footballstats::format_dates()
 
-  newCompetitions <- KEYS %>% footballstats::acomp_info()
+  newCompetitions <- KEYS %>%
+    footballstats::acomp_info()
 
-  expect_that( newCompetitions, is_a('data.frame') )
+  expect_is( newCompetitions, 'data.frame' )
   expect_equal( newCompetitions %>% nrow, 22 )
   expect_equal( newCompetitions %>% names, c('id', 'name', 'region') )
 
-  uniqueComps <- 'competition:set' %>% rredis::redisSMembers()
+  uniqueComps <- 'competition:set' %>% KEYS$RED$SMEMBERS()
 
   sortedComps <- uniqueComps %>%
     purrr::flatten_chr() %>%

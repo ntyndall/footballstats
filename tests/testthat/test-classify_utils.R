@@ -1,19 +1,22 @@
 context("test-classify_utils.R")
 
 # Reset DB
-rredis::redisFlushDB()
+KEYS$RED$FLUSHDB()
 
 test_that("Test that match data can be recreated easily.", {
 
   # Test no data returns a null data frame
-  recreated <- KEYS %>% footballstats::recreate_matchdata()
+  recreated <- KEYS %>%
+    footballstats::recreate_matchdata()
 
   expect_equal( recreated %>% nrow, 0 )
 
   # Put the test data into Redis
-  matchData <- KEYS %>% footballstats::amatch_info()
+  matchData <- KEYS %>%
+    footballstats::amatch_info()
 
-  recreated <- KEYS %>% footballstats::recreate_matchdata()
+  recreated <- KEYS %>%
+    footballstats::recreate_matchdata()
 
   expect_equal( matchData %>% nrow, recreated %>% nrow )
   expect_equal( recreated %>% names, matchData %>% names %>% setdiff('events') )
@@ -25,7 +28,8 @@ test_that("Test that match data can be recreated easily.", {
 test_that("Test that commentary data is sent to Redis.", {
 
   # Recreate the match data that is in redis
-  recreated <- KEYS %>% footballstats::recreate_matchdata()
+  recreated <- KEYS %>%
+    footballstats::recreate_matchdata()
 
   # Choose the right match ID to analyse
   recreated <- recreated[recreated$id == '2212950', ]
@@ -38,8 +42,8 @@ test_that("Test that commentary data is sent to Redis.", {
 
   # Check what keys have been added
   commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
-    rredis::redisKeys() %>%
-    as.character
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr()
 
   expect_equal( commentaryKeys %>% length, 2 )
 
@@ -48,8 +52,8 @@ test_that("Test that commentary data is sent to Redis.", {
 test_that("Check that the commentaries can be retrieved from redis as a double vector", {
 
   commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
-    rredis::redisKeys() %>%
-    as.character
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr()
 
   # Make sure to pick the right commentary for testing
   teamIDs <- commentaryKeys %>%
@@ -62,7 +66,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
   keyName <- commentaryKeys[grepl(teamIDs[1], commentaryKeys) %>% which]
   result <- footballstats::commentary_from_redis(
     keyName = keyName,
-    returnItems = 'saves'
+    returnItems = "saves"
   )
 
   expect_equal( result %>% length, 1 )
@@ -70,7 +74,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
 
   result <- footballstats::commentary_from_redis(
     keyName = keyName,
-    returnItems = c('yellowcards', 'possesiontime')
+    returnItems = c("yellowcards", "possesiontime")
   )
 
   expect_equal( result %>% length, 2 )
@@ -82,37 +86,35 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
 test_that("Check that a list of commentary data can be aggregated correctly", {
 
   commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
-    rredis::redisKeys() %>%
-    as.character
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr()
 
-  ongoalVec <- c()
-  for (i in 1:length(commentaryKeys)) {
-    ongoalVec %<>% c(
-      rredis::redisHMGet(
-        key = commentaryKeys[i],
-        fields = 'shots_ongoal'
-      )
-    )
-  }
-  ongoalVec %<>% as.integer
+  # Get values for shots on goal
+  ongoalVec <- sapply(
+    X = commentaryKeys,
+    FUN = function(x) x %>% KEYS$RED$HMGET("shots_ongoal")
+  ) %>%
+    purrr::flatten_chr() %>%
+    as.integer
 
   # Put two dummy keys into Redis to calculate average better
   addedOngoal <- c(10, 14)
-  for (i in 1:length(addedOngoal)) {
-    rredis::redisHSet(
-      key = paste0('cmt_commentary:', KEYS$COMP, ':1:', i),
-      field = 'shots_ongoal',
-      value = addedOngoal[i]
-    )
-  }
+  lapply(
+    X = 1:(addedOngoal %>% length),
+    FUN = function(x) {
+      paste0('cmt_commentary:', KEYS$COMP, ':1:', x) %>%
+        KEYS$RED$HSET(
+          field = "shots_ongoal",
+          value = addedOngoal[x]
+        )
+    }
+  )
 
   newKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
-    rredis::redisKeys() %>%
-    as.character
-  keyLen <- newKeys %>% length
+    KEYS$RED$KEYS() %>%
+    purrr::flatten_chr()
 
-  expect_equal( keyLen, 4 )
-
+  expect_equal( newKeys %>% length, 4 )
   totalStats <- c(ongoalVec, addedOngoal)
 
 })

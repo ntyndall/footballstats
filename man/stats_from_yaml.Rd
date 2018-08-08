@@ -4,7 +4,7 @@
 \alias{stats_from_yaml}
 \title{Stats from YAML}
 \usage{
-stats_from_yaml()
+stats_from_yaml(KEYS)
 }
 \description{
 A function to insert statistics not returned

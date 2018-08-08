@@ -4,7 +4,7 @@
 \alias{send_report}
 \title{Send Report}
 \usage{
-send_report()
+send_report(KEYS)
 }
 \value{
 Nothing. Redis is updated.
