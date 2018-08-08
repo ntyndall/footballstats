@@ -16,9 +16,6 @@
 
 analyse_and_predict <- function(deployed = FALSE) { # nocov start
 
-  # Make sure any new stats haven't been added since last call
-  KEYS %>% footballstats::stats_from_yaml()
-
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
     printToSlack = TRUE,
@@ -28,7 +25,8 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   )
 
   # Set up additional keys required for the main flow
-  KEYS$SEASON <- footballstats::start_season()
+  #KEYS$SEASON <- footballstats::start_season()
+  KEYS$SEASON <- 2017
   KEYS$DATE_FROM <- paste0('31.07.', KEYS$SEASON)
   KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
 
@@ -52,6 +50,9 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
     KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
     KEYS %>% footballstats::add_all()
   }
+
+  # --- Make sure any new stats haven't been added since last call -- #
+  KEYS %>% footballstats::stats_from_yaml()
 
   # --- Now predict matches --- #
   cat('\n\n *** Beginning predictions *** \n\n')
