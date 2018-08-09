@@ -20,9 +20,6 @@ stats_from_yaml <- function(KEYS) {
     "fouls", "yellowcards", "redcards", "corners"
   )
 
-  # Connect to Redis
-  footballstats::redis_con()
-
   # Find the data from the package
   newData <- system.file("extdata", "statistics.yaml", package = "footballstats") %>%
     yaml::yaml.load_file()
@@ -49,7 +46,7 @@ stats_from_yaml <- function(KEYS) {
       KEYS$RED$KEYS()
 
     # If basic stats are missing then we have a serious problem!
-    if (basicKeyName %>% is.null) {
+    if (basicKeyName %>% length %>% `==`(0)) {
       cat(' ## Check CSM entry for ID :', dNames[i],'\n')
       next
     }else {
