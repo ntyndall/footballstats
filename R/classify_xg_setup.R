@@ -1,6 +1,8 @@
 #' @title Classify XGBoost Setup
 #'
 #' @export
+#'
+#' @import xgboost
 
 
 classify_xg_setup <- function(KEYS, singleFixture, datModel) {
