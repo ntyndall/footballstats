@@ -45,7 +45,7 @@ classify_xg_setup <- function(KEYS, singleFixture) {
   }
 
   # If any are missing then return early
-  if (all.inter.data %>% anyNA %>% `!`()) {
+  if (all.inter.data %>% anyNA) {
     predicted$nAnalysed %<>% `+`(1)
   } else {
     predicted$analysed %<>% `+`(1)
