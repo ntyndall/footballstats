@@ -447,15 +447,9 @@ feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
   posH <- positions[[teamIDs[1]]]
   posA <- positions[[teamIDs[2]]]
 
-  increm <- 1
-  if (posH %>% is.null) {
-    posH <- KEYS$TIL %>% `+`(increm)
-    increm %<>% `+`(1)
-  }
-
-  if (posA %>% is.null) {
-    posA <- KEYS$TIL %>% `+`(increm)
-  }
+  # If teams have been added as play offs then max them out to teams in league
+  if (posH %>% is.null) posH <- KEYS$TIL
+  if (posA %>% is.null) posA <- KEYS$TIL
 
   # Determine & Return relative position as a data.frame
   return(
