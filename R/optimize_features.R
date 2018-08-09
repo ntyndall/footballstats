@@ -30,11 +30,10 @@ optimize_features <- function(optimizeModels = FALSE) {
     )
   }
 
-  # Connect redis
-  footballstats::redis_con()
-
-  # Set up keys
-  KEYS <- footballstats::keys_for_testing()
+  # Set up keys (Use the production DB)
+  KEYS <- footballstats::keys_for_testing(
+    dbnum = 1
+  )
 
   # Define the Season
   KEYS$SEASON <- 2017
@@ -52,7 +51,7 @@ optimize_features <- function(optimizeModels = FALSE) {
   total.metrics <- data.frame(stringsAsFactors = FALSE)
   for (comp in 1:(allComps %>% length)) {
 
-    cat(' ##', comp, '/', allComps %>% length, '\n')
+    cat(' \n ##', comp, '/', allComps %>% length, '\n')
     subs.data <- data.set %>% subset(allComps[comp] == data.set$comp_id)
 
     # Set up a progress bar here
@@ -111,9 +110,17 @@ optimize_features <- function(optimizeModels = FALSE) {
         FUN = function(x) x %>% footballstats::commentary_from_redis(returnItems = allowedCommentaries)
       ) %>%
         purrr::flatten_dbl()
-      names(cInfo) <- sapply(c(".h", ".a"), function(x) allowedCommentaries %>% paste0(x)) %>% as.character
-      matchMetrics %<>% cbind(cInfo)
 
+      # Go onto next if cInfo isn't long enough
+      if (cInfo %>% length %>% `!=`(12)) next
+
+      # Create data frame of cInfo and append on
+      names(cInfo) <- sapply(c(".h", ".a"), function(x) allowedCommentaries %>% paste0(x)) %>% as.character
+      matchMetrics %<>% cbind(
+        cInfo %>%
+          data.frame(stringsAsFactors = FALSE) %>%
+          t
+        )
 
       # Bind the positions on
       matchMetrics %<>% cbind(
@@ -136,15 +143,11 @@ optimize_features <- function(optimizeModels = FALSE) {
     }
   }
 
-  # Change possesion to some integer
-  poss_to_int <- function(x) x %>% substr(1, x %>% nchar %>% `-`(1))
-  total.metrics$possesiontime.a %<>% poss_to_int()
-  total.metrics$possesiontime.h %<>% poss_to_int()
-
   # Start to optimize this data set
   total.metrics %>%
-    footballstats::optimize_variables(
-      optimizeModels = optimizeModels,
-      GRIDS = GRIDS
+    optimize_variables(
+      optimizeModels = TRUE,
+      GRIDS = GRIDS,
+      types = "xgboost"
     )
 }
