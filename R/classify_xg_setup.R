@@ -7,6 +7,10 @@
 
 classify_xg_setup <- function(KEYS, singleFixture, datModel) {
 
+
+
+  library(xgboost)
+
   # Initialise list here
   predicted <- list(
     analysed = 0,
