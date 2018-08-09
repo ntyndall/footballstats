@@ -4,7 +4,7 @@
 \alias{generate_predictions}
 \title{generate_predictions}
 \usage{
-generate_predictions(KEYS, fixtureList)
+generate_predictions(KEYS, fixtureList, cMethod = "xgboost")
 }
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /

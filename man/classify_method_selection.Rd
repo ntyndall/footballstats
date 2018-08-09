@@ -4,7 +4,7 @@
 \alias{classify_method_selection}
 \title{Classify Method Selection}
 \usage{
-classify_method_selection(KEYS, method = "", singleFixture)
+classify_method_selection(KEYS, method = "", singleFixture, datModel)
 }
 \description{
 A function to decide which model to use

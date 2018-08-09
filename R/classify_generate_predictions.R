@@ -18,13 +18,20 @@
 #' @export
 
 
-generate_predictions <- function(KEYS, fixtureList) {
+generate_predictions <- function(KEYS, fixtureList, cMethod = "xgboost") {
 
   # Order the fixture list dataframe
   fixtureList <- fixtureList[fixtureList$formatted_date %>%
     as.Date(format = '%d.%m.%Y') %>%
     as.integer %>%
     order, ]
+
+  # Load the appropriate data model
+  datModel <- if (cMethod == "xgboost") {
+    load(file = getwd() %>% paste0("/xgModel.rda"))
+  } else {
+    footballstats::nn
+  }
 
   # Initialise arguments
   analysed <- nAnalysed <- correct <- todaysDate <- 0
@@ -61,7 +68,8 @@ generate_predictions <- function(KEYS, fixtureList) {
     predicted <- KEYS %>%
       footballstats::classify_method_selection(
         method = "xgboost",
-        singleFixture = singleFixture
+        singleFixture = singleFixture,
+        datModel = datModel
       )
 
     # Increment objects

@@ -6,7 +6,7 @@
 #' @export
 
 
-classify_method_selection <- function(KEYS, method = "", singleFixture) {
+classify_method_selection <- function(KEYS, method = "", singleFixture, datModel) {
 
   # Allowed types
   allowedMethods <- c("xgboost", "neuralnetwork")
@@ -15,7 +15,8 @@ classify_method_selection <- function(KEYS, method = "", singleFixture) {
   predicted <- if (method == "xgboost") {
     predicted <- KEYS %>%
       footballstats::classify_xg_setup(
-        singleFixture = singleFixture
+        singleFixture = singleFixture,
+        datModel = datModel
       )
   } else if (method == "neuralnetwork") {
     KEYS %>%

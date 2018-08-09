@@ -3,7 +3,7 @@
 #' @export
 
 
-classify_xg_setup <- function(KEYS, singleFixture) {
+classify_xg_setup <- function(KEYS, singleFixture, datModel) {
 
   # Initialise list here
   predicted <- list(
@@ -68,7 +68,7 @@ classify_xg_setup <- function(KEYS, singleFixture) {
       )
 
     # Make the prediction
-    result <- predict(footballstats::xgModel, sparse.test)
+    result <- predict(datModel, sparse.test)
 
     # Get the home team result
     resultsOrd <- c('D', 'L', 'W')
