@@ -4,5 +4,5 @@
 \alias{get_grid_matches}
 \title{Get Grid Matches}
 \usage{
-get_grid_matches(existing.topscore, fullGrid, r = FALSE)
+get_grid_matches(existing, fullGrid, r = FALSE)
 }
