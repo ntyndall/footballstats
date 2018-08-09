@@ -44,6 +44,13 @@ optimize_positiongrid <- function(pos, gridPoints, mygrid, boundaries) {
         )
       )
     }
+
+    # If play-offs mean I can't find a position put it first or last
+    if (res %>% length %>% `==`(0)) {
+      res <- if (h > a) gridPoints[1] else gridPoints[gridPoints %>% length]
+    }
+
+    # Append results on
     results %<>% c(res)
   }
   return(results)
@@ -54,21 +61,21 @@ optimize_positiongrid <- function(pos, gridPoints, mygrid, boundaries) {
 #' @export
 
 
-get_grid_matches <- function(existing.topscore, fullGrid, r = FALSE) {
+get_grid_matches <- function(existing, fullGrid, r = FALSE) {
   # Make sure the grid names matches up
-  names(fullGrid) <- names(existing.topscore)
+  names(fullGrid) <- names(existing)
 
   # Check for matches
   totMatches <- 0
-  for (i in 1:(existing.metrics %>% nrow)) {
+  for (i in 1:(existing %>% nrow)) {
     res <- suppressMessages(
       expr = fullGrid %>%
-        plyr::match_df(existing.metrics[i, ]) %>%
+        plyr::match_df(existing[i, ]) %>%
         nrow
     )
-    if (res %>% `==`(1)) if (r) return(TRUE) else totMatches %<>% `+`(1)
+    if (res %>% `==`(1)) totMatches %<>% `+`(1)
   }
 
   # Return number of matches
-  return(if (r) FALSE else totMatches)
+  return(if (r) totMatches %>% `==`(existing %>% nrow) else totMatches)
 }
