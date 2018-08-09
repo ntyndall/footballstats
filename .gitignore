@@ -4,5 +4,4 @@ tagged/*
 .Rhistory
 raw_odds/*
 param_optimization/*
-xgModel
-xgScales.rda
+xgModel.rda
