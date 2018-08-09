@@ -6,6 +6,9 @@
 optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                                overwrite = FALSE, types = c("xgboost", "neuralnetwork")) {
 
+  # Must supply a valid type
+  if (types %>% length %>% `>`(0) %>% `!`()) stop("Must supply some _types_")
+
   # Redfine list from GRIDS
   DAYS <- GRIDS$DAYS
   GRID_PTS <- GRIDS$GRID_PTS
@@ -29,12 +32,12 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
         header = TRUE,
         sep = ',',
         stringsAsFactors = FALSE
-      )[ , 1:5]
+      )[ , 1:6]
 
       # Get matches with existing data frame
       totMatches <- existing.topscore %>%
         footballstats::get_grid_matches(
-          fullGrid = expand.grid(DAYS, GRID_PTS, GRID_BOUND, DECAY, TOTAL_PERC)
+          fullGrid = expand.grid(DAYS, GRID_PTS, GRID_BOUND, DECAY, TOTAL_PERC, types)
         )
     } else {
       totMatches <- 0
@@ -63,7 +66,8 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
     (GRID_PTS %>% length) *
     (GRID_BOUND %>% length) *
     (DECAY %>% length) *
-    (TOTAL_PERC %>% length)
+    (TOTAL_PERC %>% length) *
+    (types %>% length)
   totalOps %<>% `-`(totMatches)
 
   # Load up the odds frame
@@ -84,12 +88,14 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 gridBoundary = GRID_BOUND[k],
                 decay = DECAY[l],
                 totalPercentage = TOTAL_PERC[m],
+                type = types,
                 stringsAsFactors = FALSE
               )
 
+              # If there is a direct match then move onto the next iteration
               matched <- check %>%
                 footballstats::get_grid_matches(
-                  fullGrid = existing.metrics,
+                  fullGrid = existing.topscore,
                   r = TRUE
                 )
 
@@ -145,6 +151,8 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 result.dat$res <- current.row$result
                 total.results %<>% rbind(result.dat)
 
+                if (result.dat %>% anyNA()) print(drow)
+
                 # Make sure there is a match, if not then set as NA
                 matchingIndex <- current.row$matchID %>% `==`(odds.frame$matchID)
                 odds.results %<>% rbind(
@@ -165,8 +173,8 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               }
             }
 
-            # Replace NA's with 0 for now.
-            total.results[total.results %>% is.na] <- 0.0
+            # Drop incomplete rows (i.e. NA's present in ANY column)
+            total.results %<>% subset(total.results %>% stats::complete.cases())
 
             # With complete data set, get scaling parameters
             dataScales <- total.results %>%
@@ -193,33 +201,30 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             FOLD_DATA <- total.results$res %>%
               footballstats::create_folds()
 
-            # Build XGBoost model using CV
-            startTime <- Sys.time()
-            xgb <- scaled.results %>%
-              footballstats::method_xgboost(
-                odds.results = odds.results,
-                FOLD_DATA = FOLD_DATA,
-                XGB = XGB
-              )
-            endTime <- Sys.time()
-            tDiff <- difftime(
-              time1 = endTime,
-              time2 = startTime
-            ) %>% format
-            cat(" XGBoost took :", tDiff, "\n")
+            # Initialise all methods
+            allMethods <- list()
 
-            # Save the scales and booster data sets
-            if (!optimizeModels) {
-              xgModel <- xgb$model
-              xgScales <- dataScales
-              xgboost::xgb.save(xgModel, "xgModel")
-              save(xgScales, file = "xgScales.rda")
+            # Build XGBoost model using CV
+            if ("xgboost" %in% types) {
+              startTime <- Sys.time()
+              allMethods$xgb <- scaled.results %>%
+                footballstats::method_xgboost(
+                  odds.results = odds.results,
+                  FOLD_DATA = FOLD_DATA,
+                  XGB = XGB
+                )
+              endTime <- Sys.time()
+              tDiff <- difftime(
+                time1 = endTime,
+                time2 = startTime
+              ) %>% format
+              cat(" XGBoost took :", tDiff, "\n")
             }
 
-            if (optimizeModels) {
-              # Build neural network using CV
+            # Build Neural network model using CV
+            if ("neuralnetwork" %in% types) {
               startTime <- Sys.time()
-              nn <- scaled.results %>%
+              allMethods$neuralnetwork <- scaled.results %>%
                 footballstats::neural_network(
                   odds.results = odds.results,
                   FOLD_DATA = FOLD_DATA,
@@ -232,11 +237,23 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 time2 = startTime
               ) %>% format
               cat(" Nueral Network took :", tDiff, "\n")
+            }
 
-              # Store the best result + output to screen
-              nnCurrentResult <- nn$totAcc %>% mean
-              xgbCurrentResult <- xgb$totAcc %>% mean
-              biggest <- nnCurrentResult %>% max(xgbCurrentResult)
+            # Save the scales and booster data sets
+            if (!optimizeModels) {
+              xgModel <- allMethods$xgb$model
+              xgScales <- dataScales
+              save(xgModel, file = "xgModel.rda")
+              save(xgScales, file = "xgScales.rda")
+            }
+
+            if (optimizeModels) {
+              # What is the best result
+              biggest <- sapply(
+                X = 1:(allMethods %>% length),
+                FUN = function(x) allMethods[[x]]$totAcc %>% mean
+              ) %>%
+                max
 
               # Print to screen the best result so far
               if (biggest %>% `>`(bestResult)) {
@@ -251,7 +268,6 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               head_write <- function(x, y) x %>% names %>% paste(collapse = ",") %>% write(file = y)
 
               # Put the different methods into a list
-              allMethods <- list(xgb, nn)
               for (z in 1:(types %>% length)) {
                 # Get average sensitivities
                 sensD <- allMethods[[z]]$totD %>% mean
@@ -265,6 +281,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                   gridBoundary = GRID_BOUND[k],
                   decay = DECAY[l],
                   totalPercentage = TOTAL_PERC[m],
+                  type = types[z],
                   `accuracy` = allMethods[[z]]$totAcc %>% mean,
                   `profit` = allMethods[[z]]$netWinnings %>% mean,
                   `profit.sd` = allMethods[[z]]$netWinnings %>% stats::sd(),
@@ -287,11 +304,15 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 )
 
                 # Make sure the results file exists and write header information
-                scoreFile <- resultsDir %>% paste0(types[z], "_results.csv")
-                if (scoreFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = scoreFile)
+                if (resultsFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = resultsFile)
 
                 # Write results to files line by line
-                topscore.frame %>% paste(collapse = ',') %>% write(file = scoreFile, append = T)
+                topscore.frame %>%
+                  paste(collapse = ',') %>%
+                  write(
+                    file = resultsFile,
+                    append = TRUE
+                  )
               }
 
               # Make sure the metrics file exists and write header information
