@@ -118,7 +118,7 @@ format_dates <- function(standardDateFormat) {
 start_season <- function() {
   frm <- function(f) Sys.Date() %>% format(f) %>% as.integer
   currentSeason <- frm("%Y")
-  return(if (`<`(frm("%m"), 7)) currentSeason - 1 else currentSeason)
+  return(if (7 %>% `<`(frm("%m"))) currentSeason - 1 else currentSeason)
 }
 
 #' @title Check Request Limit
