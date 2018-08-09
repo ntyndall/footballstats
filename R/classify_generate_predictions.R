@@ -29,6 +29,7 @@ generate_predictions <- function(KEYS, fixtureList, cMethod = "xgboost") {
   # Load the appropriate data model
   datModel <- if (cMethod == "xgboost") {
     load(file = getwd() %>% paste0("/xgModel.rda"))
+    xgModel
   } else {
     footballstats::nn
   }
