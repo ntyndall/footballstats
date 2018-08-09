@@ -38,19 +38,23 @@ add_all <- function(KEYS) { # nocov start
   # Add match information and order it
   cat(paste0(Sys.time(), ' | Matches ...'))
   matches <- KEYS %>%
-    footballstats::amatch_info() %>%
-    footballstats::order_matchdata()
+    footballstats::amatch_info()
   cat(' complete \n')
 
-  # Build league table
-  cat(paste0(Sys.time(), ' | Creating the league table ... \n'))
-  KEYS %>% footballstats::create_table(
-    matchData = matches
-  )
+  # Order match data + perform other operations if any data exists
+  if (matches %>% nrow %>% `>`(0)) {
+    matches %<>% footballstats::order_matchdata()
 
-  # Store positions on a weekly basis
-  cat(paste0(Sys.time(), ' | Storing weekly positions ... \n'))
-  KEYS %>% footballstats::weekly_positions()
+    # Build league table
+    cat(paste0(Sys.time(), ' | Creating the league table ... \n'))
+    KEYS %>% footballstats::create_table(
+      matchData = matches
+    )
+
+    # Store positions on a weekly basis
+    cat(paste0(Sys.time(), ' | Storing weekly positions ... \n'))
+    KEYS %>% footballstats::weekly_positions()
+  }
 
   # Store predicted vs. real outcomes
   readyToAnalyse <- paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*') %>%
