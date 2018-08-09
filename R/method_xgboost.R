@@ -97,6 +97,11 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
       bestAcc <- totalStats$totAcc[i]
       bestXGB <- xgb
     }
+
+    rm(xgb)
+    rm(train.data)
+    rm(test.data)
+    rm(new.odds)
   }
 
   # Return neural network plus results
