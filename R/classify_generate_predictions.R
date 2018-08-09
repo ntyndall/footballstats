@@ -103,9 +103,14 @@ generate_predictions <- function(KEYS, fixtureList) {
     }
 
     # Logs for console and for slack
-    txt <- paste0('[', actualH, '] ', homeName, ' vs. ', awayName, ' [', actualA, ']') %>% as.character
-    txtForSlack <- paste0(teamIDs[1] %>% blnk(), ' `', txt, '` ', teamIDs[2] %>% blnk()) %>% as.character
-    totalTxt %<>% c(txtForSlack)
+    totalTxt %<>% c(
+      paste0(
+        singleFixture$localteam_id %>% blnk(),
+        " `[", actualH, "] ", homeName, " vs. ", awayName, " [", actualA, "]` ",
+        singleFixture$visitorteam_id %>% blnk()
+      ) %>%
+        as.character
+    )
 
     # When making a prediction - store the guess for later
     if (KEYS$LOG_PRED) {
