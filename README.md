@@ -54,6 +54,8 @@ where the last token is the root path of where the above script is run from, e.g
 # ...
 ```
 
+Unfortunately, the size of the XGBoost model being stored in the R package leads to memory issues when lazy loading - to save some cash on large memory boxes, I _can_ just `scp xgModel.rda root@IP:/root` the file across and load it while performing the analysis so I don't have to lazy load it.
+
 ## Tagging a release
   - Update `DESCRIPTION` file to required version (must be > than most recent `GIT` version).
   - Run `Rscript tag.R {v#}` inside root directory `/footballstats/`.
