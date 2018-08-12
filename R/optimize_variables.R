@@ -103,11 +103,25 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             }
 
             icount %<>% `+`(1)
-            cat(' ## Analysing operation', icount, '/', totalOps, '\n')
+            cat(' ## Analysing operation', icount, '/', totalOps, ' (Loading data first) \n')
             odds.results <- total.results <- data.frame(stringsAsFactors = FALSE)
+
+            # Set up a progress bar here
+            pb <- utils::txtProgressBar(
+              min = 0,
+              max = total.metrics %>% nrow,
+              style = 3
+            )
 
             # Now loop over all of total.metrics
             for (drow in 2:(total.metrics %>% nrow)) {
+
+              # Update the progress bar
+              utils::setTxtProgressBar(
+                pb = pb,
+                value = drow
+              )
+
               current.row <- total.metrics[drow, ]
               smaller.metrics <- total.metrics[1:(drow - 1), ]
 
@@ -151,7 +165,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 result.dat$res <- current.row$result
                 total.results %<>% rbind(result.dat)
 
-                if (result.dat %>% anyNA()) print(drow)
+                # if (result.dat %>% anyNA()) print(drow)
 
                 # Make sure there is a match, if not then set as NA
                 matchingIndex <- current.row$matchID %>% `==`(odds.frame$matchID)
