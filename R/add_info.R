@@ -433,7 +433,7 @@ aplayer_info <- function(KEYS, playerLength) {
     footballstats::playerData %>% list
   } else {
     lapply(
-      X =  paste0("/player/", playerID, "?"),
+      X = paste0("/player/", playerIDs, "?"),
       FUN = function(x) x %>% footballstats::get_data(
         KEYS = KEYS
       )
