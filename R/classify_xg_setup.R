@@ -20,7 +20,7 @@ classify_xg_setup <- function(KEYS, singleFixture, datModel) {
     )
 
   # NA'S EXIST
-  if (all.inter.data %>% anyNA %>% `!`()) {
+  if (all.inter.data %>% anyNA %>% `!`() %>% `&&`(all.inter.data %>% is.null %>% `!`())) {
     # do calculations here (OPTIMIZE THESE VALUES ELSEWHERE!)
     result.dat <- all.inter.data %>%
       footballstats::optimize_calculation(
@@ -47,7 +47,7 @@ classify_xg_setup <- function(KEYS, singleFixture, datModel) {
   }
 
   # If any are missing then return early
-  if (all.inter.data %>% anyNA) {
+  if (all.inter.data %>% anyNA %>% `||`(all.inter.data %>% is.null)) {
     predicted$nAnalysed %<>% `+`(1)
   } else {
     predicted$analysed %<>% `+`(1)
