@@ -25,10 +25,8 @@ build_raw_data <- function(KEYS, singleFixture) {
   # Need to build a similar list of data frames...
   idTypes <- c('localID', 'awayID')
 
-  # May need to up this (or change it in general depending on the model)
-  DAYNUM <- 3
-
-  allresults <- lapply(
+  # Build the 4 by KEYS$DAYS list of metrics
+  allResults <- lapply(
     X = 1:2,
     FUN = function(i) {
       currentID <- if (i == 1) teamIDs[1] else teamIDs[2]
@@ -48,7 +46,7 @@ build_raw_data <- function(KEYS, singleFixture) {
       matchIDs <- ordKeys %>%
         footballstats::flatt(y = 3)
 
-      # Make sure matchID is next in the sequence
+      # Make sure matchID is next in the sequence, if not enough exist then return early
       subIDs <- matchIDs %>% `<`(matchID)
 
       # Subset IDs and keys
@@ -64,9 +62,14 @@ build_raw_data <- function(KEYS, singleFixture) {
       ) %>%
         purrr::flatten_chr()
 
+      # Get all local and away matches
       localMatch <- localOrAway %>% `==`(currentID) %>% which
-      awayMatch <- c(1:(localOrAway %>% length)) %>% setdiff(localMatch) %>% `[`(c(1:DAYNUM))
-      localMatch %<>% `[`(c(1:DAYNUM))
+      awayMatch <- c(1:(localOrAway %>% length)) %>% setdiff(localMatch)
+
+      # If not enough exist then exit early
+      if (localMatch %>% length %>% `<`(KEYS$DAYS) %>% `||`(awayMatch %>% length %>% `<`(KEYS$DAYS))) return(NULL)
+      awayMatch %<>% `[`(c(1:KEYS$DAYS))
+      localMatch %<>% `[`(c(1:KEYS$DAYS))
 
       # Now, what do I need in each data frame?!?!
       localComm <- ordKeys %>% `[`(localMatch)
@@ -99,27 +102,53 @@ build_raw_data <- function(KEYS, singleFixture) {
             paste0(currentIDs, ":", c(baseResults %>% mf(4), baseResults %>% mf(6))) %>%
             matrix(ncol = 2)
 
+          # Convert the matrix to a character vector
           subCKeys <- sapply(
             X = 1:(subCKeys %>% nrow),
             FUN = function(x) subCKeys[x, ]
           ) %>%
             as.character
 
+          # Get the actual commentary results from both teams
           cResults <- lapply(
             X = subCKeys,
             FUN = function(x) x %>% footballstats::commentary_from_redis(returnItems = allowedCommentaries)
           )
 
-          # Can I stack results every 2?
-          newRes <- lapply(X = 1:(cResults[[1]] %>% length), FUN = function(x) cResults %>% purrr::map(x) %>% purrr::flatten_dbl())
+          # If any of the results are NULL from the matching commentary.
+          nullComms <- cResults %>%
+            purrr::map(length) %>%
+            as.double %>%
+            `==`(allowedCommentaries %>% length) %>%
+            `!`()
+
+          # Need to fix this by pushing commentaries later (this should be rare)
+          if (nullComms %>% any) {
+            cat(" ## WARNING: Missing commentary keys:",  subCKeys %>% `[`(nullComms %>% which), "\n")
+            return(NULL)
+          }
+
+          # Transpose the list of results
+          newRes <- lapply(
+            X = 1:(cResults[[1]] %>% length),
+            FUN = function(x) cResults %>% purrr::map(x) %>% purrr::flatten_dbl()
+          )
           names(newRes) <- allowedCommentaries
 
+          # Create data frame from list
           tf <- newRes %>% data.frame(stringsAsFactors = FALSE)
           tf <- cbind(tf %>% subset(c(TRUE, FALSE)), tf %>% subset(c(FALSE, TRUE)))
-          names(tf) <- sapply(c(".h", ".a"), FUN = function(x) allowedCommentaries %>% paste0(x)) %>% as.character
+          names(tf) <- sapply(
+            X = c(".h", ".a"),
+            FUN = function(x) allowedCommentaries %>% paste0(x)
+          ) %>%
+            as.character
 
           # Now create basic data frame
-          newBase <- lapply(X = 1:(baseResults[[1]] %>% length), FUN = function(x) baseResults %>% purrr::map(x) %>% purrr::flatten_chr())
+          newBase <- lapply(
+            X = 1:(baseResults[[1]] %>% length),
+            FUN = function(x) baseResults %>% purrr::map(x) %>% purrr::flatten_chr()
+          )
           newBase %<>% data.frame(stringsAsFactors = FALSE)
           names(newBase) <- c(
             "matchID", "date", "localName", "localID", "awayName",
@@ -133,15 +162,14 @@ build_raw_data <- function(KEYS, singleFixture) {
 
           # Get scores
           newBase$result <- sapply(
-            X = 1:DAYNUM,
+            X = 1:KEYS$DAYS,
             FUN = function(x) newBase$localScore[x] %>% footballstats::match_result(newBase$awayScore[x])
           )
-
           allData <- cbind(newBase, tf)
 
           # Now get positions and other stuff
           positions <- lapply(
-            X = 1:DAYNUM,
+            X = 1:KEYS$DAYS,
             FUN = function(x) {
               KEYS %>% footballstats::feat_position(
                 matchID = allData$matchID[x],
@@ -161,6 +189,15 @@ build_raw_data <- function(KEYS, singleFixture) {
     }
   )
 
-  # Return results back as a data frame
-  return(allresults %<>% purrr::flatten_dfr())
+  # Flatten the data frame and make some final checks
+  allResults %<>% purrr::flatten_dfr()
+
+  # Check nrows is valid
+  return(
+    if (allResults %>% nrow %>% `!=`(KEYS$DAYS * 4)) {
+      NULL
+    } else {
+      allResults
+    }
+  )
 }
