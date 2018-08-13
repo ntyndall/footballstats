@@ -4,7 +4,7 @@
 \alias{predict_matches}
 \title{Predict Matches}
 \usage{
-predict_matches(KEYS)
+predict_matches(KEYS, cMethod = "xgboost", datModel)
 }
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /
