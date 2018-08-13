@@ -17,7 +17,7 @@
 #' @export
 
 
-predict_matches <- function(KEYS) {
+predict_matches <- function(KEYS, cMethod = "xgboost", datModel) {
 
   # Get fixtures
   cat(paste0(Sys.time(), ' | About to report on results...\n'))
@@ -32,7 +32,9 @@ predict_matches <- function(KEYS) {
   if (fixtureList %>% is.null %>% `!`()) {
     numOfPredicted <- KEYS %>%
       footballstats::generate_predictions(
-        fixtureList = fixtureList
+        fixtureList = fixtureList,
+        cMethod = cMethod,
+        datModel = datModel
       )
     predictions <- numOfPredicted$analysed
     cat(paste0(Sys.time(), ' | Predicted a total of ', numOfPredicted$analysed, ' matches. \n'))

@@ -58,6 +58,18 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
   KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
   totalPredictions <- 0
+
+
+  # Load the appropriate data model
+  cat(paste0(Sys.time(), " | Loading data model ... "))
+  datModel <- if (cMethod == "xgboost") {
+    load(file = getwd() %>% paste0("/xgModel.rda"))
+    xgModel
+  } else {
+    footballstats::nn
+  }
+  cat(" complete. \n\n")
+
   for (i in 1:nrow(competitions)) {
     cat(paste0(Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
                competitions$name[i], ' - ', competitions$region[i], '). \n'))
@@ -69,7 +81,9 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
 
     cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
     predictions <- KEYS %>%
-      footballstats::predict_matches()
+      footballstats::predict_matches(
+        datModel = datModel
+      )
     totalPredictions %<>% `+`(predictions)
 
     # Send a slack message to indicate how many matches have been predicted

@@ -18,21 +18,13 @@
 #' @export
 
 
-generate_predictions <- function(KEYS, fixtureList, cMethod = "xgboost") {
+generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
 
   # Order the fixture list dataframe
   fixtureList <- fixtureList[fixtureList$formatted_date %>%
     as.Date(format = '%d.%m.%Y') %>%
     as.integer %>%
     order, ]
-
-  # Load the appropriate data model
-  datModel <- if (cMethod == "xgboost") {
-    load(file = getwd() %>% paste0("/xgModel.rda"))
-    xgModel
-  } else {
-    footballstats::nn
-  }
 
   # Initialise arguments
   analysed <- nAnalysed <- correct <- todaysDate <- 0
