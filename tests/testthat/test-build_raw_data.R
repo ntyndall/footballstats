@@ -1,4 +1,5 @@
 
+KEYS$RED$FLUSHDB()
 
 test_that("Can I build a simple raw data frame before it gets compressed to aggregate statistics", {
 

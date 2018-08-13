@@ -21,7 +21,7 @@ keys_for_testing <- function(dbnum = 3) {
       TEST = TRUE,
       LOG_PRED = FALSE,
       LOGGING = FALSE,
-      DAYS = 4,
+      DAYS = 3,
       STAND = 0.5,
       TIL = 20,
       RED = redux::hiredis(db = dbnum),
