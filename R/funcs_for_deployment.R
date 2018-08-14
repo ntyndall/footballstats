@@ -24,11 +24,6 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
     storePred = TRUE
   )
 
-  # Set up additional keys required for the main flow
-  KEYS$SEASON <- footballstats::start_season()
-  KEYS$DATE_FROM <- paste0('01.07.', KEYS$SEASON)
-  KEYS$DATE_TO <- (Sys.Date() - 1) %>% footballstats::format_dates()
-
   # Load competitions and run the functionality below.
   competitions <- KEYS %>% footballstats::acomp_info()
 
@@ -41,13 +36,24 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   # Loop over all competitions being analysed
   for (i in 1:nrow(competitions)) {
     cat(
-      ' ## Storing ::' , i, '/', nrow(competitions), '(',
-      competitions$name[i], '-', competitions$region[i], '). \n'
+      " ## Storing ::" , i, "/", nrow(competitions), "(",
+      competitions$name[i], "-", competitions$region[i], ")."
     )
 
+    # Append the appropriate competition information to KEYS
     KEYS$COMP <- competitions$id[i]
     KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
-    KEYS %>% footballstats::add_all()
+
+    # Get the dates and seasons from yaml file
+    KEYS %<>% footballstats::dates_from_yaml()
+
+    # Only add data if it is within the season window
+    if (KEYS$ACTIVE) {
+      cat(" ACTIVE \n")
+      KEYS %>% footballstats::add_all()
+    } else {
+      cat("INACTIVE \n")
+    }
   }
 
   # --- Make sure any new stats haven't been added since last call -- #
@@ -71,8 +77,12 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   cat(" complete. \n\n")
 
   for (i in 1:nrow(competitions)) {
-    cat(paste0(Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
-               competitions$name[i], ' - ', competitions$region[i], '). \n'))
+    cat(
+      paste0(
+        Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
+        competitions$name[i], ' - ', competitions$region[i], '). \n'
+      )
+    )
 
     # Predict actual future results
     KEYS$COMP <- competitions$id[i]
