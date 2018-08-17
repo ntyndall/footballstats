@@ -7,7 +7,7 @@
 
 ## Installing and running this package
 
-```
+```r
 # Run this as a script
 
 # Install football stats from github
@@ -33,13 +33,13 @@ footballstats::stats_from_yaml()
 
 #### Deployment
   - Download and install [redis](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-redis) then from the command line start it by typing
-```
+```shell
 cd redis-stable/utils
 sudo ./install_server.sh
 ```
 To start and stop the redis server type `sudo service redis_6379 start / stop`
   - Edit the `/usr/lib/R/etc/Rprofile.site` file and include the following 3 tokens
-```
+```r
 Sys.setenv(FS_HOST = "___")
 Sys.setenv(FS_APIKEY = "Authorization=___")
 Sys.setenv(FS_SLACK = "___")
@@ -47,7 +47,7 @@ Sys.setenv(FS_DEPLOYLOC = "___")
 ```
 where the last token is the root path of where the above script is run from, e.g. `/root/`.
   - Set up a cron job by typing `crontab -e` with the following...
-```
+```shell
 # Collect football information - such as match / team / commentary information THEN predict matches
 0 22 * * 0 Rscript -e 'library(footballstats); footballstats::analyse_and_predict(deployed = TRUE)'
 
