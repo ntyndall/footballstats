@@ -1,4 +1,4 @@
-<img align="right" width="125" height="150" src="https://raw.githubusercontent.com/ntyndall/footballstats/master/images/sticker.png">
+<img align="right" width="125" height="150" src="https://raw.githubusercontent.com/ntyndall/footballstats/master/images/fs_sticker.png">
 
 ## Code status
 [![Build Status](https://travis-ci.org/ntyndall/footballstats.svg?branch=master)](https://travis-ci.org/ntyndall/footballstats)
