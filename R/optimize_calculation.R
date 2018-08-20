@@ -236,6 +236,33 @@ create_feature_data <- function(cFrame, type = 'h') {
   oGoals <- if (type == 'h') cFrame$awayScore else cFrame$localScore
   oType <- if (type == 'h') 'a' else 'h'
 
+  # Get convinceability
+  if (type == 'h') {
+    gd <- cFrame$localScore %>% as.integer %>% `-`(cFrame$awayScore %>% as.integer)
+  } else {
+    gd <- cFrame$awayScore %>% as.integer %>% `-`(cFrame$localScore %>% as.integer)
+  }
+
+  convince <- sapply(
+    X = 1:3,
+    FUN = function(x) {
+      if (gd[x] <= -3) {
+        1
+      } else if (gd[x] == -2) {
+        2
+      } else if (gd[x] == -1) {
+        3
+      } else if (gd[x] == 0) {
+        4
+      } else if (gd[x] == 1) {
+        5
+      } else if (gd[x] == 2) {
+        6
+      } else if (gd[x] >= 3) {
+        7
+      }
+    }
+  )
 
   featFrame <- data.frame(
     xg = goals %>% as.integer,
@@ -244,6 +271,7 @@ create_feature_data <- function(cFrame, type = 'h') {
     defensive = oGoals %>% footballstats::take_ratio(y = cFrame[[paste0('shots_ongoal.', oType)]]),
     shotacc = cFrame[[paste0('shots_ongoal.', type)]] %>% footballstats::take_ratio(y = cFrame[[paste0('shots_total.', type)]]),
     shotrate = cFrame[[paste0('shots_total.', type)]] %>% footballstats::take_ratio(y = cFrame[[paste0('possesiontime.', type)]]),
+    convince = convince,
     stringsAsFactors = FALSE
   )
 
