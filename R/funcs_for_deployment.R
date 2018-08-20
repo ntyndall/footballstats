@@ -14,7 +14,7 @@
 #' @export
 
 
-analyse_and_predict <- function(deployed = FALSE) { # nocov start
+analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
@@ -37,7 +37,7 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   for (i in 1:nrow(competitions)) {
     cat(
       " ## Storing ::" , i, "/", nrow(competitions), "(",
-      competitions$name[i], "-", competitions$region[i], ")."
+      competitions$name[i], "-", competitions$region[i], " ["
     )
 
     # Append the appropriate competition information to KEYS
@@ -49,10 +49,10 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
 
     # Only add data if it is within the season window
     if (KEYS$ACTIVE) {
-      cat(" ACTIVE \n")
+      cat(" ACTIVE ] ).\n")
       KEYS %>% footballstats::add_all()
     } else {
-      cat("INACTIVE \n")
+      cat(" INACTIVE ).\n")
     }
   }
 
@@ -64,7 +64,6 @@ analyse_and_predict <- function(deployed = FALSE) { # nocov start
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
   KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
   totalPredictions <- 0
-
 
   # Load the appropriate data model
   cat(paste0(Sys.time(), " | Loading data model ... "))
