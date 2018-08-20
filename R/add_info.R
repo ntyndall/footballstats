@@ -312,7 +312,7 @@ amatch_info <- function(KEYS) {
   if (matches %>% is.null %>% `!`()) {
 
     # If getting match info - make sure all matches have actually ended and been played!
-    matches %<>% subset(matches$status %>% `==`('FT'))
+    matches %<>% subset(matches$status %>% `==`('FT') %>% `&`(matches$ft_score %>% `!=`("[-]")))
 
     # Push unique team ID's to a list for analysis later
     KEYS$RED$pipeline(
