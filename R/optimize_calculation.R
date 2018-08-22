@@ -244,21 +244,21 @@ create_feature_data <- function(cFrame, type = 'h') {
   }
 
   convince <- sapply(
-    X = 1:3,
+    X = gd,
     FUN = function(x) {
-      if (gd[x] <= -3) {
+      if (x <= -3) {
         1
-      } else if (gd[x] == -2) {
+      } else if (x == -2) {
         2
-      } else if (gd[x] == -1) {
+      } else if (x == -1) {
         3
-      } else if (gd[x] == 0) {
+      } else if (x == 0) {
         4
-      } else if (gd[x] == 1) {
+      } else if (x == 1) {
         5
-      } else if (gd[x] == 2) {
+      } else if (x == 2) {
         6
-      } else if (gd[x] >= 3) {
+      } else if (x >= 3) {
         7
       }
     }

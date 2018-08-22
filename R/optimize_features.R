@@ -145,7 +145,7 @@ optimize_features <- function(optimizeModels = FALSE) {
 
   # Start to optimize this data set
   total.metrics %>%
-    optimize_variables(
+    footballstats::optimize_variables(
       optimizeModels = TRUE,
       GRIDS = GRIDS,
       types = "xgboost"
