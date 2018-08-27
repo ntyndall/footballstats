@@ -5,6 +5,12 @@
 
 create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFactor, totalPer, savePlot = TRUE) {
 
+  # Create the root directory
+  rootDir <- getwd() %>%
+    paste0("/param_optimization/")
+
+  if (rootDir %>% dir.exists %>% `!`()) rootDir %>% dir.create
+
   # Get all unique feature names
   singlePlots <- total.results %>%
     names %>%
@@ -24,11 +30,7 @@ create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFacto
     purrr::flatten_chr()
 
   # Fill out actual directory location
-  dirNames <- getwd() %>%
-    paste0(
-      "/param_optimization/",
-      dirNames
-    )
+  dirNames <- rootDir %>% paste0(dirNames)
 
   # Which directories don't exist
   dirExists <- dirNames %>%
