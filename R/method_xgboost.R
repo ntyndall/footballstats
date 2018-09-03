@@ -28,7 +28,7 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
   totalStats <- footballstats::init_conf_stats()
 
   # Start logging
-  cat(" ## XG CV :")
+  cat("\n ## XG CV :")
 
   # Build the model
   for (i in 1:(FOLD_DATA$PER + 1)) {
