@@ -17,13 +17,13 @@ optimize_features <- function(optimizeModels = FALSE) {
   } else {
     list(
       DAYS = 3,
-      GRID_PTS = 2,
-      GRID_BOUND = 0.1,
-      DECAY = 1,
-      TOTAL_PERC = 0.5,
+      GRID_PTS = 8,
+      GRID_BOUND = 0.2,
+      DECAY = 5000,
+      TOTAL_PERC = 1,
       NN_REP = 1,
       NN_THRESH = 0.18,
-      XG_ROUNDS = 40000,
+      XG_ROUNDS = 50000,
       XG_DEPTH = 10,
       XG_ETA = 0.2,
       XG_GAMMA = 2
@@ -144,9 +144,9 @@ optimize_features <- function(optimizeModels = FALSE) {
   }
 
   # Start to optimize this data set
-  total.metrics %>%
+  footballstats::total.metrics %>%
     footballstats::optimize_variables(
-      optimizeModels = TRUE,
+      optimizeModels = FALSE,
       GRIDS = GRIDS,
       types = "xgboost"
     )
