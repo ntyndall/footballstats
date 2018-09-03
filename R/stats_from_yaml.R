@@ -11,7 +11,7 @@
 #'
 #' @export
 
-KEYS$SEASON, ":",
+
 stats_from_yaml <- function(KEYS) {
 
   # Data named values
