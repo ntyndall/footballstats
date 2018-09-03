@@ -1,10 +1,10 @@
-library(magrittr)
-library(testthat)
-library(footballstats)
-library(covr)
-library(purrr)
-library(utils)
-library(redux)
+library(magrittr, warn.conflicts = FALSE, quietly = TRUE)
+library(testthat, warn.conflicts = FALSE, quietly = TRUE)
+library(footballstats, warn.conflicts = FALSE, quietly = TRUE)
+library(covr, warn.conflicts = FALSE, quietly = TRUE)
+library(purrr, warn.conflicts = FALSE, quietly = TRUE)
+library(utils, warn.conflicts = FALSE, quietly = TRUE)
+library(redux, warn.conflicts = FALSE, quietly = TRUE)
 
 # Set up enough keys for testing
 KEYS <<- footballstats::keys_for_testing()
