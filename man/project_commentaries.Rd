@@ -35,6 +35,6 @@ A function that tries to project the values of the commentary
 \details{
 Redis Keys used;
   \itemize{
-    \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+    \item{\strong{[HASH]} :: \code{csmt_commentary:{comp_id}:{season}:{match_id}:{team_id}}}
   }
 }

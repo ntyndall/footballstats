@@ -25,7 +25,7 @@ A function that projects the form of the two teams to the
 \details{
 Redis Keys used;
   \itemize{
-    \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+    \item{\strong{[HASH]} :: \code{csmt_commentary:{comp_id}:{season}:{match_id}:{team_id}}}
     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
   }
 }
