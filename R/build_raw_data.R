@@ -44,7 +44,7 @@ build_raw_data <- function(KEYS, singleFixture) {
 
       # Get the matchIDs
       matchIDs <- ordKeys %>%
-        footballstats::flatt(y = 3)
+        footballstats::flatt(y = 4)
 
       # Make sure matchID is next in the sequence, if not enough exist then return early
       subIDs <- matchIDs %>% `<`(matchID)

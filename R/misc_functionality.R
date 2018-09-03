@@ -25,7 +25,7 @@ order_commentaries <-function(KEYS, commentaryKeys) {
 
   # Get the dates just incase and make sure they are in order:
   matchIDs <- commentaryKeys %>%
-    footballstats::flatt(y = 3)
+    footballstats::flatt(y = 4)
 
   # Get formatted dates from redis as a vector
   dates <- KEYS$RED$pipeline(
