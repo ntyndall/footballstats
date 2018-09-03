@@ -187,21 +187,12 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               }
             }
 
-            # Drop incomplete rows (i.e. NA's present in ANY column)
-            total.results %<>% subset(total.results %>% stats::complete.cases())
-
-            # With complete data set, get scaling parameters
-            dataScales <- total.results %>%
-              footballstats::get_scales()
-
-            # Scale the data set
+            # Prepare data - get the scales and scale results
             scaled.results <- total.results %>%
-              footballstats::scale_data(
-                dataScales = dataScales
-              )
+              mltools::scale_data()
 
             # Create plots + get feature metrics
-            feat.metrics <- scaled.results %>%
+            feat.metrics <- scaled.results$data %>%
               footballstats::create_plot(
                 day = DAYS[i],
                 gridPoints = GRID_PTS[j],
@@ -221,7 +212,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             # Build XGBoost model using CV
             if ("xgboost" %in% types) {
               startTime <- Sys.time()
-              allMethods$xgb <- scaled.results %>%
+              allMethods$xgb <- scaled.results$data %>%
                 footballstats::method_xgboost(
                   odds.results = odds.results,
                   FOLD_DATA = FOLD_DATA,
@@ -238,7 +229,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             # Build Neural network model using CV
             if ("neuralnetwork" %in% types) {
               startTime <- Sys.time()
-              allMethods$neuralnetwork <- scaled.results %>%
+              allMethods$neuralnetwork <- scaled.results$data %>%
                 footballstats::neural_network(
                   odds.results = odds.results,
                   FOLD_DATA = FOLD_DATA,
@@ -256,7 +247,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             # Save the scales and booster data sets
             if (!optimizeModels) {
               xgModel <- allMethods$xgb$model
-              xgScales <- dataScales
+              xgScales <- scaled.results$scaler
               save(xgModel, file = "xgModel.rda")
               save(xgScales, file = "xgScales.rda")
             }
@@ -342,4 +333,6 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
       }
     }
   }
+
+  if (!optimizeModels) return(allMethods)
 }
