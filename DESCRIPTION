@@ -28,7 +28,9 @@ Imports:
     scales,
     xgboost,
     yaml,
-    redux
+    redux,
+    mltools
+Remotes: ntyndall/mltools
 Suggests:
     knitr,
     rmarkdown,
