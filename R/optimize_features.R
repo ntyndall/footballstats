@@ -106,7 +106,7 @@ optimize_features <- function(optimizeModels = FALSE) {
 
       # Add commentary information on
       cInfo <- lapply(
-        X = paste0('cmt_commentary:', KEYS$COMP, ':', matchID, ':', teamIDs),
+        X = paste0("csmt_commentary:", KEYS$COMP, ":", KEYS$SEASON, ":", matchID, ":", teamIDs),
         FUN = function(x) x %>% footballstats::commentary_from_redis(returnItems = allowedCommentaries)
       ) %>%
         purrr::flatten_dbl()

@@ -41,7 +41,7 @@ test_that("Test that commentary data is sent to Redis.", {
   )
 
   # Check what keys have been added
-  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
+  commentaryKeys <- paste0('csmt_commentary:', KEYS$COMP, '*') %>%
     KEYS$RED$KEYS() %>%
     purrr::flatten_chr()
 
@@ -51,14 +51,14 @@ test_that("Test that commentary data is sent to Redis.", {
 
 test_that("Check that the commentaries can be retrieved from redis as a double vector", {
 
-  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
+  commentaryKeys <- paste0('csmt_commentary:', KEYS$COMP, '*') %>%
     KEYS$RED$KEYS() %>%
     purrr::flatten_chr()
 
   # Make sure to pick the right commentary for testing
   teamIDs <- commentaryKeys %>%
     strsplit(split = '[:]') %>%
-    purrr::map(4) %>%
+    purrr::map(5) %>%
     purrr::flatten_chr() %>%
     as.integer %>%
     sort
@@ -85,7 +85,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
 
 test_that("Check that a list of commentary data can be aggregated correctly", {
 
-  commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
+  commentaryKeys <- paste0('csmt_commentary:', KEYS$COMP, '*') %>%
     KEYS$RED$KEYS() %>%
     purrr::flatten_chr()
 
@@ -102,7 +102,7 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
   lapply(
     X = 1:(addedOngoal %>% length),
     FUN = function(x) {
-      paste0('cmt_commentary:', KEYS$COMP, ':1:', x) %>%
+      paste0('csmt_commentary:', KEYS$COMP, ":", KEYS$SEASON, ":1:", x) %>%
         KEYS$RED$HSET(
           field = "shots_ongoal",
           value = addedOngoal[x]
@@ -110,7 +110,7 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
     }
   )
 
-  newKeys <- paste0('cmt_commentary:', KEYS$COMP, '*') %>%
+  newKeys <- paste0('csmt_commentary:', KEYS$COMP, '*') %>%
     KEYS$RED$KEYS() %>%
     purrr::flatten_chr()
 

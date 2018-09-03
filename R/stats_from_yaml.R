@@ -11,7 +11,7 @@
 #'
 #' @export
 
-
+KEYS$SEASON, ":",
 stats_from_yaml <- function(KEYS) {
 
   # Data named values
@@ -21,67 +21,76 @@ stats_from_yaml <- function(KEYS) {
   )
 
   # Find the data from the package
-  newData <- system.file("extdata", "statistics.yaml", package = "footballstats") %>%
+  all.data <- system.file("extdata", "statistics.yaml", package = "footballstats") %>%
     yaml::yaml.load_file()
 
-  # data names
-  dNames <- newData %>% names
+  # Season names
+  seasons <- all.data %>% names
 
-  # Loop over and check each entry
-  for (i in 1:(newData %>% length)) {
-    # Make sure each entry is of length two
-    datLens <- newData[[i]] %>%
-      purrr::map(length) %>%
-      as.integer
+  for (s in 1:(seasons %>% length)) {
+    # Subset the season
+    season.data <- all.data[[seasons[s]]]
 
-    # If some items are missing, let me know
-    if (7 %>% `==`(datLens) %>% all %>% `!`()) {
-      cat(' ## Check entry for ID :', dNames[i], '\n')
-      next
-    }
+    # data names
+    dNames <- season.data %>% names
 
-    # Get basic stat key
-    basicKeyName <- "csm:*:" %>%
-      paste0(dNames[i]) %>%
-      KEYS$RED$KEYS()
+    # Loop over and check each entry
+    for (i in 1:(season.data %>% length)) {
+      # Make sure each entry is of length two
+      datLens <- season.data[[i]] %>%
+        purrr::map(length) %>%
+        as.integer
 
-    # If basic stats are missing then we have a serious problem!
-    if (basicKeyName %>% length %>% `==`(0)) {
-      cat(' ## Check CSM entry for ID :', dNames[i],'\n')
-      next
-    }else {
-      basicKeyName %<>% purrr::flatten_chr()
-    }
+      # If some items are missing, let me know
+      if (7 %>% `==`(datLens) %>% all %>% `!`()) {
+        cat(' ## Check entry for ID :', dNames[i], '\n')
+        next
+      }
 
-    # Split it up to get the new key names
-    statsKey <- basicKeyName %>%
-      strsplit(split = ':') %>%
-      purrr::flatten_chr()
+      # Get basic stat key
+      basicKeyName <- "csm:*:" %>%
+        paste0(dNames[i]) %>%
+        KEYS$RED$KEYS()
 
-    # From the stats key, does the commentary exist???
-    comKey <- paste0("cmt_commentary:", statsKey[2], ":", dNames[i], ":")
+      # If basic stats are missing then we have a serious problem!
+      if (basicKeyName %>% length %>% `==`(0)) {
+        cat(' ## Check CSM entry for ID :', dNames[i],'\n')
+        next
+      }else {
+        basicKeyName %<>% purrr::flatten_chr()
+      }
 
-    # If 2 don't exist, then populate redis
-    if (comKey %>% paste0('*') %>% KEYS$RED$KEYS() %>% length %>% `!=`(2)) {
-      # Get the teamIDs
-      teamIDs <- statsKey %>%
-        paste(collapse = ':') %>%
-        KEYS$RED$HMGET(field = c("localteam_id", "visitorteam_id")) %>%
-        lapply(as.integer) %>%
-        purrr::flatten_int()
+      # Split it up to get the new key names
+      statsKey <- basicKeyName %>%
+        strsplit(split = ':') %>%
+        purrr::flatten_chr()
 
-      # Create the redis keys
-      comKey %<>% paste0(teamIDs)
+      # From the stats key, does the commentary exist???
+      comKey <- paste0("csmt_commentary:", statsKey[2], ":", seasons[s], ":", dNames[i], ":")
 
-      # Insert both teamID information
-      for (j in 1:2) {
-        input <- newData[[i]][[j]] %>% as.character
-        input[3] %<>% paste0('%')
-        comKey[j] %>% KEYS$RED$HMSET(
-          field = dValues,
-          value = input
-        )
+      # If 2 don't exist, then populate redis
+      if (comKey %>% paste0('*') %>% KEYS$RED$KEYS() %>% length %>% `!=`(2)) {
+        # Get the teamIDs
+        teamIDs <- statsKey %>%
+          paste(collapse = ':') %>%
+          KEYS$RED$HMGET(field = c("localteam_id", "visitorteam_id")) %>%
+          lapply(as.integer) %>%
+          purrr::flatten_int()
+
+        # Create the redis keys
+        comKey %<>% paste0(teamIDs)
+
+        # Insert both teamID information
+        for (j in 1:2) {
+          input <- season.data[[i]][[j]] %>% as.character
+          input[3] %<>% paste0('%')
+          comKey[j] %>% KEYS$RED$HMSET(
+            field = dValues,
+            value = input
+          )
+        }
       }
     }
   }
+
 }

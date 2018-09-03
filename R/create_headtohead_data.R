@@ -27,7 +27,7 @@ create_headtohead_data <- function(KEYS) {
   headtohead$matches <- data.set
 
   # Make sure connected to main database, and retrieve all the commentary keys
-  commKeys <- paste0("cmt_commentary:", KEYS$COMP, ":", data.set$id, ":")
+  commKeys <- paste0("csmt_commentary:", KEYS$COMP, ":2017:",  data.set$id, ":")
   allCommentaries <- c(paste0(commKeys, data.set$localteam_id),  paste0(commKeys, data.set$visitorteam_id))
 
   MYDB <- redux::hiredis(db = 1)

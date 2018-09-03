@@ -10,7 +10,7 @@
 #'
 #' @details Redis Keys used;
 #'   \itemize{
-#'     \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{csmt_commentary:{comp_id}:{season}:{match_id}:{team_id}}}
 #'   }
 #'
 #' @param KEYS A list containing options such as testing / prediction /
@@ -34,7 +34,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 
   # Initialise
   resSds <- resList <- weights <- c()
-  commKey <- paste0('cmt_commentary:', KEYS$COMP)
+  commKey <- paste0("csmt_commentary:", KEYS$COMP, ":", KEYS$SEASON)
 
   # Get the commentary names
   commentaryNames <- footballstats::dataScales$nn$commentaries %>%
@@ -80,7 +80,6 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
     calcPos <- data.frame()
     concede <- goals <- 0
     totOppData <- c()
-    commKey <- paste0('cmt_commentary:', KEYS$COMP)
 
     for (k in 1:(allCommentaryKeys %>% length)) {
       if (totOppData %>% length %>% `==`(KEYS$DAYS)) next
@@ -214,7 +213,7 @@ project_commentaries <- function(KEYS, teamIDs, matchDate, matchID) {
 #'
 #' @details Redis Keys used;
 #'   \itemize{
-#'     \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{csmt_commentary:{comp_id}:{season}:{match_id}:{team_id}}}
 #'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
 #'   }
 #'
@@ -232,7 +231,7 @@ project_form <- function(KEYS, teamIDs, currentID) {
 
   resList <- forms <- c()
   for (j in 1:2) {
-    commentaryKeys <- paste0('cmt_commentary:', KEYS$COMP, ':*:', teamIDs[j]) %>%
+    commentaryKeys <- paste0('csmt_commentary:', KEYS$COMP, ":", KEYS$SEASON, ':*:', teamIDs[j]) %>%
       rredis::redisKeys()
     if (commentaryKeys %>% is.null) break else commentaryKeys %<>% as.character
 

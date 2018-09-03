@@ -20,7 +20,7 @@ build_raw_data <- function(KEYS, singleFixture) {
     "visitorteam_id", "localteam_score", "visitorteam_score"
   )
 
-  commKey <- paste0('cmt_commentary:', KEYS$COMP, ":")
+  commKey <- paste0('csmt_commentary:', KEYS$COMP, ":", KEYS$SEASON, ":")
 
   # Need to build a similar list of data frames...
   idTypes <- c('localID', 'awayID')

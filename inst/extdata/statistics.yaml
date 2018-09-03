@@ -2,759 +2,760 @@
 # {matchID}:
 #   home: [shots_total, shots_ongoal, possession, fouls, yellowcards, redcards, corners]
 #
-2212925: # Tottenham vs. Chelsea | Date = 20/08/17
-  home: [18, 6, 68, 14, 4, 0, 14]
-  away: [9, 2, 32, 21, 3, 0, 3]
-2212929: # Crystal Palce vs. Swansea | Date = 26/08/17
-  home: [16, 3, 54, 9, 4, 0, 1]
-  away: [7, 3, 46, 6, 1, 0, 1]
-2212930: # Huddersfield vs. Southampton | Date = 26/08/17
-  home: [16, 6, 44, 10, 0, 0, 5]
-  away: [6, 3, 56, 10, 1, 0, 4]
-2212932: # Manchester United vs. Leicester City | Date = 26/08/17
-  home: [22, 7, 70, 8, 1, 0, 9]
-  away: [11, 4, 30, 7, 2, 0, 3]
-2212933: # Newcastle United vs. West Ham United | Date = 26/08/2017
-  home: [17, 8, 37, 17, 1, 0, 7]
-  away: [8, 3, 63, 11, 3, 0, 5]
-2212935: # Watford vs. Brighton & Hove Albion | Date = 26/08/2017
-  home: [8, 0, 42, 7, 0, 1, 3]
-  away: [16, 2, 58, 18, 1, 0, 11]
-2212928: # Chelsea vs. Everton | Date = 27/08/2017
-  home: [18, 7, 57, 12, 2, 0, 6]
-  away: [7, 0, 43, 7, 2, 0, 3]
-2212936: # West Brom vs. Stoke City | Date = 27/08/2017
-  home: [10, 2, 42, 10, 2, 0, 10]
-  away: [16, 2, 58, 9, 2, 0, 4]
-2216102: # Sunderland vs. Derby County | Date = 04/08/2017
-  home: [20, 4, 46, 12, 1, 0, 6]
-  away: [11, 4, 54, 11, 0, 0, 7]
-2216107: # Nottingham Forest vs. Millwall | Date = 04/08/2017
-  home: [11, 2, 69, 13, 0, 0, 5]
-  away: [23, 6, 31, 15, 1, 0, 4]
-2216150: # Barnsley vs. Sunderland | Date = 26/08/2017
-  home: [11, 6, 40, 11, 1, 0, 7]
-  away: [11, 3, 60, 7, 3, 0, 3]
-2216151: # Birmingham City vs. Reading | Date = 26/08/2017
-  home: [14, 2, 40, 10, 0, 0, 4]
-  away: [13, 5, 60, 5, 0, 0, 3]
-2216152: # Brentford vs. Wolverhampton Wanderers | Date = 26/08/2017
-  home: [14, 2, 54, 11, 1, 0, 8]
-  away: [16, 4, 46, 10, 1, 0, 6]
-2216154: # Burton Albion vs. Sheffield Wednesday | Date = 26/08/2017
-  home: [12, 4, 43, 7, 0, 0, 6]
-  away: [11, 3, 57, 17, 2, 0, 5]
-2216155: # Cardiff City vs. Queens Park Rangers | Date = 26/08/2017
-  home: [17, 8, 51, 12, 0, 0, 8]
-  away: [8, 1, 49, 16, 1, 0, 2]
-2216157: # Ipswich Town vs. Fulham | Date = 26/08/2017
-  home: [6, 2, 31, 18, 1, 0, 5]
-  away: [18, 7, 69, 12, 0, 0, 6]
-2216158: # Middlesbrough vs. Preston North End | Date = 26/08/2017
-  home: [5, 1, 48, 13, 1, 0, 3]
-  away: [12, 3, 52, 16, 2, 0, 8]
-2216159: # Millwall vs. Norwich City | Date = 26/08/2017
-  home: [11, 5, 28, 13, 2, 0, 5]
-  away: [15, 7, 72, 7, 1, 0, 6]
-2216160: # Nottingham Forest vs. Leeds United | Date = 26/08/2017
-  home: [5, 1, 59, 10, 3, 0, 4]
-  away: [18, 4, 41, 11, 2, 0, 2]
-2216161: # Sheffield United vs. Derby County | Date = 26/08/2017
-  home: [5, 4, 53, 15, 4, 0, 6]
-  away: [14, 2, 47, 12, 3, 0, 2]
-2213766: # Olympique Marseille vs. Angers SCO | Date = 20/08/2017
-  home: [12, 2, 61, 20, 3, 1, 11]
-  away: [11, 4, 39, 7, 2, 0, 2]
-2213774: # Amiens SC vs. Nice | Date = 26/08/2017
-  home: [12, 4, 34, 14, 3, 0, 3]
-  away: [12, 3, 66, 7, 3, 0, 4]
-2213776: # Bordeaux vs. Troyes | Date = 26/08/2017
-  home: [13, 8, 57, 9, 0, 0, 4]
-  away: [5, 2, 43, 17, 1, 0, 4]
-2213777: # Caen vs. Metz | Date = 26/08/2017
-  home: [16, 4, 53, 11, 2, 0, 9]
-  away: [9, 2, 47, 16, 2, 0, 3]
-2213778: # Dijon vs. Montpellier | Date = 26/08/2017
-  home: [7, 2, 53, 18, 2, 0, 2]
-  away: [11, 2, 47, 14, 2, 0, 4]
-2213781: # Nantes vs. Olympique Lyonnais | Date = 26/08/2017
-  home: [6, 2, 38, 13, 1, 0, 1]
-  away: [16, 3, 62, 11, 1, 0, 8]
-2213783: # Toulouse vs. Rennes | Date = 26/08/2017
-  home: [11, 7, 44, 19, 4, 0, 3]
-  away: [14, 3, 56, 22, 3, 1, 4]
-2213779: # Guingamp vs. Strasbourg | Date = 27/08/2017
-  home: [14, 6, 47, 12, 1, 0, 2]
-  away: [15, 3, 53, 14, 2, 0, 7]
-2213780: # Monaco vs. Olympique Marseille | Date = 27/08/2017
-  home: [14, 8, 46, 11, 2, 0, 1]
-  away: [11, 3, 54, 14, 3, 0, 1]
-2213808: # Olympique Marseille vs. Toulouse | Date = 24/09/2017
-  home: [23, 6, 63, 11, 2, 0, 12]
-  away: [8, 1, 37, 10, 0, 0, 5]
-2371755: # Toulouse vs. AC Ajaccio | Date = 27/05/2018
-  home: [13, 6, 41, 14, 0, 0, 4]
-  away: [10, 1, 59, 16, 2, 0, 3]
-2224815: # Borussia Dortmund vs. Hertha BSC | Date = 26/08/2017
-  home: [18, 8, 67, 12, 1, 0, 4]
-  away: [7, 4, 33, 9, 1, 0, 4]
-2224816: # RB Leipzig vs. Freiburg | Date = 27/08/2017
-  home: [29, 11, 68, 11, 2, 0, 8]
-  away: [7, 2, 32, 13, 0, 1, 2]
-2371355: # Wolfsburg vs. Holstein Kiel | Date = 17/05/2018
-  home: [14, 9, 50, 14, 0, 0, 6]
-  away: [11, 2, 50, 9, 0, 0, 5]
-2371356: # Holstein Kiel vs. Wolfsburg | Date = 21/05/2018
-  home: [11, 5, 59, 19, 3, 0, 5]
-  away: [13, 4, 41, 16, 2, 0, 5]
-2263556: # Genoa vs. Juventus | Date = 26/08/2017
-  home: [9, 3, 42, 13, 4, 0, 1]
-  away: [17, 7, 58, 8, 3, 0, 4]
-2263557: # Roma vs. Internazionale | Date = 26/08/2017
-  home: [18, 3, 49, 12, 1, 0, 12]
-  away: [14, 8, 51, 8, 1, 0, 6]
-2263558: # Benevento vs. Bologna | Date = 26/08/2017
-  home: [18, 6, 49, 10, 1, 0, 6]
-  away: [14, 4, 51, 13, 3, 0, 2]
-2263572: # Juventus vs. Chievo | Date = 09/09/2017
-  home: [15, 4, 59, 15, 2, 0, 10]
-  away: [15, 2, 41, 7, 1, 0, 6]
-2263598: # Fiorentina vs. Atalanta | Date = 24/09/2017
-  home: [10, 2, 37, 22, 2, 0, 3]
-  away: [16, 5, 63, 11, 5, 0, 8]
-2239703: # Vitória Setúbal vs. Chaves | Date = 20/08/2017
-  home: [18, 8, 49, 18, 1, 0, 8]
-  away: [5, 2, 51, 16, 2, 1, 1]
-2239707: # Belenenses vs. Vitória Setúbal | Date = 25/08/2017
-  home: [12, 4, 48, 23, 1, 1, 6]
-  away: [15, 5, 52, 16, 2, 0, 6]
-2239709: # Chaves vs. Feirense | Date = 26/08/2017
-  home: [20, 4, 66, 12, 1, 0, 13]
-  away: [8, 5, 34, 16, 4, 0, 3]
-2239710: # Paços de Ferreira vs. Vitória Guimarães | Date = 26/08/2017
-  home: [7, 3, 33, 14, 3, 1, 4]
-  away: [14, 1, 67, 20, 4, 0, 7]
-2239711: # Moreirense vs. Tondela | Date = 26/08/2017
-  home: [11, 3, 61, 11, 1, 1, 8]
-  away: [12, 6, 39, 19, 1, 0, 5]
-2239708: # Sporting Braga vs. Porto | Date = 27/08/2017
-  home: [12, 0, 45, 21, 3, 0, 5]
-  away: [20, 7, 55, 10, 4, 0, 7]
-2239712: # Boavista vs. Desportivo Aves | Date = 27/08/2017
-  home: [13, 3, 46, 27, 2, 0, 2]
-  away: [14, 4, 54, 12, 1, 1, 2]
-2239714: # Sporting CP vs. Estoril | Date = 27/08/2017
-  home: [13, 4, 54, 18, 4, 0, 7]
-  away: [8, 4, 46, 24, 5, 0, 3]
-2239723: # Porto vs. Chaves | Date = 09/09/2017
-  home: [17, 5, 61, 17, 1, 0, 8]
-  away: [7, 2, 39, 13, 3, 0, 2]
-2239734: # Desportivo Aves vs. Rio Ave | Date = 24/09/2017
-  home: [11, 4, 26, 17, 3, 0, 2]
-  away: [11, 1, 74, 11, 2, 0, 3]
-2239741: # Tondela vs. Sporting Braga | Date = 24/09/2017
-  home: [7, 2, 27, 11, 2, 1, 3]
-  away: [16, 3, 73, 19, 3, 0, 6]
-2239921: # Sporting CP vs. Rio Ave | Date = 18/03/2018
-  home: [16, 7, 45, 26, 3, 0, 7]
-  away: [7, 1, 55, 12, 1, 0, 1]
-2243821: # Yeni Malatyaspor vs. Antalyaspor | Date = 26/08/2017
-  home: [18, 5, 57, 13, 3, 0, 10]
-  away: [6, 3, 43, 20, 2, 0, 1]
-2243825: # Göztepe vs. Trabzonspor | Date = 26/08/2017
-  home: [18, 8, 39, 18, 2, 0, 3]
-  away: [15, 3, 61, 18, 4, 0, 4]
-2243828: # Beşiktaş vs. Bursaspor | Date = 26/08/2017
-  home: [18, 8, 64, 18, 2, 0, 8]
-  away: [4, 2, 36, 13, 3, 0, 4]
-2243829: # Kayserispor vs. Osmanlıspor | Date = 26/08/2017
-  home: [10, 4, 60, 12, 5, 1, 6]
-  away: [11, 2, 40, 12, 2, 1, 3]
-2243822: # Akhisar Belediyespor vs. Kasımpaşa | Date = 27/08/2017
-  home: [12, 5, 44, 8, 1, 1, 4]
-  away: [13, 3, 56, 14, 4, 0, 3]
-2243826: # Gençlerbirliği vs. Fenerbahçe | Date = 27/08/2017
-  home: [9, 2, 29, 13, 1, 2, 8]
-  away: [11, 3, 71, 14, 4, 0, 3]
-2243827: # İstanbul Başakşehir vs. Konyaspor | Date = 27/08/2017
-  home: [13, 5, 60, 20, 4, 0, 6]
-  away: [15, 4, 40, 12, 5, 1, 7]
-2243831: # Fenerbahçe vs. İstanbul Başakşehir | Date = 09/09/2017
-  home: [19, 2, 58, 19, 2, 0, 5]
-  away: [11, 7, 42, 12, 4, 0, 3]
-2243834: # Sivasspor vs. Kayserispor | Date = 09/09/2017
-  home: [6, 2, 54, 12, 2, 0, 6]
-  away: [8, 4, 46, 18, 2, 0, 4]
-2243836: # Karabükspor vs. Beşiktaş | Date = 09/09/2017
-  home: [15, 5, 49, 20, 3, 0, 3]
-  away: [16, 7, 51, 15, 2, 1, 4]
-2243837: # Konyaspor vs. Alanyaspor | Date = 09/09/2017
-  home: [17, 6, 61, 14, 3, 0, 12]
-  away: [13, 4, 39, 10, 2, 0, 5]
-2243860: # Göztepe vs. İstanbul Başakşehir | Date = 01/10/2017
-  home: [19, 4, 65, 11, 0, 0, 8]
-  away: [10, 3, 35, 15, 0, 0, 4]
-2243861: # Beşiktaş vs. Trabzonspor | Date = 01/10/2017
-  home: [10, 3, 45, 17, 4, 0, 1]
-  away: [12, 7, 55, 19, 4, 0, 4]
-2244124: # Alanyaspor vs. Gençlerbirliği | Date = 01/10/2017
-  home: [13, 7, 40, 9, 2, 1, 2]
-  away: [8, 4, 60, 21, 4, 0, 4]
-2244018: # Göztepe vs. Antalyaspor | Date = 11/03/2018
-  home: [13, 5, 53, 10, 3, 0, 5]
-  away: [20, 9, 47, 11, 5, 1, 7]
-2244020: # Kayserispor vs. Kardemir Karabükspor | Date = 11/03/2018
-  home: [23, 5, 69, 16, 1, 0, 13]
-  away: [4, 3, 31, 13, 1, 1, 2]
-2244024: # Galatasaray vs. Konyaspor | Date = 11/03/2018
-  home: [25, 9, 72, 13, 4, 0, 8]
-  away: [6, 2, 28, 12, 6, 0, 2]
-2244025: # Yeni Malatyaspor vs. Fenerbahçe | Date = 11/03/2018
-  home: [11, 3, 55, 16, 0, 0, 13]
-  away: [8, 3, 45, 10, 2, 0, 3]
-2244026: # Akhisarspor vs. Trabzonspor | Date = 12/03/2018
-  home: [13, 4, 45, 13, 2, 1, 8]
-  away: [12, 5, 55, 10, 2, 0, 4]
-2244028: # Kardemir Karabükspor vs. Osmanlıspor | Date = 16/03/2018
-  home: [16, 2, 53, 11, 2, 0, 3]
-  away: [17, 10, 47, 8, 2, 0, 5]
-2244030: # Kasımpaşa vs. Antalyaspor | Date = 16/03/2018
-  home: [23, 7, 51, 8, 0, 1, 9]
-  away: [15, 7, 49, 12, 4, 0, 7]
-2244027: # Fenerbahçe vs. Galatasaray | Date = 17/03/2018
-  home: [10, 6, 57, 16, 2, 0, 10]
-  away: [12, 5, 43, 16, 3, 0, 3]
-2244031: # Gençlerbirliği vs. Akhisarspor | Date = 17/03/2018
-  home: [11, 5, 52, 10, 2, 0, 5]
-  away: [10, 7, 48, 14, 1, 0, 6]
-2244034: # Bursaspor vs. Sivasspor | Date = 17/03/2018
-  home: [10, 4, 54, 13, 3, 0, 3]
-  away: [13, 7, 46, 17, 2, 0, 5]
-2244029: # Alanyaspor vs. Göztepe | Date = 18/03/2018
-  home: [15, 4, 43, 15, 1, 0, 8]
-  away: [4, 2, 57, 22, 4, 0, 1]
-2244032: # İstanbul Başakşehir vs. Beşiktaş | Date = 18/03/2018
-  home: [10, 3, 34, 22, 3, 1, 3]
-  away: [16, 2, 66, 12, 4, 0, 10]
-2244033: # Konyaspor vs. Kayserispor | Date = 18/03/2018
-  home: [12, 3, 45, 13, 0, 1, 6]
-  away: [5, 0, 55, 13, 2, 1, 4]
-2244035: # Trabzonspor vs. Yeni Malatyaspor | Date = 18/03/2018
-  home: [13, 7, 59, 12, 2, 0, 4]
-  away: [16, 6, 41, 17, 1, 0, 3]
-2244038: # Sivasspor vs. Kardemir Karabükspor | Date = 30/03/2018
-  home: [15, 5, 60, 15, 3, 0, 10]
-  away: [6, 2, 40, 15, 3, 0, 1]
-2244037: # Beşiktaş vs. Alanyaspor | Date = 31/03/2018
-  home: [10, 2, 65, 21, 5, 0, 6]
-  away: [9, 2, 35, 17, 2, 0, 2]
-2244040: # Yeni Malatyaspor vs. Gençlerbirliği | Date = 31/03/2018
-  home: [10, 6, 56, 15, 1, 0, 7]
-  away: [6, 4, 44, 13, 1, 0, 4]
-2244043: # Antalyaspor vs. Bursaspor | Date = 31/03/2018
-  home: [12, 3, 43, 18, 2, 0, 1]
-  away: [11, 1, 57, 15, 1, 0, 7]
-2244039: # Göztepe vs. Kasımpaşa | Date = 01/04/2018
-  home: [25, 8, 56, 16, 2, 1, 14]
-  away: [8, 3, 44, 9, 1, 0, 1]
-2244041: # Akhisarspor vs. İstanbul Başakşehir | Date = 01/04/2018
-  home: [11, 4, 31, 21, 1, 1, 2]
-  away: [13, 4, 69, 10, 1, 0, 5]
-2244042: # Galatasaray vs. Trabzonspor | Date = 01/04/2018
-  home: [19, 6, 55, 18, 2, 0, 4]
-  away: [9, 5, 45, 14, 3, 0, 1]
-2244044: # Osmanlıspor vs. Konyaspor | Date = 01/04/2018
-  home: [9, 2, 53, 13, 1, 0, 3]
-  away: [10, 4, 47, 7, 0, 0, 4]
-2244036: # Kayserispor vs. Fenerbahçe | Date = 02/04/2018
-  home: [8, 0, 46, 9, 2, 0, 7]
-  away: [16, 7, 54, 10, 2, 0, 4]
-2244053: # İstanbul Başakşehir vs. Yeni Malatyaspor | Date = 06/04/2018
-  home: [7, 2, 74, 16, 1, 0, 5]
-  away: [9, 4, 26, 14, 1, 0, 4]
-2244046: # Beşiktaş vs. Göztepe | Date = 07/04/2018
-  home: [19, 10, 57, 23, 1, 0, 3]
-  away: [13, 6, 43, 11, 4, 1, 5]
-2244048: # Kardemir Karabükspor vs. Antalyaspor | Date = 07/04/2018
-  home: [7, 4, 51, 17, 1, 0, 3]
-  away: [10, 4, 49, 16, 0, 0, 4]
-2244052: # Trabzonspor vs. Kayserispor | Date = 07/04/2018
-  home: [16, 8, 58, 13, 1, 0, 6]
-  away: [9, 3, 42, 12, 2, 0, 3]
-2244047: # Fenerbahçe vs. Osmanlıspor | Date = 08/04/2018
-  home: [19, 3, 62, 14, 1, 0, 9]
-  away: [8, 1, 38, 11, 2, 0, 2]
-2244049: # Bursaspor vs. Kasımpaşa | Date = 08/04/2018
-  home: [13, 3, 56, 18, 1, 0, 9]
-  away: [6, 1, 44, 12, 2, 0, 0]
-2244050: # Konyaspor vs. Sivasspor | Date = 08/04/2018
-  home: [13, 7, 56, 14, 2, 0, 4]
-  away: [10, 4, 44, 4, 0, 1, 8]
-2244051: # Alanyaspor vs. Akhisarspor | Date = 08/04/2018
-  home: [22, 8, 45, 15, 4, 0, 8]
-  away: [5, 1, 55, 18, 2, 0, 6]
-2244045: # Gençlerbirliği vs. Galatasaray | Date = 09/04/2018
-  home: [11, 2, 24, 18, 2, 0, 5]
-  away: [10, 4, 76, 12, 3, 0, 6]
-2244055: # Akhisar Genclik Spor vs. Besiktas | Date = 13/04/2018
-  home: [9, 3, 36, 16, 0, 0, 4]
-  away: [11, 4, 64, 10, 1, 0, 7]
-2244054: # Sivasspor vs. Fenerbahce | Date = 14/04/2018
-  home: [12, 4, 52, 14, 3, 0, 2]
-  away: [13, 6, 48, 15, 2, 0, 4]
-2244056: # Yeni Malatyaspor vs. Alanyaspor | Date = 14/04/2018
-  home: [9, 2, 52, 24, 3, 0, 2]
-  away: [5, 2, 48, 17, 2, 0, 5]
-2244057: # Kasimpasa vs. Kardemir Karabuk | Date = 14/04/2018
-  home: [15, 5, 57, 21, 1, 0, 7]
-  away: [8, 2, 43, 17, 2, 0, 7]
-2244058: # Galatasaray vs. İstanbul Başakşehir | Date = 15/04/2018
-  home: [15, 6, 56, 14, 3, 0, 5]
-  away: [6, 2, 44, 16, 3, 0, 1]
-2244059: # Kayserispor vs. Gençlerbirliği | Date = 15/04/2018
-  home: [9, 3, 61, 15, 2, 0, 1]
-  away: [13, 6, 39, 13, 3, 0, 7]
-2244060: # Göztepe vs. Bursaspor | Date = 15/04/2018
-  home: [7, 3, 46, 13, 1, 0, 6]
-  away: [10, 2, 54, 18, 4, 0, 5]
-2244061: # Antalyaspor vs. Konyaspor | Date = 15/04/2018
-  home: [10, 1, 38, 11, 2, 0, 3]
-  away: [8, 1, 62, 15, 2, 0, 6]
-2244062: # Osmanlıspor vs. Trabzonspor | Date = 16/04/2018
-  home: [21, 6, 43, 16, 0, 0, 6]
-  away: [13, 7, 57, 17, 1, 0, 3]
-2244069: # İstanbul Başakşehir vs. Kayserispor | Date = 20/04/2018
-  home: [14, 5, 57, 18, 1, 0, 4]
-  away: [5, 2, 43, 13, 1, 0, 3]
-2244063: # Kardemir Karabükspor vs. Bursaspor | Date = 21/04/2018
-  home: [8, 4, 48, 15, 2, 1, 2]
-  away: [10, 6, 52, 22, 4, 0, 3]
-2244064: # Alanyaspor vs. Galatasaray | Date = 21/04/2018
-  home: [12, 7, 38, 20, 3, 0, 6]
-  away: [8, 5, 62, 14, 2, 0, 1]
-2244065: # Gençlerbirliği vs. Osmanlıspor | Date = 21/04/2018
-  home: [10, 3, 59, 19, 2, 0, 4]
-  away: [17, 7, 41, 12, 1, 0, 5]
-2244070: # Trabzonspor vs. Sivasspor | Date = 21/04/2018
-  home: [19, 9, 55, 15, 2, 0, 6]
-  away: [8, 4, 45, 17, 1, 0, 1]
-2244066: # Akhisarspor vs. Göztepe | Date = 22/04/2018
-  home: [10, 4, 47, 15, 2, 0, 3]
-  away: [12, 5, 53, 19, 3, 0, 7]
-2244067: # Konyaspor vs. Kasımpaşa | Date = 22/04/2018
-  home: [14, 3, 48, 11, 2, 0, 9]
-  away: [13, 1, 52, 9, 1, 0, 8]
-2244071: # Beşiktaş vs. Yeni Malatyaspor | Date = 22/04/2018
-  home: [22, 6, 71, 10, 0, 0, 7]
-  away: [11, 5, 29, 14, 2, 0, 0]
-2244068: # Fenerbahçe vs. Antalyaspor | Date = 23/04/2018
-  home: [14, 6, 55, 12, 1, 0, 7]
-  away: [11, 5, 45, 10, 2, 0, 2]
-2244074: # Göztepe vs. Kardemir Karabükspor | Date = 27/04/2018
-  home: [20, 8, 57, 12, 0, 0, 6]
-  away: [10, 2, 43, 4, 1, 0, 2]
-2244073: # Kayserispor vs. Alanyaspor | Date = 28/04/2018
-  home: [12, 5, 62, 19, 3, 1, 1]
-  away: [14, 7, 38, 10, 1, 0, 4]
-2244075: # Sivasspor vs. Gençlerbirliği | Date = 28/04/2018
-  home: [11, 7, 54, 12, 0, 0, 4]
-  away: [5, 3, 46, 12, 4, 0, 5]
-2244079: # Antalyaspor vs. Trabzonspor | Date = 28/04/2018
-  home: [16, 10, 49, 18, 4, 0, 9]
-  away: [10, 5, 51, 9, 3, 0, 4]
-2244080: # Kasımpaşa vs. Fenerbahçe | Date = 28/04/2018
-  home: [18, 3, 43, 22, 1, 0, 5]
-  away: [14, 7, 57, 14, 1, 0, 2]
-2244072: # Yeni Malatyaspor vs. Akhisarspor | Date = 29/04/2018
-  home: [12, 3, 53, 14, 0, 0, 4]
-  away: [9, 1, 47, 16, 1, 0, 5]
-2244076: # Osmanlıspor vs. İstanbul Başakşehir | Date = 29/04/2018
-  home: [14, 4, 30, 14, 4, 0, 6]
-  away: [20, 6, 70, 10, 2, 0, 10]
-2244078: # Galatasaray vs. Beşiktaş | Date = 29/04/2018
-  home: [17, 6, 48, 23, 2, 0, 7]
-  away: [13, 4, 52, 16, 2, 1, 2]
-2244077: # Bursaspor vs. Konyaspor | Date = 30/04/2018
-  home: [12, 4, 43, 21, 6, 0, 7]
-  away: [11, 4, 57, 15, 3, 0, 2]
-2244087: # İstanbul Başakşehir vs. Sivasspor | Date = 04/05/2018
-  home: [9, 4, 48, 12, 3, 2, 3]
-  away: [9, 2, 52, 14, 0, 0, 4]
-2244081: # Kardemir Karabükspor vs. Konyaspor | Date = 05/05/2018
-  home: [4, 0, 45, 17, 5, 0, 1]
-  away: [12, 3, 55, 14, 2, 0, 9]
-2244084: # Alanyaspor vs. Osmanlıspor | Date = 05/05/2018
-  home: [13, 3, 48, 17, 6, 0, 5]
-  away: [13, 4, 52, 22, 2, 0, 3]
-2244085: # Trabzonspor vs. Kasımpaşa | Date = 05/05/2018
-  home: [20, 8, 59, 15, 4, 2, 8]
-  away: [16, 9, 41, 9, 2, 0, 3]
-2244082: # Fenerbahçe vs. Bursaspor | Date = 06/05/2018
-  home: [23, 6, 67, 11, 2, 0, 5]
-  away: [7, 4, 33, 14, 2, 2, 4]
-2244083: # Akhisarspor vs. Galatasaray | Date = 06/05/2018
-  home: [9, 2, 64, 15, 3, 1, 4]
-  away: [15, 5, 36, 9, 2, 0, 4]
-2244086: # Gençlerbirliği vs. Antalyaspor | Date = 06/05/2018
-  home: [11, 2, 56, 16, 3, 0, 4]
-  away: [13, 3, 44, 18, 2, 0, 5]
-2244088: # Beşiktaş vs. Kayserispor | Date = 07/05/2018
-  home: [17, 7, 48, 13, 0, 1, 7]
-  away: [10, 1, 52, 10, 2, 1, 7]
-2244089: # Göztepe vs. Yeni Malatyaspor | Date = 07/05/2018
-  home: [11, 1, 59, 16, 3, 0, 8]
-  away: [11, 2, 41, 15, 1, 0, 0]
-2244096: # Antalyaspor vs. İstanbul Başakşehir | Date = 11/05/2018
-  home: [12, 2, 44, 13, 1, 0, 5]
-  away: [10, 6, 56, 10, 1, 0, 3]
-2244090: # Galatasaray vs. Yeni Malatyaspor | Date = 12/05/2018
-  home: [14, 6, 55, 15, 1, 0, 3]
-  away: [9, 1, 45, 15, 5, 0, 2]
-2244094: # Konyaspor vs. Göztepe | Date = 12/05/2018
-  home: [13, 2, 57, 11, 2, 0, 7]
-  away: [17, 8, 43, 13, 4, 1, 10]
-2244095: # Kasımpaşa vs. Gençlerbirliği | Date = 12/05/2018
-  home: [17, 6, 56, 15, 4, 0, 3]
-  away: [14, 8, 44, 9, 1, 1, 5]
-2244092: # Osmanlıspor vs. Beşiktaş | Date = 13/05/2018
-  home: [13, 4, 30, 8, 0, 0, 5]
-  away: [11, 4, 70, 15, 1, 0, 6]
-2244093: # Sivasspor vs. Alanyaspor | Date = 13/05/2018
-  home: [9, 5, 54, 13, 3, 0, 4]
-  away: [10, 7, 46, 14, 7, 0, 2]
-2244097: # Bursaspor vs. Trabzonspor | Date = 13/05/2018
-  home: [15, 3, 63, 13, 2, 0, 7]
-  away: [13, 4, 37, 22, 3, 0, 3]
-2244091: # Kayserispor vs. Akhisarspor | Date = 14/05/2018
-  home: [15, 1, 63, 7, 2, 0, 8]
-  away: [10, 6, 37, 9, 3, 0, 1]
-2244098: # Kardemir Karabükspor vs. Fenerbahçe | Date = 14/05/2018
-  home: [10, 3, 38, 10, 2, 0, 2]
-  away: [33, 13, 62, 13, 2, 0, 12]
-2244101: # Gençlerbirliği vs. Bursaspor | Date = 18/05/2018
-  home: [11, 4, 47, 11, 0, 0, 3]
-  away: [14, 4, 53, 15, 0, 0, 5]
-2244102: # Akhisarspor vs. Osmanlıspor | Date = 18/05/2018
-  home: [17, 8, 65, 7, 0, 0, 3]
-  away: [18, 5, 35, 9, 0, 0, 3]
-2244103: # Alanyaspor vs. Antalyaspor | Date = 18/05/2018
-  home: [15, 9, 51, 21, 2, 0, 6]
-  away: [8, 4, 49, 17, 1, 0, 5]
-2244105: # Trabzonspor vs. Kardemir Karabükspor | Date = 18/05/2018
-  home: [26, 10, 53, 13, 1, 0, 5]
-  away: [10, 5, 47, 15, 3, 0, 9]
-2244106: # Yeni Malatyaspor vs. Kayserispor | Date = 18/05/2018
-  home: [9, 4, 39, 5, 0, 0, 3]
-  away: [19, 11, 61, 8, 1, 0, 9]
-2244099: # Göztepe vs. Galatasaray | Date = 19/05/2018
-  home: [8, 2, 52, 15, 1, 0, 4]
-  away: [11, 2, 48, 12, 1, 0, 3]
-2244100: # Fenerbahçe vs. Konyaspor | Date = 19/05/2018
-  home: [22, 8, 49, 9, 0, 0, 7]
-  away: [14, 8, 51, 10, 3, 0, 4]
-2244104: # İstanbul Başakşehir vs. Kasımpaşa | Date = 19/05/2018
-  home: [24, 6, 62, 11, 3, 0, 8]
-  away: [11, 4, 38, 8, 3, 0, 2]
-2244107: # Beşiktaş vs. Sivasspor | Date = 19/05/2018
-  home: [22, 11, 64, 16, 3, 0, 7]
-  away: [11, 4, 36, 12, 2, 1, 4]
-2251391: # Real Betis vs. Celta de Vigo | Date = 25/08/2017
-  home: [10, 3, 45, 13, 2, 0, 4]
-  away: [9, 1, 55, 9, 2, 0, 6]
-2251384: # Deportivo Alavés vs. Barcelona | Date = 26/08/2017
-  home: [11, 2, 26, 12, 2, 0, 1]
-  away: [23, 11, 74, 10, 3, 0, 14]
-2251386: # Levante vs. Deportivo La Coruña | Date = 26/08/2017
-  home: [24, 5, 58, 11, 1, 0, 6]
-  away: [11, 4, 42, 12, 2, 0, 5]
-2251387: # Las Palmas vs. Atlético Madrid | Date = 26/08/2017
-  home: [11, 4, 63, 11, 4, 0, 4]
-  away: [8, 6, 37, 9, 1, 0, 2]
-2251388: # Girona vs. Málaga | Date = 26/08/2017
-  home: [15, 4, 44, 11, 3, 0, 2]
-  away: [7, 2, 56, 15, 4, 0, 3]
-2251385: # Espanyol vs. Leganés | Date = 27/08/2017
-  home: [15, 2, 60, 10, 3, 0, 9]
-  away: [12, 8, 40, 14, 3, 0, 1]
-2251390: # Getafe vs. Sevilla | Date = 27/08/2017
-  home: [15, 3, 43, 20, 0, 0, 7]
-  away: [6, 3, 57, 10, 1, 0, 5]
-2251392: # Eibar vs. Athletic Club | Date = 27/08/2017
-  home: [14, 5, 57, 14, 1, 1, 4]
-  away: [9, 4, 43, 11, 1, 0, 3]
-2251395: # Valencia vs. Atlético Madrid | Date = 09/09/2017
-  home: [11, 0, 49, 16, 1, 0, 4]
-  away: [13, 4, 51, 14, 0, 0, 3]
-2251396: # Real Madrid vs. Levante | Date = 09/09/2017
-  home: [18, 10, 69, 9, 2, 1, 13]
-  away: [5, 2, 31, 16, 2, 0, 3]
-2251400: # Sevilla vs. Eibar | Date = 09/09/2017
-  home: [12, 6, 60, 14, 1, 0, 6]
-  away: [7, 2, 40, 18, 1, 0, 5]
-2251402: # Barcelona vs. Espanyol | Date = 09/09/2017
-  home: [20, 9, 77, 11, 1, 0, 8]
-  away: [9, 1, 23, 18, 5, 0, 7]
-2251432: # Real Sociedad vs. Valencia | Date = 24/09/2017
-  home: [18, 6, 58, 11, 2, 0, 7]
-  away: [13, 4, 42, 13, 5, 1, 6]
-2251433: # Valencia vs. Athletic Club | Date = 01/10/2017
-  home: [10, 6, 39, 18, 3, 0, 2]
-  away: [16, 6, 61, 16, 4, 0, 8]
-2251434: # Real Madrid vs. Espanyol | Date = 01/10/2017
-  home: [23, 8, 64, 8, 2, 0, 10]
-  away: [8, 3, 36, 10, 2, 0, 3]
-2251440: # Barcelona vs. Las Palmas | Date = 01/10/2017
-  home: [22, 10, 48, 10, 5, 0, 8]
-  away: [11, 1, 52, 11, 1, 0, 3]
-2251441: # Villarreal vs. Eibar | Date = 01/10/2017
-  home: [12, 6, 60, 15, 2, 0, 6]
-  away: [8, 0, 40, 9, 1, 0, 3]
-2251752: # Villarreal vs. Real Madrid | Date = 19/05/2018
-  home: [14, 5, 38, 13, 4, 0, 4]
-  away: [16, 7, 62, 10, 3, 0, 5]
-2211752: # Lokomotiv Moskva vs. Ural | Date = 26/08/2017
-  home: [15, 8, 44, 15, 0, 0, 8]
-  away: [12, 2, 56, 7, 0, 0, 6]
-2211754: # Rubin Kazan' vs. Tosno | Date = 26/08/2017
-  home: [3, 1, 51, 18, 3, 0, 3]
-  away: [9, 3, 49, 12, 2, 0, 1]
-2211755: # CSKA Moskva vs. Akhmat Grozny | Date = 27/08/2017
-  home: [26, 5, 76, 6, 0, 0, 10]
-  away: [11, 4, 24, 13, 3, 0, 3]
-2211757: # Zenit vs. Rostov | Date = 27/08/2017
-  home: [11, 0, 68, 9, 1, 0, 13]
-  away: [8, 3, 32, 12, 0, 0, 5]
-2211758: # Krasnodar vs. Dinamo Moskva | Date = 27/08/2017
-  home: [16, 10, 54, 24, 3, 0, 5]
-  away: [10, 2, 46, 15, 2, 0, 2]
-2211763: # Amkar Perm' vs. CSKA Moskva | Date = 08/09/2017
-  home: [5, 1, 43, 14, 3, 1, 0]
-  away: [9, 4, 57, 15, 2, 0, 4]
-2211759: # Tosno vs. Anzhi | Date = 09/09/2017
-  home: [27, 9, 59, 7, 1, 0, 4]
-  away: [8, 5, 41, 12, 0, 0, 6]
-2211762: # Spartak Moskva vs. Rubin Kazan' | Date = 09/09/2017
-  home: [8, 2, 53, 12, 4, 0, 3]
-  away: [7, 1, 47, 15, 1, 0, 2]
-2211764: # Rostov vs. Arsenal Tula | Date = 09/09/2017
-  home: [12, 2, 57, 16, 0, 0, 3]
-  away: [9, 4, 43, 18, 3, 0, 3]
-2211859: # Arsenal Tula vs. Akhmat Grozny | Date = 04/03/2018
-  home: [10, 3, 43, 16, 4, 0, 6]
-  away: [14, 3, 57, 13, 1, 1, 4]
-2211865: # Spartak Moskva vs. SKA Khabarovsk | Date = 11/03/2018
-  home: [41, 12, 80, 10, 2, 0, 9]
-  away: [2, 0, 20, 12, 1, 0, 0]
-2211867: # Akhmat Grozny vs. CSKA Moskva | Date = 11/03/2018
-  home: [18, 6, 58, 10, 1, 0, 11]
-  away: [18, 8, 42, 18, 2, 0, 5]
-2211869: # Rostov vs. Zenit | Date = 11/03/2018
-  home: [6, 4, 42, 16, 2, 0, 6]
-  away: [10, 0, 58, 10, 3, 0, 8]
-2211864: # Ural vs. Lokomotiv Moskva | Date = 12/03/2018
-  home: [14, 4, 58, 20, 4, 0, 2]
-  away: [14, 8, 42, 18, 2, 0, 5]
-2211871: # Anzhi vs. Tosno | Date = 17/03/2018
-  home: [11, 5, 47, 20, 0, 0, 4]
-  away: [6, 0, 53, 24, 1, 0, 3]
-2211873: # SKA Khabarovsk vs. Ural | Date = 17/03/2018
-  home: [14, 7, 52, 14, 1, 0, 4]
-  away: [26, 10, 48, 23, 2, 0, 5]
-2211874: # Rubin Kazan' vs. Spartak Moskva | Date = 17/03/2018
-  home: [10, 5, 58, 12, 2, 0, 5]
-  away: [10, 5, 42, 16, 2, 0, 3]
-2211876: # Arsenal Tula vs. Rostov | Date = 17/03/2018
-  home: [19, 7, 60, 19, 3, 0, 4]
-  away: [12, 6, 40, 11, 2, 0, 4]
-2211878: # Krasnodar vs. Ufa | Date = 17/03/2018
-  home: [24, 7, 70, 8, 1, 0, 6]
-  away: [5, 1, 30, 11, 3, 0, 3]
-2211880: # Amkar Perm' vs. Lokomotiv Moskva | Date = 31/03/2018
-  home: [15, 5, 33, 8, 1, 0, 9]
-  away: [16, 5, 67, 14, 0, 1, 3]
-2211881: # Akhmat Grozny vs. SKA Khabarovsk | Date = 31/03/2018
-  home: [18, 5, 65, 17, 2, 0, 8]
-  away: [7, 2, 35, 9, 1, 0, 2]
-2211883: # Spartak Moskva vs. Tosno | Date = 31/03/2018
-  home: [15, 5, 55, 10, 2, 0, 6]
-  away: [10, 2, 45, 15, 1, 0, 5]
-2211885: # Dinamo Moskva vs. Arsenal Tula | Date = 31/03/2018
-  home: [14, 7, 60, 18, 1, 0, 10]
-  away: [8, 3, 40, 14, 3, 0, 3]
-2211879: # Krasnodar vs. Anzhi | Date = 01/04/2018
-  home: [9, 3, 66, 16, 2, 0, 5]
-  away: [10, 2, 34, 11, 2, 0, 6]
-2211882: # Ural vs. Rubin Kazan' | Date = 01/04/2018
-  home: [10, 2, 47, 17, 2, 1, 3]
-  away: [8, 4, 53, 19, 2, 0, 3]
-2211884: # Rostov vs. CSKA Moskva | Date = 01/04/2018
-  home: [6, 2, 45, 13, 3, 0, 6]
-  away: [12, 2, 55, 7, 1, 0, 2]
-2211886: # Ufa vs. Zenit | Date = 01/04/2018
-  home: [11, 4, 63, 10, 1, 0, 8]
-  away: [10, 4, 37, 8, 1, 0, 1]
-2211889: # SKA Khabarovsk vs. Amkar Perm' | Date = 07/04/2018
-  home: [10, 1, 48, 12, 0, 1, 3]
-  away: [15, 6, 52, 10, 1, 0, 1]
-2211890: # Rubin Kazan' vs. Akhmat Grozny | Date = 07/04/2018
-  home: [8, 4, 65, 10, 3, 0, 1]
-  away: [6, 3, 35, 11, 3, 0, 4]
-2211893: # Arsenal Tula vs. Ufa | Date = 07/04/2018
-  home: [11, 3, 52, 13, 1, 0, 3]
-  away: [7, 3, 48, 16, 3, 0, 3]
-2211894: # Zenit vs. Krasnodar | Date = 07/04/2018
-  home: [16, 5, 45, 10, 2, 0, 10]
-  away: [9, 4, 55, 13, 2, 0, 4]
-2211887: # Anzhi vs. Spartak Moskva | Date = 08/04/2018
-  home: [12, 3, 40, 9, 0, 0, 2]
-  away: [14, 5, 60, 18, 0, 0, 3]
-2211888: # Lokomotiv Moskva vs. Rostov | Date = 08/04/2018
-  home: [14, 3, 60, 10, 3, 0, 8]
-  away: [3, 1, 40, 17, 5, 0, 5]
-2211891: # Tosno vs. Ural | Date = 08/04/2018
-  home: [9, 2, 47, 23, 2, 0, 5]
-  away: [11, 3, 53, 20, 3, 0, 1]
-2211892: # CSKA Moskva vs. Dinamo Moskva | Date = 09/04/2018
-  home: [17, 2, 63, 9, 2, 0, 8]
-  away: [9, 3, 37, 9, 3, 0, 0]
-2211899: # Akhmat Grozny vs. Tosno | Date = 13/04/2018
-  home: [15, 2, 45, 13, 3, 0, 2]
-  away: [8, 1, 55, 17, 2, 0, 3]
-2211895: # Zenit vs. Anzhi | Date = 14/04/2018
-  home: [15, 6, 63, 13, 3, 0, 11]
-  away: [7, 1, 37, 13, 1, 0, 0]
-2211896: # Dinamo Moskva vs. Lokomotiv Moskva | Date = 14/04/2018
-  home: [12, 2, 58, 13, 3, 0, 6]
-  away: [11, 6, 42, 16, 4, 0, 1]
-2211898: # Amkar Perm' vs. Rubin Kazan' | Date = 14/04/2018
-  home: [6, 3, 39, 13, 2, 0, 5]
-  away: [11, 7, 61, 16, 2, 0, 6]
-2211902: # Krasnodar vs. Arsenal Tula | Date = 14/04/2018
-  home: [11, 7, 49, 16, 5, 0, 5]
-  away: [5, 3, 51, 10, 2, 0, 3]
-2211897: # Rostov vs. SKA Khabarovsk | Date = 15/04/2018
-  home: [11, 5, 55, 13, 1, 0, 8]
-  away: [4, 0, 45, 5, 2, 0, 4]
-2211900: # Ural vs. Spartak Moskva | Date = 15/04/2018
-  home: [20, 6, 34, 10, 1, 0, 6]
-  away: [19, 4, 66, 18, 2, 0, 4]
-2211901: # Ufa vs. CSKA Moskva | Date = 15/04/2018
-  home: [11, 5, 40, 8, 1, 0, 3]
-  away: [16, 5, 60, 11, 1, 0, 3]
-2211872: # Lokomotiv Moskva vs. Akhmat Grozny | Date = 18/04/2018
-  home: [8, 4, 58, 28, 3, 0, 9]
-  away: [7, 1, 42, 18, 2, 0, 7]
-2211875: # CSKA Moskva vs. Amkar Perm' | Date = 18/04/2018
-  home: [18, 6, 72, 9, 0, 0, 5]
-  away: [5, 2, 28, 7, 1, 0, 9]
-2211877: # Zenit vs. Dinamo Moskva | Date = 18/04/2018
-  home: [15, 6, 53, 9, 0, 0, 7]
-  away: [7, 1, 47, 13, 2, 0, 4]
-2211903: # Anzhi vs. Ural | Date = 21/04/2018
-  home: [9, 3, 51, 11, 3, 0, 8]
-  away: [16, 6, 49, 19, 3, 0, 4]
-2211906: # Rubin Kazan' vs. Rostov | Date = 21/04/2018
-  home: [11, 5, 64, 13, 0, 0, 4]
-  away: [10, 2, 36, 10, 0, 0, 6]
-2211904: # Lokomotiv Moskva vs. Ufa | Date = 22/04/2018
-  home: [12, 5, 62, 13, 2, 0, 5]
-  away: [8, 2, 38, 12, 4, 0, 5]
-2211905: # SKA Khabarovsk vs. Dinamo Moskva | Date = 22/04/2018
-  home: [10, 1, 51, 15, 1, 0, 8]
-  away: [9, 3, 49, 16, 3, 0, 5]
-2211907: # Tosno vs. Amkar Perm' | Date = 22/04/2018
-  home: [10, 1, 67, 13, 2, 0, 6]
-  away: [11, 4, 33, 19, 3, 0, 2]
-2211909: # CSKA Moskva vs. Krasnodar | Date = 22/04/2018
-  home: [22, 7, 53, 8, 1, 0, 6]
-  away: [12, 3, 47, 18, 1, 0, 1]
-2211910: # Arsenal Tula vs. Zenit | Date = 22/04/2018
-  home: [14, 8, 49, 15, 2, 1, 8]
-  away: [13, 5, 51, 8, 1, 0, 6]
-2211908: # Spartak Moskva vs. Akhmat Grozny | Date = 23/04/2018
-  home: [21, 8, 75, 13, 2, 0, 7]
-  away: [7, 4, 25, 17, 3, 0, 0]
-2211911: # Arsenal Tula vs. Anzhi | Date = 28/04/2018
-  home: [22, 4, 47, 15, 2, 0, 5]
-  away: [9, 5, 53, 14, 3, 0, 4]
-2211915: # Rostov vs. Tosno | Date = 29/04/2018
-  home: [22, 7, 72, 19, 2, 0, 9]
-  away: [8, 1, 28, 6, 2, 1, 2]
-2211916: # Amkar Perm' vs. Spartak Moskva | Date = 29/04/2018
-  home: [11, 0, 46, 7, 3, 0, 4]
-  away: [17, 4, 54, 14, 2, 0, 5]
-2211918: # Zenit vs. CSKA Moskva | Date = 29/04/2018
-  home: [20, 4, 54, 18, 3, 0, 5]
-  away: [10, 2, 46, 16, 4, 0, 6]
-2211912: # Krasnodar vs. Lokomotiv Moskva | Date = 30/04/2018
-  home: [20, 6, 53, 12, 2, 0, 4]
-  away: [17, 4, 47, 8, 0, 0, 6]
-2211913: # Ufa vs. SKA Khabarovsk | Date = 30/04/2018
-  home: [12, 3, 54, 10, 0, 0, 8]
-  away: [9, 5, 46, 14, 3, 0, 5]
-2211914: # Dinamo Moskva vs. Rubin Kazan' | Date = 30/04/2018
-  home: [7, 1, 38, 12, 2, 0, 5]
-  away: [6, 2, 62, 12, 3, 0, 3]
-2211917: # Akhmat Grozny vs. Ural | Date = 30/04/2018
-  home: [13, 2, 55, 13, 0, 0, 7]
-  away: [5, 3, 45, 15, 1, 1, 2]
-2211920: # Lokomotiv Moskva vs. Zenit | Date = 05/05/2018
-  home: [7, 5, 45, 13, 2, 0, 2]
-  away: [6, 1, 55, 22, 5, 0, 3]
-2211921: # SKA Khabarovsk vs. Krasnodar | Date = 05/05/2018
-  home: [15, 4, 36, 9, 0, 0, 3]
-  away: [16, 7, 64, 8, 0, 0, 4]
-2211923: # Tosno vs. Dinamo Moskva | Date = 05/05/2018
-  home: [14, 5, 43, 11, 4, 0, 3]
-  away: [10, 6, 57, 20, 2, 0, 5]
-2211924: # Spartak Moskva vs. Rostov | Date = 05/05/2018
-  home: [16, 7, 58, 10, 2, 0, 7]
-  away: [11, 2, 42, 17, 2, 1, 2]
-2211925: # Ural vs. Amkar Perm' | Date = 06/05/2018
-  home: [9, 1, 69, 13, 3, 0, 4]
-  away: [8, 4, 31, 16, 4, 0, 4]
-2211926: # CSKA Moskva vs. Arsenal Tula | Date = 06/05/2018
-  home: [16, 9, 55, 8, 0, 0, 6]
-  away: [7, 2, 45, 9, 1, 0, 2]
-2211919: # Anzhi vs. Akhmat Grozny | Date = 07/05/2018
-  home: [15, 3, 59, 12, 2, 1, 13]
-  away: [12, 6, 41, 23, 5, 0, 3]
-2211922: # Rubin Kazan' vs. Ufa | Date = 07/05/2018
-  home: [14, 2, 60, 14, 2, 0, 7]
-  away: [4, 2, 40, 12, 1, 0, 5]
-2211700: # Spartak Moskva vs. Dinamo Moskva | Date = 13/05/2018
-  home: [18, 9, 64, 7, 3, 0, 6]
-  away: [14, 6, 36, 16, 5, 0, 3]
-2211927: # CSKA Moskva vs. Anzhi | Date = 13/05/2018
-  home: [15, 6, 62, 15, 2, 0, 6]
-  away: [9, 4, 38, 10, 2, 0, 2]
-2211928: # Arsenal Tula vs. Lokomotiv Moskva | Date = 13/05/2018
-  home: [25, 4, 48, 20, 3, 0, 4]
-  away: [5, 1, 52, 11, 2, 1, 5]
-2211929: # Zenit vs. SKA Khabarovsk | Date = 13/05/2018
-  home: [30, 14, 67, 10, 3, 0, 8]
-  away: [5, 1, 33, 10, 2, 0, 6]
-2211930: # Krasnodar vs. Rubin Kazan' | Date = 13/05/2018
-  home: [14, 6, 59, 12, 4, 0, 7]
-  away: [10, 5, 41, 12, 1, 0, 2]
-2211931: # Ufa vs. Tosno | Date = 13/05/2018
-  home: [13, 6, 48, 12, 3, 0, 3]
-  away: [12, 3, 52, 8, 2, 0, 5]
-2211933: # Rostov vs. Ural | Date = 13/05/2018
-  home: [13, 1, 37, 12, 0, 0, 4]
-  away: [15, 3, 63, 6, 2, 0, 8]
-2211934: # Amkar Perm' vs. Akhmat Grozny | Date = 13/05/2018
-  home: [16, 5, 61, 10, 2, 0, 7]
-  away: [7, 0, 39, 14, 0, 1, 3]
-2371357: # Yenisey vs. FK Anzi Makhackala | Date = 17/05/2018
-  home: [19, 7, 46, 10, 3, 0, 4]
-  away: [7, 0, 54, 15, 3, 0, 3]
-2371359: # Amkar vs. FC Tambov | Date = 17/05/2018
-  home: [19, 7, 68, 15, 1, 0, 8]
-  away: [3, 2, 32, 15, 1, 0, 0]
-2371358: # FK Anzi Makhackala vs. Yenisey | Date = 20/05/2018
-  home: [18, 9, 59, 6, 2, 0, 5]
-  away: [7, 5, 41, 15, 1, 0, 5]
-2371360: # FC Tambov vs. Amkar | Date = 20/05/2018
-  home: [9, 2, 66, 16, 2, 0, 7]
-  away: [7, 3, 34, 19, 5, 0, 1]
+2017:
+  2212925: # Tottenham vs. Chelsea | Date = 20/08/17
+    home: [18, 6, 68, 14, 4, 0, 14]
+    away: [9, 2, 32, 21, 3, 0, 3]
+  2212929: # Crystal Palce vs. Swansea | Date = 26/08/17
+    home: [16, 3, 54, 9, 4, 0, 1]
+    away: [7, 3, 46, 6, 1, 0, 1]
+  2212930: # Huddersfield vs. Southampton | Date = 26/08/17
+    home: [16, 6, 44, 10, 0, 0, 5]
+    away: [6, 3, 56, 10, 1, 0, 4]
+  2212932: # Manchester United vs. Leicester City | Date = 26/08/17
+    home: [22, 7, 70, 8, 1, 0, 9]
+    away: [11, 4, 30, 7, 2, 0, 3]
+  2212933: # Newcastle United vs. West Ham United | Date = 26/08/2017
+    home: [17, 8, 37, 17, 1, 0, 7]
+    away: [8, 3, 63, 11, 3, 0, 5]
+  2212935: # Watford vs. Brighton & Hove Albion | Date = 26/08/2017
+    home: [8, 0, 42, 7, 0, 1, 3]
+    away: [16, 2, 58, 18, 1, 0, 11]
+  2212928: # Chelsea vs. Everton | Date = 27/08/2017
+    home: [18, 7, 57, 12, 2, 0, 6]
+    away: [7, 0, 43, 7, 2, 0, 3]
+  2212936: # West Brom vs. Stoke City | Date = 27/08/2017
+    home: [10, 2, 42, 10, 2, 0, 10]
+    away: [16, 2, 58, 9, 2, 0, 4]
+  2216102: # Sunderland vs. Derby County | Date = 04/08/2017
+    home: [20, 4, 46, 12, 1, 0, 6]
+    away: [11, 4, 54, 11, 0, 0, 7]
+  2216107: # Nottingham Forest vs. Millwall | Date = 04/08/2017
+    home: [11, 2, 69, 13, 0, 0, 5]
+    away: [23, 6, 31, 15, 1, 0, 4]
+  2216150: # Barnsley vs. Sunderland | Date = 26/08/2017
+    home: [11, 6, 40, 11, 1, 0, 7]
+    away: [11, 3, 60, 7, 3, 0, 3]
+  2216151: # Birmingham City vs. Reading | Date = 26/08/2017
+    home: [14, 2, 40, 10, 0, 0, 4]
+    away: [13, 5, 60, 5, 0, 0, 3]
+  2216152: # Brentford vs. Wolverhampton Wanderers | Date = 26/08/2017
+    home: [14, 2, 54, 11, 1, 0, 8]
+    away: [16, 4, 46, 10, 1, 0, 6]
+  2216154: # Burton Albion vs. Sheffield Wednesday | Date = 26/08/2017
+    home: [12, 4, 43, 7, 0, 0, 6]
+    away: [11, 3, 57, 17, 2, 0, 5]
+  2216155: # Cardiff City vs. Queens Park Rangers | Date = 26/08/2017
+    home: [17, 8, 51, 12, 0, 0, 8]
+    away: [8, 1, 49, 16, 1, 0, 2]
+  2216157: # Ipswich Town vs. Fulham | Date = 26/08/2017
+    home: [6, 2, 31, 18, 1, 0, 5]
+    away: [18, 7, 69, 12, 0, 0, 6]
+  2216158: # Middlesbrough vs. Preston North End | Date = 26/08/2017
+    home: [5, 1, 48, 13, 1, 0, 3]
+    away: [12, 3, 52, 16, 2, 0, 8]
+  2216159: # Millwall vs. Norwich City | Date = 26/08/2017
+    home: [11, 5, 28, 13, 2, 0, 5]
+    away: [15, 7, 72, 7, 1, 0, 6]
+  2216160: # Nottingham Forest vs. Leeds United | Date = 26/08/2017
+    home: [5, 1, 59, 10, 3, 0, 4]
+    away: [18, 4, 41, 11, 2, 0, 2]
+  2216161: # Sheffield United vs. Derby County | Date = 26/08/2017
+    home: [5, 4, 53, 15, 4, 0, 6]
+    away: [14, 2, 47, 12, 3, 0, 2]
+  2213766: # Olympique Marseille vs. Angers SCO | Date = 20/08/2017
+    home: [12, 2, 61, 20, 3, 1, 11]
+    away: [11, 4, 39, 7, 2, 0, 2]
+  2213774: # Amiens SC vs. Nice | Date = 26/08/2017
+    home: [12, 4, 34, 14, 3, 0, 3]
+    away: [12, 3, 66, 7, 3, 0, 4]
+  2213776: # Bordeaux vs. Troyes | Date = 26/08/2017
+    home: [13, 8, 57, 9, 0, 0, 4]
+    away: [5, 2, 43, 17, 1, 0, 4]
+  2213777: # Caen vs. Metz | Date = 26/08/2017
+    home: [16, 4, 53, 11, 2, 0, 9]
+    away: [9, 2, 47, 16, 2, 0, 3]
+  2213778: # Dijon vs. Montpellier | Date = 26/08/2017
+    home: [7, 2, 53, 18, 2, 0, 2]
+    away: [11, 2, 47, 14, 2, 0, 4]
+  2213781: # Nantes vs. Olympique Lyonnais | Date = 26/08/2017
+    home: [6, 2, 38, 13, 1, 0, 1]
+    away: [16, 3, 62, 11, 1, 0, 8]
+  2213783: # Toulouse vs. Rennes | Date = 26/08/2017
+    home: [11, 7, 44, 19, 4, 0, 3]
+    away: [14, 3, 56, 22, 3, 1, 4]
+  2213779: # Guingamp vs. Strasbourg | Date = 27/08/2017
+    home: [14, 6, 47, 12, 1, 0, 2]
+    away: [15, 3, 53, 14, 2, 0, 7]
+  2213780: # Monaco vs. Olympique Marseille | Date = 27/08/2017
+    home: [14, 8, 46, 11, 2, 0, 1]
+    away: [11, 3, 54, 14, 3, 0, 1]
+  2213808: # Olympique Marseille vs. Toulouse | Date = 24/09/2017
+    home: [23, 6, 63, 11, 2, 0, 12]
+    away: [8, 1, 37, 10, 0, 0, 5]
+  2371755: # Toulouse vs. AC Ajaccio | Date = 27/05/2018
+    home: [13, 6, 41, 14, 0, 0, 4]
+    away: [10, 1, 59, 16, 2, 0, 3]
+  2224815: # Borussia Dortmund vs. Hertha BSC | Date = 26/08/2017
+    home: [18, 8, 67, 12, 1, 0, 4]
+    away: [7, 4, 33, 9, 1, 0, 4]
+  2224816: # RB Leipzig vs. Freiburg | Date = 27/08/2017
+    home: [29, 11, 68, 11, 2, 0, 8]
+    away: [7, 2, 32, 13, 0, 1, 2]
+  2371355: # Wolfsburg vs. Holstein Kiel | Date = 17/05/2018
+    home: [14, 9, 50, 14, 0, 0, 6]
+    away: [11, 2, 50, 9, 0, 0, 5]
+  2371356: # Holstein Kiel vs. Wolfsburg | Date = 21/05/2018
+    home: [11, 5, 59, 19, 3, 0, 5]
+    away: [13, 4, 41, 16, 2, 0, 5]
+  2263556: # Genoa vs. Juventus | Date = 26/08/2017
+    home: [9, 3, 42, 13, 4, 0, 1]
+    away: [17, 7, 58, 8, 3, 0, 4]
+  2263557: # Roma vs. Internazionale | Date = 26/08/2017
+    home: [18, 3, 49, 12, 1, 0, 12]
+    away: [14, 8, 51, 8, 1, 0, 6]
+  2263558: # Benevento vs. Bologna | Date = 26/08/2017
+    home: [18, 6, 49, 10, 1, 0, 6]
+    away: [14, 4, 51, 13, 3, 0, 2]
+  2263572: # Juventus vs. Chievo | Date = 09/09/2017
+    home: [15, 4, 59, 15, 2, 0, 10]
+    away: [15, 2, 41, 7, 1, 0, 6]
+  2263598: # Fiorentina vs. Atalanta | Date = 24/09/2017
+    home: [10, 2, 37, 22, 2, 0, 3]
+    away: [16, 5, 63, 11, 5, 0, 8]
+  2239703: # Vitória Setúbal vs. Chaves | Date = 20/08/2017
+    home: [18, 8, 49, 18, 1, 0, 8]
+    away: [5, 2, 51, 16, 2, 1, 1]
+  2239707: # Belenenses vs. Vitória Setúbal | Date = 25/08/2017
+    home: [12, 4, 48, 23, 1, 1, 6]
+    away: [15, 5, 52, 16, 2, 0, 6]
+  2239709: # Chaves vs. Feirense | Date = 26/08/2017
+    home: [20, 4, 66, 12, 1, 0, 13]
+    away: [8, 5, 34, 16, 4, 0, 3]
+  2239710: # Paços de Ferreira vs. Vitória Guimarães | Date = 26/08/2017
+    home: [7, 3, 33, 14, 3, 1, 4]
+    away: [14, 1, 67, 20, 4, 0, 7]
+  2239711: # Moreirense vs. Tondela | Date = 26/08/2017
+    home: [11, 3, 61, 11, 1, 1, 8]
+    away: [12, 6, 39, 19, 1, 0, 5]
+  2239708: # Sporting Braga vs. Porto | Date = 27/08/2017
+    home: [12, 0, 45, 21, 3, 0, 5]
+    away: [20, 7, 55, 10, 4, 0, 7]
+  2239712: # Boavista vs. Desportivo Aves | Date = 27/08/2017
+    home: [13, 3, 46, 27, 2, 0, 2]
+    away: [14, 4, 54, 12, 1, 1, 2]
+  2239714: # Sporting CP vs. Estoril | Date = 27/08/2017
+    home: [13, 4, 54, 18, 4, 0, 7]
+    away: [8, 4, 46, 24, 5, 0, 3]
+  2239723: # Porto vs. Chaves | Date = 09/09/2017
+    home: [17, 5, 61, 17, 1, 0, 8]
+    away: [7, 2, 39, 13, 3, 0, 2]
+  2239734: # Desportivo Aves vs. Rio Ave | Date = 24/09/2017
+    home: [11, 4, 26, 17, 3, 0, 2]
+    away: [11, 1, 74, 11, 2, 0, 3]
+  2239741: # Tondela vs. Sporting Braga | Date = 24/09/2017
+    home: [7, 2, 27, 11, 2, 1, 3]
+    away: [16, 3, 73, 19, 3, 0, 6]
+  2239921: # Sporting CP vs. Rio Ave | Date = 18/03/2018
+    home: [16, 7, 45, 26, 3, 0, 7]
+    away: [7, 1, 55, 12, 1, 0, 1]
+  2243821: # Yeni Malatyaspor vs. Antalyaspor | Date = 26/08/2017
+    home: [18, 5, 57, 13, 3, 0, 10]
+    away: [6, 3, 43, 20, 2, 0, 1]
+  2243825: # Göztepe vs. Trabzonspor | Date = 26/08/2017
+    home: [18, 8, 39, 18, 2, 0, 3]
+    away: [15, 3, 61, 18, 4, 0, 4]
+  2243828: # Beşiktaş vs. Bursaspor | Date = 26/08/2017
+    home: [18, 8, 64, 18, 2, 0, 8]
+    away: [4, 2, 36, 13, 3, 0, 4]
+  2243829: # Kayserispor vs. Osmanlıspor | Date = 26/08/2017
+    home: [10, 4, 60, 12, 5, 1, 6]
+    away: [11, 2, 40, 12, 2, 1, 3]
+  2243822: # Akhisar Belediyespor vs. Kasımpaşa | Date = 27/08/2017
+    home: [12, 5, 44, 8, 1, 1, 4]
+    away: [13, 3, 56, 14, 4, 0, 3]
+  2243826: # Gençlerbirliği vs. Fenerbahçe | Date = 27/08/2017
+    home: [9, 2, 29, 13, 1, 2, 8]
+    away: [11, 3, 71, 14, 4, 0, 3]
+  2243827: # İstanbul Başakşehir vs. Konyaspor | Date = 27/08/2017
+    home: [13, 5, 60, 20, 4, 0, 6]
+    away: [15, 4, 40, 12, 5, 1, 7]
+  2243831: # Fenerbahçe vs. İstanbul Başakşehir | Date = 09/09/2017
+    home: [19, 2, 58, 19, 2, 0, 5]
+    away: [11, 7, 42, 12, 4, 0, 3]
+  2243834: # Sivasspor vs. Kayserispor | Date = 09/09/2017
+    home: [6, 2, 54, 12, 2, 0, 6]
+    away: [8, 4, 46, 18, 2, 0, 4]
+  2243836: # Karabükspor vs. Beşiktaş | Date = 09/09/2017
+    home: [15, 5, 49, 20, 3, 0, 3]
+    away: [16, 7, 51, 15, 2, 1, 4]
+  2243837: # Konyaspor vs. Alanyaspor | Date = 09/09/2017
+    home: [17, 6, 61, 14, 3, 0, 12]
+    away: [13, 4, 39, 10, 2, 0, 5]
+  2243860: # Göztepe vs. İstanbul Başakşehir | Date = 01/10/2017
+    home: [19, 4, 65, 11, 0, 0, 8]
+    away: [10, 3, 35, 15, 0, 0, 4]
+  2243861: # Beşiktaş vs. Trabzonspor | Date = 01/10/2017
+    home: [10, 3, 45, 17, 4, 0, 1]
+    away: [12, 7, 55, 19, 4, 0, 4]
+  2244124: # Alanyaspor vs. Gençlerbirliği | Date = 01/10/2017
+    home: [13, 7, 40, 9, 2, 1, 2]
+    away: [8, 4, 60, 21, 4, 0, 4]
+  2244018: # Göztepe vs. Antalyaspor | Date = 11/03/2018
+    home: [13, 5, 53, 10, 3, 0, 5]
+    away: [20, 9, 47, 11, 5, 1, 7]
+  2244020: # Kayserispor vs. Kardemir Karabükspor | Date = 11/03/2018
+    home: [23, 5, 69, 16, 1, 0, 13]
+    away: [4, 3, 31, 13, 1, 1, 2]
+  2244024: # Galatasaray vs. Konyaspor | Date = 11/03/2018
+    home: [25, 9, 72, 13, 4, 0, 8]
+    away: [6, 2, 28, 12, 6, 0, 2]
+  2244025: # Yeni Malatyaspor vs. Fenerbahçe | Date = 11/03/2018
+    home: [11, 3, 55, 16, 0, 0, 13]
+    away: [8, 3, 45, 10, 2, 0, 3]
+  2244026: # Akhisarspor vs. Trabzonspor | Date = 12/03/2018
+    home: [13, 4, 45, 13, 2, 1, 8]
+    away: [12, 5, 55, 10, 2, 0, 4]
+  2244028: # Kardemir Karabükspor vs. Osmanlıspor | Date = 16/03/2018
+    home: [16, 2, 53, 11, 2, 0, 3]
+    away: [17, 10, 47, 8, 2, 0, 5]
+  2244030: # Kasımpaşa vs. Antalyaspor | Date = 16/03/2018
+    home: [23, 7, 51, 8, 0, 1, 9]
+    away: [15, 7, 49, 12, 4, 0, 7]
+  2244027: # Fenerbahçe vs. Galatasaray | Date = 17/03/2018
+    home: [10, 6, 57, 16, 2, 0, 10]
+    away: [12, 5, 43, 16, 3, 0, 3]
+  2244031: # Gençlerbirliği vs. Akhisarspor | Date = 17/03/2018
+    home: [11, 5, 52, 10, 2, 0, 5]
+    away: [10, 7, 48, 14, 1, 0, 6]
+  2244034: # Bursaspor vs. Sivasspor | Date = 17/03/2018
+    home: [10, 4, 54, 13, 3, 0, 3]
+    away: [13, 7, 46, 17, 2, 0, 5]
+  2244029: # Alanyaspor vs. Göztepe | Date = 18/03/2018
+    home: [15, 4, 43, 15, 1, 0, 8]
+    away: [4, 2, 57, 22, 4, 0, 1]
+  2244032: # İstanbul Başakşehir vs. Beşiktaş | Date = 18/03/2018
+    home: [10, 3, 34, 22, 3, 1, 3]
+    away: [16, 2, 66, 12, 4, 0, 10]
+  2244033: # Konyaspor vs. Kayserispor | Date = 18/03/2018
+    home: [12, 3, 45, 13, 0, 1, 6]
+    away: [5, 0, 55, 13, 2, 1, 4]
+  2244035: # Trabzonspor vs. Yeni Malatyaspor | Date = 18/03/2018
+    home: [13, 7, 59, 12, 2, 0, 4]
+    away: [16, 6, 41, 17, 1, 0, 3]
+  2244038: # Sivasspor vs. Kardemir Karabükspor | Date = 30/03/2018
+    home: [15, 5, 60, 15, 3, 0, 10]
+    away: [6, 2, 40, 15, 3, 0, 1]
+  2244037: # Beşiktaş vs. Alanyaspor | Date = 31/03/2018
+    home: [10, 2, 65, 21, 5, 0, 6]
+    away: [9, 2, 35, 17, 2, 0, 2]
+  2244040: # Yeni Malatyaspor vs. Gençlerbirliği | Date = 31/03/2018
+    home: [10, 6, 56, 15, 1, 0, 7]
+    away: [6, 4, 44, 13, 1, 0, 4]
+  2244043: # Antalyaspor vs. Bursaspor | Date = 31/03/2018
+    home: [12, 3, 43, 18, 2, 0, 1]
+    away: [11, 1, 57, 15, 1, 0, 7]
+  2244039: # Göztepe vs. Kasımpaşa | Date = 01/04/2018
+    home: [25, 8, 56, 16, 2, 1, 14]
+    away: [8, 3, 44, 9, 1, 0, 1]
+  2244041: # Akhisarspor vs. İstanbul Başakşehir | Date = 01/04/2018
+    home: [11, 4, 31, 21, 1, 1, 2]
+    away: [13, 4, 69, 10, 1, 0, 5]
+  2244042: # Galatasaray vs. Trabzonspor | Date = 01/04/2018
+    home: [19, 6, 55, 18, 2, 0, 4]
+    away: [9, 5, 45, 14, 3, 0, 1]
+  2244044: # Osmanlıspor vs. Konyaspor | Date = 01/04/2018
+    home: [9, 2, 53, 13, 1, 0, 3]
+    away: [10, 4, 47, 7, 0, 0, 4]
+  2244036: # Kayserispor vs. Fenerbahçe | Date = 02/04/2018
+    home: [8, 0, 46, 9, 2, 0, 7]
+    away: [16, 7, 54, 10, 2, 0, 4]
+  2244053: # İstanbul Başakşehir vs. Yeni Malatyaspor | Date = 06/04/2018
+    home: [7, 2, 74, 16, 1, 0, 5]
+    away: [9, 4, 26, 14, 1, 0, 4]
+  2244046: # Beşiktaş vs. Göztepe | Date = 07/04/2018
+    home: [19, 10, 57, 23, 1, 0, 3]
+    away: [13, 6, 43, 11, 4, 1, 5]
+  2244048: # Kardemir Karabükspor vs. Antalyaspor | Date = 07/04/2018
+    home: [7, 4, 51, 17, 1, 0, 3]
+    away: [10, 4, 49, 16, 0, 0, 4]
+  2244052: # Trabzonspor vs. Kayserispor | Date = 07/04/2018
+    home: [16, 8, 58, 13, 1, 0, 6]
+    away: [9, 3, 42, 12, 2, 0, 3]
+  2244047: # Fenerbahçe vs. Osmanlıspor | Date = 08/04/2018
+    home: [19, 3, 62, 14, 1, 0, 9]
+    away: [8, 1, 38, 11, 2, 0, 2]
+  2244049: # Bursaspor vs. Kasımpaşa | Date = 08/04/2018
+    home: [13, 3, 56, 18, 1, 0, 9]
+    away: [6, 1, 44, 12, 2, 0, 0]
+  2244050: # Konyaspor vs. Sivasspor | Date = 08/04/2018
+    home: [13, 7, 56, 14, 2, 0, 4]
+    away: [10, 4, 44, 4, 0, 1, 8]
+  2244051: # Alanyaspor vs. Akhisarspor | Date = 08/04/2018
+    home: [22, 8, 45, 15, 4, 0, 8]
+    away: [5, 1, 55, 18, 2, 0, 6]
+  2244045: # Gençlerbirliği vs. Galatasaray | Date = 09/04/2018
+    home: [11, 2, 24, 18, 2, 0, 5]
+    away: [10, 4, 76, 12, 3, 0, 6]
+  2244055: # Akhisar Genclik Spor vs. Besiktas | Date = 13/04/2018
+    home: [9, 3, 36, 16, 0, 0, 4]
+    away: [11, 4, 64, 10, 1, 0, 7]
+  2244054: # Sivasspor vs. Fenerbahce | Date = 14/04/2018
+    home: [12, 4, 52, 14, 3, 0, 2]
+    away: [13, 6, 48, 15, 2, 0, 4]
+  2244056: # Yeni Malatyaspor vs. Alanyaspor | Date = 14/04/2018
+    home: [9, 2, 52, 24, 3, 0, 2]
+    away: [5, 2, 48, 17, 2, 0, 5]
+  2244057: # Kasimpasa vs. Kardemir Karabuk | Date = 14/04/2018
+    home: [15, 5, 57, 21, 1, 0, 7]
+    away: [8, 2, 43, 17, 2, 0, 7]
+  2244058: # Galatasaray vs. İstanbul Başakşehir | Date = 15/04/2018
+    home: [15, 6, 56, 14, 3, 0, 5]
+    away: [6, 2, 44, 16, 3, 0, 1]
+  2244059: # Kayserispor vs. Gençlerbirliği | Date = 15/04/2018
+    home: [9, 3, 61, 15, 2, 0, 1]
+    away: [13, 6, 39, 13, 3, 0, 7]
+  2244060: # Göztepe vs. Bursaspor | Date = 15/04/2018
+    home: [7, 3, 46, 13, 1, 0, 6]
+    away: [10, 2, 54, 18, 4, 0, 5]
+  2244061: # Antalyaspor vs. Konyaspor | Date = 15/04/2018
+    home: [10, 1, 38, 11, 2, 0, 3]
+    away: [8, 1, 62, 15, 2, 0, 6]
+  2244062: # Osmanlıspor vs. Trabzonspor | Date = 16/04/2018
+    home: [21, 6, 43, 16, 0, 0, 6]
+    away: [13, 7, 57, 17, 1, 0, 3]
+  2244069: # İstanbul Başakşehir vs. Kayserispor | Date = 20/04/2018
+    home: [14, 5, 57, 18, 1, 0, 4]
+    away: [5, 2, 43, 13, 1, 0, 3]
+  2244063: # Kardemir Karabükspor vs. Bursaspor | Date = 21/04/2018
+    home: [8, 4, 48, 15, 2, 1, 2]
+    away: [10, 6, 52, 22, 4, 0, 3]
+  2244064: # Alanyaspor vs. Galatasaray | Date = 21/04/2018
+    home: [12, 7, 38, 20, 3, 0, 6]
+    away: [8, 5, 62, 14, 2, 0, 1]
+  2244065: # Gençlerbirliği vs. Osmanlıspor | Date = 21/04/2018
+    home: [10, 3, 59, 19, 2, 0, 4]
+    away: [17, 7, 41, 12, 1, 0, 5]
+  2244070: # Trabzonspor vs. Sivasspor | Date = 21/04/2018
+    home: [19, 9, 55, 15, 2, 0, 6]
+    away: [8, 4, 45, 17, 1, 0, 1]
+  2244066: # Akhisarspor vs. Göztepe | Date = 22/04/2018
+    home: [10, 4, 47, 15, 2, 0, 3]
+    away: [12, 5, 53, 19, 3, 0, 7]
+  2244067: # Konyaspor vs. Kasımpaşa | Date = 22/04/2018
+    home: [14, 3, 48, 11, 2, 0, 9]
+    away: [13, 1, 52, 9, 1, 0, 8]
+  2244071: # Beşiktaş vs. Yeni Malatyaspor | Date = 22/04/2018
+    home: [22, 6, 71, 10, 0, 0, 7]
+    away: [11, 5, 29, 14, 2, 0, 0]
+  2244068: # Fenerbahçe vs. Antalyaspor | Date = 23/04/2018
+    home: [14, 6, 55, 12, 1, 0, 7]
+    away: [11, 5, 45, 10, 2, 0, 2]
+  2244074: # Göztepe vs. Kardemir Karabükspor | Date = 27/04/2018
+    home: [20, 8, 57, 12, 0, 0, 6]
+    away: [10, 2, 43, 4, 1, 0, 2]
+  2244073: # Kayserispor vs. Alanyaspor | Date = 28/04/2018
+    home: [12, 5, 62, 19, 3, 1, 1]
+    away: [14, 7, 38, 10, 1, 0, 4]
+  2244075: # Sivasspor vs. Gençlerbirliği | Date = 28/04/2018
+    home: [11, 7, 54, 12, 0, 0, 4]
+    away: [5, 3, 46, 12, 4, 0, 5]
+  2244079: # Antalyaspor vs. Trabzonspor | Date = 28/04/2018
+    home: [16, 10, 49, 18, 4, 0, 9]
+    away: [10, 5, 51, 9, 3, 0, 4]
+  2244080: # Kasımpaşa vs. Fenerbahçe | Date = 28/04/2018
+    home: [18, 3, 43, 22, 1, 0, 5]
+    away: [14, 7, 57, 14, 1, 0, 2]
+  2244072: # Yeni Malatyaspor vs. Akhisarspor | Date = 29/04/2018
+    home: [12, 3, 53, 14, 0, 0, 4]
+    away: [9, 1, 47, 16, 1, 0, 5]
+  2244076: # Osmanlıspor vs. İstanbul Başakşehir | Date = 29/04/2018
+    home: [14, 4, 30, 14, 4, 0, 6]
+    away: [20, 6, 70, 10, 2, 0, 10]
+  2244078: # Galatasaray vs. Beşiktaş | Date = 29/04/2018
+    home: [17, 6, 48, 23, 2, 0, 7]
+    away: [13, 4, 52, 16, 2, 1, 2]
+  2244077: # Bursaspor vs. Konyaspor | Date = 30/04/2018
+    home: [12, 4, 43, 21, 6, 0, 7]
+    away: [11, 4, 57, 15, 3, 0, 2]
+  2244087: # İstanbul Başakşehir vs. Sivasspor | Date = 04/05/2018
+    home: [9, 4, 48, 12, 3, 2, 3]
+    away: [9, 2, 52, 14, 0, 0, 4]
+  2244081: # Kardemir Karabükspor vs. Konyaspor | Date = 05/05/2018
+    home: [4, 0, 45, 17, 5, 0, 1]
+    away: [12, 3, 55, 14, 2, 0, 9]
+  2244084: # Alanyaspor vs. Osmanlıspor | Date = 05/05/2018
+    home: [13, 3, 48, 17, 6, 0, 5]
+    away: [13, 4, 52, 22, 2, 0, 3]
+  2244085: # Trabzonspor vs. Kasımpaşa | Date = 05/05/2018
+    home: [20, 8, 59, 15, 4, 2, 8]
+    away: [16, 9, 41, 9, 2, 0, 3]
+  2244082: # Fenerbahçe vs. Bursaspor | Date = 06/05/2018
+    home: [23, 6, 67, 11, 2, 0, 5]
+    away: [7, 4, 33, 14, 2, 2, 4]
+  2244083: # Akhisarspor vs. Galatasaray | Date = 06/05/2018
+    home: [9, 2, 64, 15, 3, 1, 4]
+    away: [15, 5, 36, 9, 2, 0, 4]
+  2244086: # Gençlerbirliği vs. Antalyaspor | Date = 06/05/2018
+    home: [11, 2, 56, 16, 3, 0, 4]
+    away: [13, 3, 44, 18, 2, 0, 5]
+  2244088: # Beşiktaş vs. Kayserispor | Date = 07/05/2018
+    home: [17, 7, 48, 13, 0, 1, 7]
+    away: [10, 1, 52, 10, 2, 1, 7]
+  2244089: # Göztepe vs. Yeni Malatyaspor | Date = 07/05/2018
+    home: [11, 1, 59, 16, 3, 0, 8]
+    away: [11, 2, 41, 15, 1, 0, 0]
+  2244096: # Antalyaspor vs. İstanbul Başakşehir | Date = 11/05/2018
+    home: [12, 2, 44, 13, 1, 0, 5]
+    away: [10, 6, 56, 10, 1, 0, 3]
+  2244090: # Galatasaray vs. Yeni Malatyaspor | Date = 12/05/2018
+    home: [14, 6, 55, 15, 1, 0, 3]
+    away: [9, 1, 45, 15, 5, 0, 2]
+  2244094: # Konyaspor vs. Göztepe | Date = 12/05/2018
+    home: [13, 2, 57, 11, 2, 0, 7]
+    away: [17, 8, 43, 13, 4, 1, 10]
+  2244095: # Kasımpaşa vs. Gençlerbirliği | Date = 12/05/2018
+    home: [17, 6, 56, 15, 4, 0, 3]
+    away: [14, 8, 44, 9, 1, 1, 5]
+  2244092: # Osmanlıspor vs. Beşiktaş | Date = 13/05/2018
+    home: [13, 4, 30, 8, 0, 0, 5]
+    away: [11, 4, 70, 15, 1, 0, 6]
+  2244093: # Sivasspor vs. Alanyaspor | Date = 13/05/2018
+    home: [9, 5, 54, 13, 3, 0, 4]
+    away: [10, 7, 46, 14, 7, 0, 2]
+  2244097: # Bursaspor vs. Trabzonspor | Date = 13/05/2018
+    home: [15, 3, 63, 13, 2, 0, 7]
+    away: [13, 4, 37, 22, 3, 0, 3]
+  2244091: # Kayserispor vs. Akhisarspor | Date = 14/05/2018
+    home: [15, 1, 63, 7, 2, 0, 8]
+    away: [10, 6, 37, 9, 3, 0, 1]
+  2244098: # Kardemir Karabükspor vs. Fenerbahçe | Date = 14/05/2018
+    home: [10, 3, 38, 10, 2, 0, 2]
+    away: [33, 13, 62, 13, 2, 0, 12]
+  2244101: # Gençlerbirliği vs. Bursaspor | Date = 18/05/2018
+    home: [11, 4, 47, 11, 0, 0, 3]
+    away: [14, 4, 53, 15, 0, 0, 5]
+  2244102: # Akhisarspor vs. Osmanlıspor | Date = 18/05/2018
+    home: [17, 8, 65, 7, 0, 0, 3]
+    away: [18, 5, 35, 9, 0, 0, 3]
+  2244103: # Alanyaspor vs. Antalyaspor | Date = 18/05/2018
+    home: [15, 9, 51, 21, 2, 0, 6]
+    away: [8, 4, 49, 17, 1, 0, 5]
+  2244105: # Trabzonspor vs. Kardemir Karabükspor | Date = 18/05/2018
+    home: [26, 10, 53, 13, 1, 0, 5]
+    away: [10, 5, 47, 15, 3, 0, 9]
+  2244106: # Yeni Malatyaspor vs. Kayserispor | Date = 18/05/2018
+    home: [9, 4, 39, 5, 0, 0, 3]
+    away: [19, 11, 61, 8, 1, 0, 9]
+  2244099: # Göztepe vs. Galatasaray | Date = 19/05/2018
+    home: [8, 2, 52, 15, 1, 0, 4]
+    away: [11, 2, 48, 12, 1, 0, 3]
+  2244100: # Fenerbahçe vs. Konyaspor | Date = 19/05/2018
+    home: [22, 8, 49, 9, 0, 0, 7]
+    away: [14, 8, 51, 10, 3, 0, 4]
+  2244104: # İstanbul Başakşehir vs. Kasımpaşa | Date = 19/05/2018
+    home: [24, 6, 62, 11, 3, 0, 8]
+    away: [11, 4, 38, 8, 3, 0, 2]
+  2244107: # Beşiktaş vs. Sivasspor | Date = 19/05/2018
+    home: [22, 11, 64, 16, 3, 0, 7]
+    away: [11, 4, 36, 12, 2, 1, 4]
+  2251391: # Real Betis vs. Celta de Vigo | Date = 25/08/2017
+    home: [10, 3, 45, 13, 2, 0, 4]
+    away: [9, 1, 55, 9, 2, 0, 6]
+  2251384: # Deportivo Alavés vs. Barcelona | Date = 26/08/2017
+    home: [11, 2, 26, 12, 2, 0, 1]
+    away: [23, 11, 74, 10, 3, 0, 14]
+  2251386: # Levante vs. Deportivo La Coruña | Date = 26/08/2017
+    home: [24, 5, 58, 11, 1, 0, 6]
+    away: [11, 4, 42, 12, 2, 0, 5]
+  2251387: # Las Palmas vs. Atlético Madrid | Date = 26/08/2017
+    home: [11, 4, 63, 11, 4, 0, 4]
+    away: [8, 6, 37, 9, 1, 0, 2]
+  2251388: # Girona vs. Málaga | Date = 26/08/2017
+    home: [15, 4, 44, 11, 3, 0, 2]
+    away: [7, 2, 56, 15, 4, 0, 3]
+  2251385: # Espanyol vs. Leganés | Date = 27/08/2017
+    home: [15, 2, 60, 10, 3, 0, 9]
+    away: [12, 8, 40, 14, 3, 0, 1]
+  2251390: # Getafe vs. Sevilla | Date = 27/08/2017
+    home: [15, 3, 43, 20, 0, 0, 7]
+    away: [6, 3, 57, 10, 1, 0, 5]
+  2251392: # Eibar vs. Athletic Club | Date = 27/08/2017
+    home: [14, 5, 57, 14, 1, 1, 4]
+    away: [9, 4, 43, 11, 1, 0, 3]
+  2251395: # Valencia vs. Atlético Madrid | Date = 09/09/2017
+    home: [11, 0, 49, 16, 1, 0, 4]
+    away: [13, 4, 51, 14, 0, 0, 3]
+  2251396: # Real Madrid vs. Levante | Date = 09/09/2017
+    home: [18, 10, 69, 9, 2, 1, 13]
+    away: [5, 2, 31, 16, 2, 0, 3]
+  2251400: # Sevilla vs. Eibar | Date = 09/09/2017
+    home: [12, 6, 60, 14, 1, 0, 6]
+    away: [7, 2, 40, 18, 1, 0, 5]
+  2251402: # Barcelona vs. Espanyol | Date = 09/09/2017
+    home: [20, 9, 77, 11, 1, 0, 8]
+    away: [9, 1, 23, 18, 5, 0, 7]
+  2251432: # Real Sociedad vs. Valencia | Date = 24/09/2017
+    home: [18, 6, 58, 11, 2, 0, 7]
+    away: [13, 4, 42, 13, 5, 1, 6]
+  2251433: # Valencia vs. Athletic Club | Date = 01/10/2017
+    home: [10, 6, 39, 18, 3, 0, 2]
+    away: [16, 6, 61, 16, 4, 0, 8]
+  2251434: # Real Madrid vs. Espanyol | Date = 01/10/2017
+    home: [23, 8, 64, 8, 2, 0, 10]
+    away: [8, 3, 36, 10, 2, 0, 3]
+  2251440: # Barcelona vs. Las Palmas | Date = 01/10/2017
+    home: [22, 10, 48, 10, 5, 0, 8]
+    away: [11, 1, 52, 11, 1, 0, 3]
+  2251441: # Villarreal vs. Eibar | Date = 01/10/2017
+    home: [12, 6, 60, 15, 2, 0, 6]
+    away: [8, 0, 40, 9, 1, 0, 3]
+  2251752: # Villarreal vs. Real Madrid | Date = 19/05/2018
+    home: [14, 5, 38, 13, 4, 0, 4]
+    away: [16, 7, 62, 10, 3, 0, 5]
+  2211752: # Lokomotiv Moskva vs. Ural | Date = 26/08/2017
+    home: [15, 8, 44, 15, 0, 0, 8]
+    away: [12, 2, 56, 7, 0, 0, 6]
+  2211754: # Rubin Kazan' vs. Tosno | Date = 26/08/2017
+    home: [3, 1, 51, 18, 3, 0, 3]
+    away: [9, 3, 49, 12, 2, 0, 1]
+  2211755: # CSKA Moskva vs. Akhmat Grozny | Date = 27/08/2017
+    home: [26, 5, 76, 6, 0, 0, 10]
+    away: [11, 4, 24, 13, 3, 0, 3]
+  2211757: # Zenit vs. Rostov | Date = 27/08/2017
+    home: [11, 0, 68, 9, 1, 0, 13]
+    away: [8, 3, 32, 12, 0, 0, 5]
+  2211758: # Krasnodar vs. Dinamo Moskva | Date = 27/08/2017
+    home: [16, 10, 54, 24, 3, 0, 5]
+    away: [10, 2, 46, 15, 2, 0, 2]
+  2211763: # Amkar Perm' vs. CSKA Moskva | Date = 08/09/2017
+    home: [5, 1, 43, 14, 3, 1, 0]
+    away: [9, 4, 57, 15, 2, 0, 4]
+  2211759: # Tosno vs. Anzhi | Date = 09/09/2017
+    home: [27, 9, 59, 7, 1, 0, 4]
+    away: [8, 5, 41, 12, 0, 0, 6]
+  2211762: # Spartak Moskva vs. Rubin Kazan' | Date = 09/09/2017
+    home: [8, 2, 53, 12, 4, 0, 3]
+    away: [7, 1, 47, 15, 1, 0, 2]
+  2211764: # Rostov vs. Arsenal Tula | Date = 09/09/2017
+    home: [12, 2, 57, 16, 0, 0, 3]
+    away: [9, 4, 43, 18, 3, 0, 3]
+  2211859: # Arsenal Tula vs. Akhmat Grozny | Date = 04/03/2018
+    home: [10, 3, 43, 16, 4, 0, 6]
+    away: [14, 3, 57, 13, 1, 1, 4]
+  2211865: # Spartak Moskva vs. SKA Khabarovsk | Date = 11/03/2018
+    home: [41, 12, 80, 10, 2, 0, 9]
+    away: [2, 0, 20, 12, 1, 0, 0]
+  2211867: # Akhmat Grozny vs. CSKA Moskva | Date = 11/03/2018
+    home: [18, 6, 58, 10, 1, 0, 11]
+    away: [18, 8, 42, 18, 2, 0, 5]
+  2211869: # Rostov vs. Zenit | Date = 11/03/2018
+    home: [6, 4, 42, 16, 2, 0, 6]
+    away: [10, 0, 58, 10, 3, 0, 8]
+  2211864: # Ural vs. Lokomotiv Moskva | Date = 12/03/2018
+    home: [14, 4, 58, 20, 4, 0, 2]
+    away: [14, 8, 42, 18, 2, 0, 5]
+  2211871: # Anzhi vs. Tosno | Date = 17/03/2018
+    home: [11, 5, 47, 20, 0, 0, 4]
+    away: [6, 0, 53, 24, 1, 0, 3]
+  2211873: # SKA Khabarovsk vs. Ural | Date = 17/03/2018
+    home: [14, 7, 52, 14, 1, 0, 4]
+    away: [26, 10, 48, 23, 2, 0, 5]
+  2211874: # Rubin Kazan' vs. Spartak Moskva | Date = 17/03/2018
+    home: [10, 5, 58, 12, 2, 0, 5]
+    away: [10, 5, 42, 16, 2, 0, 3]
+  2211876: # Arsenal Tula vs. Rostov | Date = 17/03/2018
+    home: [19, 7, 60, 19, 3, 0, 4]
+    away: [12, 6, 40, 11, 2, 0, 4]
+  2211878: # Krasnodar vs. Ufa | Date = 17/03/2018
+    home: [24, 7, 70, 8, 1, 0, 6]
+    away: [5, 1, 30, 11, 3, 0, 3]
+  2211880: # Amkar Perm' vs. Lokomotiv Moskva | Date = 31/03/2018
+    home: [15, 5, 33, 8, 1, 0, 9]
+    away: [16, 5, 67, 14, 0, 1, 3]
+  2211881: # Akhmat Grozny vs. SKA Khabarovsk | Date = 31/03/2018
+    home: [18, 5, 65, 17, 2, 0, 8]
+    away: [7, 2, 35, 9, 1, 0, 2]
+  2211883: # Spartak Moskva vs. Tosno | Date = 31/03/2018
+    home: [15, 5, 55, 10, 2, 0, 6]
+    away: [10, 2, 45, 15, 1, 0, 5]
+  2211885: # Dinamo Moskva vs. Arsenal Tula | Date = 31/03/2018
+    home: [14, 7, 60, 18, 1, 0, 10]
+    away: [8, 3, 40, 14, 3, 0, 3]
+  2211879: # Krasnodar vs. Anzhi | Date = 01/04/2018
+    home: [9, 3, 66, 16, 2, 0, 5]
+    away: [10, 2, 34, 11, 2, 0, 6]
+  2211882: # Ural vs. Rubin Kazan' | Date = 01/04/2018
+    home: [10, 2, 47, 17, 2, 1, 3]
+    away: [8, 4, 53, 19, 2, 0, 3]
+  2211884: # Rostov vs. CSKA Moskva | Date = 01/04/2018
+    home: [6, 2, 45, 13, 3, 0, 6]
+    away: [12, 2, 55, 7, 1, 0, 2]
+  2211886: # Ufa vs. Zenit | Date = 01/04/2018
+    home: [11, 4, 63, 10, 1, 0, 8]
+    away: [10, 4, 37, 8, 1, 0, 1]
+  2211889: # SKA Khabarovsk vs. Amkar Perm' | Date = 07/04/2018
+    home: [10, 1, 48, 12, 0, 1, 3]
+    away: [15, 6, 52, 10, 1, 0, 1]
+  2211890: # Rubin Kazan' vs. Akhmat Grozny | Date = 07/04/2018
+    home: [8, 4, 65, 10, 3, 0, 1]
+    away: [6, 3, 35, 11, 3, 0, 4]
+  2211893: # Arsenal Tula vs. Ufa | Date = 07/04/2018
+    home: [11, 3, 52, 13, 1, 0, 3]
+    away: [7, 3, 48, 16, 3, 0, 3]
+  2211894: # Zenit vs. Krasnodar | Date = 07/04/2018
+    home: [16, 5, 45, 10, 2, 0, 10]
+    away: [9, 4, 55, 13, 2, 0, 4]
+  2211887: # Anzhi vs. Spartak Moskva | Date = 08/04/2018
+    home: [12, 3, 40, 9, 0, 0, 2]
+    away: [14, 5, 60, 18, 0, 0, 3]
+  2211888: # Lokomotiv Moskva vs. Rostov | Date = 08/04/2018
+    home: [14, 3, 60, 10, 3, 0, 8]
+    away: [3, 1, 40, 17, 5, 0, 5]
+  2211891: # Tosno vs. Ural | Date = 08/04/2018
+    home: [9, 2, 47, 23, 2, 0, 5]
+    away: [11, 3, 53, 20, 3, 0, 1]
+  2211892: # CSKA Moskva vs. Dinamo Moskva | Date = 09/04/2018
+    home: [17, 2, 63, 9, 2, 0, 8]
+    away: [9, 3, 37, 9, 3, 0, 0]
+  2211899: # Akhmat Grozny vs. Tosno | Date = 13/04/2018
+    home: [15, 2, 45, 13, 3, 0, 2]
+    away: [8, 1, 55, 17, 2, 0, 3]
+  2211895: # Zenit vs. Anzhi | Date = 14/04/2018
+    home: [15, 6, 63, 13, 3, 0, 11]
+    away: [7, 1, 37, 13, 1, 0, 0]
+  2211896: # Dinamo Moskva vs. Lokomotiv Moskva | Date = 14/04/2018
+    home: [12, 2, 58, 13, 3, 0, 6]
+    away: [11, 6, 42, 16, 4, 0, 1]
+  2211898: # Amkar Perm' vs. Rubin Kazan' | Date = 14/04/2018
+    home: [6, 3, 39, 13, 2, 0, 5]
+    away: [11, 7, 61, 16, 2, 0, 6]
+  2211902: # Krasnodar vs. Arsenal Tula | Date = 14/04/2018
+    home: [11, 7, 49, 16, 5, 0, 5]
+    away: [5, 3, 51, 10, 2, 0, 3]
+  2211897: # Rostov vs. SKA Khabarovsk | Date = 15/04/2018
+    home: [11, 5, 55, 13, 1, 0, 8]
+    away: [4, 0, 45, 5, 2, 0, 4]
+  2211900: # Ural vs. Spartak Moskva | Date = 15/04/2018
+    home: [20, 6, 34, 10, 1, 0, 6]
+    away: [19, 4, 66, 18, 2, 0, 4]
+  2211901: # Ufa vs. CSKA Moskva | Date = 15/04/2018
+    home: [11, 5, 40, 8, 1, 0, 3]
+    away: [16, 5, 60, 11, 1, 0, 3]
+  2211872: # Lokomotiv Moskva vs. Akhmat Grozny | Date = 18/04/2018
+    home: [8, 4, 58, 28, 3, 0, 9]
+    away: [7, 1, 42, 18, 2, 0, 7]
+  2211875: # CSKA Moskva vs. Amkar Perm' | Date = 18/04/2018
+    home: [18, 6, 72, 9, 0, 0, 5]
+    away: [5, 2, 28, 7, 1, 0, 9]
+  2211877: # Zenit vs. Dinamo Moskva | Date = 18/04/2018
+    home: [15, 6, 53, 9, 0, 0, 7]
+    away: [7, 1, 47, 13, 2, 0, 4]
+  2211903: # Anzhi vs. Ural | Date = 21/04/2018
+    home: [9, 3, 51, 11, 3, 0, 8]
+    away: [16, 6, 49, 19, 3, 0, 4]
+  2211906: # Rubin Kazan' vs. Rostov | Date = 21/04/2018
+    home: [11, 5, 64, 13, 0, 0, 4]
+    away: [10, 2, 36, 10, 0, 0, 6]
+  2211904: # Lokomotiv Moskva vs. Ufa | Date = 22/04/2018
+    home: [12, 5, 62, 13, 2, 0, 5]
+    away: [8, 2, 38, 12, 4, 0, 5]
+  2211905: # SKA Khabarovsk vs. Dinamo Moskva | Date = 22/04/2018
+    home: [10, 1, 51, 15, 1, 0, 8]
+    away: [9, 3, 49, 16, 3, 0, 5]
+  2211907: # Tosno vs. Amkar Perm' | Date = 22/04/2018
+    home: [10, 1, 67, 13, 2, 0, 6]
+    away: [11, 4, 33, 19, 3, 0, 2]
+  2211909: # CSKA Moskva vs. Krasnodar | Date = 22/04/2018
+    home: [22, 7, 53, 8, 1, 0, 6]
+    away: [12, 3, 47, 18, 1, 0, 1]
+  2211910: # Arsenal Tula vs. Zenit | Date = 22/04/2018
+    home: [14, 8, 49, 15, 2, 1, 8]
+    away: [13, 5, 51, 8, 1, 0, 6]
+  2211908: # Spartak Moskva vs. Akhmat Grozny | Date = 23/04/2018
+    home: [21, 8, 75, 13, 2, 0, 7]
+    away: [7, 4, 25, 17, 3, 0, 0]
+  2211911: # Arsenal Tula vs. Anzhi | Date = 28/04/2018
+    home: [22, 4, 47, 15, 2, 0, 5]
+    away: [9, 5, 53, 14, 3, 0, 4]
+  2211915: # Rostov vs. Tosno | Date = 29/04/2018
+    home: [22, 7, 72, 19, 2, 0, 9]
+    away: [8, 1, 28, 6, 2, 1, 2]
+  2211916: # Amkar Perm' vs. Spartak Moskva | Date = 29/04/2018
+    home: [11, 0, 46, 7, 3, 0, 4]
+    away: [17, 4, 54, 14, 2, 0, 5]
+  2211918: # Zenit vs. CSKA Moskva | Date = 29/04/2018
+    home: [20, 4, 54, 18, 3, 0, 5]
+    away: [10, 2, 46, 16, 4, 0, 6]
+  2211912: # Krasnodar vs. Lokomotiv Moskva | Date = 30/04/2018
+    home: [20, 6, 53, 12, 2, 0, 4]
+    away: [17, 4, 47, 8, 0, 0, 6]
+  2211913: # Ufa vs. SKA Khabarovsk | Date = 30/04/2018
+    home: [12, 3, 54, 10, 0, 0, 8]
+    away: [9, 5, 46, 14, 3, 0, 5]
+  2211914: # Dinamo Moskva vs. Rubin Kazan' | Date = 30/04/2018
+    home: [7, 1, 38, 12, 2, 0, 5]
+    away: [6, 2, 62, 12, 3, 0, 3]
+  2211917: # Akhmat Grozny vs. Ural | Date = 30/04/2018
+    home: [13, 2, 55, 13, 0, 0, 7]
+    away: [5, 3, 45, 15, 1, 1, 2]
+  2211920: # Lokomotiv Moskva vs. Zenit | Date = 05/05/2018
+    home: [7, 5, 45, 13, 2, 0, 2]
+    away: [6, 1, 55, 22, 5, 0, 3]
+  2211921: # SKA Khabarovsk vs. Krasnodar | Date = 05/05/2018
+    home: [15, 4, 36, 9, 0, 0, 3]
+    away: [16, 7, 64, 8, 0, 0, 4]
+  2211923: # Tosno vs. Dinamo Moskva | Date = 05/05/2018
+    home: [14, 5, 43, 11, 4, 0, 3]
+    away: [10, 6, 57, 20, 2, 0, 5]
+  2211924: # Spartak Moskva vs. Rostov | Date = 05/05/2018
+    home: [16, 7, 58, 10, 2, 0, 7]
+    away: [11, 2, 42, 17, 2, 1, 2]
+  2211925: # Ural vs. Amkar Perm' | Date = 06/05/2018
+    home: [9, 1, 69, 13, 3, 0, 4]
+    away: [8, 4, 31, 16, 4, 0, 4]
+  2211926: # CSKA Moskva vs. Arsenal Tula | Date = 06/05/2018
+    home: [16, 9, 55, 8, 0, 0, 6]
+    away: [7, 2, 45, 9, 1, 0, 2]
+  2211919: # Anzhi vs. Akhmat Grozny | Date = 07/05/2018
+    home: [15, 3, 59, 12, 2, 1, 13]
+    away: [12, 6, 41, 23, 5, 0, 3]
+  2211922: # Rubin Kazan' vs. Ufa | Date = 07/05/2018
+    home: [14, 2, 60, 14, 2, 0, 7]
+    away: [4, 2, 40, 12, 1, 0, 5]
+  2211700: # Spartak Moskva vs. Dinamo Moskva | Date = 13/05/2018
+    home: [18, 9, 64, 7, 3, 0, 6]
+    away: [14, 6, 36, 16, 5, 0, 3]
+  2211927: # CSKA Moskva vs. Anzhi | Date = 13/05/2018
+    home: [15, 6, 62, 15, 2, 0, 6]
+    away: [9, 4, 38, 10, 2, 0, 2]
+  2211928: # Arsenal Tula vs. Lokomotiv Moskva | Date = 13/05/2018
+    home: [25, 4, 48, 20, 3, 0, 4]
+    away: [5, 1, 52, 11, 2, 1, 5]
+  2211929: # Zenit vs. SKA Khabarovsk | Date = 13/05/2018
+    home: [30, 14, 67, 10, 3, 0, 8]
+    away: [5, 1, 33, 10, 2, 0, 6]
+  2211930: # Krasnodar vs. Rubin Kazan' | Date = 13/05/2018
+    home: [14, 6, 59, 12, 4, 0, 7]
+    away: [10, 5, 41, 12, 1, 0, 2]
+  2211931: # Ufa vs. Tosno | Date = 13/05/2018
+    home: [13, 6, 48, 12, 3, 0, 3]
+    away: [12, 3, 52, 8, 2, 0, 5]
+  2211933: # Rostov vs. Ural | Date = 13/05/2018
+    home: [13, 1, 37, 12, 0, 0, 4]
+    away: [15, 3, 63, 6, 2, 0, 8]
+  2211934: # Amkar Perm' vs. Akhmat Grozny | Date = 13/05/2018
+    home: [16, 5, 61, 10, 2, 0, 7]
+    away: [7, 0, 39, 14, 0, 1, 3]
+  2371357: # Yenisey vs. FK Anzi Makhackala | Date = 17/05/2018
+    home: [19, 7, 46, 10, 3, 0, 4]
+    away: [7, 0, 54, 15, 3, 0, 3]
+  2371359: # Amkar vs. FC Tambov | Date = 17/05/2018
+    home: [19, 7, 68, 15, 1, 0, 8]
+    away: [3, 2, 32, 15, 1, 0, 0]
+  2371358: # FK Anzi Makhackala vs. Yenisey | Date = 20/05/2018
+    home: [18, 9, 59, 6, 2, 0, 5]
+    away: [7, 5, 41, 15, 1, 0, 5]
+  2371360: # FC Tambov vs. Amkar | Date = 20/05/2018
+    home: [9, 2, 66, 16, 2, 0, 7]
+    away: [7, 3, 34, 19, 5, 0, 1]

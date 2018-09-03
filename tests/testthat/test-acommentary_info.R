@@ -41,13 +41,13 @@ test_that("Send in a single commentary to see it is stored correctly", {
   expect_equal( checkPlayerExists %>% tolower, 'artur boruc' )
 
   # Get the general match commentaries
-  teamCommentaries <- "cmt_commentary:*" %>%
+  teamCommentaries <- "csmt_commentary:*" %>%
     KEYS$RED$KEYS()
 
   teamIDs <- teamCommentaries %>%
     purrr::flatten_chr() %>%
     strsplit(split = ':') %>%
-    purrr::map(4) %>%
+    purrr::map(5) %>%
     purrr::flatten_chr() %>%
     as.integer %>%
     sort

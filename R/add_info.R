@@ -30,7 +30,7 @@ acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
   # Check if the commentary already exists for both teams for all IDs
   comExists <- KEYS$RED$pipeline(
     .commands = lapply(
-      X = paste0("cmt_commentary:", KEYS$COMP, ":", matchIDs, ":*"),
+      X = paste0("csmt_commentary:", KEYS$COMP, ":", KEYS$SEASON, ":", matchIDs, ":*"),
       FUN = function(x) x %>% KEYS$PIPE$KEYS()
     )
   ) %>%
@@ -720,7 +720,7 @@ ateam_info <- function(KEYS, teamListLength) {
 #'
 #' @details Redis Keys used;
 #'   \itemize{
-#'     \item{\strong{[HASH]} :: \code{cmt_commentary:{comp_id}:{match_id}:{team_id}}}
+#'     \item{\strong{[HASH]} :: \code{csmt_commentary:{comp_id}:{season}:{match_id}:{team_id}}}
 #'     \item{\strong{[HASH]} :: \code{cmp:{comp_id}:{match_id}:{player_id}}}
 #'   }
 #'
@@ -741,7 +741,7 @@ ateam_info <- function(KEYS, teamListLength) {
 commentary_sub <- function(KEYS, matchID, teamID, teamStats, commentary) {
 
   # Insert commentary here
-  paste0("cmt_commentary:", KEYS$COMP, ":", matchID, ":", teamID) %>%
+  paste0("csmt_commentary:", KEYS$COMP, ":", KEYS$SEASON, ":", matchID, ":", teamID) %>%
     KEYS$RED$HMSET(
       field = teamStats %>% names,
       value = teamStats %>% as.character
