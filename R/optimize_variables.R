@@ -203,11 +203,11 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               )
 
             # Create Fold Data
-            FOLD_DATA <- total.results$res %>%
-              footballstats::create_folds()
+            #FOLD_DATA <- total.results$res %>%
+            #  footballstats::create_folds()
 
             # Initialise all methods
-            allMethods <- list()
+            #allMethods <- list()
 
             # Build XGBoost model using CV
             if ("xgboost" %in% types) {
@@ -230,12 +230,16 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             if ("neuralnetwork" %in% types) {
               startTime <- Sys.time()
               allMethods$neuralnetwork <- scaled.results$data %>%
-                footballstats::neural_network(
-                  odds.results = odds.results,
-                  FOLD_DATA = FOLD_DATA,
-                  NN = NN,
-                  LOGS = FALSE
+                mltools::gen_nn(
+                  NN = NN
                 )
+
+              # Now calculate odds
+              allMethods$neuralnetwork$totalStats$netWinnings <- sapply(
+                X = nnResults$results,
+                FUN = function(x) odds.results %>% footballstats::calculate_winnings(x)
+              )
+
               endTime <- Sys.time()
               tDiff <- difftime(
                 time1 = endTime,
@@ -256,7 +260,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               # What is the best result
               biggest <- sapply(
                 X = 1:(allMethods %>% length),
-                FUN = function(x) allMethods[[x]]$totAcc %>% mean
+                FUN = function(x) allMethods[[x]]$totalStats$totAcc %>% mean
               ) %>%
                 max
 
@@ -274,10 +278,13 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
 
               # Put the different methods into a list
               for (z in 1:(types %>% length)) {
+                # Rename list object
+                myStats <- allMethods[[z]]$totalStats
+
                 # Get average sensitivities
-                sensD <- allMethods[[z]]$totD %>% mean
-                sensL <- allMethods[[z]]$totL %>% mean
-                sensW <- allMethods[[z]]$totW %>% mean
+                sensD <- myStats$totD %>% mean
+                sensL <- myStats$totL %>% mean
+                sensW <- myStats$totW %>% mean
 
                 # Store all results in a data frame
                 topscore.frame <- data.frame(
@@ -287,23 +294,23 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                   decay = DECAY[l],
                   totalPercentage = TOTAL_PERC[m],
                   type = types[z],
-                  `accuracy` = allMethods[[z]]$totAcc %>% mean,
-                  `profit` = allMethods[[z]]$netWinnings %>% mean,
-                  `profit.sd` = allMethods[[z]]$netWinnings %>% stats::sd(),
-                  `profit.min` = allMethods[[z]]$netWinnings %>% min,
-                  `profit.max` = allMethods[[z]]$netWinnings %>% max,
-                  `accuracy.sd` = allMethods[[z]]$totAcc %>% stats::sd(),
-                  `accuracy.min` = allMethods[[z]]$totAcc %>% min,
-                  `accuracy.max` = allMethods[[z]]$totAcc %>% max,
-                  `sensitivity.D` = allMethods[[z]]$totD %>% mean,
-                  `sensitivity.D.min` = allMethods[[z]]$totD %>% min,
-                  `sensitivity.D.max` = allMethods[[z]]$totD %>% max,
-                  `sensitivity.L` = allMethods[[z]]$totL %>% mean,
-                  `sensitivity.L.min` = allMethods[[z]]$totL %>% min,
-                  `sensitivity.L.max` = allMethods[[z]]$totL %>% max,
-                  `sensitivity.W` = allMethods[[z]]$totW %>% mean,
-                  `sensitivity.W.min` = allMethods[[z]]$totW %>% min,
-                  `sensitivity.W.max` = allMethods[[z]]$totW %>% max,
+                  `accuracy` = myStats$totAcc %>% mean,
+                  `profit` = myStats$netWinnings %>% mean,
+                  `profit.sd` = myStats$netWinnings %>% stats::sd(),
+                  `profit.min` = myStats$netWinnings %>% min,
+                  `profit.max` = myStats$netWinnings %>% max,
+                  `accuracy.sd` = myStats$totAcc %>% stats::sd(),
+                  `accuracy.min` = myStats$totAcc %>% min,
+                  `accuracy.max` = myStats$totAcc %>% max,
+                  `sensitivity.D` = myStats$totD %>% mean,
+                  `sensitivity.D.min` = myStats$totD %>% min,
+                  `sensitivity.D.max` = myStats$totD %>% max,
+                  `sensitivity.L` = myStats$totL %>% mean,
+                  `sensitivity.L.min` = myStats$totL %>% min,
+                  `sensitivity.L.max` = myStats$totL %>% max,
+                  `sensitivity.W` = myStats$totW %>% mean,
+                  `sensitivity.W.min` = myStats$totW %>% min,
+                  `sensitivity.W.max` = myStats$totW %>% max,
                   `sensitivity.sd` = c(sensD, sensL, sensW) %>% stats::sd(),
                   stringsAsFactors = FALSE
                 )
