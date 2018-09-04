@@ -45,12 +45,9 @@ method_xgboost <- function(total.results, odds.results, FOLD_DATA, XGB) {
     )
 
     # Set up train and test data
-    train.data <- new.results[
-      FOLD_DATA$FOLDS[-filterTest] %>% purrr::flatten_int(), ]
-    test.data <- new.results[
-      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
-    new.odds <- odds.results[
-      FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+    train.data <- new.results[FOLD_DATA$FOLDS[-filterTest] %>% purrr::flatten_int(), ]
+    test.data <- new.results[FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
+    new.odds <- odds.results[FOLD_DATA$FOLDS[filterTest] %>% purrr::flatten_int(), ]
 
     # Create labels
     trainLabels <- train.data$res
