@@ -49,7 +49,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
   # Define neural network input list
   NN <- list(
     REP = GRIDS$NN_REP,
-    THRESH = GRIDS$NN_THRESH
+    THRESH = GRIDS$NN_THRESH %>% max(0.3)
   )
 
   # Define XGBoost input list
@@ -66,8 +66,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
     (GRID_PTS %>% length) *
     (GRID_BOUND %>% length) *
     (DECAY %>% length) *
-    (TOTAL_PERC %>% length) *
-    (types %>% length)
+    (TOTAL_PERC %>% length)
   totalOps %<>% `-`(totMatches)
 
   # Load up the odds frame
@@ -105,6 +104,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             icount %<>% `+`(1)
             cat(' ## Analysing operation', icount, '/', totalOps, ' (Loading data first) \n')
             odds.results <- total.results <- data.frame(stringsAsFactors = FALSE)
+            allMatchIDs <- c()
 
             # Set up a progress bar here
             pb <- utils::txtProgressBar(
@@ -150,22 +150,22 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 )
 
                 # do calculations here
-                result.dat <- home.away.dat %>% footballstats::optimize_calculation(
-                  day = DAYS[i],
-                  gridPoints = GRID_PTS[j],
-                  gridBoundary= GRID_BOUND[k],
-                  decayFactor = DECAY[l],
-                  til = current.row$til,
-                  totalPer = TOTAL_PERC[m]
-                )
+                result.dat <- home.away.dat %>%
+                  footballstats::optimize_calculation(
+                    day = DAYS[i],
+                    gridPoints = GRID_PTS[j],
+                    gridBoundary= GRID_BOUND[k],
+                    decayFactor = DECAY[l],
+                    til = current.row$til,
+                    totalPer = TOTAL_PERC[m]
+                  )
 
                 # Append positions on
                 result.dat$`position.h` <- current.row$`position.h` %>% `/`(current.row$til)
                 result.dat$`position.a` <- current.row$`position.a` %>% `/`(current.row$til)
                 result.dat$res <- current.row$result
                 total.results %<>% rbind(result.dat)
-
-                # if (result.dat %>% anyNA()) print(drow)
+                allMatchIDs %<>% c(current.row$matchID)
 
                 # Make sure there is a match, if not then set as NA
                 matchingIndex <- current.row$matchID %>% `==`(odds.frame$matchID)
@@ -187,6 +187,13 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               }
             }
 
+            # Match up matchIDs with odds frame
+            new.odds <- odds.frame[allMatchIDs %>% match(odds.frame$matchID), ]
+
+            # Remove NA's from matchIDs
+            allMatchIDs %<>%
+              `[`(total.results %>% stats::complete.cases())
+
             # Prepare data - get the scales and scale results
             scaled.results <- total.results %>%
               mltools::scale_data()
@@ -202,22 +209,25 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 savePlot = FALSE
               )
 
-            # Create Fold Data
-            #FOLD_DATA <- total.results$res %>%
-            #  footballstats::create_folds()
-
             # Initialise all methods
-            #allMethods <- list()
+            allMethods <- list()
 
             # Build XGBoost model using CV
             if ("xgboost" %in% types) {
               startTime <- Sys.time()
+
+              # Build and save XGBoost
               allMethods$xgb <- scaled.results$data %>%
-                footballstats::method_xgboost(
-                  odds.results = odds.results,
-                  FOLD_DATA = FOLD_DATA,
+                mltools::gen_xgb(
                   XGB = XGB
                 )
+
+              # Now calculate odds
+              allMethods$xgb$totalStats$netWinnings <- sapply(
+                X = allMethods$xgb$results,
+                FUN = function(x) new.odds %>% footballstats::calculate_winnings(x)
+              )
+
               endTime <- Sys.time()
               tDiff <- difftime(
                 time1 = endTime,
@@ -229,6 +239,8 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             # Build Neural network model using CV
             if ("neuralnetwork" %in% types) {
               startTime <- Sys.time()
+
+              # Build and save NN
               allMethods$neuralnetwork <- scaled.results$data %>%
                 mltools::gen_nn(
                   NN = NN
@@ -236,7 +248,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
 
               # Now calculate odds
               allMethods$neuralnetwork$totalStats$netWinnings <- sapply(
-                X = nnResults$results,
+                X = allMethods$neuralnetwork$results,
                 FUN = function(x) odds.results %>% footballstats::calculate_winnings(x)
               )
 
@@ -245,7 +257,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 time1 = endTime,
                 time2 = startTime
               ) %>% format
-              cat(" Nueral Network took :", tDiff, "\n")
+              cat(" Neural Network took :", tDiff, "\n")
             }
 
             # Save the scales and booster data sets
