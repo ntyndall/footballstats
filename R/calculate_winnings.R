@@ -6,7 +6,7 @@
 calculate_winnings <- function(odds.results, winInfo) {
 
   # Subset the odds correctly
-  new.odds <- odds.results[winInfo$foldint, ]
+  new.odds <- odds.results[winInfo$foldint %>% sort, ]
   Actual.score <- winInfo$actual
   Predicted.score <- winInfo$predicted
 
