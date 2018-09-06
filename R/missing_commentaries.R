@@ -12,9 +12,7 @@ missing_commentaries <- function(KEYS) {
 
   # Get all seasons as a vector
   allSeasons <- allCSMs %>%
-    strsplit(split = ":") %>%
-    purrr::map(3) %>%
-    purrr::flatten_chr()
+    footballstats::flatt(3)
 
   # Get unique seasons
   uniqueSeasons <- allSeasons %>%
@@ -41,15 +39,11 @@ missing_commentaries <- function(KEYS) {
 
     # Get all match IDs
     matchIDs <- splitCSM[[i]] %>%
-      strsplit(split = ":") %>%
-      purrr::map(4) %>%
-      purrr::flatten_chr()
+      footballstats::flatt(4)
 
     # Get commentary IDs
     comIDs <- splitCSMT[[i]] %>%
-      strsplit(split = ":") %>%
-      purrr::map(4) %>%
-      purrr::flatten_chr()
+      footballstats::flatt(4)
 
     matched <- lapply(
       X = matchIDs,
@@ -70,9 +64,7 @@ missing_commentaries <- function(KEYS) {
       # Sort them
       missingComm %<>% `[`(
         missingComm %>%
-          strsplit(split = ":") %>%
-          purrr::map(2) %>%
-          purrr::flatten_chr() %>%
+          footballstats::flatt(2) %>%
           as.integer %>%
           order
         )
@@ -88,10 +80,16 @@ missing_commentaries <- function(KEYS) {
         )
       )
 
+      # Get the new matched up matchIDs too
+      newIDs <- missingComm %>%
+        footballstats::flatt(4)
+
       # Now print out the results!
       cat(
         "",
         paste0(
+          newIDs,
+          ": # ",
           results %>% purrr::map(1) %>% purrr::flatten_chr(),
           " vs. ",
           results %>% purrr::map(2) %>% purrr::flatten_chr(),
