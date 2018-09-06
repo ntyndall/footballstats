@@ -25,14 +25,17 @@ stats_from_yaml <- function(KEYS) {
     yaml::yaml.load_file()
 
   # Season names
-  seasons <- all.data %>% names
+  seasons <- all.data %>%
+    names
 
-  for (s in 1:(seasons %>% length)) {
+  for (s in seasons) {
     # Subset the season
-    season.data <- all.data[[seasons[s]]]
+    season.data <- all.data %>%
+      `[[`(s)
 
     # data names
-    dNames <- season.data %>% names
+    dNames <- season.data %>%
+      names
 
     # Loop over and check each entry
     for (i in 1:(season.data %>% length)) {
@@ -56,7 +59,7 @@ stats_from_yaml <- function(KEYS) {
       if (basicKeyName %>% length %>% `==`(0)) {
         cat(' ## Check CSM entry for ID :', dNames[i],'\n')
         next
-      }else {
+      } else {
         basicKeyName %<>% purrr::flatten_chr()
       }
 
@@ -66,7 +69,7 @@ stats_from_yaml <- function(KEYS) {
         purrr::flatten_chr()
 
       # From the stats key, does the commentary exist???
-      comKey <- paste0("csmt_commentary:", statsKey[2], ":", seasons[s], ":", dNames[i], ":")
+      comKey <- paste0("csmt_commentary:", statsKey[2], ":", s, ":", dNames[i], ":")
 
       # If 2 don't exist, then populate redis
       if (comKey %>% paste0('*') %>% KEYS$RED$KEYS() %>% length %>% `!=`(2)) {
@@ -93,4 +96,6 @@ stats_from_yaml <- function(KEYS) {
     }
   }
 
+  # Now check to see which ones haven't been added
+  KEYS %>% footballstats::missing_commentaries()
 }
