@@ -273,7 +273,7 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
 #'  Redis Keys used;
 #'   \itemize{
 #'     \item{\strong{[LIST]} :: \code{analyseTeams}}
-#'     \item{\strong{[SET]} :: \code{c_matchSetInfo:{comp_id}}}
+#'     \item{\strong{[SET]} :: \code{cs_matchSetInfo:{comp_id}:{season}}}
 #'     \item{\strong{[SET]} :: \code{c:{comp_id}:ready}}
 #'     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
 #'     \item{\strong{[HASH]} :: \code{c:{comp_id}:pred:{match_id}}}
@@ -346,7 +346,7 @@ amatch_info <- function(KEYS) {
     addMatches <- KEYS$RED$pipeline(
       .commands = lapply(
         X = matches$id,
-        FUN = function(x) paste0('c_matchSetInfo:', KEYS$COMP) %>% KEYS$PIPE$SADD(x)
+        FUN = function(x) paste0('cs_matchSetInfo:', KEYS$COMP, ":", KEYS$SEASON) %>% KEYS$PIPE$SADD(x)
       )
     ) %>%
       purrr::flatten_int() %>%
