@@ -59,13 +59,14 @@ classify_xg_setup <- function(KEYS, singleFixture, datModel) {
       )
 
     # Determine boundaries
-    scaled.results %<>% footballstats::scaled_to_discrete(
-      boundLen = 4
-    )
+    scaled.results %<>%
+      mltools::scaled_to_discrete(
+        boundLen = 4
+      )
 
     # Create a sparse matrix
     sparse.test <- scaled.results %>%
-      footballstats::create_sparse(
+      mltools::create_sparse(
         boundLen = 4
       )
 
