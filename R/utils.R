@@ -49,8 +49,12 @@ sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  #
         LOG_PRED = storePred,
         RED = redux::hiredis(db = 1),
         PIPE = redux::redis,
+        XG_BOUND = 4,
         DAYS = 3,
-        STAND = 0.075
+        PARAM_GPOINTS = 8,
+        PARAM_GBOUNDARY = 0.2,
+        PARAM_DECAY = 5000,
+        PARAM_TOTALPER = 1
       )
     )
   }

@@ -21,11 +21,15 @@ keys_for_testing <- function(dbnum = 3) {
       TEST = TRUE,
       LOG_PRED = FALSE,
       LOGGING = FALSE,
-      DAYS = 3,
-      STAND = 0.5,
       TIL = 20,
       RED = redux::hiredis(db = dbnum),
-      PIPE = redux::redis
+      PIPE = redux::redis,
+      XG_BOUND = 4,
+      DAYS = 3,
+      PARAM_GPOINTS = 8,
+      PARAM_GBOUNDARY = 0.2,
+      PARAM_DECAY = 5000,
+      PARAM_TOTALPER = 1
     )
   )
 }
