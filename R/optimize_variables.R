@@ -268,7 +268,8 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               # Build and save NN
               allMethods$neuralnetwork <- scaled.results$data %>%
                 mltools::gen_nn(
-                  NN = NN
+                  NN = NN,
+                  logs = TRUE
                 )
 
               # Now calculate odds
@@ -288,7 +289,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               if ("neuralnetwork" %in% saveModels) {
                 nnModel <- allMethods$neuralnetwork$model
                 nnScales <- scaled.results$scaler
-                save(nn, file = modelDir %>% paste0("nnModel.rda"))
+                save(nnModel, file = modelDir %>% paste0("nnModel.rda"))
                 save(nnScales, file = modelDir %>% paste0("nnScales.rda"))
               }
             }
