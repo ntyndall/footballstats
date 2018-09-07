@@ -24,12 +24,12 @@ classify_xg_setup <- function(KEYS, singleFixture, datModel) {
     # do calculations here (OPTIMIZE THESE VALUES ELSEWHERE!)
     result.dat <- all.inter.data %>%
       footballstats::optimize_calculation(
-        day = 3,
-        gridPoints = 4,
-        gridBoundary = 0.1,
-        decayFactor = 1,
+        day = KEYS$DAYS,
+        gridPoints = KEYS$PARAM_GPOINTS,
+        gridBoundary = KEYS$PARAM_GBOUNDARY,
+        decayFactor = KEYS$PARAM_DECAY,
         til = KEYS$TIL,
-        totalPer = 0.5
+        totalPer = KEYS$PARAM_TOTALPER
       )
 
     # Now I need positions for the two current teams!!
@@ -61,21 +61,20 @@ classify_xg_setup <- function(KEYS, singleFixture, datModel) {
     # Determine boundaries
     scaled.results %<>%
       mltools::scaled_to_discrete(
-        boundLen = 4
+        boundLen = KEYS$XG_BOUND
       )
 
     # Create a sparse matrix
     sparse.test <- scaled.results %>%
       mltools::create_sparse(
-        boundLen = 4
+        boundLen = KEYS$XG_BOUND
       )
 
     # Make the prediction
     result <- predict(datModel, sparse.test)
 
     # Get the home team result
-    resultsOrd <- c('D', 'L', 'W')
-    predicted$home <- resultsOrd[result %>% `+`(1)]
+    predicted$home <- c('D', 'L', 'W') %>% `[`(result %>% `+`(1))
     predicted$away <- predicted$home %>% footballstats::other_score()
   }
 
