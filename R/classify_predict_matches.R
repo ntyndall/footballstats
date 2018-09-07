@@ -17,7 +17,7 @@
 #' @export
 
 
-predict_matches <- function(KEYS, cMethod = "xgboost", datModel) {
+predict_matches <- function(KEYS, datModel, cMethod = "xgboost") {
 
   # Get fixtures
   cat(paste0(Sys.time(), ' | About to report on results...\n'))
