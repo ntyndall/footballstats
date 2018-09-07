@@ -24,32 +24,45 @@
 
 predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
 
-  # Get all matchIDs from prediction keys
-  readyToAnalyse <- readyToAnalyse %>%
-    strsplit(split = '[:]') %>%
-    purrr::map(5) %>%
-    purrr::flatten_chr()
+  # Get the matchIDs where keys exist
+  readyToAnalyse %<>%
+    footballstats::flatt(5)
 
   # All predicted matchIDs
   allPreds <- "all_predictions" %>%
-    KEYS$RED$SMEMBERS()
+    KEYS$RED$SMEMBERS() %>%
+    purrr::flatten_chr()
 
-  # Make sure it isn't NULL before flattening
-  if (allPreds %>% length %>% `>`(0)) {
-    allPreds %<>% purrr::flatten_chr()
+  # Which matches have been played yet?
+  matched <- allPreds %in% matches$id
 
-    # Remove them from the set
-    KEYS$RED$pipeline(
-      .commands = lapply(
-        X = allPreds,
-        FUN = function(x) "all_predictions" %>% KEYS$PIPE$SREM(x)
+  # Initialise matchIDs
+  matchIDs <- c()
+
+  # If any are to be appended, check now
+  if (matched %>% any) {
+    # Subset
+    allPreds %<>% `[`(matched)
+
+    # Do the keys exist
+    matched2 <- allPreds %in% readyToAnalyse
+
+    # Also make sure it has a key
+    if (matched2 %>% any) {
+      # Subset and assign matchIDs here
+      matchIDs <- allPreds %>% `[`(matched2)
+
+      # Remove them from the set
+      KEYS$RED$pipeline(
+        .commands = lapply(
+          X = matchIDs,
+          FUN = function(x) "all_predictions" %>% KEYS$PIPE$SREM(x)
+        )
       )
-    )
+    }
   }
 
-  # Get the intersection of ready to analyse
-  matchIDs <- intersect(allPreds, readyToAnalyse)
-
+  # Make sure some are to be analysed
   if (matchIDs %>% length %>% `>`(0)) {
     readyLen <- matchIDs %>% length
     if (KEYS$LOGGING) cat(paste0(Sys.time(), ' | Checking off ', readyLen, ' already predicted matches. \n'))
@@ -60,7 +73,7 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
     # Get all the keys to be updated
     redKeys <- KEYS$RED$pipeline(
       .commands = lapply(
-        X = paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':*:', matchIDs),
+        X = resultKeys,
         FUN = function(x) x %>% KEYS$PIPE$KEYS()
       )
     ) %>%
@@ -88,16 +101,22 @@ predict_vs_real <- function(KEYS, readyToAnalyse, matches) {
       matchIDs %<>% `[`(toPredict)
       redKeys %<>% `[`(toPredict)
 
-      # Now reshape the matchData coming in and match with currentData
+      # Subset the full matches data set and convert to list
+      matchList <- matches %>%
+        subset(matches$id %in% matchIDs) %>%
+        `[`(c("id", "localteam_score", "visitorteam_score")) %>%
+        lapply(as.integer)
+
+      # Set up function for calculating results
       get_res <- function(x) if (x > 0) "W" else if (x < 0) "L" else "D"
-      matchList <- matches[c("id", "localteam_score", "visitorteam_score")] %>% lapply(as.integer)
-      matchList$homeres <- matchList$localteam_score %>% `-`(matchList$visitorteam_score) %>% get_res()
 
+      # Get the result for all matches
+      matchList$homeres <- sapply(
+        X = matchList$localteam_score %>% `-`(matchList$visitorteam_score),
+        FUN = function(x) x %>% get_res()
+      )
 
-      # Now match with the current matchIDs
-      matchList %<>%
-        purrr::map(function(x) x %>% `[`(matchIDs %in% matchList$id))
-
+      # Update redis keys whether the prediction was successful or not
       KEYS$RED$pipeline(
         .commands = lapply(
           X = 1:(currentData %>% length),
