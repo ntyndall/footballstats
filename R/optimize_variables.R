@@ -66,7 +66,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
   # Define neural network input list
   NN <- list(
     REP = GRIDS$NN_REP,
-    THRESH = GRIDS$NN_THRESH %>% max(0.3)
+    THRESH = GRIDS$NN_THRESH %>% min(0.3)
   )
 
   # Define XGBoost input list

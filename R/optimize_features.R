@@ -22,8 +22,8 @@ optimize_features <- function(optimizeModels = FALSE) {
       DECAY = 5000,
       TOTAL_PERC = 1,
       NN_REP = 1,
-      NN_THRESH = 0.18,
-      XG_ROUNDS = 50000,
+      NN_THRESH = 0.005,
+      XG_ROUNDS = 100,
       XG_DEPTH = 10,
       XG_ETA = 0.2,
       XG_GAMMA = 2
@@ -151,7 +151,7 @@ optimize_features <- function(optimizeModels = FALSE) {
     footballstats::optimize_variables(
       optimizeModels = FALSE,
       GRIDS = GRIDS,
-      types = c("xgboost", "neuralnetwork"),
-      saveModels = c("xgboost", "neuralnetwork")
+      types = "neuralnetwork",
+      saveModels = "neuralnetwork"
     )
 }
