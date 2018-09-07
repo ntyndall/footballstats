@@ -60,7 +60,7 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
     # Call in here
     predicted <- KEYS %>%
       footballstats::classify_method_selection(
-        method = "xgboost",
+        method = cMethod,
         singleFixture = singleFixture,
         datModel = datModel
       )
