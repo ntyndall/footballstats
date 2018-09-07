@@ -143,8 +143,11 @@ optimize_features <- function(optimizeModels = FALSE) {
     }
   }
 
+  # Data has been saved for easy access
+  # total.metrics <- footballstats::total.metrics
+
   # Start to optimize this data set
-  footballstats::total.metrics %>%
+  myres <- total.metrics %>%
     footballstats::optimize_variables(
       optimizeModels = FALSE,
       GRIDS = GRIDS,
