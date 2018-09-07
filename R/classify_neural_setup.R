@@ -11,73 +11,54 @@ classify_neural_setup <- function(KEYS, singleFixture, datModel) {
     nAnalysed = 0
   )
 
-  # Get team information from fixture data frame
-  matchID <- singleFixture$id %>% as.integer
-  teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
+  # Calculate actual data set
+  all.inter.data <- KEYS %>%
+    footballstats::build_raw_data(
+      singleFixture = singleFixture
+    )
 
-  # Need a non-null frame to start with
-  matchMetrics <- data.frame(
-    matchID = matchID,
-    stringsAsFactors = FALSE
-  )
+  # NA'S EXIST
+  if (all.inter.data %>% anyNA %>% `!`() %>% `&&`(all.inter.data %>% is.null %>% `!`())) {
+    # do calculations here (OPTIMIZE THESE VALUES ELSEWHERE!)
+    result.dat <- all.inter.data %>%
+      footballstats::optimize_calculation(
+        day = KEYS$DAYS,
+        gridPoints = KEYS$PARAM_GPOINTS,
+        gridBoundary = KEYS$PARAM_GBOUNDARY,
+        decayFactor = KEYS$PARAM_DECAY,
+        til = KEYS$TIL,
+        totalPer = KEYS$PARAM_TOTALPER
+      )
 
-  # Bind the commentaries together
-  matchMetrics %<>% cbind(
-    footballstats::project_commentaries(
+    # Now I need positions for the two current teams!!
+    positions <- footballstats::feat_position(
       KEYS = KEYS,
-      teamIDs = teamIDs,
-      matchDate = singleFixture$formatted_date,
-      matchID = matchID
+      matchID = singleFixture$id,
+      teamIDs = c(singleFixture$localteam_id, singleFixture$visitorteam_id),
+      matchDate = singleFixture$formatted_date
     )
-  )
 
-  # Bind the form
-  matchMetrics %<>% cbind(
-    footballstats::project_form(
-      KEYS = KEYS,
-      teamIDs = teamIDs,
-      currentID = matchID
-    )
-  )
-
-  # Figure out the standings
-  positions <- footballstats::feat_position(
-    KEYS = KEYS,
-    matchID = matchID,
-    teamIDs = teamIDs,
-    matchDate = singleFixture$formatted_date
-  )
-
-  matchMetrics %<>% cbind(
-    data.frame(
-      `position.h` = positions$position.h,
-      `position.a` = positions$position.a,
-      stringsAsFactors = FALSE
-    )
-  )
-
-  # Use data scales pre determined by scripts
-  dataScales <- footballstats::nnScales
+    # Append them on
+    result.dat$`position.h` <- positions$`position.h` %>% `/`(KEYS$TIL)
+    result.dat$`position.a` <- positions$`position.a` %>% `/`(KEYS$TIL)
+  }
 
   # If any are missing then return early
-  if (matchMetrics %>% is.na %>% any) {
+  if (all.inter.data %>% anyNA %>% `||`(all.inter.data %>% is.null)) {
     predicted$nAnalysed %<>% `+`(1)
   } else {
     predicted$analysed %<>% `+`(1)
-    matchMetrics$matchID <- NULL
 
-    # Scale the data as required
-    scled <- matchMetrics %>%
-      scale(
-        center = dataScales$sMin,
-        scale = dataScales$sMax - dataScales$sMin
-      ) %>%
-      as.data.frame
+    # Scale results
+    scaled.results <- result.dat %>%
+      footballstats::scale_data(
+        dataScales = footballstats::nnScales
+      )
 
-    # Make the prediction
+    # Calculate results
     result <- neuralnet::compute(
       x = datModel,
-      covariate = scled
+      covariate = scaled.results
     )
 
     # Get the home team result
