@@ -151,6 +151,7 @@ optimize_features <- function(optimizeModels = FALSE) {
     footballstats::optimize_variables(
       optimizeModels = FALSE,
       GRIDS = GRIDS,
-      types = "xgboost"
+      types = c("xgboost", "neuralnetwork"),
+      saveModels = c("xgboost", "neuralnetwork")
     )
 }

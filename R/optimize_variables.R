@@ -4,7 +4,24 @@
 
 
 optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
-                               overwrite = FALSE, types = c("xgboost", "neuralnetwork")) {
+                               overwrite = FALSE, types = c("xgboost", "neuralnetwork"),
+                               saveModels = c()) {
+
+  # Create directory
+  if (saveModels %>% length %>% `>`(0)) {
+    modelDir <- getwd() %>% paste0("/mymodels/")
+    if (modelDir %>% dir.exists %>% `!`()) modelDir %>% dir.create
+  }
+
+  # Only save models when requested
+  if (optimizeModels) {
+    if (saveModels %>% length %>% `>`(0)) {
+      cat(" ## If you want to save any models, then set optimizeModels to FALSE! \n\n")
+      saveModels <- c()
+    }
+  } else {
+    saveModels %<>% intersect(types)
+  }
 
   # Must supply a valid type
   if (types %>% length %>% `>`(0) %>% `!`()) stop("Must supply some _types_")
@@ -234,6 +251,14 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 time2 = startTime
               ) %>% format
               cat(" XGBoost took :", tDiff, "\n")
+
+              # Save the models
+              if ("xgboost" %in% saveModels) {
+                xgModel <- allMethods$xgb$model
+                xgScales <- scaled.results$scaler
+                save(xgModel, file = modelDir %>% paste0("xgModel.rda"))
+                save(xgScales, file = modelDir %>% paste0("xgScales.rda"))
+              }
             }
 
             # Build Neural network model using CV
@@ -258,14 +283,14 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                 time2 = startTime
               ) %>% format
               cat(" Neural Network took :", tDiff, "\n")
-            }
 
-            # Save the scales and booster data sets
-            if (!optimizeModels) {
-              xgModel <- allMethods$xgb$model
-              xgScales <- scaled.results$scaler
-              save(xgModel, file = "xgModel.rda")
-              save(xgScales, file = "xgScales.rda")
+              # Save the models
+              if ("neuralnetwork" %in% saveModels) {
+                nnModel <- allMethods$neuralnetwork$model
+                nnScales <- scaled.results$scaler
+                save(nn, file = modelDir %>% paste0("nnModel.rda"))
+                save(nnScales, file = modelDir %>% paste0("nnScales.rda"))
+              }
             }
 
             if (optimizeModels) {
