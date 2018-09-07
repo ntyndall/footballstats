@@ -71,7 +71,7 @@ analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov
     load(file = getwd() %>% paste0("/xgModel.rda"))
     xgModel
   } else {
-    footballstats::nn
+    footballstats::nnModel
   }
   cat(" complete. \n\n")
 
