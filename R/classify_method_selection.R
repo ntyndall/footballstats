@@ -21,7 +21,8 @@ classify_method_selection <- function(KEYS, method = "", singleFixture, datModel
   } else if (method == "neuralnetwork") {
     KEYS %>%
       footballstats::classify_neural_setup(
-        singleFixture = singleFixture
+        singleFixture = singleFixture,
+        datModel = datModel
       )
   } else {
     KEYS %>%
