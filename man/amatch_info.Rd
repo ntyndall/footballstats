@@ -30,7 +30,7 @@ API endpoints;
  Redis Keys used;
   \itemize{
     \item{\strong{[LIST]} :: \code{analyseTeams}}
-    \item{\strong{[SET]} :: \code{c_matchSetInfo:{comp_id}}}
+    \item{\strong{[SET]} :: \code{cs_matchSetInfo:{comp_id}:{season}}}
     \item{\strong{[SET]} :: \code{c:{comp_id}:ready}}
     \item{\strong{[HASH]} :: \code{csm:{comp_id}:{season}:{match_id}}}
     \item{\strong{[HASH]} :: \code{c:{comp_id}:pred:{match_id}}}
