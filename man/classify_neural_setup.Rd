@@ -4,5 +4,5 @@
 \alias{classify_neural_setup}
 \title{Classify Neural Setup}
 \usage{
-classify_neural_setup(KEYS, singleFixture)
+classify_neural_setup(KEYS, singleFixture, datModel)
 }

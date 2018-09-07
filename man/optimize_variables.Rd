@@ -5,5 +5,6 @@
 \title{Optimize Variables}
 \usage{
 optimize_variables(total.metrics, GRIDS, optimizeModels = TRUE,
-  overwrite = FALSE, types = c("xgboost", "neuralnetwork"))
+  overwrite = FALSE, types = c("xgboost", "neuralnetwork"),
+  saveModels = c())
 }
