@@ -63,50 +63,59 @@ analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov
   cat('\n\n *** Beginning predictions *** \n\n')
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
   KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
-  totalPredictions <- 0
 
-  # Load the appropriate data model
-  cat(paste0(Sys.time(), " | Loading data model ... "))
-  datModel <- if (cMethod == "xgboost") {
-    load(file = getwd() %>% paste0("/xgModel.rda"))
-    xgModel
-  } else {
-    footballstats::nnModel
-  }
-  cat(" complete. \n\n")
+  cMethods <- c("xgboost", "neuralnetwork")
+  # Loop over each classification type
+  for (k in 1:(cMethods %>% length)) {
 
-  for (i in 1:nrow(competitions)) {
-    cat(
-      paste0(
-        Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
-        competitions$name[i], ' - ', competitions$region[i], '). \n'
+    # Rest total predictions each time
+    totalPredictions <- 0
+
+    # Load the appropriate data model
+    cat(paste0(Sys.time(), " | Loading data model ... "))
+    datModel <- if (cMethods[k] == "xgboost") {
+      footballstats::xgModel
+    } else if (cMethods[k] == "neuralnetwork") {
+      footballstats::nnModel
+    } else {
+      stop(" ## Select a valid value for cMethod!")
+    }
+
+    # Loop over each competition
+    for (i in 1:nrow(competitions)) {
+      cat(
+        paste0(
+          Sys.time(), ' | Storing ' , i, ' / ', nrow(competitions), ' (',
+          competitions$name[i], ' - ', competitions$region[i], '). \n'
+        )
       )
-    )
 
-    # Predict actual future results
-    KEYS$COMP <- competitions$id[i]
-    KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
-    KEYS$COMP_NAME <- competitions$name[i]
+      # Predict actual future results
+      KEYS$COMP <- competitions$id[i]
+      KEYS$TIL <- KEYS$COMP %>% footballstats::teams_in_league()
+      KEYS$COMP_NAME <- competitions$name[i]
 
-    cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
-    predictions <- KEYS %>%
-      footballstats::predict_matches(
-        datModel = datModel
-      )
-    totalPredictions %<>% `+`(predictions)
+      cat(paste0(Sys.time(), ' | Predicting actual upcoming fixtures. \n'))
+      predictions <- KEYS %>%
+        footballstats::predict_matches(
+          datModel = datModel,
+          cMethod = cMethods[k]
+        )
+      totalPredictions %<>% `+`(predictions)
 
-    # Send a slack message to indicate how many matches have been predicted
-    if (KEYS$SLACK_PRNT && i == nrow(competitions)) {
-      slackr::slackrSetup(
-        channel = '#results',
-        api_token = KEYS$FS_SLACK
-      )
-      slackr::slackr_msg(
-        txt = paste0('Predicted a total of ', totalPredictions, ' matches'),
-        channel = '#results',
-        api_token = KEYS$FS_SLACK,
-        username = 'predictions'
-      )
+      # Send a slack message to indicate how many matches have been predicted
+      if (KEYS$SLACK_PRNT && i == nrow(competitions)) {
+        slackr::slackrSetup(
+          channel = '#results',
+          api_token = KEYS$FS_SLACK
+        )
+        slackr::slackr_msg(
+          txt = paste0('Predicted a total of ', totalPredictions, ' matches'),
+          channel = '#results',
+          api_token = KEYS$FS_SLACK,
+          username = 'predictions'
+        )
+      }
     }
   }
 } # nocov end
