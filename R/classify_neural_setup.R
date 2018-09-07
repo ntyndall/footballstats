@@ -3,7 +3,7 @@
 #' @export
 
 
-classify_neural_setup <- function(KEYS, singleFixture) {
+classify_neural_setup <- function(KEYS, singleFixture, datModel) {
 
   # Initialise list here
   predicted <- list(
@@ -57,7 +57,7 @@ classify_neural_setup <- function(KEYS, singleFixture) {
   )
 
   # Use data scales pre determined by scripts
-  dataScales <- footballstats::dataScales$nn
+  dataScales <- footballstats::nnScales
 
   # If any are missing then return early
   if (matchMetrics %>% is.na %>% any) {
@@ -76,7 +76,7 @@ classify_neural_setup <- function(KEYS, singleFixture) {
 
     # Make the prediction
     result <- neuralnet::compute(
-      x = footballstats::nn$neural,
+      x = datModel,
       covariate = scled
     )
 
