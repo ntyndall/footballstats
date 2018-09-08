@@ -74,7 +74,8 @@ analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov
     # Load the appropriate data model
     cat(paste0(Sys.time(), " | Loading data model ... "))
     datModel <- if (cMethods[k] == "xgboost") {
-      footballstats::xgModel
+      load(file = getwd() %>% paste0("/xgModel.rda"))
+      xgModel
     } else if (cMethods[k] == "neuralnetwork") {
       footballstats::nnModel
     } else {
