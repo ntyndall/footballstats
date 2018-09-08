@@ -110,7 +110,7 @@ analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov
           api_token = KEYS$FS_SLACK
         )
         slackr::slackr_msg(
-          txt = paste0('Predicted a total of ', totalPredictions, ' matches'),
+          txt = paste0('Predicted a total of ', totalPredictions, ' matches [ by ', cMethods[k], ' ]'),
           channel = '#results',
           api_token = KEYS$FS_SLACK,
           username = 'predictions'
