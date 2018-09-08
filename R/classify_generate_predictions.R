@@ -149,7 +149,7 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
     firstMsg <- paste0(
       ':soccer: _Reporting on results for week ',
       fixtureList$week[1], ' (', KEYS$COMP_NAME,
-      ')_ :soccer: '
+      ' : ', cMethod, ')_ :soccer: '
     )
 
     slackr::slackr_msg(

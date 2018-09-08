@@ -72,7 +72,7 @@ analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov
     totalPredictions <- 0
 
     # Load the appropriate data model
-    cat(paste0(Sys.time(), " | Loading data model ... "))
+    cat(paste0(Sys.time(), " | Loading data model ... \n"))
     datModel <- if (cMethods[k] == "xgboost") {
       load(file = getwd() %>% paste0("/xgModel.rda"))
       xgModel
@@ -111,7 +111,7 @@ analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov
           api_token = KEYS$FS_SLACK
         )
         slackr::slackr_msg(
-          txt = paste0('Predicted a total of ', totalPredictions, ' matches [ by ', cMethods[k], ' ]'),
+          txt = paste0('Predicted a total of ', totalPredictions, ' matches'),
           channel = '#results',
           api_token = KEYS$FS_SLACK,
           username = 'predictions'
