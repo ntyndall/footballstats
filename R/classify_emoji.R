@@ -34,7 +34,7 @@ classify_emoji <- function() { # nocov start
     'not', 'sun', 'bur', 'pre', 'ful', 'bri', 'ips',
     'que', 'wol', 'bol', 'car', 'mil', 'bir', 'der',
     'hul', 'rea', 'mid', 'bre', 'she', 'lee', 'bar',
-    'nor', 'sheu'
+    'nor', 'sheu', 'rot', 'wig', 'bla'
   )
   englandTwo <- paste0(':england-', englandTwo, ':')
 
@@ -42,7 +42,8 @@ classify_emoji <- function() { # nocov start
   englandTwoIds <- c(
     9297, 9384, 9074, 9317, 9175, 9066, 9227, 9318,
     9446, 9048, 9083, 9276, 9039, 9133, 9221, 9324,
-    9274, 9059, 9349, 9238, 9021, 9296, 9348
+    9274, 9059, 9349, 9238, 9021, 9296, 9348, 9333,
+    9434, 9044
   )
 
   # Belgium details
@@ -76,21 +77,22 @@ classify_emoji <- function() { # nocov start
   portugal <-  c(
     'bel', 'ben', 'bfc', 'bra', 'mar', 'pac', 'por',
     'rio', 'vit', 'vitset', 'est', 'des', 'ton', 'pmo',
-    'cha', 'spo', 'fei', 'mor'
+    'cha', 'spo', 'fei', 'mor', 'cdn', 'san'
   )
   portugal <- paste0(':portugal-', portugal, ':')
 
   portugalIds <- c(
     14265, 14267, 14270, 14446, 14378, 14399, 14408,
     14414, 14473, 14474, 14317, 14310, 14294, 14407,
-    14311, 14448, 14339, 14387
+    14311, 14448, 14339, 14387, 14389, 14417
   )
 
   # Germany details
   germany <- c(
     'baymun', 'ham', 'her', 'hof', 'main', 'wol',
     'sch', 'fre', 'bormc', 'kol', 'aug', 'einfra',
-    'bordor', 'baylev', 'wer', 'vfb', 'han', 'lei'
+    'bordor', 'baylev', 'wer', 'vfb', 'han', 'lei',
+    'for', 'nur'
   )
   germany <- paste0(':germany-', germany, ':')
 
@@ -98,27 +100,29 @@ classify_emoji <- function() { # nocov start
   germanyIds <- c(
     10285, 10419, 10437, 10442, 10388, 10653, 10576,
     10382, 10307, 10476, 10269, 10347, 10303, 10281,
-    10677, 10646, 10423, 10552
+    10677, 10646, 10423, 10552, 10377, 10372
   )
 
   # Russia details
   russia <- c(
     'spa', 'din', 'lok', 'csk', 'ars', 'zen', 'ufa',
-    'kra', 'amk', 'ura', 'rub', 'ros'
+    'kra', 'amk', 'ura', 'rub', 'ros', 'ore', 'kry',
+    'yen'
   )
   russia <- paste0(':russia-', russia, ':')
 
   # Russia IDs
   russiaIds <- c(
     14921, 14803, 14871, 14796, 14787, 14950, 14792,
-    14827, 14784, 14939, 14896, 14837
+    14827, 14784, 14939, 14896, 14837, 14852, 14862,
+    14879
   )
 
   # Turkey details
   turkey <- c(
     'ist', 'akh', 'gen', 'goz', 'ala', 'yen', 'tra',
     'bes', 'gal', 'kas', 'osm', 'kar', 'bur', 'siv',
-    'fen', 'ant', 'kay', 'kon'
+    'fen', 'ant', 'kay', 'kon', 'erz', 'riz', 'ank'
   )
   turkey <- paste0(':turkey-', turkey, ':')
 
@@ -126,14 +130,15 @@ classify_emoji <- function() { # nocov start
   turkeyIds <-  c(
     17047, 16971, 17035, 17038, 16973, 17072, 17106,
     16994, 17029, 17057, 16980, 17053, 17002, 17097,
-    17027, 16981, 17060, 17068
+    17027, 16981, 17060, 17068, 19918, 17006, 16979
   )
 
   # Italy details
   italy <- c(
     'asr', 'ata', 'ben', 'bol', 'cag', 'chi', 'cro', 'fio',
     'gen', 'hel', 'int', 'juv', 'laz', 'mil', 'nap',
-    'sam', 'spa', 'tor', 'udi', 'uss'
+    'sam', 'spa', 'tor', 'udi', 'uss', 'fro', 'par',
+    'emp'
   )
   italy <- paste0(':italy-', italy, ':')
 
@@ -141,7 +146,8 @@ classify_emoji <- function() { # nocov start
   italyIds <- c(
     11998, 11811, 11821, 11822, 11830, 11850, 11861, 11894,
     11903, 11914, 11917, 11922, 11925, 11938, 11947,
-    12005, 12026, 12046, 12051, 12013
+    12005, 12026, 12046, 12051, 12013, 11898, 11959,
+    11867
   )
 
   # France details
@@ -149,7 +155,7 @@ classify_emoji <- function() { # nocov start
     'ami', 'ang', 'bor', 'cae', 'dij', 'gui',
     'lil', 'lyo', 'mac', 'mar', 'met', 'mon',
     'nic', 'nnt', 'psg', 'ren', 'sai', 'str', 'tou',
-    'tro'
+    'tro', 'nim', 'sta'
   )
   france <- paste0(':france-', france, ':')
 
@@ -158,7 +164,24 @@ classify_emoji <- function() { # nocov start
     9826, 9831, 9875, 9883, 9909, 9973,
     10004, 10040, 10020, 10042, 10018, 10024,
     10033, 10031, 10061, 10122, 10085, 10124, 10134,
-    10140
+    10140, 10034, 10073
+  )
+
+  # Spain details
+  spain <- c(
+    'atb', 'atm', 'bar', 'cel', 'dea', 'del',
+    'eib', 'esp', 'get', 'gir', 'leg', 'lev',
+    'mal', 'bet', 'mad', 'soc', 'sev', 'las',
+    'val', 'vil', 'ray', 'hue', 'vll'
+  )
+  spain <- paste0(':spain-', spain, ':')
+
+  # France IDs
+  spainIds <- c(
+    15679, 15692, 15702, 15934, 15997, 15999,
+    16006, 16009, 16017, 16021, 15833, 16043,
+    16050, 16107, 16110, 16117, 16175, 16040,
+    16261, 16270, 16098, 16030, 16123
   )
 
   # Set up keynames as the IDs
@@ -166,15 +189,20 @@ classify_emoji <- function() { # nocov start
     englandOneIds, englandTwoIds, belgiumIds,
     greeceIds, portugalIds, germanyIds,
     russiaIds, turkeyIds, franceIds,
-    italyIds
-  ) %>% as.integer
+    italyIds, spainIds
+  ) %>%
+    as.integer
 
-  myHash <- keyNames %>% hashmap::hashmap(
-    values = c(
-      englandOne, englandTwo, belgium, greece,
-      portugal, germany, russia, turkey, france,
-      italy
+  # Create the hash
+  myHash <- keyNames %>%
+    hashmap::hashmap(
+      values = c(
+        englandOne, englandTwo, belgium, greece,
+        portugal, germany, russia, turkey, france,
+        italy, spain
+      )
     )
-  )
+
+  # Return hash back
   return(myHash)
 } # nocov end
