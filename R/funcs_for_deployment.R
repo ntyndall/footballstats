@@ -14,7 +14,7 @@
 #' @export
 
 
-analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov start
+analyse_and_predict <- function(deployed = FALSE, addAll = TRUE) { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
@@ -48,7 +48,7 @@ analyse_and_predict <- function(deployed = FALSE, cMethod = "xgboost") { # nocov
     KEYS %<>% footballstats::dates_from_yaml()
 
     # Only add data if it is within the season window
-    if (KEYS$ACTIVE) {
+    if (KEYS$ACTIVE && addAll) {
       cat(" ACTIVE ] ).\n")
       KEYS %>% footballstats::add_all()
     } else {
