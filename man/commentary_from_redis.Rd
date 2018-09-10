@@ -4,7 +4,7 @@
 \alias{commentary_from_redis}
 \title{Commentary From Redis}
 \usage{
-commentary_from_redis(keyName, returnItems)
+commentary_from_redis(KEYS, keyName, returnItems)
 }
 \arguments{
 \item{keyName}{A character string that defines the redis key

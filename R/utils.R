@@ -19,7 +19,7 @@
 
 
 sensitive_keys <- function(printToSlack, printToScreen, testing, storePred) {  # nocov start
-  cat(paste0(Sys.time(), ' | Loading global environment variables...'))
+  cat(paste0(Sys.time(), ' | Loading global environment variables... \n'))
   fsHost <- Sys.getenv("FS_HOST")
   fsApikey <- Sys.getenv("FS_APIKEY")
   fsSlack <- Sys.getenv("FS_SLACK")
