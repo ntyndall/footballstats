@@ -25,10 +25,6 @@ cat(' ## Install Complete. \n\n')
 
 # Set up log directory
 footballstats::create_log_dir()
-
-# Initializing missing data on first install
-cat('\n ## Inserting missing statistics from `statistics.yaml` to redis \n\n')
-footballstats::stats_from_yaml()
 ``` 
 
 #### Deployment
@@ -58,11 +54,11 @@ where the last token is the root path of where the above script is run from, e.g
 # ...
 ```
 
-Unfortunately, the size of the XGBoost model being stored in the R package leads to memory issues when lazy loading - to save some cash on large memory boxes, I _can_ just `scp xgModel.rda root@IP:/root` the file across and load it while performing the analysis so I don't have to lazy load it.
+Unfortunately, the size of the XGBoost model being stored in the R package leads to memory issues when lazy loading - to save some cash on large memory boxes, I _can_ just `scp mymodels/xgModel.rda root@IP:/root` the file across and load it while performing the analysis so I don't have to lazy load it.
 
 ## Tagging a release
   - Update `DESCRIPTION` file to required version (must be > than most recent `GIT` version).
-  - Run `Rscript tag.R {v#}` inside root directory `/footballstats/`.
+  - Run `Rscript -e "organisR::tag.R()"` inside root directory `/footballstats/`.
   - Update Github with the newest tag and binary that is produced from step 2.
 
 ## Scripts

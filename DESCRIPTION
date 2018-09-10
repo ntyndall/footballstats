@@ -29,8 +29,11 @@ Imports:
     xgboost,
     yaml,
     redux,
-    mltools
-Remotes: ntyndall/mltools
+    mltools,
+    organisR
+Remotes: 
+    ntyndall/mltools,
+    ntyndall/organisR
 Suggests:
     knitr,
     rmarkdown,
