@@ -65,6 +65,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
 
   keyName <- commentaryKeys[grepl(teamIDs[1], commentaryKeys) %>% which]
   result <- footballstats::commentary_from_redis(
+    KEYS = KEYS,
     keyName = keyName,
     returnItems = "saves"
   )
@@ -73,6 +74,7 @@ test_that("Check that the commentaries can be retrieved from redis as a double v
   expect_equal( result, 2 )
 
   result <- footballstats::commentary_from_redis(
+    KEYS = KEYS,
     keyName = keyName,
     returnItems = c("yellowcards", "possesiontime")
   )
