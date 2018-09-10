@@ -84,7 +84,7 @@ order_matchdata <- function(matchData) {
 #' @export
 
 
-commentary_from_redis <- function(keyName, returnItems) {
+commentary_from_redis <- function(KEYS, keyName, returnItems) {
   # Get all commentary items
   results <- keyName %>%
     KEYS$RED$HMGET(
