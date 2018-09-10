@@ -112,7 +112,13 @@ build_raw_data <- function(KEYS, singleFixture) {
           # Get the actual commentary results from both teams
           cResults <- lapply(
             X = subCKeys,
-            FUN = function(x) x %>% footballstats::commentary_from_redis(returnItems = allowedCommentaries)
+            FUN = function(x) {
+              KEYS %>%
+                footballstats::commentary_from_redis(
+                  keyName = x,
+                  returnItems = allowedCommentaries
+                )
+            }
           )
 
           # If any of the results are NULL from the matching commentary.
