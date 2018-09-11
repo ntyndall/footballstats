@@ -4,7 +4,7 @@
 \alias{analyse_and_predict}
 \title{Analyse Match and Event and Predict}
 \usage{
-analyse_and_predict(deployed = FALSE, cMethod = "xgboost")
+analyse_and_predict(deployed = FALSE, addAll = TRUE)
 }
 \arguments{
 \item{deployed}{A boolean value to indicate whether the
