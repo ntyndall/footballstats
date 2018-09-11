@@ -1,19 +1,14 @@
-library(testthat)
-library(purrr)
-library(magrittr)
-library(footballstats)
-library(rredis)
+library(testthat, warn.conflicts = FALSE, quietly = TRUE)
+library(purrr, warn.conflicts = FALSE, quietly = TRUE)
+library(magrittr, warn.conflicts = FALSE, quietly = TRUE)
+library(footballstats, warn.conflicts = FALSE, quietly = TRUE)
+library(redux, warn.conflicts = FALSE, quietly = TRUE)
 
-# Connect to DB 3 (away from production)
-rredis::redisConnect(
-  host = 'localhost',
-  port = 6379,
-  nodelay = FALSE
-)
-rredis::redisSelect(3)
-
-# Set up enough keys for testing
+# Set up enough keys for testing (db = 3)
 KEYS <<- footballstats::keys_for_testing()
+
+# Remove keys for good measure
+KEYS$RED$FLUSHDB()
 
 # Run the tests!
 results <- testthat::test_dir(
@@ -21,3 +16,5 @@ results <- testthat::test_dir(
   reporter = "summary"
 )
 
+# Remove keys for good measure (again)
+KEYS$RED$FLUSHDB()
