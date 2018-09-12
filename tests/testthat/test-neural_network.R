@@ -7,7 +7,7 @@ test_that('Make sure neural network functions for multiple scenarios', {
     mltools::gen_nn(
       NN = list(
         REP = 1,
-        THRESH = 0.2
+        THRESH = 0.04
       )
     )
 
@@ -23,7 +23,7 @@ test_that('Make sure neural network functions for multiple scenarios', {
     mltools::gen_nn(
       NN = list(
         REP = 1,
-        THRESH = 0.2
+        THRESH = 0.04
       )
     )
 
