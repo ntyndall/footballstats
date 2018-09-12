@@ -148,32 +148,3 @@ scale_data <- function(mDat, dataScales) {
   if ('res' %in% (mDat %>% colnames)) scaled.data %<>% cbind(res = mDat$res)
   return(scaled.data)
 }
-
-#' @title Get Scales
-#'
-#' @description We subtract 1 from the data frame as the data set
-#'  MUST always have a trailing column that contains labelled
-#'  match data with 'W / D / L' etc. Also, one feature is not
-#'  permitted, so mDat must therefore have 3 or more columns.
-#'
-#' @param mDat A data frame with multiple columns, each one
-#'  containing a feature, and a final row with labelled results
-#'  i.e. 'W / D / L'.
-#'
-#' @return A list value with the following names :
-#' \itemize{
-#'  \item{sMax : maximum values per feature}
-#'  \item{sMin : minimum values per feature}
-#'  \item{cols : an integer defining the number of columns
-#'   of sMax and sMin}
-#'  }
-#'
-#' @export
-
-
-get_scales <- function(mDat) {
-  nc <- `-`(mDat %>% ncol, 1)
-  maxs <- apply(mDat[ , 1:nc], 2, max)
-  mins <- apply(mDat[ , 1:nc], 2, min)
-  list(sMax = maxs, sMin = mins, cols = nc) %>% return()
-}

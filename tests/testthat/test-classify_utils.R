@@ -120,33 +120,3 @@ test_that("Check that a list of commentary data can be aggregated correctly", {
   totalStats <- c(ongoalVec, addedOngoal)
 
 })
-
-test_that("Scale something at random", {
-
-  # Set up test data set in the form that the features will take
-  testData <- data.frame(
-    one = c(2, 4, 6),
-    two = c(-2, -10, -7),
-    label = c('W', 'L', 'D'),
-    stringsAsFactors = FALSE
-  )
-
-  # Get the scales based on min and max values of the data
-  result <- testData %>% footballstats::get_scales()
-
-  expect_that( result, is_a('list') )
-  expect_equal( result$sMax %>% length, 2 )
-  expect_equal( result$sMin %>% length, 2 )
-  expect_equal( result$cols, 2 )
-
-  # Scale the testData with the resultant scalers
-  testScaled <- footballstats::scale_data(
-    mDat = testData,
-    dataScales = result
-  )
-
-  expect_that( testScaled, is_a('data.frame') )
-  expect_equal( testScaled %>% nrow, 3 )
-  expect_equal( testScaled %>% ncol, 2 )
-
-})
