@@ -27,7 +27,7 @@ test_that('Make sure neural network functions for multiple scenarios', {
       )
     )
 
-  expect_that( result$neural, is_a('nn') )
+  expect_that( result$model, is_a('nn') )
   expect_equal( result %>% length, 3 )
 
 })
