@@ -1,22 +1,3 @@
-#' @title Optimize Rowwise
-#'
-#' @export
-
-
-optimize_rowwise <- function(frame, intervals) {
-  firstNames <- frame %>% names
-  mets <- apply(
-    X = frame,
-    MARGIN = 1,
-    FUN = function(x) x %>% as.integer %>% `*`(intervals)
-  ) %>%
-    t %>%
-    data.frame
-
-  names(mets) <- firstNames
-  return(mets)
-}
-
 #' @title Optimize Position Grid
 #'
 #' @export
