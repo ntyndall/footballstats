@@ -13,7 +13,7 @@ test_that("Test that match data can be recreated easily.", {
 
   # Put the test data into Redis
   matchData <- KEYS %>%
-    footballstats::amatch_info()
+    footballstats::amatch_info(footballstats::data.2017[1:10, ])
 
   recreated <- KEYS %>%
     footballstats::recreate_matchdata()

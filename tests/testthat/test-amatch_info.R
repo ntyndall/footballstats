@@ -5,9 +5,9 @@ KEYS$RED$FLUSHDB()
 
 test_that("Check the keys are as they should be by adding match data", {
 
-  # Add match data from footballstats data source *controlled by KEYS$TEST*
+  # Add match data from footballstats
   newMatchData <- KEYS %>%
-    footballstats::amatch_info()
+    footballstats::amatch_info(footballstats::data.2017[1:10, ])
 
   # Check redis for expected output
   matchIDs <- "csm:*" %>% KEYS$RED$KEYS() %>%
