@@ -5,14 +5,16 @@ KEYS$RED$FLUSHDB()
 
 test_that('Calculate score based on vector of forms', {
 
-  expect_equal( 'LLL' %>% footballstats::form_to_int(), 0 )
-  expect_equal( 'DDD' %>% footballstats::form_to_int(), 3 )
-  expect_equal( 'WWW' %>% footballstats::form_to_int(), 6 )
-  expect_equal( 'WDL' %>% footballstats::form_to_int(), 3 )
-  expect_equal( 'LDW' %>% footballstats::form_to_int(), 3 )
-  expect_equal( 'W' %>% footballstats::form_to_int(), 2 )
-  expect_equal( 'D' %>% footballstats::form_to_int(), 1 )
-  expect_equal( 'L' %>% footballstats::form_to_int(), 0 )
+  int_sum <- function(x) x %>% footballstats::form_to_int() %>% sum
+
+  expect_equal( c("L", "L", "L") %>% int_sum(), 0 )
+  expect_equal( c("D", "D", "D") %>% int_sum(), 3 )
+  expect_equal( c("W", "W", "W") %>% int_sum(), 6 )
+  expect_equal( c("W", "D", "L") %>% int_sum(), 3 )
+  expect_equal( c("L", "D", "W") %>% int_sum(), 3 )
+  expect_equal( "W" %>% int_sum(), 2 )
+  expect_equal( "D" %>% int_sum(), 1 )
+  expect_equal( "L" %>% int_sum(), 0 )
 
 })
 

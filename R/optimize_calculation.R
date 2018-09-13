@@ -266,7 +266,7 @@ create_feature_data <- function(cFrame, type = 'h') {
 
   featFrame <- data.frame(
     xg = goals %>% as.integer,
-    form = ftRes %>% footballstats::formint_2(),
+    form = ftRes %>% footballstats::form_to_int(),
     clinical = goals %>% footballstats::take_ratio(y = cFrame[[paste0('shots_ongoal.', type)]]),
     defensive = oGoals %>% footballstats::take_ratio(y = cFrame[[paste0('shots_ongoal.', oType)]]),
     shotacc = cFrame[[paste0('shots_ongoal.', type)]] %>% footballstats::take_ratio(y = cFrame[[paste0('shots_total.', type)]]),
@@ -284,7 +284,7 @@ create_feature_data <- function(cFrame, type = 'h') {
 #' @export
 
 
-formint_2 <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0) {
+form_to_int <- function(oldForms, winPoints = 2, drawPoints = 1, losePoints = 0) {
   return(
     lapply(
       X = oldForms,
