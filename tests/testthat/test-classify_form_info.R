@@ -17,68 +17,17 @@ test_that('Calculate score based on vector of forms', {
 })
 
 
-test_that("Send in a single commentary to see it is stored correctly", {
-
-  # Get the match info coupled to the commentary
-  singleMatch <- footballstats::matchData[1, ]
-
-  # The home team as the teamID
-  res <- singleMatch %>%
-    footballstats::current_or_other(
-      teamID = singleMatch$localteam_id
-    )
-
-  expect_equal( singleMatch$localteam_score %>% as.integer, res$current )
-  expect_equal( singleMatch$visitorteam_score %>% as.integer, res$other )
-
-  # The away team as the teamID
-  res <- singleMatch %>%
-    footballstats::current_or_other(
-      teamID = singleMatch$visitorteam_id
-    )
-
-  expect_equal( singleMatch$visitorteam_score %>% as.integer, res$current )
-  expect_equal( singleMatch$localteam_score %>% as.integer, res$other )
-
-})
-
-
 test_that("Does the list return a character result of 'W' / 'L' / 'D' ", {
 
-  subFunc <- function(c, o) footballstats::match_result(scoreCurrent = c, scoreOther = o)
+  subFunc <- function(c, o) {
+    footballstats::match_result(
+      scoreCurrent = c,
+      scoreOther = o
+    )
+  }
 
   expect_equal( subFunc(c = 2, o = 1), 'W' )
   expect_equal( subFunc(c = 1, o = 1), 'D' )
   expect_equal( subFunc(c = 0, o = 1), 'L' )
 
 })
-
-
-test_that("Create team form.", {
-
-  matchData <- footballstats::matchData %>%
-    footballstats::order_matchdata()
-
-  # Choose a team from the ordered data set, this one is Arsenal.
-  teamID <- matchData$localteam_id[2]
-
-  formList <- matchData %>% footballstats::team_form(
-    teamID = teamID
-  )
-
-  # Calculate the number of matches this team ID has played
-  numMatches <- matchData[c('localteam_id', 'visitorteam_id')] %>%
-    `==`(teamID) %>%
-    sum
-
-  expect_equal( numMatches, formList$date %>% length )
-  expect_equal( numMatches, formList$form %>% length )
-  expect_equal( formList$form %>% paste(collapse = ''), 'WLWLDWD' )
-
-  sortedDates <- formList$date %>% sort
-
-  expect_equal( sortedDates[1], 17418 )
-  expect_equal( sortedDates[numMatches], 17468 )
-
-})
-
