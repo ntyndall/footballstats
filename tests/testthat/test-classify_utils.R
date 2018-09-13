@@ -13,7 +13,7 @@ test_that("Test that match data can be recreated easily.", {
 
   # Put the test data into Redis
   matchData <- KEYS %>%
-    footballstats::amatch_info(footballstats::data.2017[1:10, ])
+    footballstats::amatch_info(footballstats::matchData[60:70, ])
 
   recreated <- KEYS %>%
     footballstats::recreate_matchdata()
@@ -32,7 +32,7 @@ test_that("Test that commentary data is sent to Redis.", {
     footballstats::recreate_matchdata()
 
   # Choose the right match ID to analyse
-  recreated <- recreated[recreated$id == '2212950', ]
+  recreated <- recreated[1, ]
 
   KEYS %>% footballstats::acommentary_info(
     matchIDs = recreated$id,

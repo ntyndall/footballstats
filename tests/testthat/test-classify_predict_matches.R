@@ -33,21 +33,19 @@ test_that('Classify all - end to end from adding data to classifying and predict
     )
   KEYS %>% footballstats::weekly_positions()
 
-  # Load XGBoost model
-  load(file = getwd() %>% paste0("/xgModel.rda"))
-
-  # # Create the predictions here
+  # Create the predictions here
   KEYS$LOG_PRED <- TRUE
-  KEYS %>% predict_matches(
-    datModel = xgModel,
+  KEYS %>% footballstats::predict_matches(
+    datModel = footballstats::nnModel,
+    cMethod = "neuralnetwork",
     test.dat
   )
   KEYS$LOG_PRED <- FALSE
 
-  predictions <- 'csdm_pred:1204:*' %>%
+  predictions <- "csdm_pred:1204:*" %>%
     KEYS$RED$KEYS() %>%
     purrr::flatten_chr() %>%
-    strsplit(split = '[:]') %>%
+    strsplit(split = "[:]") %>%
     purrr::map(5) %>%
     purrr::flatten_chr() %>%
     as.integer %>%
