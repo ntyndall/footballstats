@@ -311,7 +311,13 @@ amatch_info <- function(KEYS, ...) {
     )
   }  # nocov end
 
+  # If matches exist then push them to redis
   if (matches %>% is.null %>% `!`()) {
+
+    # Double check the date format before it goes into redis!
+    if (matches$formatted_date[1] %>% grepl(pattern = "[.]") %>% `!`()) {
+      matches$formatted_date %<>% format("%d.%m.%Y")
+    }
 
     # If getting match info - make sure all matches have actually ended and been played!
     matches %<>% subset(matches$status %>% `==`('FT') %>% `&`(matches$ft_score %>% `!=`("[-]")))
