@@ -4,7 +4,7 @@
 \alias{amatch_info}
 \title{amatch_info}
 \usage{
-amatch_info(KEYS)
+amatch_info(KEYS, ...)
 }
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /
