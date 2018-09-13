@@ -10,7 +10,7 @@ test_that('Classify all - end to end from adding data to classifying and predict
   raw.dat <- footballstats::data.2017 %>%
     subset(footballstats::data.2017$comp_id %>% `==`("1204"))
 
-  # NEED TO UPDATE DATE
+  # NEED TO UPDATE DATE (otherwise handled in amatch_info)
   raw.dat$formatted_date %<>% format("%d.%m.%Y")
 
   train.dat <- raw.dat[1:359, ]
