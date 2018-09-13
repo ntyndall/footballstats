@@ -289,7 +289,7 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
 #' @export
 
 
-amatch_info <- function(KEYS) {
+amatch_info <- function(KEYS, ...) {
   valuesToRetain <- c(
     "id", "comp_id", "formatted_date", "season",
     "week", "venue", "venue_id", "venue_city",
@@ -299,8 +299,10 @@ amatch_info <- function(KEYS) {
     "ft_score", "et_score", "penalty_local", "penalty_visitor"
   )
 
-  matches <- if (KEYS$TEST) {
-    footballstats::matchData
+  # Data input
+  input <- list(...)
+  matches <- if (input %>% length %>% `>`(0)) {
+    input[[1]]
   } else {  # nocov start
     footballstats::get_data(
       endpoint = paste0(

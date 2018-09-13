@@ -17,12 +17,15 @@
 #' @export
 
 
-predict_matches <- function(KEYS, datModel, cMethod = "xgboost") {
+predict_matches <- function(KEYS, datModel, ..., cMethod = "xgboost") {
+
+  # Check input first
+  input <- list(...)
 
   # Get fixtures
   cat(paste0(Sys.time(), ' | About to report on results...\n'))
-  fixtureList <- if (KEYS$TEST) {
-    footballstats::matchData[60:70, ]
+  fixtureList <- if (input %>% length %>% `>`(0)) {
+    input %>% `[[`(1)
   } else { # nocov start
     paste0("/matches?comp_id=", KEYS$COMP, "&from_date=", KEYS$DATE_FROM, "&to_date=", KEYS$DATE_TO, "&") %>%
       footballstats::get_data(KEYS = KEYS)
