@@ -3,6 +3,19 @@ context('test-classify_all.R')
 # Reset DB
 KEYS$RED$FLUSHDB()
 
+test_that("No predictions to be made", {
+
+  # If no data is found, then it will be assigned NULL
+  noResults <- KEYS %>%
+    footballstats::predict_matches(
+      datModel = footballstats::nnModel,
+      cMethod = "neuralnetwork",
+      NULL
+    )
+
+  expect_equal( noResults, 0 )
+
+})
 
 test_that('Classify all - end to end from adding data to classifying and predicting.', {
 
