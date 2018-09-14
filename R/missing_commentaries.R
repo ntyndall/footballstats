@@ -34,9 +34,6 @@ missing_commentaries <- function(KEYS) {
   # Loop over all seasons (Just for reporting purposes)
   for (i in 1:(uniqueSeasons %>% length)) {
 
-    # Just skip this for now.
-    if (uniqueSeasons[i] %>% `==`("2017")) next
-
     # Get all match IDs
     matchIDs <- splitCSM[[i]] %>%
       footballstats::flatt(4)
