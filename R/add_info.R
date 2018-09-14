@@ -48,7 +48,7 @@ acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
     visitorteam %<>% `[`(comExists)
 
     # Get all commentaries here and only take the non-null elements
-    commentaries <- if (KEYS$TEST) {
+    commentaries <- if (KEYS$TEST) { # nocov start
       footballstats::fullCommentary[[1]] %>% list
     } else {
       lapply(
@@ -57,7 +57,7 @@ acommentary_info <- function(KEYS, matchIDs, localteam, visitorteam) {
           KEYS = KEYS
         )
       )
-    }
+    } # nocov end
 
     # Figure out which commentaries are null
     nullCom <- commentaries %>%

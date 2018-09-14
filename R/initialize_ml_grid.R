@@ -6,7 +6,7 @@
 #' @export
 
 
-initialize_ml_grid <- function() {
+initialize_ml_grid <- function() { # nocov start
   return(
     list(
       DAYS = c(3, 4, 5),
@@ -22,4 +22,4 @@ initialize_ml_grid <- function() {
       XG_GAMMA = 2
     )
   )
-}
+} # nocov end
