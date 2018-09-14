@@ -72,6 +72,9 @@ test_that("Calculate winnings from odds - Only add up those that have been predi
       )
     )
 
+  # Subset the five.match data frame
+  sub.match <- five.match %>% subset(lVec)
+
   # Win two of the three (specify which 2: W + D)
   expect_equal( result, sub.match$homewin[1] %>% as.double %>% `+`(sub.match$draw[2] %>% as.double) %>% `-`(lVec %>% sum) )
 

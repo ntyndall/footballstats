@@ -30,4 +30,4 @@ test_that("Create a model (neural network) during optimization", {
   expect_is( myres$neuralnetwork$model, "nn" )
   expect_equal( myres$neuralnetwork$totalStats %>% length, 7)
 
-)}
+})
