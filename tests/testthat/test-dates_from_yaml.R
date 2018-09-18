@@ -1,7 +1,7 @@
 context("test-dates_from_yaml")
 
 
-test_that("Create head to head data set", {
+test_that("Make sure the season is chosen correctly from dates from yaml", {
 
   # Time in 2017
   tNow <- "10/11/2017" %>%
