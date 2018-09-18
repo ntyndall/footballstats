@@ -6,7 +6,7 @@
 #' @export
 
 
-create_headtohead_data <- function(KEYS, saveData = TRUE) { # start nocov
+create_headtohead_data <- function(KEYS, saveData = TRUE) { # nocov start
 
   # headtohead list
   headtohead <- list()
@@ -93,4 +93,4 @@ create_headtohead_data <- function(KEYS, saveData = TRUE) { # start nocov
   } else {
     return(headtohead)
   }
-} # end nocov
+} # nocov end

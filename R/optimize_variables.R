@@ -15,10 +15,10 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
 
   # Only save models when requested
   if (optimizeModels) {
-    if (saveModels %>% length %>% `>`(0)) { # start nocov
+    if (saveModels %>% length %>% `>`(0)) { # nocov start
       cat(" ## If you want to save any models, then set optimizeModels to FALSE! \n\n")
       saveModels <- c()
-    } # end nocov
+    } # nocov end
   } else {
     saveModels %<>% intersect(types)
   }
@@ -34,7 +34,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
   TOTAL_PERC <- GRIDS$TOTAL_PERC
 
   # Only write to files if need be
-  if (optimizeModels) { # start nocov
+  if (optimizeModels) { # nocov start
     # Make sure the base directory exists
     resultsDir <- getwd() %>% paste0("/results_optimization/")
     if (resultsDir %>% dir.exists %>% `!`()) resultsDir %>% dir.create
@@ -61,7 +61,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
     }
   } else {
     totMatches <- 0
-  } # end nocov
+  } # nocov end
 
   # Define neural network input list
   NN <- list(
@@ -254,12 +254,12 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               cat(" XGBoost took :", tDiff, "\n")
 
               # Save the models
-              if ("xgboost" %in% saveModels) { # start nocov
+              if ("xgboost" %in% saveModels) { # nocov start
                 xgModel <- allMethods$xgb$model
                 xgScales <- scaled.results$scaler
                 save(xgModel, file = modelDir %>% paste0("xgModel.rda"))
                 save(xgScales, file = modelDir %>% paste0("xgScales.rda"))
-              } # end nocov
+              } # nocov end
             }
 
             # Build Neural network model using CV
@@ -287,22 +287,22 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               cat(" Neural Network took :", tDiff, "\n")
 
               # Save the models
-              if ("neuralnetwork" %in% saveModels) { # start nocov
+              if ("neuralnetwork" %in% saveModels) { # nocov start
                 nnModel <- allMethods$neuralnetwork$model
                 nnScales <- scaled.results$scaler
                 save(nnModel, file = modelDir %>% paste0("nnModel.rda"))
                 save(nnScales, file = modelDir %>% paste0("nnScales.rda"))
-              } # end nocov
+              } # nocov end
             }
 
             # Write metrics to file
-            if (optimizeModels) { # start nocov
+            if (optimizeModels) { # nocov start
               allMethods %>%
                 footballstats::optimize_save_metrics(
                   resultsFile = resultsFile,
                   resultsDir = resultsDir
                 )
-            } # end nocov
+            } # nocov end
           }
         }
       }

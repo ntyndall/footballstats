@@ -6,7 +6,7 @@
 #' @export
 
 
-plot_feature <- function(original.data) { # start nocov
+plot_feature <- function(original.data) { # nocov start
   toplot <- data.frame(
     home = original.data$possesiontime.h,
     away = original.data$possesiontime.a,
@@ -22,5 +22,5 @@ plot_feature <- function(original.data) { # start nocov
     )
   ) %>%
     `+`(ggplot2::geom_point())
-} # end nocov
+} # nocov end
 
