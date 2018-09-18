@@ -6,7 +6,7 @@
 #' @export
 
 
-dates_from_yaml <- function(KEYS) {
+dates_from_yaml <- function(KEYS, tNow = Sys.Date()) {
 
   # Define the redis key holding the season
   sKey <- "c_currentSeason:" %>% paste0(KEYS$COMP)
@@ -17,7 +17,7 @@ dates_from_yaml <- function(KEYS) {
 
   # If it doesn't exist then use date now!
   if (cSeason %>% is.null) {
-    cSeason <- Sys.Date() %>% format("%Y")
+    cSeason <- tNow %>% format("%Y")
     sKey %>% KEYS$RED$SET(value = cSeason)
   }
 
@@ -26,13 +26,19 @@ dates_from_yaml <- function(KEYS) {
     yaml::yaml.load_file()
 
   # get right data (season and competition) (and does it exist?)
-  myDates %<>% `[[`(cSeason) %>% `[[`(KEYS$COMP)
+  myDates %<>% `[[`(cSeason) %>% `[[`(KEYS$COMP %>% as.character)
 
   # Turn off activity until checks are passed
   KEYS$ACTIVE <- FALSE
 
   # Make sure that the information exists
   if (myDates %>% is.null) {
+
+    # Try updating the season again, otherwise it could be stuck forever
+    cSeason <- tNow %>% format("%Y")
+    sKey %>% KEYS$RED$SET(value = cSeason)
+
+    # Log details
     cat(
       paste0(
         Sys.time(), " | Supply season dates for season : ", cSeason, " for competition : ", KEYS$COMP, "\n"
@@ -42,18 +48,15 @@ dates_from_yaml <- function(KEYS) {
     # Convert to date time
     newDates <- myDates %>% as.Date(format = "%d.%m.%Y")
 
-    # Get the date now
-    tn <- Sys.Date()
-
     # Make sure the time is now active (inbetween start and end dates)
-    if (tn %>% `>`(newDates[1]) %>% `&&`(tn %>% `<`(newDates[2]))) {
+    if (tNow %>% `>`(newDates[1]) %>% `&&`(tNow %>% `<`(newDates[2]))) {
       KEYS$ACTIVE <- TRUE
       KEYS$DATE_FROM <- myDates[1]
-      KEYS$DATE_TO <- tn %>% `-`(1) %>% footballstats::format_dates()
+      KEYS$DATE_TO <- tNow %>% `-`(1) %>% footballstats::format_dates()
     } else {
       # If the season has finally ended then update the redis key
-      if (tn %>% `>`(newDates[2])) {
-        cSeason <- tn %>% format("%Y")
+      if (tNow %>% `>`(newDates[2])) {
+        cSeason <- tNow %>% format("%Y")
         sKey %>% KEYS$RED$SET(
           value = cSeason
         )

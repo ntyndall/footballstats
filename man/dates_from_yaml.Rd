@@ -4,7 +4,7 @@
 \alias{dates_from_yaml}
 \title{Get Dates}
 \usage{
-dates_from_yaml(KEYS)
+dates_from_yaml(KEYS, tNow = Sys.Date())
 }
 \description{
 A function that checks whether or not the season

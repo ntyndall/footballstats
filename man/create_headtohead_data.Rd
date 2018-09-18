@@ -4,5 +4,9 @@
 \alias{create_headtohead_data}
 \title{Create Head to Head Data}
 \usage{
-create_headtohead_data(KEYS)
+create_headtohead_data(KEYS, saveData = TRUE)
+}
+\details{
+Need to port forward redis connection to local to
+ get all the commentary information.
 }
