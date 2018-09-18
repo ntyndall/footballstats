@@ -58,7 +58,7 @@ Unfortunately, the size of the XGBoost model being stored in the R package leads
 
 ## Tagging a release
   - Update `DESCRIPTION` file to required version (must be > than most recent `GIT` version).
-  - Run `Rscript -e "organisR::tag.R()"` inside root directory `/footballstats/`.
+  - Run `Rscript -e "organisR::tag()"` inside root directory `/footballstats/`.
   - Update Github with the newest tag and binary that is produced from step 2.
 
 ## Scripts
