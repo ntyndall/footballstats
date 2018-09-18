@@ -14,7 +14,9 @@
 #' @export
 
 
-analyse_and_predict <- function(deployed = FALSE, addAll = TRUE, cMethods = c("xgboost", "neuralnetwork")) { # nocov start
+analyse_and_predict <- function(deployed = FALSE, addAll = TRUE,
+                                cMethods = c("xgboost", "neuralnetwork"),
+                                predRange = c(1, 7)) { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
@@ -61,8 +63,10 @@ analyse_and_predict <- function(deployed = FALSE, addAll = TRUE, cMethods = c("x
 
   # --- Now predict matches --- #
   cat('\n\n *** Beginning predictions *** \n\n')
-  KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
-  KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
+
+  if (predRange[1] >= predRange[2]) stop("Prediction range is invalid")
+  KEYS$DATE_FROM <- Sys.Date() %>% `+`(predRange[1]) %>% footballstats::format_dates()
+  KEYS$DATE_TO <- Sys.Date() %>% `+`(predRange[2]) %>% footballstats::format_dates()
 
   # Loop over each classification type
   for (k in 1:(cMethods %>% length)) {
