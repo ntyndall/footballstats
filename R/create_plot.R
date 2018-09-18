@@ -58,7 +58,7 @@ create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFacto
   for (i in 1:toplot) {
 
     # Only create plot if required
-    if (savePlot) {
+    if (savePlot) { # start nocov
       # Define the plot title
       plotTitle <- paste0(
         "day : ", day, " | gridP : ", gridPoints,
@@ -79,7 +79,7 @@ create_plot <- function(total.results, day, gridPoints, gridBoundary, decayFacto
         filename = dirNames[i] %>% paste0("/", fileName, ".png"),
         plot = g
       )
-    }
+    } # end nocov
 
     # Define current values of feature
     vals <- total.results[[singlePlots[i]]]
