@@ -1,9 +1,12 @@
 #' @title Create Head to Head Data
 #'
+#' @details Need to port forward redis connection to local to
+#'  get all the commentary information.
+#'
 #' @export
 
 
-create_headtohead_data <- function(KEYS) {
+create_headtohead_data <- function(KEYS, saveData = TRUE) { # start nocov
 
   # headtohead list
   headtohead <- list()
@@ -30,19 +33,21 @@ create_headtohead_data <- function(KEYS) {
   commKeys <- paste0("csmt_commentary:", KEYS$COMP, ":2017:",  data.set$id, ":")
   allCommentaries <- c(paste0(commKeys, data.set$localteam_id),  paste0(commKeys, data.set$visitorteam_id))
 
+  # Set up the portforward DB
   MYDB <- redux::hiredis(db = 1)
-  # Retrieve all the commentaries from redis
-  MYDB$HGETALL(allCommentaries[1])
 
+  # field Names for commentaries
+  fNames <- c("shots_total", "shots_ongoal", "fouls", "corners", "possesiontime", "yellowcards")
+
+  # Retrieve all the commentaries from redis
   comm <- MYDB$pipeline(
     .commands = lapply(
       X = allCommentaries,
       FUN = function(x) {
         print(x)
-        x %>% KEYS$PIPE$HMGET(field =   c(
-          'shots_total', 'shots_ongoal', 'fouls', 'corners',
-          'possesiontime', 'yellowcards'
-        ))
+        x %>% KEYS$PIPE$HMGET(
+          field = fNames
+        )
       }
     )
   )
@@ -52,10 +57,7 @@ create_headtohead_data <- function(KEYS) {
     X = 1:(comm %>% length),
     FUN = function(x) {
       res <- comm[[x]] %>% data.frame(stringsAsFactors = FALSE)
-      names(res) <- c(
-        'shots_total', 'shots_ongoal', 'fouls', 'corners',
-        'possesiontime', 'yellowcards'
-      )
+      names(res) <- fNames
       res
     }
   ) %>%
@@ -85,5 +87,10 @@ create_headtohead_data <- function(KEYS) {
   headtohead$matches$formatted_date %<>% format('%d.%m.%Y')
   headtohead$matches %<>% lapply(as.character)
   headtohead$commentaryData %<>% lapply(as.character)
-  save(headtohead, file = "/home/niall/Desktop/football-project/footballstats/data/headtohead.rda")
-}
+
+  if (saveData) {
+    save(headtohead, file = getwd() %>% paste0("/data/headtohead.rda"))
+  } else {
+    return(headtohead)
+  }
+} # end nocov
