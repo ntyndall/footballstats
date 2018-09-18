@@ -74,7 +74,8 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
     ROUNDS = GRIDS$XG_ROUNDS,
     DEPTH = GRIDS$XG_DEPTH,
     ETA = GRIDS$XG_ETA,
-    GAMMA = GRIDS$XG_GAMMA
+    GAMMA = GRIDS$XG_GAMMA,
+    BOUNDARY = GRIDS$XG_BOUNDARY
   )
 
   # Initialise values for generating and tracking results

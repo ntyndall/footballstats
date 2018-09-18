@@ -4,7 +4,8 @@
 \alias{analyse_and_predict}
 \title{Analyse Match and Event and Predict}
 \usage{
-analyse_and_predict(deployed = FALSE, addAll = TRUE)
+analyse_and_predict(deployed = FALSE, addAll = TRUE,
+  cMethods = c("xgboost", "neuralnetwork"))
 }
 \arguments{
 \item{deployed}{A boolean value to indicate whether the

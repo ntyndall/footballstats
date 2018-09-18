@@ -26,7 +26,8 @@ optimize_features <- function(optimizeModels = FALSE) {
       XG_ROUNDS = 100,
       XG_DEPTH = 10,
       XG_ETA = 0.2,
-      XG_GAMMA = 2
+      XG_GAMMA = 2,
+      XG_BOUNDARY = 4
     )
   }
 
