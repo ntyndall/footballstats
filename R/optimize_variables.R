@@ -15,10 +15,10 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
 
   # Only save models when requested
   if (optimizeModels) {
-    if (saveModels %>% length %>% `>`(0)) {
+    if (saveModels %>% length %>% `>`(0)) { # start nocov
       cat(" ## If you want to save any models, then set optimizeModels to FALSE! \n\n")
       saveModels <- c()
-    }
+    } # end nocov
   } else {
     saveModels %<>% intersect(types)
   }
@@ -34,7 +34,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
   TOTAL_PERC <- GRIDS$TOTAL_PERC
 
   # Only write to files if need be
-  if (optimizeModels) {
+  if (optimizeModels) { # start nocov
     # Make sure the base directory exists
     resultsDir <- getwd() %>% paste0("/results_optimization/")
     if (resultsDir %>% dir.exists %>% `!`()) resultsDir %>% dir.create
@@ -61,7 +61,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
     }
   } else {
     totMatches <- 0
-  }
+  } # end nocov
 
   # Define neural network input list
   NN <- list(
@@ -254,12 +254,12 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               cat(" XGBoost took :", tDiff, "\n")
 
               # Save the models
-              if ("xgboost" %in% saveModels) {
+              if ("xgboost" %in% saveModels) { # start nocov
                 xgModel <- allMethods$xgb$model
                 xgScales <- scaled.results$scaler
                 save(xgModel, file = modelDir %>% paste0("xgModel.rda"))
                 save(xgScales, file = modelDir %>% paste0("xgScales.rda"))
-              }
+              } # end nocov
             }
 
             # Build Neural network model using CV
@@ -287,93 +287,22 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               cat(" Neural Network took :", tDiff, "\n")
 
               # Save the models
-              if ("neuralnetwork" %in% saveModels) {
+              if ("neuralnetwork" %in% saveModels) { # start nocov
                 nnModel <- allMethods$neuralnetwork$model
                 nnScales <- scaled.results$scaler
                 save(nnModel, file = modelDir %>% paste0("nnModel.rda"))
                 save(nnScales, file = modelDir %>% paste0("nnScales.rda"))
-              }
+              } # end nocov
             }
 
-            if (optimizeModels) {
-              # What is the best result
-              biggest <- sapply(
-                X = 1:(allMethods %>% length),
-                FUN = function(x) allMethods[[x]]$totalStats$totAcc %>% mean
-              ) %>%
-                max
-
-              # Print to screen the best result so far
-              if (biggest %>% `>`(bestResult)) {
-                cat(
-                  ' \n   -> New best result of :', biggest,
-                  'from :', bestResult, '\n'
+            # Write metrics to file
+            if (optimizeModels) { # start nocov
+              allMethods %>%
+                footballstats::optimize_save_metrics(
+                  resultsFile = resultsFile,
+                  resultsDir = resultsDir
                 )
-                bestResult <- biggest
-              }
-
-              # Write headers function
-              head_write <- function(x, y) x %>% names %>% paste(collapse = ",") %>% write(file = y)
-
-              # Put the different methods into a list
-              for (z in 1:(types %>% length)) {
-                # Rename list object
-                myStats <- allMethods[[z]]$totalStats
-
-                # Get average sensitivities
-                sensD <- myStats$totD %>% mean
-                sensL <- myStats$totL %>% mean
-                sensW <- myStats$totW %>% mean
-
-                # Store all results in a data frame
-                topscore.frame <- data.frame(
-                  day = DAYS[i],
-                  gridPoints = GRID_PTS[j],
-                  gridBoundary = GRID_BOUND[k],
-                  decay = DECAY[l],
-                  totalPercentage = TOTAL_PERC[m],
-                  type = types[z],
-                  `accuracy` = myStats$totAcc %>% mean,
-                  `profit` = myStats$netWinnings %>% mean,
-                  `profit.sd` = myStats$netWinnings %>% stats::sd(),
-                  `profit.min` = myStats$netWinnings %>% min,
-                  `profit.max` = myStats$netWinnings %>% max,
-                  `accuracy.sd` = myStats$totAcc %>% stats::sd(),
-                  `accuracy.min` = myStats$totAcc %>% min,
-                  `accuracy.max` = myStats$totAcc %>% max,
-                  `sensitivity.D` = myStats$totD %>% mean,
-                  `sensitivity.D.min` = myStats$totD %>% min,
-                  `sensitivity.D.max` = myStats$totD %>% max,
-                  `sensitivity.L` = myStats$totL %>% mean,
-                  `sensitivity.L.min` = myStats$totL %>% min,
-                  `sensitivity.L.max` = myStats$totL %>% max,
-                  `sensitivity.W` = myStats$totW %>% mean,
-                  `sensitivity.W.min` = myStats$totW %>% min,
-                  `sensitivity.W.max` = myStats$totW %>% max,
-                  `sensitivity.sd` = c(sensD, sensL, sensW) %>% stats::sd(),
-                  stringsAsFactors = FALSE
-                )
-
-                # Make sure the results file exists and write header information
-                if (resultsFile %>% file.exists %>% `!`()) topscore.frame %>% head_write(y = resultsFile)
-
-                # Write results to files line by line
-                topscore.frame %>%
-                  paste(collapse = ',') %>%
-                  write(
-                    file = resultsFile,
-                    append = TRUE
-                  )
-              }
-
-              # Make sure the metrics file exists and write header information
-              featureFile <- resultsDir %>% paste0("features.csv")
-              if (featureFile %>% file.exists %>% `!`()) feat.metrics %>% head_write(y = featureFile)
-
-              for (feat in 1:(feat.metrics %>% nrow)) {
-                feat.metrics[feat, ] %>% paste(collapse = ',') %>% write(file = featureFile, append = T)
-              }
-            }
+            } # end nocov
           }
         }
       }
