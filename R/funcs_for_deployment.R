@@ -14,7 +14,7 @@
 #' @export
 
 
-analyse_and_predict <- function(deployed = FALSE, addAll = TRUE) { # nocov start
+analyse_and_predict <- function(deployed = FALSE, addAll = TRUE, cMethods = c("xgboost", "neuralnetwork")) { # nocov start
 
   # Obtain API and sensitive key information
   KEYS <- footballstats::sensitive_keys(
@@ -64,7 +64,6 @@ analyse_and_predict <- function(deployed = FALSE, addAll = TRUE) { # nocov start
   KEYS$DATE_FROM <- Sys.Date() %>% `+`(1) %>% footballstats::format_dates()
   KEYS$DATE_TO <- Sys.Date() %>% `+`(7) %>% footballstats::format_dates()
 
-  cMethods <- c("xgboost", "neuralnetwork")
   # Loop over each classification type
   for (k in 1:(cMethods %>% length)) {
 
@@ -74,8 +73,7 @@ analyse_and_predict <- function(deployed = FALSE, addAll = TRUE) { # nocov start
     # Load the appropriate data model
     cat(paste0(Sys.time(), " | Loading data model ... \n"))
     datModel <- if (cMethods[k] == "xgboost") {
-      load(file = getwd() %>% paste0("/xgModel.rda"))
-      xgModel
+      footballstats::xgModel
     } else if (cMethods[k] == "neuralnetwork") {
       footballstats::nnModel
     } else {
