@@ -1,94 +1,43 @@
 
 
-skysports <- httr::GET(url = "https://www.skysports.com/premier-league-results/2017-18")
+# Make the query
+skysports <- "https://www.skysports.com/premier-league-results/2017-18" %>%
+  httr::GET()
 
-
-allitems <- skysports$content %>% 
+# Read the data from the request
+requestData <- skysports %>% 
+  `[[`("content") %>%
   rawToChar() %>%
-  xml2::read_html() %>%
-  xml2::xml_find_all(".//div")
+  xml2::read_html()
 
-# Get all attributes
-allattrs <- allitems %>% xml2::xml_attrs()
+# Just the first batch
+firstContent <- requestData %>% 
+  xml2::xml_find_all(".//div") %>% 
+  sky_find_urls()
 
+# Find additional content by clicking `Show More` @ bottom of page
+secondContent <- requestData %>%
+  xml2::xml_find_all(".//script") %>%
+  sky_get_logical(
+    myID = "type", 
+    nameMatch = "text/show-more"
+  ) %>% 
+    xml2::xml_text() %>% 
+    xml2::read_html() %>%
+    xml2::xml_find_all(".//div") %>% 
+    sky_find_urls()
 
-i <- 40
+# Combine the two vectors to get a complete list of URLs
+allUrls <- c(firstContent, secondContent)
 
-allURLs <- c()
-for (i in 1:(allattrs %>% length)) {
-  currentVal <- allattrs %>% `[[`(i)
-  currentNames <- currentVal %>% names
-  if (currentNames %>% length %>% `==`(1)) {
-    # Start to parse the data
-    if (currentVal %>% as.character %>% `==`("fixres__item")) {
-      getURL <- allitems[i] %>% 
-        xml2::xml_find_all(".//a") %>% 
-        xml2::xml_attrs() %>%
-        `[[`(1)
-      
-      # Get the next URL
-      nextURL <- getURL %>%
-        `[`(getURL %>% names %>% `==`("href")) %>% 
-        as.character
-      allURLs %<>% c(nextURL)
-    }
-  }
-}
-
-# Possibly more content?
-allitems <- skysports$content %>% 
-  rawToChar() %>%
-  xml2::read_html() %>%
-  xml2::xml_find_all(".//script")
-
-# find the right index <- 
-allatts <- allitems %>% xml2::xml_attrs()
-moreContent <- lapply(
-  X = allatts,
-  FUN = function(x) {
-    currNames <- x %>% names
-    if ("type" %in% (currNames)) {
-      if (x %>% `[`(currNames %>% `==`("type")) %>% as.character %>% `==`("text/show-more")) {
-        TRUE
-      } else {
-        FALSE
-      }
-    } else {
-      FALSE
-    }
-  }
+# Create the endpoints to target statistics
+fullUrls <- lapply(
+  X = allUrls %>% strsplit(split = "/[[:digit:]+$]"), 
+  FUN = function(x) paste0(x[1], "/stats/", x[2])
 ) %>%
-  purrr::flatten_lgl() %>% 
-  which
+  purrr::flatten_chr()
 
-
-allitems[moreContent] %>% xml2::xml_text() %>% xml2::read_html() -> moreData
-
-moreAttrs <- moreData %>% xml2::xml_find_all(".//div")
-allattrs <- moreAttrs %>% xml2::xml_attrs()
-for (i in 1:(allattrs %>% length)) {
-  currentVal <- allattrs %>% `[[`(i)
-  currentNames <- currentVal %>% names
-  if (currentNames %>% length %>% `==`(1)) {
-    # Start to parse the data
-    if (currentVal %>% as.character %>% `==`("fixres__item")) {
-      getURL <- moreAttrs[i] %>% 
-        xml2::xml_find_all(".//a") %>% 
-        xml2::xml_attrs() %>%
-        `[[`(1)
-      
-      # Get the next URL
-      nextURL <- getURL %>%
-        `[`(getURL %>% names %>% `==`("href")) %>% 
-        as.character
-      allURLs %<>% c(nextURL)
-    }
-  }
-}
-
-
-spltStr <- allURLs[1] %>% strsplit(split = "/[[:digit:]+$]") %>% purrr::flatten_chr()
-spltStr <- paste0(spltStr[1], "/stats/", spltStr[2])
+# (Need to loop over now)
 httr::GET(url = spltStr) -> actualMatch
 
 actualDoc <- actualMatch %>% xml2::read_html()
