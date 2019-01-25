@@ -99,3 +99,18 @@ sky_collect_stats <- function(total.metrics, nodeSet) {
   # Return updated data frame back
   return(total.metrics)
 }
+
+#' @title Sky Get HTML
+#'
+#' @export
+
+
+sky_get_html <- function(x) {
+  return(
+    x %>%
+      httr::GET() %>%
+      `[[`("content") %>% 
+      rawToChar() %>%
+      xml2::read_html()
+  )
+}
