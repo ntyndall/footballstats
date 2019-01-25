@@ -54,3 +54,48 @@ sky_find_urls <- function(nodeSet) {
   # Return all urls back
   return(allURLs)
 }
+
+
+#' @title Sky Collect Stats
+#' 
+#' @export
+
+sky_collect_stats <- function(total.metrics, nodeSet) {
+  
+  for (i in 1:(nodeSet %>% length)) {
+    # Get title
+    mytitle <- nodeSet %>% 
+      `[`(i) %>% 
+      xml2::xml_find_first(".//h5") %>% 
+      xml2::xml_text() %>% 
+      trimws()
+    
+    # just spans
+    justSpans <- nodeSet %>% 
+      `[`(i) %>% 
+      xml2::xml_find_all(".//span")
+    
+    # Get home/ away attributes
+    homeAway <- justSpans %>% 
+      xml2::xml_attrs()
+    
+    only_drole <- function(x) x %>% purrr::map(function(x) "data-role" %in% (x %>% names)) %>% purrr::flatten_lgl()
+    justSpans %<>% `[`(homeAway %>% only_drole())
+    homeAway %<>% `[`(homeAway %>% only_drole())
+    
+    # Loop over both
+    for (j in 1:(justSpans %>% length)) {
+      singleNames <- homeAway[[j]] %>% names
+      droleAttr <- homeAway %>% `[[`(j) %>% `[`("data-role" %>% `==`(singleNames)) %>% as.character
+      if (droleAttr %>% `==`("match-stat-home")) homeFig <- justSpans[j] else awayFig <- justSpans[j]
+    }
+    
+    toBind <- data.frame(homeFig %>% xml2::xml_text(), awayFig %>% xml2::xml_text())
+    names(toBind) <- paste0(c("home.", "away."), mytitle)
+    
+    total.metrics %<>% cbind(toBind)
+  }
+  
+  # Return updated data frame back
+  return(total.metrics)
+}
