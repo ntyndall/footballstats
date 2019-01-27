@@ -108,7 +108,7 @@ create_table <- function(KEYS, matchData) {
     allInfo$allKeys <- paste0('cwt_l:', KEYS$COMP, ':', KEYS$SEASON, ':', allInfo$week, ':', allInfo$tids)
 
     # Lapply over every uniqueTeam now and create new (filter if they have been analysed already)
-    lapply(
+    myresults <- lapply(
       X = 1:(newUniques %>% length),
       FUN = function(x) {
 
@@ -126,13 +126,21 @@ create_table <- function(KEYS, matchData) {
         # Get cumulative sum
         csum <- function(x) x %>% cumsum %>% `[`(-1)
 
-        # Create
-        cPts <- c(lastData$table[[newUniques[x]]]$PTS %>% as.integer, singleTeam$pts) %>% csum()
-        cGf <- c(lastData$table[[newUniques[x]]]$GF %>% as.integer, singleTeam$gf) %>% csum()
-        cGd <- c(lastData$table[[newUniques[x]]]$GD %>% as.integer, (singleTeam$gf - singleTeam$ga)) %>% csum()
+        # Character teamid
+        charInd <- newUniques[x] %>% as.character
 
+        # Create
+        cPts <- c(lastData$table[[charInd]]$PTS %>% as.integer, singleTeam$pts) %>% csum() %>% as.character
+        cGf <- c(lastData$table[[charInd]]$GF %>% as.integer, singleTeam$gf) %>% csum() %>% as.character
+        cGd <- c(lastData$table[[charInd]]$GD %>% as.integer, (singleTeam$gf - singleTeam$ga)) %>% csum() %>% as.character
+
+        #if (tName %>% `==`("Cardiff City")) {
+          #print(paste0(x, "  ", cPts))
+        #}
+
+        #if (cGd %>% is.na %>% `|`(cGd %>% `==`("NA"))) print("WHY?!?!")
         # Start to create new keys
-        KEYS$RED$pipeline(
+        blnk <- KEYS$RED$pipeline(
           .commands = lapply(
             X = 1:(singleTeam$allKeys %>% length),
             FUN = function(y) {
@@ -146,6 +154,7 @@ create_table <- function(KEYS, matchData) {
       }
     )
   }
+  return(NULL)
 }
 
 #' @title Weekly Positions
@@ -194,7 +203,7 @@ weekly_positions <- function(KEYS) {
 
     # Get subkeys
     subKeys <- redisKeys %>%
-      subset(paste0(':', uniqKeys[i], ':') %>% grepl(redisKeys))
+      subset(paste0(KEYS$SEASON, ':', uniqKeys[i], ':') %>% grepl(redisKeys))
 
     # There could be non-zero weeks..
     if (subKeys %>% identical(character(0))) next
@@ -271,7 +280,7 @@ weekly_positions <- function(KEYS) {
     paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>%
       KEYS$RED$HMSET(
         field = singleWeek$teamID,
-        value = c(1:(singleWeek %>% nrow))
+        value = c(1:(singleWeek %>% nrow)) %>% as.character
       )
   }
 }
