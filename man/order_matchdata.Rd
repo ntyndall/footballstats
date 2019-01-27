@@ -4,11 +4,14 @@
 \alias{order_matchdata}
 \title{Order Match Dataset}
 \usage{
-order_matchdata(matchData)
+order_matchdata(matchData, formatter = "\%d.\%m.\%Y")
 }
 \arguments{
 \item{matchData}{A data frame that contains rows of single matches
 that have been played between two teams.}
+
+\item{formatter}{A string that defines how the dates coming in should
+look, i.e. allow for any kind of standard date formats.}
 }
 \value{
 A data frame that has been ordered by date.

@@ -56,14 +56,16 @@ recreate_matchdata <- function(KEYS) {
 #'
 #' @param matchData A data frame that contains rows of single matches
 #'  that have been played between two teams.
+#' @param formatter A string that defines how the dates coming in should
+#'  look, i.e. allow for any kind of standard date formats.
 #'
 #' @return A data frame that has been ordered by date.
 #'
 #' @export
 
 
-order_matchdata <- function(matchData) {
-  matchData$formatted_date %<>% as.Date('%d.%m.%Y')
+order_matchdata <- function(matchData, formatter = '%d.%m.%Y') {
+  matchData$formatted_date %<>% as.Date(fomat = formatter)
   matchData <- matchData[matchData$formatted_date %>% order(matchData$id), ]
   return(matchData)
 }
