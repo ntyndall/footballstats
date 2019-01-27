@@ -4,7 +4,8 @@
 \alias{feat_position}
 \title{League Position}
 \usage{
-feat_position(KEYS, matchID, teamIDs, matchDate = NULL)
+feat_position(KEYS, matchID, teamIDs, matchDate = NULL,
+  formatter = "\%d.\%m.\%Y")
 }
 \arguments{
 \item{KEYS}{A list containing options such as testing / prediction /

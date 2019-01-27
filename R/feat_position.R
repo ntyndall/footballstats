@@ -26,7 +26,7 @@
 #' @export
 
 
-feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
+feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL, formatter = "%d.%m.%Y") {
 
   # Get the start date
   startDate <- paste0('c_startDate:', KEYS$COMP, ':', KEYS$SEASON) %>%
@@ -37,11 +37,11 @@ feat_position <- function(KEYS, matchID, teamIDs, matchDate = NULL) {
   currentDate <- if (matchDate %>% is.null) {
     paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchID) %>%
       KEYS$RED$HGET(field = 'formatted_date') %>%
-      as.Date(format = '%d.%m.%Y') %>%
+      as.Date(format = formatter) %>%
       as.integer
   } else {
     matchDate %>%
-      as.Date(format = '%d.%m.%Y') %>%
+      as.Date(format = formatter) %>%
       as.integer
   }
 
