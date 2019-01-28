@@ -1,0 +1,47 @@
+footballdata:
+  england:
+    leagues:
+      premiership: "E0"
+      championship: "E1"
+      league-1: "E2"
+      league-2: "E3"
+    startYear: 2004
+  germany:
+    leagues:
+      bundesliga-1: "D1"
+      bundesliga-2: "D2"
+    startYear: 2006
+  italy:
+    leagues:
+      serie-A: "I1"
+    startYear: 2005
+  spain:
+    leagues:
+      la-liga-1: "SP1"
+    startYear: 2005
+  france:
+    leagues:
+      ligue-1: "F1"
+    startYear: 2005
+  holland:
+    leagues:
+      eredivisie: "N1"
+    startYear: 2017
+  belgium:
+    leagues:
+      jupiler: "B1"
+    startYear: 2017
+  portugal:
+    leagues:
+      liga-1: "P1"
+    startYear: 2017
+  turkey:
+    leagues:
+      ligi-1: "T1"
+    startYear: 2017
+  greece:
+    leagues:
+      ethniki: "G1"
+    startYear: 2017
+
+
