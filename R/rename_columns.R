@@ -1,9 +1,9 @@
-#' @title Rename data
+#' @title Rename Columns
 #'
 #' @export
 
 
-rename_data <- function(d.set, mapping = "") {
+rename_columns <- function(d.set, mapping = "") {
   # Read the mappings from yaml
   myMappings <- "~/Documents/footballstats/inst/mappings/details.yaml" %>%
     yaml::yaml.load_file() %>%
@@ -29,6 +29,8 @@ rename_data <- function(d.set, mapping = "") {
   # Create a named vector for dplyr to use
   newList %<>% unlist
 
-  # Return the data set with renamed columns
-  return(d.set %>% dplyr::rename(!!!newList))
+  # Rename those columns
+  d.set %<>% dplyr::rename(!!!newList)
+
+  return(d.set %>% dplyr::select(newList %>% names))
 }
