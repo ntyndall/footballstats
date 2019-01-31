@@ -65,8 +65,8 @@ recreate_matchdata <- function(KEYS) {
 
 
 order_matchdata <- function(matchData, formatter = '%d.%m.%Y') {
-  matchData$formatted_date %<>% as.Date(fomat = formatter)
-  matchData <- matchData[matchData$formatted_date %>% order(matchData$id), ]
+  matchData$zzz.date %<>% as.Date(format = formatter)
+  matchData <- matchData[matchData$zzz.date %>% order(matchData$zzz.matchID), ]
   return(matchData)
 }
 
