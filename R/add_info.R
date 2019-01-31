@@ -290,14 +290,6 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
 
 
 amatch_info <- function(KEYS, ...) {
-  valuesToRetain <- c(
-    "id", "comp_id", "formatted_date", "season",
-    "week", "venue", "venue_id", "venue_city",
-    "status", "timer", "time", "localteam_id",
-    "localteam_name", "localteam_score", "visitorteam_id",
-    "visitorteam_name", "visitorteam_score", "ht_score",
-    "ft_score", "et_score", "penalty_local", "penalty_visitor"
-  )
 
   # Data input
   input <- list(...)
@@ -314,24 +306,30 @@ amatch_info <- function(KEYS, ...) {
   # If matches exist then push them to redis
   if (matches %>% is.null %>% `!`()) {
 
+    # Rename the columns
+    matches %<>%
+      footballstats::rename_columns(
+        mapping = "api"
+      )
+
     # Double check the date format before it goes into redis!
-    if (matches$formatted_date[1] %>% grepl(pattern = "[.]") %>% `!`()) {
-      matches$formatted_date %<>% format("%d.%m.%Y")
+    if (matches$zzz.date[1] %>% grepl(pattern = "[.]") %>% `!`()) {
+      matches$zzz.date %<>% format("%d.%m.%Y")
     }
 
     # If getting match info - make sure all matches have actually ended and been played!
-    matches %<>% subset(matches$status %>% `==`('FT') %>% `&`(matches$ft_score %>% `!=`("[-]")))
+    matches %<>% subset(matches$zzz.status %>% `==`('FT') %>% `&`(matches$zzz.score %>% `!=`("[-]")))
 
     # Push unique team ID's to a list for analysis later
     KEYS$RED$pipeline(
       .commands = lapply(
-        X = c(matches$localteam_id, matches$visitorteam_id) %>% unique,
+        X = c(matches$home.id, matches$away.id) %>% unique,
         FUN = function(x) "analyseTeams" %>% KEYS$PIPE$LPUSH(x)
       )
     )
 
     # Define all the matchIDs
-    matchIDs <- matches$id
+    matchIDs <- matches$zzz.matchID
 
     # Push matches that have already been predicted to a set
     predictionsExist <- KEYS$RED$pipeline(
@@ -345,15 +343,16 @@ amatch_info <- function(KEYS, ...) {
 
     # Push to a `ready` set for other functions to pick up
     if (predictionsExist %>% any) {
-      paste0('c:', KEYS$COMP, ':ready') %>% KEYS$RED$SADD(
-        member = matchIDs %>% `[`(predictionsExist)
-      )
+      paste0('c:', KEYS$COMP, ':ready') %>%
+        KEYS$RED$SADD(
+          member = matchIDs %>% `[`(predictionsExist)
+        )
     }
 
     # See if any matches belong to the set already analysed
     addMatches <- KEYS$RED$pipeline(
       .commands = lapply(
-        X = matches$id,
+        X = matches$zzz.matchID,
         FUN = function(x) paste0('cs_matchSetInfo:', KEYS$COMP, ":", KEYS$SEASON) %>% KEYS$PIPE$SADD(x)
       )
     ) %>%
@@ -364,14 +363,13 @@ amatch_info <- function(KEYS, ...) {
     if (addMatches %>% any) {
       # Only those that haven't been added
       matchesToAdd <- matches %>% subset(
-        subset = addMatches,
-        select = valuesToRetain
+        subset = addMatches
       )
 
       # Define the redis matchKey
       matchKeys <- paste0(
         "csm:", KEYS$COMP, ":",
-        KEYS$SEASON, ":", matchesToAdd$id
+        KEYS$SEASON, ":", matchesToAdd$zzz.matchID
       )
 
       # Push data to redis
