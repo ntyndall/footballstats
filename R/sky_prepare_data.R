@@ -175,9 +175,6 @@ for (i in 1:(allCompIDs %>% length)) {
       comp.z = compID
     )
 
-    new.data %>% dplyr::rename(
-
-    )
     ress <- new.data %>%
       sub_metrics(
         colNames = list(localID = "home.id", awayID = "away.id")
