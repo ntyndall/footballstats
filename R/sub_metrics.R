@@ -14,6 +14,9 @@ sub_metrics <- function(total.metrics, colNames, GRIDS, odds.frame = data.frame(
     style = 3
   )
 
+  # Fix index values for now!
+  i <- j <- k <- l <- m <- 1
+
   # Now loop over all of total.metrics
   for (drow in 2:(total.metrics %>% nrow)) {
 
@@ -51,7 +54,6 @@ sub_metrics <- function(total.metrics, colNames, GRIDS, odds.frame = data.frame(
       )
 
       # do calculations here
-      i <- j <- k <- l <- m <- 1
       result.dat <- home.away.dat %>%
         footballstats::optimize_calculation(
           day = DAYS[i],
