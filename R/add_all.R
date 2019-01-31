@@ -71,9 +71,9 @@ add_all <- function(KEYS) { # nocov start
   cat(paste0(Sys.time(), ' | Commentary ...'))
   if (matches %>% nrow %>% `>`(0)) {
     KEYS %>% footballstats::acommentary_info(
-      matchIDs = matches$id,
-      localteam = matches$localteam_id,
-      visitorteam = matches$visitorteam_id
+      matchIDs = matches$zzz.matchID,
+      localteam = matches$home.id,
+      visitorteam = matches$away.id
     )
   }
   cat(' complete \n')
@@ -82,8 +82,8 @@ add_all <- function(KEYS) { # nocov start
   cat(paste0(Sys.time(), ' | Events ...'))
   if (matches %>% nrow %>% `>`(0)) {
     KEYS %>% footballstats::aevent_info(
-      matchIDs = matches$id,
-      matchEvents = matches$events
+      matchIDs = matches$zzz.matchID,
+      matchEvents = matches$zzz.events
     )
   }
   cat(' complete \n')
@@ -107,7 +107,7 @@ add_all <- function(KEYS) { # nocov start
   totalRequests <- uniqueRequests + teamListLength
   cat(paste0(Sys.time(), ' . ----------------{-S-U-M-M-A-R-Y-}------------------ \n'))
   cat(paste0(Sys.time(), ' | Analysed ', totalRequests, ' unique GET requests. \n'))
-  cat(paste0(Sys.time(), ' | Analysed ', matches$events %>% length, ' matches/events. \n'))
+  cat(paste0(Sys.time(), ' | Analysed ', matches$zzz.events %>% length, ' matches/events. \n'))
   cat(paste0(Sys.time(), ' | Analysed ', teamListLength, ' teams. \n'))
   cat(paste0(Sys.time(), ' | Players to be analysed : ', plBef, ' -> ', plAft, '. \n'))
   cat(paste0(Sys.time(), ' ` -------------------------------------------------- \n\n'))
