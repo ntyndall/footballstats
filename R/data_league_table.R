@@ -33,7 +33,7 @@ create_table <- function(KEYS, matchData) {
 
   # If it doesn't exist then create it
   if (startDate %>% is.null) {
-    startDate <- matchData$formatted_date %>% as.integer %>% min
+    startDate <- matchData$zzz.date %>% as.integer %>% min
     dateKey %>%
       KEYS$RED$SET(
         value = startDate
@@ -43,13 +43,13 @@ create_table <- function(KEYS, matchData) {
   }
 
   matchList <- matchData %>% as.list
-  matchList[c("formatted_date", "localteam_score", "visitorteam_score")] %<>% lapply(as.integer)
+  matchList[c("zzz.date", "home.score", "away.score")] %<>% lapply(as.integer)
 
   # Get all unique teamIDs
-  uniqueTeams <- c(matchList$localteam_id, matchList$visitorteam_id) %>%
+  uniqueTeams <- c(matchList$home.teamID, matchList$away.teamID) %>%
     unique
 
-  uniqueNames <- c(matchList$localteam_name, matchList$visitorteam_name) %>%
+  uniqueNames <- c(matchList$home.team, matchList$away.team) %>%
     unique
 
   # Get all the previous keys
@@ -60,23 +60,23 @@ create_table <- function(KEYS, matchData) {
   # Get previous week for EVERY
   lastData <- KEYS %>% footballstats::get_last_week(uniqueTeams = uniqueTeams)
 
-  scores <- c(matchList$localteam_score, matchList$visitorteam_score)
+  scores <- c(matchList$home.score, matchList$away.score)
 
   # Get points from result
-  res <- matchList$localteam_score - matchList$visitorteam_score
+  res <- matchList$home.score - matchList$away.score
 
   # Stack useful vectorc
   allInfo <- list(
-    ids = matchList$id %>% rep(2),
-    tids = c(matchList$localteam_id, matchList$visitorteam_id),
-    teams = c(matchList$localteam_name, matchList$visitorteam_name),
+    ids = matchList$zzz.matchID %>% rep(2),
+    tids = c(matchList$home.teamID, matchList$away.teamID),
+    teams = c(matchList$home.team, matchList$away.name),
     pts = c(
       sapply(res, FUN = function(x) if (x > 0) 3 else if (x < 0) 0 else 1),
       sapply(res, FUN = function(x) if (x > 0) 0 else if (x < 0) 3 else 1)
     ),
-    gf = c(matchList$localteam_score, matchList$visitorteam_score),
-    ga = c(matchList$visitorteam_score, matchList$localteam_score),
-    week = matchList$formatted_date %>% `-`(startDate) %>% `/`(7) %>% floor %>% `+`(1) %>% rep(2)
+    gf = c(matchList$home.score, matchList$away.score),
+    ga = c(matchList$away.score, matchList$home.score),
+    week = matchList$zzz.date %>% `-`(startDate) %>% `/`(7) %>% floor %>% `+`(1) %>% rep(2)
   )
 
   # Define set key
@@ -134,11 +134,6 @@ create_table <- function(KEYS, matchData) {
         cGf <- c(lastData$table[[charInd]]$GF %>% as.integer, singleTeam$gf) %>% csum() %>% as.character
         cGd <- c(lastData$table[[charInd]]$GD %>% as.integer, (singleTeam$gf - singleTeam$ga)) %>% csum() %>% as.character
 
-        #if (tName %>% `==`("Cardiff City")) {
-          #print(paste0(x, "  ", cPts))
-        #}
-
-        #if (cGd %>% is.na %>% `|`(cGd %>% `==`("NA"))) print("WHY?!?!")
         # Start to create new keys
         blnk <- KEYS$RED$pipeline(
           .commands = lapply(
