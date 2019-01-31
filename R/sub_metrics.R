@@ -3,7 +3,7 @@
 #' @export
 
 
-sub_metrics <- function(total.metrics, colNames, odds.frame = data.frame()) {
+sub_metrics <- function(total.metrics, colNames, GRIDS, odds.frame = data.frame()) {
   odds.results <- total.results <- data.frame(stringsAsFactors = FALSE)
   allMatchIDs <- c()
 
@@ -51,31 +51,32 @@ sub_metrics <- function(total.metrics, colNames, odds.frame = data.frame()) {
       )
 
       # do calculations here
+      i <- j <- k <- l <- m <- 1
       result.dat <- home.away.dat %>%
         footballstats::optimize_calculation(
           day = DAYS[i],
           gridPoints = GRID_PTS[j],
           gridBoundary= GRID_BOUND[k],
           decayFactor = DECAY[l],
-          til = current.row$til,
+          til = current.row$zzz.til,
           totalPer = TOTAL_PERC[m]
         )
 
       # Append positions on
-      result.dat$`position.h` <- current.row$`position.h` %>% `/`(current.row$til)
-      result.dat$`position.a` <- current.row$`position.a` %>% `/`(current.row$til)
+      result.dat$`position.h` <- current.row$`position.h` %>% `/`(current.row$zzz.til)
+      result.dat$`position.a` <- current.row$`position.a` %>% `/`(current.row$zzz.til)
       result.dat$res <- current.row$result
       total.results %<>% rbind(result.dat)
-      allMatchIDs %<>% c(current.row$matchID)
+      allMatchIDs %<>% c(current.row$zzz.matchID)
 
       # Make sure there is a match, if not then set as NA
-      matchingIndex <- current.row$matchID %>% `==`(odds.frame$matchID)
+      matchingIndex <- current.row$zzz.matchID %>% `==`(odds.frame$matchID)
       odds.results %<>% rbind(
         if (matchingIndex %>% any) {
           odds.frame[matchingIndex %>% which, ]
         } else {
           data.frame(
-            matchID = current.row$matchID,
+            matchID = current.row$zzz.matchID,
             homewin = NA,
             draw = NA,
             awaywin = NA,
