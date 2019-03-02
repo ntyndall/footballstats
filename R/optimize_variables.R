@@ -5,7 +5,7 @@
 
 optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
                                overwrite = FALSE, types = c("xgboost", "neuralnetwork"),
-                               saveModels = c()) {
+                               saveModels = c(), colNames = list(localID = "localID", awayID = "awayID")) {
 
   # Create directory
   if (saveModels %>% length %>% `>`(0)) {
@@ -121,99 +121,16 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
 
             icount %<>% `+`(1)
             cat(' ## Analysing operation', icount, '/', totalOps, ' (Loading data first) \n')
-            odds.results <- total.results <- data.frame(stringsAsFactors = FALSE)
-            allMatchIDs <- c()
 
-            # Set up a progress bar here
-            pb <- utils::txtProgressBar(
-              min = 0,
-              max = total.metrics %>% nrow,
-              style = 3
-            )
-
-            # Now loop over all of total.metrics
-            for (drow in 2:(total.metrics %>% nrow)) {
-
-              # Update the progress bar
-              utils::setTxtProgressBar(
-                pb = pb,
-                value = drow
+            # Determine expected goals/ accuracy etc
+            all.results <- total.metrics %>%
+              footballstats::sub_metrics(
+                colNames = colNames,
+                odds.frame = odds.frame
               )
-
-              current.row <- total.metrics[drow, ]
-              smaller.metrics <- total.metrics[1:(drow - 1), ]
-
-              # Subset smaller subset for logical matches
-              haMatches <- list(
-                hh = smaller.metrics$localID %>% `==`(current.row$localID),
-                ah = smaller.metrics$awayID %>% `==`(current.row$localID),
-                ha = smaller.metrics$localID %>% `==`(current.row$awayID),
-                aa = smaller.metrics$awayID %>% `==`(current.row$awayID)
-              )
-
-              # Number of rows of each type
-              allSums <- haMatches %>% purrr::map(sum)
-
-              if (allSums %>% purrr::map(function(x) x > DAYS[i]) %>% purrr::flatten_lgl() %>% all) {
-
-                # Separating function
-                sep_dat <- function(x, d, s) return(x[(s - d + 1):(x %>% nrow), ])
-
-                # Get grid values here
-                home.away.dat <- rbind(
-                  smaller.metrics %>% subset(haMatches$hh) %>% sep_dat(d = DAYS[i], s = allSums$hh),
-                  smaller.metrics %>% subset(haMatches$ah) %>% sep_dat(d = DAYS[i], s = allSums$ah),
-                  smaller.metrics %>% subset(haMatches$ha) %>% sep_dat(d = DAYS[i], s = allSums$ha),
-                  smaller.metrics %>% subset(haMatches$aa) %>% sep_dat(d = DAYS[i], s = allSums$aa)
-                )
-
-                # do calculations here
-                result.dat <- home.away.dat %>%
-                  footballstats::optimize_calculation(
-                    day = DAYS[i],
-                    gridPoints = GRID_PTS[j],
-                    gridBoundary= GRID_BOUND[k],
-                    decayFactor = DECAY[l],
-                    til = current.row$til,
-                    totalPer = TOTAL_PERC[m]
-                  )
-
-                # Append positions on
-                result.dat$`position.h` <- current.row$`position.h` %>% `/`(current.row$til)
-                result.dat$`position.a` <- current.row$`position.a` %>% `/`(current.row$til)
-                result.dat$res <- current.row$result
-                total.results %<>% rbind(result.dat)
-                allMatchIDs %<>% c(current.row$matchID)
-
-                # Make sure there is a match, if not then set as NA
-                matchingIndex <- current.row$matchID %>% `==`(odds.frame$matchID)
-                odds.results %<>% rbind(
-                  if (matchingIndex %>% any) {
-                    odds.frame[matchingIndex %>% which, ]
-                  } else {
-                    data.frame(
-                      matchID = current.row$matchID,
-                      homewin = NA,
-                      draw = NA,
-                      awaywin = NA,
-                      stringsAsFactors = FALSE
-                    )
-                  }
-                )
-              } else {
-                next
-              }
-            }
-
-            # Match up matchIDs with odds frame
-            new.odds <- odds.frame[allMatchIDs %>% match(odds.frame$matchID), ]
-
-            # Remove NA's from matchIDs
-            allMatchIDs %<>%
-              `[`(total.results %>% stats::complete.cases())
 
             # Prepare data - get the scales and scale results
-            scaled.results <- total.results %>%
+            scaled.results <- all.results$data %>%
               mltools::scale_data()
 
             # Create plots + get feature metrics
@@ -243,7 +160,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
               # Now calculate odds
               allMethods$xgb$totalStats$netWinnings <- sapply(
                 X = allMethods$xgb$results,
-                FUN = function(x) new.odds %>% footballstats::calculate_winnings(x)
+                FUN = function(x) all.results$odds %>% footballstats::calculate_winnings(x)
               )
 
               endTime <- Sys.time()
