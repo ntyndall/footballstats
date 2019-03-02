@@ -4,7 +4,7 @@ leagueEndpoints <- c(
   "premier-league",
   "championship",
   "la-liga",
-  "eredivise",
+  "eredivisie",
   "serie-a",
   "bundesliga",
   "ligue-1"
@@ -14,7 +14,7 @@ leagueEndpoints <- c(
 # 2013 -> 2018 (+1) Define years to start to end
 myYears <- seq(
   from = 2013, 
-  to = 2018, 
+  to = 2019, 
   by = 1
 )
 
@@ -25,14 +25,16 @@ actualYears <- firstHalf %>% paste0("/") %>% paste0(secondHalf)
 
 # Loop over both the league, and the year!
 for (i in leagueEndpoints) {
-  
+  if (i %in% (c( "premier-league",
+                "championship",
+                "la-liga") %>% paste0("-results/"))) next
   # New data frame for every league
   all.metrics <- data.frame(stringsAsFactors = FALSE)
   
   # Loop over years first
   for (j in 1:(queryYears %>% length)) {
     # Log which query ~ 
-    cat(crayon::red(paste0(" ", i, " :: ", queryYears[j], "\n")))
+    cat(crayon::green(paste0("\n ", i, " :: ", queryYears[j], "\n")))
     
     # Read the data from the request
     requestData <- "https://www.skysports.com/" %>% 
@@ -92,7 +94,7 @@ for (i in leagueEndpoints) {
         pb = pb,
         value = k
       )
-      
+
       # Get the html doc
       actualDoc <- fullUrls[k] %>%
         get_html()
@@ -105,8 +107,13 @@ for (i in leagueEndpoints) {
         ) %>%
         xml2::xml_text() %>% 
         gsub(pattern = "\n", replacement = "") %>% 
-        trimws()
+        trimws() %>%
+        as.integer
       
+      if (haScores %>% length %>% `==`(0)) {
+        cat(crayon::red("No details for :", fullUrls[k], "\n\n"))
+        next
+      }
       # Names & Date
       details <- actualDoc %>% 
         xml2::xml_find_all(".//li") %>%
@@ -131,10 +138,14 @@ for (i in leagueEndpoints) {
         as.Date() %>%
         as.character
 
+
       # Set up total.metrics
       total.metrics <- data.frame(
         homeTeam = haTeam[1],
         awayTeam = haTeam[2],
+        homeScore = haScores[1],
+        awayScore = haScores[2],
+        matchResult = if (haScores[1] %>% `>`(haScores[2])) 'W' else if (haScores[1] %>% `<`(haScores[2])) 'L' else 'D',
         matchDate = matchDate,
         season = actualYears[j],
         stringsAsFactors = FALSE
