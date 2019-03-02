@@ -6,5 +6,5 @@
 \usage{
 optimize_variables(total.metrics, GRIDS, optimizeModels = TRUE,
   overwrite = FALSE, types = c("xgboost", "neuralnetwork"),
-  saveModels = c())
+  saveModels = c(), colNames = list(localID = "localID", awayID = "awayID"))
 }

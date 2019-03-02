@@ -4,6 +4,6 @@
 \alias{optimize_sort_ha}
 \title{Optimize Sort HA}
 \usage{
-optimize_sort_ha(homeDat, awayDat, gridPoints, mygrid, boundaries, ha = "h",
+optimize_sort_ha(cFrame, oFrame, gridPoints, mygrid, boundaries, ha = "h",
   decayFactor)
 }

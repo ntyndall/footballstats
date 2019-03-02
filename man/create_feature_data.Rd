@@ -4,5 +4,5 @@
 \alias{create_feature_data}
 \title{Create Feature Data}
 \usage{
-create_feature_data(cFrame, type = "h")
+create_feature_data(cFrame, type = "home")
 }

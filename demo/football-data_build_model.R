@@ -122,6 +122,6 @@ for (i in 1:(fNames %>% length)) {
       )
 
     # Bind it all onto one data frame
-    total.metrics %<>% rbind(new.metrics)
+    total.metrics %<>% rbind(new.metrics$data)
   }
 }
