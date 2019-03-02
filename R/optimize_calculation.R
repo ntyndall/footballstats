@@ -55,7 +55,7 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
       # Get metric data
       analyse.data <- cFrame %>%
         footballstats::create_feature_data(
-          type = if (x == 1) "h" else "a"
+          type = if (x == 1) "home" else "away"
         )
 
       # Get position list
@@ -77,12 +77,12 @@ optimize_calculation <- function(home.away.dat, day, gridPoints, gridBoundary, d
       # Create combination of home and away
       if (totalPer > 0.01) {
         ha.dat <- footballstats::optimize_sort_ha(
-          homeDat = cFrame,
-          awayDat = oFrame,
+          cFrame = cFrame,
+          oFrame = oFrame,
           gridPoints = gridPoints,
           mygrid = mygrid,
           boundaries = boundaries,
-          ha = if (x == 1) "h" else "a",
+          ha = if (x == 1) "home" else "away",
           decayFactor = decayFactor
         )
         agg.data <- ha.dat %>% `*`(totalPer) %>% `+`(agg.data * (1 - totalPer))
@@ -134,68 +134,56 @@ optimize_get_data <- function(positions, cData, gridPoints, mygrid, boundaries, 
 #' @export
 
 
-optimize_sort_ha <- function(homeDat, awayDat, gridPoints, mygrid, boundaries, ha = 'h', decayFactor) {
-  allNames <- homeDat %>% names
+optimize_sort_ha <- function(cFrame, oFrame, gridPoints, mygrid, boundaries, ha = 'h', decayFactor) {
 
-  # Remove til
-  homeDat$til <- NULL
+  d.sets <- list(cFrame, oFrame)
 
-  # Bluff home / away just to get the correct metrics! (as home away doesnt matter now)
-  newAway <- data.frame(
-    matchID = awayDat$matchID,
-    date = awayDat$date,
-    localName = awayDat$awayName,
-    awayName = awayDat$localName,
-    localID = awayDat$awayID,
-    awayID = awayDat$localID,
-    localScore = awayDat$awayScore,
-    awayScore = awayDat$localScore,
-    result = awayDat$result %>% footballstats::flip_res(),
-    stringsAsFactors = FALSE
+  oFrame %>% names -> nuNames
+
+  # Find the consistent team (Brighton) and map it to home
+  cFrame$til <- NULL
+  # Just list all the rules out first!
+
+  # Get standard columns
+  nFrame <- oFrame  %>% `[`(oFrame %>% names %>% grepl(pattern = "^zzz\\."))
+
+  # Map home to away ---
+  nFrame1 <- oFrame %>% `[`(oFrame %>% names %>% grepl(pattern = "^home\\."))
+  names(nFrame1) <- nFrame1 %>% names %>% gsub(pattern = "^home\\.", replacement = "away.")
+
+  nFrame2 <- oFrame %>% `[`(oFrame %>% names %>% grepl(pattern = "\\.h$"))
+  names(nFrame2) <- nFrame2 %>% names %>% gsub(pattern = "\\.h$", replacement = ".a")
+
+  # Map away to home ---
+  nFrame3 <- oFrame %>% `[`(oFrame %>% names %>% grepl(pattern = "^away\\."))
+  names(nFrame3) <- nFrame3 %>% names %>% gsub(pattern = "^away\\.", replacement = "home.")
+
+  nFrame4 <- oFrame %>% `[`(oFrame %>% names %>% grepl(pattern = "\\.a$"))
+  names(nFrame4) <- nFrame4 %>% names %>% gsub(pattern = "\\.a$", replacement = ".h")
+
+  nFrame %<>% cbind(
+    nFrame1, nFrame2, nFrame3, nFrame4
   )
 
-  aStats <- awayDat[ ,c(16:21)]
-  hStats <- awayDat[ ,c(10:15)]
+  # Flip the result of zzz.result!!!
+  nFrame$zzz.result %<>% footballstats::flip_res()
 
-  aNames <- aStats %>% names
-  hNames <- hStats %>% names
-
-  names(hStats) <- aNames
-  names(aStats) <- hNames
-
-  newAway %<>% cbind(
-    hStats,
-    aStats,
-    data.frame(
-      `position.h` = awayDat$position.a,
-      `position.a` = awayDat$position.h,
-      stringsAsFactors = FALSE
-    )
-  )
+  # Now bind them both on!
+  cFrame %<>% rbind(nFrame)
 
   # Order the data frame
-  orderDat <- rbind(homeDat, newAway)
-  orderDat <- orderDat[orderDat$date %>% order, ]
+  cFrame <- cFrame[cFrame$zzz.date %>% order, ]
 
   # Get metrics back
-  analyse.data <- orderDat %>%
-    footballstats::create_feature_data()
-
-  # Rename if looking at away team
-  # (it is fudged to consider home but needs changed back now)
-  if (ha == 'a') {
-    names(analyse.data) <- analyse.data %>%
-      names %>%
-      strsplit(split = '[.]') %>%
-      purrr::map(1) %>%
-      purrr::flatten_chr() %>%
-      paste0('.a')
-  }
+  analyse.data <- cFrame %>%
+    footballstats::create_feature_data(
+      type = ha
+    )
 
   # Adjust with factors
   newDat <- list(
-    posH = orderDat$position.h,
-    posA = orderDat$position.a
+    posH = cFrame$position.h,
+    posA = cFrame$position.a
   ) %>%
     footballstats::optimize_get_data(
       cDat = analyse.data,
@@ -228,19 +216,19 @@ flip_res <- function(x) {
 #' @export
 
 
-create_feature_data <- function(cFrame, type = 'h') {
+create_feature_data <- function(cFrame, type = 'home') {
 
-  # Make sure to get the right information
-  goals <- if (type == 'h') cFrame$localScore else cFrame$awayScore
-  ftRes <- if (type == 'h') cFrame$result else cFrame$result %>% footballstats::flip_res()
-  oGoals <- if (type == 'h') cFrame$awayScore else cFrame$localScore
-  oType <- if (type == 'h') 'a' else 'h'
+  # Get the matching score
+  oType <- if (type == "home") "away" else "home"
+  goals <- cFrame[[paste0(type, ".score")]]
+  ftRes <- if (type == 'home') cFrame$zzz.result else cFrame$zzz.result %>% footballstats::flip_res()
+  oGoals <- cFrame[[paste0(oType, ".score")]]
 
   # Get convinceability
-  if (type == 'h') {
-    gd <- cFrame$localScore %>% as.integer %>% `-`(cFrame$awayScore %>% as.integer)
+  if (type == 'home') {
+    gd <- cFrame$home.score %>% as.integer %>% `-`(cFrame$away.score %>% as.integer)
   } else {
-    gd <- cFrame$awayScore %>% as.integer %>% `-`(cFrame$localScore %>% as.integer)
+    gd <- cFrame$away.score %>% as.integer %>% `-`(cFrame$home.score %>% as.integer)
   }
 
   convince <- sapply(
@@ -267,15 +255,14 @@ create_feature_data <- function(cFrame, type = 'h') {
   featFrame <- data.frame(
     xg = goals %>% as.integer,
     form = ftRes %>% footballstats::form_to_int(),
-    clinical = goals %>% footballstats::take_ratio(y = cFrame[[paste0('shots_ongoal.', type)]]),
-    defensive = oGoals %>% footballstats::take_ratio(y = cFrame[[paste0('shots_ongoal.', oType)]]),
-    shotacc = cFrame[[paste0('shots_ongoal.', type)]] %>% footballstats::take_ratio(y = cFrame[[paste0('shots_total.', type)]]),
-    shotrate = cFrame[[paste0('shots_total.', type)]] %>% footballstats::take_ratio(y = cFrame[[paste0('possesiontime.', type)]]),
+    clinical = goals %>% footballstats::take_ratio(y = cFrame %>% `[[`(paste0(type, ".ontarget"))),
+    defensive = oGoals %>% footballstats::take_ratio(y = cFrame %>% `[[`(paste0(oType, ".ontarget"))),
+    shotacc = cFrame %>% `[[`(paste0(type, ".ontarget")) %>% footballstats::take_ratio(y = cFrame %>% `[[`(paste0(type, ".shots"))),
     convince = convince,
     stringsAsFactors = FALSE
   )
 
-  names(featFrame) <- featFrame %>% names %>% paste0('.', type)
+  names(featFrame) <- paste0(type, ".", featFrame %>% names)
   return(featFrame)
 }
 
