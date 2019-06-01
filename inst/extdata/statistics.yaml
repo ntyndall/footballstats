@@ -1,6 +1,7 @@
 # Example
-# {matchID}:
-#   home: [shots_total, shots_ongoal, possession, fouls, yellowcards, redcards, corners]
+# {season}:
+#   {matchID}:
+#      home: [shots_total, shots_ongoal, possession, fouls, yellowcards, redcards, corners]
 #
 2017:
   2212925: # Tottenham vs. Chelsea | Date = 20/08/17
@@ -892,3 +893,1443 @@
   2389646: # West Bromwich Albion vs. Stoke City | Date = 2018-09-01
     home: [12, 6, 43, 9, 3, 0, 3]
     away: [16, 5, 57, 14, 1, 0, 7]
+  2502607: # Lille vs. Caen | Date = 2018-10-27
+    home: [11, 4, 0, 13, 0, 0, 9]
+    away: [5, 1, 0, 20, 2, 0, 4]
+  2502623: # Angers SCO vs. Montpellier | Date = 2018-11-10
+    home: [10, 3, 0, 16, 1, 0, 5]
+    away: [10, 3, 0, 13, 2, 0, 3]
+  2502649: # Monaco vs. Montpellier | Date = 2018-12-01
+    home: [13, 2, 0, 6, 0, 0, 4]
+    away: [15, 3, 0, 20, 0, 0, 3]
+  2375611: # Angers SCO vs. Lille | Date = 2018-09-01
+    home: [6, 3, 0, 14, 0, 1, 4]
+    away: [17, 4, 0, 8, 1, 0, 5]
+  2502606: # Guingamp vs. Strasbourg | Date = 2018-10-27
+    home: [10, 4, 0, 10, 1, 0, 6]
+    away: [12, 5, 0, 14, 1, 0, 5]
+  2502880: # Olympique Marseille vs. Olympique Lyonnais | Date = 2019-05-12
+    home: [17, 6, 0, 16, 3, 1, 4]
+    away: [15, 5, 0, 11, 1, 0, 1]
+  2375610: # Toulouse vs. Nîmes | Date = 2018-08-25
+    home: [10, 5, 0, 17, 1, 0, 3]
+    away: [9, 0, 0, 21, 3, 0, 3]
+  2502866: # Nantes vs. Dijon | Date = 2019-05-05
+    home: [22, 5, 0, 9, 0, 0, 3]
+    away: [8, 3, 0, 13, 2, 1, 2]
+  2502631: # Toulouse vs. Amiens SC | Date = 2018-11-10
+    home: [23, 6, 0, 11, 3, 0, 7]
+    away: [7, 2, 0, 15, 1, 0, 3]
+  2502656: # Caen vs. Nîmes | Date = 2018-12-05
+    home: [11, 3, 0, 19, 1, 0, 0]
+    away: [23, 7, 0, 14, 3, 0, 6]
+  2375598: # Rennes vs. Angers SCO | Date = 2018-08-18
+    home: [5, 2, 0, 8, 1, 0, 3]
+    away: [7, 0, 0, 11, 2, 0, 0]
+  2502629: # Rennes vs. Nantes | Date = 2018-11-11
+    home: [14, 4, 0, 15, 4, 0, 8]
+    away: [7, 3, 0, 17, 3, 0, 4]
+  2502643: # Angers SCO vs. Caen | Date = 2018-12-01
+    home: [11, 4, 0, 15, 1, 0, 6]
+    away: [8, 3, 0, 8, 2, 0, 2]
+  2502644: # Bordeaux vs. PSG | Date = 2018-12-02
+    home: [18, 4, 0, 12, 1, 0, 4]
+    away: [9, 2, 0, 12, 2, 0, 4]
+  2375609: # PSG vs. Angers SCO | Date = 2018-08-25
+    home: [13, 5, 0, 10, 2, 0, 9]
+    away: [11, 6, 0, 2, 0, 0, 1]
+  2502624: # Bordeaux vs. Caen | Date = 2018-11-11
+    home: [16, 6, 0, 12, 4, 0, 3]
+    away: [9, 1, 0, 14, 3, 0, 6]
+  2502611: # Toulouse vs. Montpellier | Date = 2018-10-27
+    home: [15, 4, 0, 13, 2, 0, 5]
+    away: [22, 8, 0, 13, 1, 0, 7]
+  2502879: # Saint-Étienne vs. Montpellier | Date = 2019-05-10
+    home: [16, 5, 0, 11, 3, 1, 11]
+    away: [11, 4, 0, 18, 4, 1, 1]
+  2502873: # Caen vs. Reims | Date = 2019-05-11
+    home: [14, 10, 0, 7, 1, 0, 4]
+    away: [15, 4, 0, 19, 2, 0, 9]
+  2502652: # Saint-Étienne vs. Nantes | Date = 2018-11-30
+    home: [16, 4, 0, 16, 1, 0, 8]
+    away: [7, 1, 0, 17, 2, 0, 1]
+  2502888: # Saint-Étienne vs. Nice | Date = 2019-05-18
+    home: [11, 5, 0, 17, 0, 0, 2]
+    away: [19, 5, 0, 14, 3, 0, 9]
+  2502660: # Nantes vs. Olympique Marseille | Date = 2018-12-05
+    home: [11, 4, 0, 16, 0, 0, 8]
+    away: [8, 3, 0, 11, 1, 0, 7]
+  2502651: # Rennes vs. Strasbourg | Date = 2018-12-02
+    home: [12, 2, 0, 8, 3, 0, 10]
+    away: [14, 8, 0, 10, 1, 0, 3]
+  2375605: # Olympique Marseille vs. Rennes | Date = 2018-08-26
+    home: [8, 3, 0, 16, 1, 0, 8]
+    away: [7, 2, 0, 15, 1, 0, 4]
+  2502870: # Toulouse vs. Rennes | Date = 2019-05-05
+    home: [19, 4, 0, 20, 3, 0, 6]
+    away: [11, 3, 0, 15, 3, 0, 6]
+  2375606: # Montpellier vs. Saint-Étienne | Date = 2018-08-25
+    home: [14, 1, 0, 12, 3, 0, 6]
+    away: [9, 2, 0, 14, 0, 0, 3]
+  2502878: # Rennes vs. Guingamp | Date = 2019-05-12
+    home: [7, 4, 0, 12, 3, 1, 6]
+    away: [23, 9, 0, 12, 1, 0, 8]
+  2502653: # Toulouse vs. Dijon | Date = 2018-12-02
+    home: [12, 3, 0, 12, 1, 1, 2]
+    away: [14, 5, 0, 17, 3, 0, 5]
+  2375594: # Guingamp vs. PSG | Date = 2018-08-18
+    home: [11, 3, 0, 15, 0, 0, 4]
+    away: [17, 7, 0, 16, 1, 0, 7]
+  2502876: # Nice vs. Nantes | Date = 2019-05-11
+    home: [8, 2, 0, 13, 2, 0, 4]
+    away: [13, 3, 0, 13, 3, 0, 1]
+  2502663: # Strasbourg vs. PSG | Date = 2018-12-05
+    home: [4, 2, 0, 12, 2, 0, 3]
+    away: [20, 5, 0, 14, 3, 0, 11]
+  2502868: # Reims vs. Nîmes | Date = 2019-05-04
+    home: [8, 2, 0, 17, 3, 0, 3]
+    away: [15, 5, 0, 7, 2, 0, 5]
+  2375603: # Lille vs. Guingamp | Date = 2018-08-26
+    home: [13, 7, 0, 13, 2, 0, 4]
+    away: [13, 4, 0, 13, 1, 1, 4]
+  2502886: # Montpellier vs. Nantes | Date = 2019-05-18
+    home: [16, 2, 0, 13, 0, 0, 4]
+    away: [10, 2, 0, 11, 3, 0, 3]
+  2375604: # Olympique Lyonnais vs. Strasbourg | Date = 2018-08-24
+    home: [22, 10, 0, 13, 1, 0, 5]
+    away: [9, 1, 0, 13, 2, 0, 4]
+  2502869: # Strasbourg vs. Olympique Marseille | Date = 2019-05-03
+    home: [7, 4, 0, 12, 1, 0, 0]
+    away: [13, 2, 0, 15, 2, 0, 4]
+  2375599: # Strasbourg vs. Saint-Étienne | Date = 2018-08-19
+    home: [11, 5, 0, 11, 1, 0, 7]
+    away: [9, 2, 0, 7, 2, 1, 2]
+  2502867: # PSG vs. Nice | Date = 2019-05-04
+    home: [17, 5, 0, 15, 2, 0, 9]
+    away: [8, 2, 0, 14, 3, 0, 1]
+  2502650: # Nîmes vs. Amiens SC | Date = 2018-12-01
+    home: [13, 7, 0, 10, 1, 0, 5]
+    away: [9, 2, 0, 12, 4, 0, 2]
+  2502633: # Amiens SC vs. Olympique Marseille | Date = 2018-11-25
+    home: [9, 3, 0, 14, 2, 0, 5]
+    away: [21, 9, 0, 11, 2, 0, 8]
+  2502874: # Dijon vs. Strasbourg | Date = 2019-05-11
+    home: [13, 6, 0, 12, 1, 0, 2]
+    away: [17, 8, 0, 13, 1, 0, 7]
+  2502887: # PSG vs. Dijon | Date = 2019-05-18
+    home: [17, 7, 0, 13, 1, 0, 2]
+    away: [13, 3, 0, 4, 1, 0, 5]
+  2502662: # Reims vs. Toulouse | Date = 2018-12-05
+    home: [22, 7, 0, 15, 3, 0, 10]
+    away: [7, 3, 0, 22, 6, 1, 3]
+  2502608: # Monaco vs. Dijon | Date = 2018-10-27
+    home: [12, 5, 0, 15, 2, 0, 6]
+    away: [11, 3, 0, 14, 3, 0, 4]
+  2502628: # Nîmes vs. Nice | Date = 2018-11-10
+    home: [8, 3, 0, 11, 4, 2, 4]
+    away: [13, 8, 0, 16, 5, 0, 6]
+  2375592: # Caen vs. Nice | Date = 2018-08-18
+    home: [13, 4, 0, 22, 2, 0, 5]
+    away: [16, 5, 0, 11, 2, 0, 10]
+  2502657: # Dijon vs. Guingamp | Date = 2018-12-05
+    home: [9, 3, 0, 19, 6, 1, 2]
+    away: [21, 9, 0, 17, 1, 0, 9]
+  2502547: # Montpellier vs. Nice | Date = 2018-09-22
+    home: [12, 5, 0, 14, 3, 0, 6]
+    away: [9, 2, 0, 11, 2, 0, 5]
+  2502632: # Monaco vs. PSG | Date = 2018-11-11
+    home: [15, 2, 0, 15, 0, 0, 6]
+    away: [14, 9, 0, 10, 0, 0, 9]
+  2502550: # Saint-Étienne vs. Caen | Date = 2018-09-22
+    home: [23, 7, 0, 3, 2, 0, 9]
+    away: [9, 2, 0, 20, 3, 0, 6]
+  2375608: # Nice vs. Dijon | Date = 2018-08-25
+    home: [16, 3, 0, 11, 2, 0, 5]
+    away: [9, 5, 0, 19, 3, 0, 3]
+  2502627: # Olympique Marseille vs. Dijon | Date = 2018-11-11
+    home: [16, 3, 0, 9, 0, 0, 10]
+    away: [9, 3, 0, 17, 2, 0, 4]
+  2375600: # Toulouse vs. Bordeaux | Date = 2018-08-19
+    home: [13, 5, 0, 10, 1, 0, 1]
+    away: [15, 8, 0, 11, 1, 0, 2]
+  2375601: # Amiens SC vs. Reims | Date = 2018-08-25
+    home: [14, 8, 0, 18, 1, 0, 4]
+    away: [7, 3, 0, 17, 1, 1, 2]
+  2502605: # Bordeaux vs. Nice | Date = 2018-10-28
+    home: [23, 7, 0, 13, 2, 0, 5]
+    away: [13, 2, 0, 13, 3, 0, 2]
+  2502862: # Guingamp vs. Caen | Date = 2019-05-04
+    home: [10, 1, 0, 24, 1, 0, 5]
+    away: [1, 0, 0, 14, 4, 0, 0]
+  2375591: # Amiens SC vs. Montpellier | Date = 2018-08-18
+    home: [11, 2, 0, 15, 1, 0, 6]
+    away: [7, 3, 0, 15, 3, 0, 2]
+  2502871: # Amiens SC vs. Toulouse | Date = 2019-05-11
+    home: [19, 3, 0, 13, 2, 0, 3]
+    away: [7, 2, 0, 21, 4, 0, 3]
+  2502604: # Angers SCO vs. Olympique Lyonnais | Date = 2018-10-27
+    home: [14, 4, 0, 9, 2, 1, 7]
+    away: [9, 5, 0, 10, 5, 0, 0]
+  2375597: # Reims vs. Olympique Lyonnais | Date = 2018-08-17
+    home: [7, 2, 0, 11, 2, 0, 0]
+    away: [19, 5, 0, 10, 0, 0, 4]
+  2502884: # Olympique Lyonnais vs. Caen | Date = 2019-05-18
+    home: [16, 8, 0, 10, 3, 0, 4]
+    away: [7, 2, 0, 11, 1, 0, 4]
+  2375619: # Strasbourg vs. Nantes | Date = 2018-09-01
+    home: [10, 5, 0, 12, 1, 0, 1]
+    away: [14, 5, 0, 12, 2, 0, 3]
+  2502872: # Angers SCO vs. PSG | Date = 2019-05-11
+    home: [14, 4, 0, 27, 0, 0, 2]
+    away: [9, 4, 0, 18, 0, 1, 3]
+  2375615: # Nîmes vs. PSG | Date = 2018-09-01
+    home: [14, 6, 0, 12, 1, 1, 3]
+    away: [7, 5, 0, 11, 3, 1, 4]
+  2502865: # Montpellier vs. Amiens SC | Date = 2019-05-05
+    home: [13, 4, 0, 14, 1, 0, 5]
+    away: [4, 1, 0, 22, 2, 0, 0]
+  2502612: # Olympique Marseille vs. PSG | Date = 2018-10-28
+    home: [12, 2, 0, 8, 4, 0, 5]
+    away: [11, 5, 0, 11, 2, 0, 7]
+  2375670: # PSG vs. Olympique Lyonnais | Date = 2018-10-07
+    home: [14, 8, 0, 11, 2, 1, 2]
+    away: [16, 6, 0, 16, 4, 1, 10]
+  2502882: # Guingamp vs. Nîmes | Date = 2019-05-18
+    home: [18, 9, 0, 17, 2, 0, 5]
+    away: [21, 4, 0, 12, 2, 0, 5]
+  2502534: # Olympique Marseille vs. Guingamp | Date = 2018-09-16
+    home: [17, 6, 0, 7, 1, 0, 8]
+    away: [2, 0, 0, 9, 1, 0, 1]
+  2375640: # Olympique Lyonnais vs. Olympique Marseille | Date = 2018-09-23
+    home: [17, 5, 0, 7, 1, 0, 3]
+    away: [9, 3, 0, 12, 2, 1, 7]
+  2502603: # Amiens SC vs. Nantes | Date = 2018-10-27
+    home: [18, 8, 0, 16, 1, 0, 10]
+    away: [12, 5, 0, 10, 2, 0, 2]
+  2502889: # Strasbourg vs. Rennes | Date = 2019-05-18
+    home: [19, 6, 0, 10, 1, 0, 11]
+    away: [11, 6, 0, 14, 2, 0, 1]
+  2502890: # Toulouse vs. Olympique Marseille | Date = 2019-05-18
+    home: [19, 5, 0, 4, 1, 0, 5]
+    away: [21, 8, 0, 11, 2, 0, 9]
+  2375607: # Nantes vs. Caen | Date = 2018-08-25
+    home: [16, 3, 0, 16, 2, 0, 3]
+    away: [3, 2, 0, 16, 3, 1, 1]
+  2502863: # Olympique Lyonnais vs. Lille | Date = 2019-05-05
+    home: [20, 8, 0, 13, 0, 0, 5]
+    away: [13, 6, 0, 18, 2, 0, 4]
+  2502645: # Guingamp vs. Nice | Date = 2018-12-01
+    home: [12, 2, 0, 6, 1, 0, 4]
+    away: [10, 1, 0, 11, 1, 0, 1]
+  2502861: # Bordeaux vs. Angers SCO | Date = 2019-05-04
+    home: [10, 2, 0, 17, 2, 0, 5]
+    away: [9, 1, 0, 14, 0, 0, 1]
+  2502543: # Angers SCO vs. Toulouse | Date = 2018-09-22
+    home: [16, 4, 0, 14, 1, 0, 4]
+    away: [7, 0, 0, 14, 2, 0, 4]
+  2502877: # Nîmes vs. Monaco | Date = 2019-05-11
+    home: [12, 4, 0, 19, 1, 0, 5]
+    away: [12, 5, 0, 19, 4, 0, 9]
+  2502646: # Lille vs. Olympique Lyonnais | Date = 2018-12-01
+    home: [13, 6, 0, 14, 2, 0, 4]
+    away: [18, 5, 0, 8, 1, 0, 6]
+  2502875: # Lille vs. Bordeaux | Date = 2019-05-12
+    home: [6, 4, 0, 6, 2, 0, 3]
+    away: [5, 1, 0, 12, 4, 1, 4]
+  2375602: # Bordeaux vs. Monaco | Date = 2018-08-26
+    home: [14, 6, 0, 10, 1, 0, 5]
+    away: [15, 5, 0, 14, 2, 0, 8]
+  2375613: # Guingamp vs. Toulouse | Date = 2018-09-01
+    home: [23, 5, 0, 12, 3, 0, 11]
+    away: [5, 4, 0, 13, 2, 1, 4]
+  2502885: # Monaco vs. Amiens SC | Date = 2019-05-18
+    home: [10, 3, 0, 22, 5, 0, 4]
+    away: [9, 3, 0, 13, 2, 0, 5]
+  2502545: # Lille vs. Nantes | Date = 2018-09-22
+    home: [11, 8, 0, 15, 3, 0, 4]
+    away: [11, 4, 0, 12, 4, 0, 1]
+  2502864: # Monaco vs. Saint-Étienne | Date = 2019-05-05
+    home: [13, 5, 0, 12, 3, 0, 2]
+    away: [8, 3, 0, 16, 5, 0, 8]
+  2502648: # Olympique Marseille vs. Reims | Date = 2018-12-02
+    home: [16, 5, 0, 16, 2, 0, 13]
+    away: [12, 4, 0, 12, 1, 0, 1]
+  2502658: # Olympique Lyonnais vs. Rennes | Date = 2018-12-05
+    home: [15, 8, 0, 14, 1, 0, 5]
+    away: [10, 2, 0, 12, 0, 0, 2]
+  2502551: # Strasbourg vs. Amiens SC | Date = 2018-09-22
+    home: [13, 6, 0, 16, 1, 0, 1]
+    away: [8, 3, 0, 13, 4, 0, 1]
+  2502883: # Lille vs. Angers SCO | Date = 2019-05-18
+    home: [18, 12, 0, 13, 1, 0, 3]
+    away: [13, 3, 0, 12, 3, 0, 6]
+  2502881: # Bordeaux vs. Reims | Date = 2019-05-18
+    home: [13, 4, 0, 11, 0, 0, 10]
+    away: [9, 2, 0, 15, 1, 0, 0]
+  2375612: # Dijon vs. Caen | Date = 2018-09-01
+    home: [15, 2, 0, 11, 0, 0, 9]
+    away: [9, 4, 0, 13, 3, 0, 5]
+  2502630: # Saint-Étienne vs. Reims | Date = 2018-11-10
+    home: [14, 5, 0, 10, 3, 0, 5]
+    away: [14, 3, 0, 21, 1, 0, 6]
+  2375593: # Dijon vs. Nantes | Date = 2018-08-18
+    home: [14, 7, 0, 18, 0, 0, 3]
+    away: [7, 0, 0, 13, 1, 1, 4]
+  2375616: # Reims vs. Montpellier | Date = 2018-09-01
+    home: [21, 6, 0, 11, 0, 0, 5]
+    away: [9, 3, 0, 11, 0, 0, 5]
+  2375595: # Monaco vs. Lille | Date = 2018-08-18
+    home: [10, 1, 0, 10, 0, 0, 8]
+    away: [13, 4, 0, 14, 0, 0, 4]
+  2502655: # Bordeaux vs. Saint-Étienne | Date = 2018-12-05
+    home: [13, 5, 0, 13, 2, 0, 3]
+    away: [14, 4, 0, 12, 3, 0, 7]
+  2375596: # Nîmes vs. Olympique Marseille | Date = 2018-08-19
+    home: [14, 7, 0, 11, 3, 0, 6]
+    away: [10, 5, 0, 11, 1, 0, 7]
+  2502548: # Reims vs. Dijon | Date = 2018-09-22
+    home: [11, 2, 0, 15, 1, 0, 9]
+    away: [6, 0, 0, 14, 1, 0, 3]
+  2398290: # Konyaspor vs. BB Erzurumspor | Date = 2018-08-12
+    home: [16, 9, 0, 11, 1, 0, 4]
+    away: [6, 4, 0, 14, 2, 0, 7]
+  2504159: # BB Erzurumspor vs. Fenerbahçe | Date = 2019-05-20
+    home: [14, 3, 0, 8, 4, 0, 8]
+    away: [10, 3, 0, 13, 5, 0, 2]
+  2504020: # Göztepe vs. Trabzonspor | Date = 2019-02-22
+    home: [8, 1, 0, 13, 2, 0, 10]
+    away: [13, 6, 0, 9, 1, 0, 3]
+  2504150: # Antalyaspor vs. Bursaspor | Date = 2019-05-10
+    home: [3, 1, 0, 13, 4, 1, 0]
+    away: [16, 5, 0, 20, 3, 0, 8]
+  2503932: # Sivasspor vs. Rizespor | Date = 2018-11-25
+    home: [25, 6, 0, 14, 2, 1, 19]
+    away: [9, 4, 0, 7, 3, 0, 3]
+  2503899: # Trabzonspor vs. BB Erzurumspor | Date = 2018-10-22
+    home: [13, 1, 0, 10, 1, 0, 7]
+    away: [10, 4, 0, 14, 3, 0, 5]
+  2503998: # Yeni Malatyaspor vs. Kayserispor | Date = 2019-02-02
+    home: [7, 5, 0, 11, 0, 0, 4]
+    away: [7, 4, 0, 16, 3, 0, 3]
+  2504072: # Beşiktaş vs. İstanbul Başakşehir | Date = 2019-04-13
+    home: [15, 6, 0, 16, 2, 0, 10]
+    away: [13, 5, 0, 18, 2, 0, 4]
+  2504146: # Yeni Malatyaspor vs. BB Erzurumspor | Date = 2019-05-12
+    home: [15, 9, 0, 16, 3, 0, 4]
+    away: [21, 5, 0, 18, 3, 0, 9]
+  2503988: # Ankaragücü vs. Alanyaspor | Date = 2019-01-28
+    home: [8, 3, 0, 14, 5, 0, 4]
+    away: [10, 3, 0, 21, 1, 0, 3]
+  2503876: # Rizespor vs. Fenerbahçe | Date = 2018-09-30
+    home: [9, 4, 0, 11, 1, 0, 5]
+    away: [17, 5, 0, 15, 1, 0, 7]
+  2504042: # Göztepe vs. Kasımpaşa | Date = 2019-03-10
+    home: [12, 2, 0, 14, 1, 0, 7]
+    away: [4, 2, 0, 25, 3, 0, 1]
+  2503850: # İstanbul Başakşehir vs. Akhisarspor | Date = 2018-08-27
+    home: [17, 9, 0, 12, 0, 0, 4]
+    away: [4, 1, 0, 7, 1, 0, 1]
+  2503867: # Trabzonspor vs. Göztepe | Date = 2018-09-22
+    home: [13, 5, 0, 12, 2, 0, 4]
+    away: [5, 2, 0, 12, 4, 0, 2]
+  2503862: # İstanbul Başakşehir vs. Antalyaspor | Date = 2018-09-16
+    home: [15, 6, 0, 11, 0, 0, 4]
+    away: [8, 3, 0, 8, 2, 0, 2]
+  2504151: # Alanyaspor vs. Rizespor | Date = 2019-05-19
+    home: [16, 5, 0, 14, 3, 0, 5]
+    away: [12, 3, 0, 17, 1, 0, 6]
+  2504112: # Bursaspor vs. Akhisarspor | Date = 2019-04-28
+    home: [20, 2, 0, 17, 1, 0, 7]
+    away: [11, 2, 0, 14, 3, 0, 4]
+  2503955: # Bursaspor vs. Antalyaspor | Date = 2018-12-09
+    home: [13, 4, 0, 21, 4, 0, 9]
+    away: [6, 3, 0, 11, 1, 0, 0]
+  2504156: # Galatasaray vs. İstanbul Başakşehir | Date = 2019-05-19
+    home: [15, 4, 0, 14, 4, 0, 8]
+    away: [5, 2, 0, 12, 3, 0, 1]
+  2504101: # Beşiktaş vs. Ankaragücü | Date = 2019-04-28
+    home: [10, 5, 0, 15, 2, 0, 2]
+    away: [15, 8, 0, 18, 3, 0, 9]
+  2503930: # Trabzonspor vs. Fenerbahçe | Date = 2018-11-25
+    home: [26, 8, 0, 11, 3, 0, 6]
+    away: [11, 3, 0, 17, 3, 0, 6]
+  2503950: # Sivasspor vs. Göztepe | Date = 2018-12-08
+    home: [15, 6, 0, 13, 3, 0, 7]
+    away: [7, 1, 0, 13, 4, 1, 3]
+  2503991: # Fenerbahçe vs. Yeni Malatyaspor | Date = 2019-01-28
+    home: [19, 8, 0, 21, 6, 0, 6]
+    away: [8, 4, 0, 20, 4, 0, 4]
+  2503943: # Beşiktaş vs. Galatasaray | Date = 2018-12-02
+    home: [14, 5, 0, 21, 4, 0, 6]
+    away: [10, 2, 0, 14, 4, 0, 5]
+  2503890: # Konyaspor vs. Beşiktaş | Date = 2018-10-07
+    home: [15, 5, 0, 18, 6, 0, 9]
+    away: [7, 4, 0, 10, 7, 1, 4]
+  2504055: # Sivasspor vs. Kayserispor | Date = 2019-04-06
+    home: [17, 8, 0, 14, 2, 0, 4]
+    away: [10, 8, 0, 14, 3, 0, 4]
+  2503946: # Fenerbahçe vs. Kasımpaşa | Date = 2018-12-03
+    home: [21, 3, 0, 11, 3, 0, 8]
+    away: [16, 3, 0, 19, 1, 0, 2]
+  2398302: # Yeni Malatyaspor vs. Fenerbahçe | Date = 2018-08-18
+    home: [14, 2, 0, 14, 2, 0, 2]
+    away: [13, 4, 0, 9, 0, 0, 3]
+  2504058: # Trabzonspor vs. Antalyaspor | Date = 2019-04-05
+    home: [21, 7, 0, 12, 1, 0, 8]
+    away: [12, 3, 0, 12, 1, 0, 1]
+  2504148: # Konyaspor vs. Trabzonspor | Date = 2019-05-12
+    home: [7, 4, 0, 13, 4, 0, 5]
+    away: [19, 6, 0, 11, 1, 0, 5]
+  2398306: # Ankaragücü vs. Trabzonspor | Date = 2018-08-25
+    home: [15, 6, 0, 11, 2, 0, 5]
+    away: [9, 7, 0, 12, 2, 0, 9]
+  2504094: # İstanbul Başakşehir vs. Rizespor | Date = 2019-04-21
+    home: [16, 5, 0, 14, 0, 0, 7]
+    away: [9, 1, 0, 19, 4, 0, 2]
+  2503863: # Rizespor vs. Bursaspor | Date = 2018-09-16
+    home: [12, 5, 0, 25, 0, 0, 3]
+    away: [9, 4, 0, 19, 2, 0, 3]
+  2504037: # Sivasspor vs. Yeni Malatyaspor | Date = 2019-03-08
+    home: [13, 5, 0, 18, 1, 0, 6]
+    away: [10, 3, 0, 17, 3, 0, 9]
+  2503977: # Alanyaspor vs. Sivasspor | Date = 2019-01-20
+    home: [19, 8, 0, 13, 0, 0, 8]
+    away: [9, 0, 0, 15, 3, 0, 2]
+  2503843: # Alanyaspor vs. Ankaragücü | Date = 2018-08-19
+    home: [19, 5, 0, 19, 3, 1, 6]
+    away: [5, 4, 0, 15, 6, 1, 2]
+  2504122: # Ankaragücü vs. Rizespor | Date = 2019-05-04
+    home: [10, 3, 0, 15, 5, 0, 7]
+    away: [16, 5, 0, 13, 2, 0, 4]
+  2503967: # Galatasaray vs. Sivasspor | Date = 2018-12-23
+    home: [15, 5, 0, 18, 2, 0, 7]
+    away: [16, 7, 0, 4, 2, 0, 5]
+  2504085: # Kasımpaşa vs. Bursaspor | Date = 2019-04-19
+    home: [10, 2, 0, 16, 2, 0, 3]
+    away: [17, 5, 0, 15, 1, 0, 4]
+  2503918: # Alanyaspor vs. Yeni Malatyaspor | Date = 2018-11-04
+    home: [17, 6, 0, 20, 2, 0, 10]
+    away: [2, 1, 0, 20, 3, 0, 0]
+  2503905: # Antalyaspor vs. Trabzonspor | Date = 2018-10-27
+    home: [12, 7, 0, 14, 2, 0, 5]
+    away: [11, 4, 0, 15, 1, 0, 3]
+  2503936: # Galatasaray vs. Konyaspor | Date = 2018-11-23
+    home: [13, 2, 0, 12, 1, 1, 0]
+    away: [8, 2, 0, 14, 3, 0, 3]
+  2503885: # BB Erzurumspor vs. Alanyaspor | Date = 2018-10-06
+    home: [13, 4, 0, 10, 2, 0, 6]
+    away: [6, 1, 0, 15, 2, 0, 5]
+  2503878: # Sivasspor vs. Bursaspor | Date = 2018-09-30
+    home: [9, 3, 0, 23, 2, 0, 5]
+    away: [7, 3, 0, 14, 4, 0, 6]
+  2503987: # İstanbul Başakşehir vs. Kasımpaşa | Date = 2019-01-28
+    home: [16, 5, 0, 18, 2, 0, 7]
+    away: [9, 2, 0, 9, 0, 0, 2]
+  2397579: # İstanbul Başakşehir vs. Trabzonspor | Date = 2018-08-12
+    home: [15, 5, 0, 16, 2, 0, 9]
+    away: [8, 0, 0, 15, 2, 0, 2]
+  2503944: # Konyaspor vs. Alanyaspor | Date = 2018-11-30
+    home: [9, 4, 0, 10, 3, 0, 2]
+    away: [8, 2, 0, 10, 2, 1, 3]
+  2503975: # Trabzonspor vs. İstanbul Başakşehir | Date = 2019-01-20
+    home: [20, 10, 0, 17, 3, 0, 8]
+    away: [10, 8, 0, 15, 2, 0, 4]
+  2503960: # Sivasspor vs. Ankaragücü | Date = 2018-12-15
+    home: [19, 8, 0, 13, 1, 0, 9]
+    away: [10, 4, 0, 12, 4, 0, 6]
+  2503898: # Rizespor vs. Konyaspor | Date = 2018-10-21
+    home: [9, 3, 0, 20, 2, 1, 3]
+    away: [14, 4, 0, 21, 0, 0, 7]
+  2397581: # Rizespor vs. Kasımpaşa | Date = 2018-08-11
+    home: [8, 5, 0, 13, 2, 0, 3]
+    away: [14, 6, 0, 14, 1, 0, 6]
+  2503948: # Akhisarspor vs. Fenerbahçe | Date = 2018-12-09
+    home: [12, 4, 0, 13, 2, 0, 2]
+    away: [16, 4, 0, 7, 1, 0, 7]
+  2504149: # Rizespor vs. Galatasaray | Date = 2019-05-11
+    home: [13, 3, 0, 17, 5, 1, 3]
+    away: [12, 5, 0, 10, 1, 0, 1]
+  2504050: # Fenerbahçe vs. Sivasspor | Date = 2019-03-15
+    home: [15, 5, 0, 10, 3, 0, 9]
+    away: [11, 2, 0, 20, 2, 0, 7]
+  2504074: # BB Erzurumspor vs. Akhisarspor | Date = 2019-04-15
+    home: [16, 5, 0, 11, 1, 0, 6]
+    away: [13, 8, 0, 9, 2, 0, 3]
+  2504048: # Bursaspor vs. Galatasaray | Date = 2019-03-17
+    home: [13, 5, 0, 13, 2, 0, 5]
+    away: [9, 3, 0, 8, 6, 0, 3]
+  2503853: # BB Erzurumspor vs. İstanbul Başakşehir | Date = 2018-09-02
+    home: [16, 3, 0, 13, 3, 0, 8]
+    away: [5, 2, 0, 11, 1, 0, 2]
+  2504158: # Kasımpaşa vs. Konyaspor | Date = 2019-05-17
+    home: [18, 3, 0, 13, 1, 0, 6]
+    away: [12, 4, 0, 9, 1, 0, 7]
+  2503913: # Göztepe vs. Rizespor | Date = 2018-11-05
+    home: [12, 6, 0, 11, 0, 0, 6]
+    away: [13, 2, 0, 8, 1, 0, 13]
+  2398303: # Göztepe vs. Fenerbahçe | Date = 2018-08-25
+    home: [5, 1, 0, 16, 2, 0, 4]
+    away: [9, 1, 0, 16, 1, 0, 5]
+  2504034: # Akhisarspor vs. Alanyaspor | Date = 2019-03-04
+    home: [8, 4, 0, 20, 1, 0, 5]
+    away: [8, 1, 0, 21, 2, 0, 4]
+  2397576: # Ankaragücü vs. Galatasaray | Date = 2018-08-10
+    home: [3, 1, 0, 15, 2, 0, 2]
+    away: [12, 4, 0, 9, 2, 0, 4]
+  2503892: # Bursaspor vs. Ankaragücü | Date = 2018-10-06
+    home: [13, 5, 0, 19, 1, 0, 10]
+    away: [7, 2, 0, 11, 0, 0, 5]
+  2503866: # Kasımpaşa vs. Alanyaspor | Date = 2018-09-23
+    home: [24, 6, 0, 14, 2, 0, 7]
+    away: [8, 3, 0, 17, 3, 0, 0]
+  2503888: # Akhisarspor vs. Trabzonspor | Date = 2018-10-07
+    home: [11, 4, 0, 15, 1, 0, 5]
+    away: [10, 4, 0, 16, 3, 0, 5]
+  2504059: # Kasımpaşa vs. BB Erzurumspor | Date = 2019-04-07
+    home: [19, 5, 0, 15, 1, 0, 6]
+    away: [13, 3, 0, 11, 1, 0, 4]
+  2503934: # Akhisarspor vs. Bursaspor | Date = 2018-11-25
+    home: [6, 3, 0, 13, 0, 0, 3]
+    away: [19, 7, 0, 11, 2, 0, 7]
+  2503840: # Trabzonspor vs. Sivasspor | Date = 2018-08-17
+    home: [10, 8, 0, 12, 1, 0, 8]
+    away: [12, 3, 0, 19, 4, 0, 5]
+  2504053: # Antalyaspor vs. Alanyaspor | Date = 2019-03-16
+    home: [9, 4, 0, 17, 3, 0, 1]
+    away: [12, 5, 0, 10, 2, 0, 5]
+  2398317: # Trabzonspor vs. Galatasaray | Date = 2018-09-01
+    home: [13, 6, 0, 11, 2, 0, 1]
+    away: [8, 0, 0, 7, 1, 1, 1]
+  2503994: # Antalyaspor vs. Beşiktaş | Date = 2019-02-03
+    home: [11, 4, 0, 12, 3, 0, 7]
+    away: [13, 7, 0, 14, 2, 0, 7]
+  2503942: # Antalyaspor vs. Göztepe | Date = 2018-12-01
+    home: [8, 4, 0, 17, 1, 0, 6]
+    away: [15, 3, 0, 17, 1, 0, 4]
+  2504088: # Trabzonspor vs. Yeni Malatyaspor | Date = 2019-04-20
+    home: [20, 8, 0, 13, 2, 0, 7]
+    away: [11, 3, 0, 15, 3, 1, 3]
+  2503854: # Kasımpaşa vs. Ankaragücü | Date = 2018-09-02
+    home: [10, 4, 0, 8, 1, 0, 5]
+    away: [15, 7, 0, 11, 3, 0, 6]
+  2503981: # Bursaspor vs. Fenerbahçe | Date = 2019-01-21
+    home: [13, 4, 0, 18, 4, 0, 3]
+    away: [5, 3, 0, 18, 2, 0, 7]
+  2504153: # Bursaspor vs. Göztepe | Date = 2019-05-19
+    home: [14, 3, 0, 19, 3, 0, 5]
+    away: [2, 1, 0, 10, 1, 0, 2]
+  2503904: # Yeni Malatyaspor vs. Galatasaray | Date = 2018-10-28
+    home: [12, 5, 0, 16, 2, 0, 5]
+    away: [14, 2, 0, 13, 1, 0, 5]
+  2504032: # Yeni Malatyaspor vs. İstanbul Başakşehir | Date = 2019-03-03
+    home: [9, 2, 0, 10, 2, 0, 4]
+    away: [9, 5, 0, 12, 3, 0, 3]
+  2503909: # Konyaspor vs. İstanbul Başakşehir | Date = 2018-10-27
+    home: [9, 1, 0, 11, 1, 0, 3]
+    away: [7, 4, 0, 15, 0, 0, 2]
+  2503886: # Fenerbahçe vs. İstanbul Başakşehir | Date = 2018-10-07
+    home: [16, 4, 0, 15, 5, 0, 7]
+    away: [9, 3, 0, 16, 4, 0, 6]
+  2504132: # Galatasaray vs. Beşiktaş | Date = 2019-05-05
+    home: [16, 7, 0, 14, 2, 0, 5]
+    away: [14, 5, 0, 17, 7, 0, 3]
+  2503947: # Ankaragücü vs. İstanbul Başakşehir | Date = 2018-12-10
+    home: [8, 1, 0, 10, 0, 0, 0]
+    away: [15, 8, 0, 14, 1, 0, 7]
+  2504036: # Konyaspor vs. Göztepe | Date = 2019-03-03
+    home: [13, 7, 0, 14, 3, 0, 3]
+    away: [12, 2, 0, 11, 4, 1, 5]
+  2503925: # BB Erzurumspor vs. Göztepe | Date = 2018-11-10
+    home: [7, 4, 0, 14, 2, 0, 2]
+    away: [9, 3, 0, 9, 2, 0, 6]
+  2503995: # Trabzonspor vs. Ankaragücü | Date = 2019-02-02
+    home: [21, 8, 0, 19, 4, 0, 2]
+    away: [13, 5, 0, 17, 3, 0, 5]
+  2504098: # Alanyaspor vs. Fenerbahçe | Date = 2019-04-21
+    home: [25, 8, 0, 12, 0, 0, 10]
+    away: [7, 1, 0, 14, 1, 0, 4]
+  2503999: # Alanyaspor vs. Galatasaray | Date = 2019-02-02
+    home: [13, 7, 0, 22, 3, 0, 2]
+    away: [5, 3, 0, 18, 5, 0, 3]
+  2504009: # Konyaspor vs. Yeni Malatyaspor | Date = 2019-02-10
+    home: [8, 4, 0, 12, 0, 0, 4]
+    away: [8, 3, 0, 18, 0, 0, 1]
+  2503858: # Alanyaspor vs. Trabzonspor | Date = 2018-09-17
+    home: [16, 7, 0, 19, 1, 0, 4]
+    away: [11, 5, 0, 9, 2, 0, 6]
+  2504057: # Galatasaray vs. Yeni Malatyaspor | Date = 2019-04-06
+    home: [25, 6, 0, 9, 2, 0, 12]
+    away: [8, 2, 0, 14, 2, 0, 1]
+  2503962: # Beşiktaş vs. Trabzonspor | Date = 2018-12-16
+    home: [18, 8, 0, 16, 3, 0, 10]
+    away: [14, 7, 0, 14, 1, 0, 8]
+  2503873: # Fenerbahçe vs. Beşiktaş | Date = 2018-09-24
+    home: [13, 7, 0, 13, 1, 0, 2]
+    away: [11, 4, 0, 16, 5, 1, 7]
+  2504019: # Alanyaspor vs. Kasımpaşa | Date = 2019-02-23
+    home: [19, 9, 0, 16, 3, 0, 5]
+    away: [5, 2, 0, 16, 2, 1, 6]
+  2504011: # Trabzonspor vs. Alanyaspor | Date = 2019-02-17
+    home: [13, 2, 0, 17, 1, 0, 4]
+    away: [10, 6, 0, 17, 2, 0, 2]
+  2504018: # Fenerbahçe vs. Konyaspor | Date = 2019-02-16
+    home: [17, 3, 0, 16, 3, 0, 11]
+    away: [3, 2, 0, 10, 1, 1, 3]
+  2503990: # Rizespor vs. Akhisarspor | Date = 2019-01-27
+    home: [25, 6, 0, 16, 2, 0, 6]
+    away: [9, 4, 0, 13, 1, 1, 1]
+  2504017: # Yeni Malatyaspor vs. Beşiktaş | Date = 2019-02-15
+    home: [4, 1, 0, 8, 1, 1, 3]
+    away: [18, 7, 0, 20, 1, 0, 10]
+  2504014: # BB Erzurumspor vs. Sivasspor | Date = 2019-02-17
+    home: [12, 6, 0, 15, 2, 0, 2]
+    away: [18, 6, 0, 13, 5, 0, 5]
+  2503900: # Alanyaspor vs. Antalyaspor | Date = 2018-10-21
+    home: [12, 0, 0, 15, 3, 1, 7]
+    away: [10, 3, 0, 14, 4, 0, 4]
+  2504120: # Sivasspor vs. İstanbul Başakşehir | Date = 2019-05-03
+    home: [5, 1, 0, 15, 3, 0, 2]
+    away: [12, 5, 0, 16, 4, 0, 9]
+  2503964: # Fenerbahçe vs. BB Erzurumspor | Date = 2018-12-17
+    home: [14, 5, 0, 11, 0, 0, 7]
+    away: [6, 3, 0, 17, 3, 0, 1]
+  2504049: # Yeni Malatyaspor vs. Ankaragücü | Date = 2019-03-17
+    home: [8, 4, 0, 12, 2, 0, 4]
+    away: [11, 3, 0, 15, 2, 0, 4]
+  2503879: # İstanbul Başakşehir vs. Yeni Malatyaspor | Date = 2018-10-01
+    home: [14, 6, 0, 11, 2, 0, 12]
+    away: [11, 3, 0, 9, 2, 0, 2]
+  2503889: # Kasımpaşa vs. Göztepe | Date = 2018-10-05
+    home: [19, 5, 0, 16, 1, 0, 6]
+    away: [12, 5, 0, 9, 0, 0, 5]
+  2503861: # Sivasspor vs. BB Erzurumspor | Date = 2018-09-16
+    home: [20, 7, 0, 12, 0, 0, 3]
+    away: [11, 5, 0, 10, 2, 0, 2]
+  2503953: # Trabzonspor vs. Konyaspor | Date = 2018-12-08
+    home: [18, 6, 0, 13, 2, 0, 5]
+    away: [7, 2, 0, 13, 3, 0, 2]
+  2504031: # Bursaspor vs. Sivasspor | Date = 2019-03-02
+    home: [12, 5, 0, 21, 3, 0, 7]
+    away: [4, 3, 0, 10, 1, 0, 1]
+  2503907: # Akhisarspor vs. Göztepe | Date = 2018-10-29
+    home: [11, 4, 0, 18, 3, 0, 3]
+    away: [13, 3, 0, 14, 4, 0, 3]
+  2503968: # Antalyaspor vs. Fenerbahçe | Date = 2018-12-24
+    home: [7, 3, 0, 12, 1, 0, 2]
+    away: [19, 6, 0, 11, 4, 1, 9]
+  2503846: # Rizespor vs. BB Erzurumspor | Date = 2018-08-24
+    home: [9, 2, 0, 9, 1, 0, 4]
+    away: [11, 3, 0, 20, 1, 0, 7]
+  2504047: # Akhisarspor vs. Kasımpaşa | Date = 2019-03-16
+    home: [15, 7, 0, 11, 1, 0, 7]
+    away: [16, 7, 0, 15, 0, 0, 6]
+  2504067: # Kayserispor vs. Ankaragücü | Date = 2019-04-14
+    home: [12, 3, 0, 6, 0, 0, 2]
+    away: [12, 6, 0, 13, 1, 0, 6]
+  2503980: # Antalyaspor vs. Kayserispor | Date = 2019-01-19
+    home: [3, 0, 0, 13, 0, 0, 2]
+    away: [16, 2, 0, 13, 1, 0, 6]
+  2503963: # Konyaspor vs. Kasımpaşa | Date = 2018-12-15
+    home: [10, 3, 0, 9, 2, 0, 3]
+    away: [20, 6, 0, 10, 6, 0, 8]
+  2503844: # Galatasaray vs. Göztepe | Date = 2018-08-19
+    home: [11, 5, 0, 13, 4, 0, 6]
+    away: [9, 2, 0, 14, 2, 0, 6]
+  2503958: # Göztepe vs. Bursaspor | Date = 2018-12-14
+    home: [8, 2, 0, 15, 1, 0, 3]
+    away: [6, 3, 0, 13, 3, 0, 6]
+  2504045: # Ankaragücü vs. Bursaspor | Date = 2019-03-09
+    home: [10, 4, 0, 11, 1, 0, 5]
+    away: [12, 2, 0, 7, 1, 0, 4]
+  2503920: # Beşiktaş vs. Sivasspor | Date = 2018-11-11
+    home: [9, 2, 0, 14, 4, 0, 6]
+    away: [10, 3, 0, 14, 3, 0, 5]
+  2398309: # Kayserispor vs. Yeni Malatyaspor | Date = 2018-08-25
+    home: [13, 5, 0, 15, 2, 0, 4]
+    away: [6, 2, 0, 13, 1, 0, 6]
+  2504116: # Konyaspor vs. Galatasaray | Date = 2019-04-29
+    home: [4, 2, 0, 8, 1, 0, 4]
+    away: [11, 0, 0, 6, 1, 0, 7]
+  2504062: # İstanbul Başakşehir vs. Konyaspor | Date = 2019-04-07
+    home: [15, 4, 0, 9, 1, 0, 8]
+    away: [13, 4, 0, 11, 2, 0, 5]
+  2503848: # Beşiktaş vs. Antalyaspor | Date = 2018-08-26
+    home: [28, 10, 0, 15, 2, 0, 12]
+    away: [7, 5, 0, 19, 7, 0, 1]
+  2503851: # Galatasaray vs. Alanyaspor | Date = 2018-08-27
+    home: [17, 9, 0, 12, 0, 0, 4]
+    away: [4, 1, 0, 7, 1, 0, 1]
+  2503941: # Yeni Malatyaspor vs. Akhisarspor | Date = 2018-12-03
+    home: [9, 3, 0, 16, 4, 0, 0]
+    away: [7, 3, 0, 13, 3, 0, 0]
+  2504006: # Galatasaray vs. Trabzonspor | Date = 2019-02-10
+    home: [18, 9, 0, 17, 4, 0, 4]
+    away: [14, 4, 0, 12, 1, 0, 9]
+  2503875: # Ankaragücü vs. Antalyaspor | Date = 2018-10-01
+    home: [14, 3, 0, 10, 2, 0, 5]
+    away: [11, 6, 0, 18, 5, 0, 8]
+  2504064: # Antalyaspor vs. Kasımpaşa | Date = 2019-04-14
+    home: [10, 5, 0, 17, 2, 1, 4]
+    away: [25, 7, 0, 13, 2, 0, 5]
+  2503917: # Akhisarspor vs. BB Erzurumspor | Date = 2018-11-03
+    home: [10, 5, 0, 13, 2, 0, 3]
+    away: [5, 1, 0, 16, 1, 0, 2]
+  2503874: # Bursaspor vs. İstanbul Başakşehir | Date = 2018-09-21
+    home: [13, 4, 0, 10, 1, 0, 1]
+    away: [7, 1, 0, 14, 4, 0, 4]
+  2503903: # Bursaspor vs. Alanyaspor | Date = 2018-10-26
+    home: [12, 7, 0, 17, 1, 0, 2]
+    away: [7, 0, 0, 17, 0, NA, 6]
+  2503912: # Trabzonspor vs. Bursaspor | Date = 2018-11-04
+    home: [17, 6, 0, 16, 2, 0, 3]
+    away: [14, 6, 0, 16, 2, 0, 6]
+  2504029: # Fenerbahçe vs. Rizespor | Date = 2019-03-02
+    home: [22, 7, 0, 13, 2, 0, 9]
+    away: [9, 4, 0, 13, 4, 1, 2]
+  2504154: # Antalyaspor vs. Yeni Malatyaspor | Date = 2019-05-18
+    home: [17, 5, 0, 16, 2, 0, 5]
+    away: [12, 2, 0, 13, 4, 1, 4]
+  2504128: # Akhisarspor vs. Yeni Malatyaspor | Date = 2019-05-05
+    home: [19, 5, 0, 13, 2, 0, 5]
+    away: [12, 4, 0, 16, 3, 0, 3]
+  2504033: # Kayserispor vs. Beşiktaş | Date = 2019-03-02
+    home: [14, 5, 0, 16, 3, 0, 4]
+    away: [10, 4, 0, 11, 3, 0, 7]
+  2503931: # Alanyaspor vs. Kayserispor | Date = 2018-11-24
+    home: [15, 10, 0, 20, 3, 0, 9]
+    away: [5, 1, 0, 11, 5, 0, 2]
+  2503935: # Kasımpaşa vs. Yeni Malatyaspor | Date = 2018-11-25
+    home: [21, 9, 0, 19, 2, 0, 7]
+    away: [17, 2, 0, 9, 1, 0, 4]
+  2503984: # Kayserispor vs. Bursaspor | Date = 2019-01-26
+    home: [7, 4, 0, 15, 2, 1, 8]
+    away: [12, 3, 0, 9, 2, 0, 7]
+  2504143: # Fenerbahçe vs. Akhisarspor | Date = 2019-05-11
+    home: [10, 5, 0, 17, 3, 0, 2]
+    away: [5, 1, 0, 26, 3, 0, 1]
+  2503884: # Yeni Malatyaspor vs. Sivasspor | Date = 2018-10-07
+    home: [23, 8, 0, 13, 3, 0, 5]
+    away: [12, 5, 0, 13, 4, 1, 3]
+  2503957: # Kayserispor vs. Akhisarspor | Date = 2018-12-16
+    home: [13, 5, 0, 19, 2, 0, 3]
+    away: [7, 2, 0, 8, 1, 0, 6]
+  2504022: # Sivasspor vs. Antalyaspor | Date = 2019-02-23
+    home: [11, 4, 0, 17, 1, 0, 7]
+    away: [8, 4, 0, 9, 2, 0, 5]
+  2504082: # Galatasaray vs. Kayserispor | Date = 2019-04-20
+    home: [17, 7, 0, 9, 3, 0, 6]
+    away: [11, 5, 0, 16, 5, 1, 3]
+  2503939: # Rizespor vs. Ankaragücü | Date = 2018-11-30
+    home: [21, 6, 0, 12, 3, 0, 7]
+    away: [10, 4, 0, 6, 2, 0, 2]
+  2398316: # Akhisarspor vs. Sivasspor | Date = 2018-09-01
+    home: [22, 6, 0, 19, 1, 0, 5]
+    away: [11, 4, 0, 17, 3, 0, 1]
+  2504030: # Kasımpaşa vs. Trabzonspor | Date = 2019-03-04
+    home: [14, 8, 0, 13, 4, 0, 6]
+    away: [10, 5, 0, 12, 2, 0, 1]
+  2503956: # Rizespor vs. Alanyaspor | Date = 2018-12-15
+    home: [16, 8, 0, 19, 4, 0, 9]
+    away: [16, 6, 0, 17, 3, 0, 5]
+  2504096: # Ankaragücü vs. Konyaspor | Date = 2019-04-21
+    home: [14, 6, 0, 15, 1, 0, 1]
+    away: [12, 1, 0, 15, 2, 0, 4]
+  2503971: # Trabzonspor vs. Rizespor | Date = 2018-12-23
+    home: [18, 5, 0, 18, 4, 0, 6]
+    away: [13, 6, 0, 9, 2, 0, 4]
+  2503996: # Akhisarspor vs. İstanbul Başakşehir | Date = 2019-02-03
+    home: [22, 6, 0, 14, 4, 0, 5]
+    away: [18, 6, 0, 17, 3, 0, 3]
+  2503895: # Galatasaray vs. Bursaspor | Date = 2018-10-19
+    home: [10, 3, 0, 6, 1, 0, 1]
+    away: [13, 3, 0, 18, 5, 0, 6]
+  2503872: # Kayserispor vs. Konyaspor | Date = 2018-09-22
+    home: [17, 4, 0, 18, 1, 0, 6]
+    away: [8, 5, 0, 7, 2, 0, 5]
+  2504054: # Beşiktaş vs. Göztepe | Date = 2019-03-16
+    home: [6, 1, 0, 20, 0, 0, 3]
+    away: [13, 5, 0, 13, 2, 0, 4]
+  2503893: # İstanbul Başakşehir vs. Kayserispor | Date = 2018-10-20
+    home: [14, 3, 0, 15, 4, 0, 8]
+    away: [7, 2, 0, 14, 3, 0, 4]
+  2503916: # İstanbul Başakşehir vs. Beşiktaş | Date = 2018-11-03
+    home: [9, 3, 0, 14, 2, 0, 3]
+    away: [15, 3, 0, 14, 2, 0, 9]
+  2504015: # Antalyaspor vs. İstanbul Başakşehir | Date = 2019-02-18
+    home: [8, 3, 0, 12, 3, 0, 8]
+    away: [17, 8, 0, 15, 2, 0, 5]
+  2504145: # Göztepe vs. Sivasspor | Date = 2019-05-11
+    home: [20, 8, 0, 14, 3, 1, 6]
+    away: [9, 4, 0, 10, 0, 0, 1]
+  2503997: # BB Erzurumspor vs. Rizespor | Date = 2019-02-03
+    home: [10, 2, 0, 15, 1, 0, 17]
+    away: [6, 1, 0, 14, 1, 0, 1]
+  2504001: # İstanbul Başakşehir vs. BB Erzurumspor | Date = 2019-02-09
+    home: [9, 2, 0, 21, 3, 0, 3]
+    away: [13, 2, 0, 12, 1, 0, 6]
+  2397582: # Sivasspor vs. Alanyaspor | Date = 2018-08-11
+    home: [12, 5, 0, 13, 1, 0, 4]
+    away: [9, 3, 0, 16, 3, 0, 7]
+  2503865: # Konyaspor vs. Fenerbahçe | Date = 2018-09-16
+    home: [15, 6, 0, 10, 3, 0, 6]
+    away: [10, 2, 0, 11, 1, 0, 6]
+  2503954: # Galatasaray vs. Rizespor | Date = 2018-12-08
+    home: [20, 8, 0, 11, 2, 0, 8]
+    away: [18, 8, 0, 12, 1, 0, 4]
+  2503993: # Kasımpaşa vs. Sivasspor | Date = 2019-02-02
+    home: [5, 3, 0, 15, 3, 0, 3]
+    away: [21, 8, 0, 10, 0, 0, 11]
+  2503915: # Sivasspor vs. Konyaspor | Date = 2018-11-05
+    home: [17, 3, 0, 23, 2, 0, 12]
+    away: [10, 2, 0, 13, 4, 1, 3]
+  2503945: # Kayserispor vs. Trabzonspor | Date = 2018-12-01
+    home: [7, 2, 0, 15, 5, 0, 2]
+    away: [18, 7, 0, 16, 1, 0, 5]
+  2503928: # Fenerbahçe vs. Alanyaspor | Date = 2018-11-11
+    home: [12, 5, 0, 11, 2, 0, 3]
+    away: [10, 3, 0, 17, 2, 0, 6]
+  2503869: # Antalyaspor vs. Sivasspor | Date = 2018-09-23
+    home: [6, 3, 0, 14, 4, 0, 6]
+    away: [15, 2, 0, 7, 1, 0, 4]
+  2503911: # Kasımpaşa vs. Antalyaspor | Date = 2018-11-03
+    home: [19, 6, 0, 12, 2, 0, 7]
+    away: [9, 6, 0, 14, 4, 0, 3]
+  2503922: # Bursaspor vs. Kasımpaşa | Date = 2018-11-11
+    home: [24, 4, 0, 17, 3, 0, 6]
+    away: [10, 4, 0, 14, 1, 0, 6]
+  2504136: # Trabzonspor vs. Kayserispor | Date = 2019-05-06
+    home: [19, 7, 0, 14, 2, 0, 5]
+    away: [16, 4, 0, 10, 3, 0, 3]
+  2504046: # Kayserispor vs. İstanbul Başakşehir | Date = 2019-03-17
+    home: [12, 6, 0, 14, 2, 0, 1]
+    away: [34, 10, 0, 9, 1, 0, 15]
+  2503924: # Antalyaspor vs. Akhisarspor | Date = 2018-11-11
+    home: [17, 6, 0, 10, 3, 0, 8]
+    away: [5, 3, 0, 17, 1, 0, 7]
+  2503983: # Sivasspor vs. Trabzonspor | Date = 2019-01-27
+    home: [15, 5, 0, 11, 0, 0, 3]
+    away: [15, 6, 0, 14, 1, 0, 5]
+  2504144: # Beşiktaş vs. Alanyaspor | Date = 2019-05-13
+    home: [12, 4, 0, 17, 2, 0, 2]
+    away: [9, 3, 0, 20, 1, 0, 5]
+  2504003: # Kayserispor vs. Fenerbahçe | Date = 2019-02-08
+    home: [13, 5, 0, 15, 2, 0, 3]
+    away: [8, 2, 0, 18, 5, 2, 5]
+  2503985: # Konyaspor vs. Antalyaspor | Date = 2019-01-27
+    home: [11, 4, 0, 19, 1, 0, 5]
+    away: [7, 2, 0, 10, 1, 0, 1]
+  2504016: # Bursaspor vs. Rizespor | Date = 2019-02-16
+    home: [17, 2, 0, 14, 3, 0, 8]
+    away: [5, 5, 0, 22, 2, 0, 4]
+  2504076: # Yeni Malatyaspor vs. Alanyaspor | Date = 2019-04-14
+    home: [18, 5, 0, 14, 1, 1, 3]
+    away: [8, 4, 0, 15, 5, 1, 4]
+  2503855: # Antalyaspor vs. Rizespor | Date = 2018-09-02
+    home: [13, 4, 0, 12, 3, 1, 5]
+    away: [6, 2, 0, 13, 3, 1, 5]
+  2504044: # Rizespor vs. Kayserispor | Date = 2019-03-10
+    home: [12, 6, 0, 14, 3, 0, 4]
+    away: [16, 4, 0, 10, 1, 0, 5]
+  2503894: # Kasımpaşa vs. Akhisarspor | Date = 2018-10-20
+    home: [16, 6, 0, 18, 1, 0, 3]
+    away: [16, 5, 0, 16, 3, 0, 7]
+  2503841: # BB Erzurumspor vs. Beşiktaş | Date = 2018-08-19
+    home: [10, 3, 0, 11, 0, 0, 9]
+    away: [10, 6, 0, 7, 3, 0, 9]
+  2503857: # Ankaragücü vs. Akhisarspor | Date = 2018-09-15
+    home: [7, 1, 0, 19, 2, 0, 2]
+    away: [12, 4, 0, 11, 3, 0, 12]
+  2504024: # Galatasaray vs. Akhisarspor | Date = 2019-02-24
+    home: [21, 6, 0, 15, 2, 0, 15]
+    away: [4, 1, 0, 24, 6, 0, 2]
+  2503887: # Antalyaspor vs. Galatasaray | Date = 2018-10-06
+    home: [5, 0, 0, 15, 1, 0, 5]
+    away: [15, 7, 0, 14, 3, 0, 7]
+  2503965: # Ankaragücü vs. Göztepe | Date = 2018-12-22
+    home: [13, 1, 0, 16, 2, 0, 4]
+    away: [11, 4, 0, 18, 1, 0, 3]
+  2504147: # Kayserispor vs. Kasımpaşa | Date = 2019-05-12
+    home: [19, 6, 0, 11, 4, 0, 13]
+    away: [7, 6, 0, 15, 4, 1, 5]
+  2503845: # Kasımpaşa vs. İstanbul Başakşehir | Date = 2018-08-20
+    home: [13, 3, 0, 18, 0, 0, 5]
+    away: [15, 5, 0, 16, 3, 0, 2]
+  2504138: # Kasımpaşa vs. Fenerbahçe | Date = 2019-05-04
+    home: [9, 2, 0, 15, 5, 0, 5]
+    away: [14, 6, 0, 12, 0, 0, 9]
+  2503910: # Fenerbahçe vs. Ankaragücü | Date = 2018-10-28
+    home: [13, 3, 0, 16, 4, 1, 5]
+    away: [17, 8, 0, 21, 5, 0, 7]
+  2503929: # Ankaragücü vs. Beşiktaş | Date = 2018-11-24
+    home: [15, 4, 0, 18, 2, 0, 4]
+    away: [15, 6, 0, 15, 2, 0, 5]
+  2503880: # Beşiktaş vs. Kayserispor | Date = 2018-09-29
+    home: [12, 4, 0, 10, 1, 0, 6]
+    away: [9, 3, 0, 11, 0, 0, 3]
+  2503914: # Ankaragücü vs. Kayserispor | Date = 2018-11-04
+    home: [10, 5, 0, 18, 0, 0, 3]
+    away: [11, 2, 0, 18, 4, 1, 6]
+  2503896: # Ankaragücü vs. Yeni Malatyaspor | Date = 2018-10-21
+    home: [7, 3, 0, 21, 4, 0, 6]
+    away: [10, 2, 0, 19, 4, 0, 6]
+  2504005: # Sivasspor vs. Akhisarspor | Date = 2019-02-11
+    home: [13, 6, 0, 18, 4, 1, 3]
+    away: [13, 3, 0, 13, 2, 0, 8]
+  2504103: # Fenerbahçe vs. Trabzonspor | Date = 2019-04-27
+    home: [16, 5, 0, 17, 5, 1, 5]
+    away: [17, 5, 0, 20, 2, 0, 2]
+  2397584: # Beşiktaş vs. Akhisarspor | Date = 2018-08-12
+    home: [13, 4, 0, 17, 3, 0, 12]
+    away: [8, 4, 0, 16, 6, 0, 3]
+  2503989: # Göztepe vs. Galatasaray | Date = 2019-01-26
+    home: [16, 1, 0, 17, 3, 0, 13]
+    away: [9, 6, 0, 12, 3, 0, 3]
+  2398292: # Fenerbahçe vs. Bursaspor | Date = 2018-08-11
+    home: [7, 2, 0, 12, 3, 0, 4]
+    away: [6, 3, 0, 15, 3, 0, 4]
+  2504152: # Akhisarspor vs. Kayserispor | Date = 2019-05-19
+    home: [16, 4, 0, 15, 3, 0, 5]
+    away: [21, 8, 0, 10, 2, 0, 7]
+  2504041: # Trabzonspor vs. Akhisarspor | Date = 2019-03-09
+    home: [17, 8, 0, 20, 5, 0, 7]
+    away: [10, 4, 0, 21, 3, 0, 0]
+  2504070: # Konyaspor vs. Sivasspor | Date = 2019-04-13
+    home: [6, 3, 0, 13, 2, 0, 0]
+    away: [8, 3, 0, 10, 1, 0, 4]
+  2504155: # Ankaragücü vs. Sivasspor | Date = 2019-05-20
+    home: [14, 6, 0, 15, 4, 0, 8]
+    away: [10, 4, 0, 7, 1, 0, 3]
+  2503926: # Rizespor vs. İstanbul Başakşehir | Date = 2018-11-10
+    home: [6, 2, 0, 14, 2, 0, 4]
+    away: [13, 4, 0, 10, 1, 0, 4]
+  2504125: # BB Erzurumspor vs. Bursaspor | Date = 2019-05-04
+    home: [8, 3, 0, 9, 3, 0, 4]
+    away: [15, 2, 0, 11, 2, 0, 7]
+  2504021: # Rizespor vs. Yeni Malatyaspor | Date = 2019-02-22
+    home: [14, 6, 0, 11, 2, 0, 3]
+    away: [11, 3, 0, 18, 3, 0, 2]
+  2398291: # Kayserispor vs. Antalyaspor | Date = 2018-08-13
+    home: [8, 5, 0, 16, 0, 0, 6]
+    away: [4, 1, 0, 8, 2, 1, 2]
+  2503976: # Kasımpaşa vs. Rizespor | Date = 2019-01-21
+    home: [22, 6, 0, 13, 2, 0, 10]
+    away: [7, 2, 0, 19, 4, 0, 3]
+  2503852: # Yeni Malatyaspor vs. Konyaspor | Date = 2018-08-31
+    home: [11, 3, 0, 9, 2, 0, 3]
+    away: [6, 4, 0, 23, 4, 0, 1]
+  2503970: # Akhisarspor vs. Konyaspor | Date = 2018-12-24
+    home: [8, 3, 0, 14, 3, 0, 0]
+    away: [10, 3, 0, 15, 3, 0, 4]
+  2503901: # Göztepe vs. Beşiktaş | Date = 2018-10-21
+    home: [10, 5, 0, 18, 3, 0, 5]
+    away: [10, 2, 0, 14, 2, 0, 6]
+  2503933: # BB Erzurumspor vs. Antalyaspor | Date = 2018-11-24
+    home: [14, 2, 0, 12, 3, 0, 7]
+    away: [7, 1, 0, 12, 0, 0, 3]
+  2504066: # Rizespor vs. Göztepe | Date = 2019-04-13
+    home: [15, 8, 0, 18, 2, 0, 3]
+    away: [8, 2, 0, 15, 1, 0, 6]
+  2503891: # Kayserispor vs. Rizespor | Date = 2018-10-06
+    home: [14, 4, 0, 11, 1, 1, 5]
+    away: [6, 2, 0, 14, 3, 1, 6]
+  2503992: # Fenerbahçe vs. Göztepe | Date = 2019-02-01
+    home: [12, 4, 0, 16, 3, 0, 3]
+    away: [6, 3, 0, 15, 3, 1, 2]
+  2504023: # Ankaragücü vs. BB Erzurumspor | Date = 2019-02-24
+    home: [14, 6, 0, 23, 2, 0, 2]
+    away: [14, 6, 0, 12, 2, 1, 6]
+  2503923: # Yeni Malatyaspor vs. Trabzonspor | Date = 2018-11-09
+    home: [10, 6, 0, 14, 1, 0, 2]
+    away: [15, 5, 0, 6, 1, 0, 2]
+  2504105: # Kayserispor vs. Alanyaspor | Date = 2019-04-28
+    home: [13, 7, 0, 16, 2, 0, 2]
+    away: [15, 3, 0, 16, 3, 0, 6]
+  2504135: # Alanyaspor vs. Konyaspor | Date = 2019-05-06
+    home: [18, 7, 0, 16, 3, 0, 11]
+    away: [8, 4, 0, 13, 6, 0, 6]
+  2503951: # BB Erzurumspor vs. Yeni Malatyaspor | Date = 2018-12-09
+    home: [15, 5, 0, 10, 0, 0, 9]
+    away: [9, 5, 0, 15, 3, 0, 4]
+  2503864: # Beşiktaş vs. Yeni Malatyaspor | Date = 2018-09-15
+    home: [17, 6, 0, 14, 3, 1, 10]
+    away: [10, 6, 0, 15, 3, 0, 5]
+  2504027: # İstanbul Başakşehir vs. Bursaspor | Date = 2019-02-24
+    home: [8, 1, 0, 7, 2, 0, 6]
+    away: [10, 2, 0, 10, 1, 0, 4]
+  2504060: # Göztepe vs. Akhisarspor | Date = 2019-04-07
+    home: [19, 5, 0, 15, 3, 0, 14]
+    away: [12, 3, 0, 15, 3, 0, 7]
+  2504043: # Beşiktaş vs. Konyaspor | Date = 2019-03-10
+    home: [20, 12, 0, 14, 2, 0, 9]
+    away: [4, 3, 0, 20, 3, 0, 1]
+  2503868: # Yeni Malatyaspor vs. Rizespor | Date = 2018-09-22
+    home: [23, 9, 0, 17, 2, 0, 10]
+    away: [7, 1, 0, 15, 3, 1, 3]
+  2398314: # Fenerbahçe vs. Kayserispor | Date = 2018-09-01
+    home: [15, 4, 0, 11, 4, 0, 4]
+    away: [20, 11, 0, 12, 2, 1, 4]
+  2503966: # Kasımpaşa vs. Beşiktaş | Date = 2018-12-22
+    home: [12, 7, 0, 14, 3, 0, 4]
+    away: [16, 6, 0, 15, 3, 0, 3]
+  2503927: # Konyaspor vs. Ankaragücü | Date = 2018-11-10
+    home: [15, 3, 0, 15, 1, 0, 3]
+    away: [7, 2, 0, 16, 2, 0, 4]
+  2504039: # İstanbul Başakşehir vs. Fenerbahçe | Date = 2019-03-09
+    home: [17, 3, 0, 14, 2, 0, 3]
+    away: [12, 4, 0, 10, 2, 0, 4]
+  2503969: # BB Erzurumspor vs. Kayserispor | Date = 2018-12-23
+    home: [20, 5, 0, 14, 2, 0, 5]
+    away: [7, 3, 0, 12, 6, 0, 3]
+  2503959: # Yeni Malatyaspor vs. Antalyaspor | Date = 2018-12-16
+    home: [12, 3, 0, 16, 2, 1, 2]
+    away: [8, 1, 0, 18, 4, 1, 2]
+  2503938: # İstanbul Başakşehir vs. Sivasspor | Date = 2018-12-01
+    home: [16, 2, 0, 8, 3, 0, 6]
+    away: [9, 1, 0, 15, 3, 0, 0]
+  2503882: # Galatasaray vs. BB Erzurumspor | Date = 2018-09-28
+    home: [12, 7, 0, 12, 3, 0, 10]
+    away: [10, 1, 0, 12, 2, 0, 6]
+  2504025: # Konyaspor vs. Kayserispor | Date = 2019-02-24
+    home: [8, 1, 0, 7, 2, 0, 6]
+    away: [10, 2, 0, 10, 1, 0, 4]
+  2398318: # Alanyaspor vs. Göztepe | Date = 2018-09-01
+    home: [9, 2, 0, 16, 2, 0, 5]
+    away: [10, 2, 0, 12, 2, 0, 8]
+  2504026: # Beşiktaş vs. Fenerbahçe | Date = 2019-02-25
+    home: [9, 5, 0, 22, 2, 0, 3]
+    away: [17, 4, 0, 19, 4, 0, 5]
+  2503972: # Alanyaspor vs. İstanbul Başakşehir | Date = 2018-12-22
+    home: [13, 7, 0, 13, 3, 1, 1]
+    away: [12, 6, 0, 12, 2, 0, 3]
+  2503908: # Beşiktaş vs. Rizespor | Date = 2018-10-29
+    home: [26, 12, 0, 12, 3, 0, 7]
+    away: [5, 2, 0, 12, 2, 2, 2]
+  2504141: # İstanbul Başakşehir vs. Ankaragücü | Date = 2019-05-12
+    home: [20, 7, 0, 12, 0, 0, 5]
+    away: [8, 1, 0, 12, 1, 0, 2]
+  2504013: # Kayserispor vs. Göztepe | Date = 2019-02-17
+    home: [15, 4, 0, 10, 4, 0, 2]
+    away: [8, 2, 0, 10, 1, 0, 5]
+  2503921: # Kayserispor vs. Galatasaray | Date = 2018-11-10
+    home: [12, 3, 0, 13, 5, 1, 4]
+    away: [11, 6, 0, 9, 3, 0, 3]
+  2503902: # Kayserispor vs. Sivasspor | Date = 2018-10-28
+    home: [10, 4, 0, 13, 4, 0, 3]
+    away: [14, 2, 0, 14, 6, 1, 5]
+  2503859: # Galatasaray vs. Kasımpaşa | Date = 2018-09-14
+    home: [15, 5, 0, 11, 1, 0, 4]
+    away: [16, 6, 0, 14, 2, 0, 7]
+  2503986: # Beşiktaş vs. BB Erzurumspor | Date = 2019-01-25
+    home: [15, 5, 0, 15, 4, 1, 11]
+    away: [10, 3, 0, 14, 4, 0, 2]
+  2503978: # Akhisarspor vs. Beşiktaş | Date = 2019-01-18
+    home: [15, 5, 0, 12, 3, 0, 8]
+    away: [11, 5, 0, 18, 4, 0, 2]
+  2503842: # Akhisarspor vs. Rizespor | Date = 2018-08-19
+    home: [8, 3, 0, 18, 0, 1, 4]
+    away: [24, 10, 0, 14, 1, 0, 3]
+  2503881: # Alanyaspor vs. Akhisarspor | Date = 2018-09-29
+    home: [5, 3, 0, 17, 4, 1, 2]
+    away: [6, 1, 0, 9, 2, 0, 8]
+  2504000: # Bursaspor vs. Konyaspor | Date = 2019-02-04
+    home: [17, 3, 0, 11, 0, 0, 4]
+    away: [4, 3, 0, 15, 2, 0, 4]
+  2503856: # Bursaspor vs. Beşiktaş | Date = 2018-09-02
+    home: [9, 3, 0, 14, 2, 0, 4]
+    away: [11, 4, 0, 15, 2, 0, 3]
+  2398293: # Göztepe vs. Yeni Malatyaspor | Date = 2018-08-12
+    home: [10, 4, 0, 11, 4, 2, 4]
+    away: [6, 3, 0, 11, 5, 1, 0]
+  2504002: # Ankaragücü vs. Kasımpaşa | Date = 2019-02-11
+    home: [8, 5, 0, 16, 3, 0, 4]
+    away: [15, 2, 0, 12, 1, 0, 4]
+  2503974: # Galatasaray vs. Ankaragücü | Date = 2019-01-19
+    home: [23, 10, 0, 13, 3, 0, 0]
+    away: [11, 3, 0, 13, 3, 0, 2]
+  2504118: # İstanbul Başakşehir vs. Göztepe | Date = 2019-04-26
+    home: [23, 5, 0, 11, 2, 0, 9]
+    away: [8, 4, 0, 10, 1, 0, 1]
+  2504004: # Rizespor vs. Antalyaspor | Date = 2019-02-09
+    home: [20, 5, 0, 15, 2, 0, 7]
+    away: [25, 4, 0, 13, 1, 0, 8]
+  2503979: # BB Erzurumspor vs. Konyaspor | Date = 2019-01-19
+    home: [14, 3, 0, 11, 3, 0, 8]
+    away: [10, 4, 0, 15, 4, 0, 4]
+  2504007: # Göztepe vs. Alanyaspor | Date = 2019-02-10
+    home: [14, 7, 0, 13, 8, 1, 1]
+    away: [14, 6, 0, 14, 4, 0, 5]
+  2503877: # Trabzonspor vs. Kasımpaşa | Date = 2018-09-29
+    home: [19, 7, 0, 14, 2, 0, 7]
+    away: [16, 9, 0, 11, 3, 0, 6]
+  2503940: # Bursaspor vs. BB Erzurumspor | Date = 2018-12-02
+    home: [13, 4, 0, 19, 2, 0, 2]
+    away: [8, 2, 0, 13, 1, 0, 3]
+  2503919: # Galatasaray vs. Fenerbahçe | Date = 2018-11-02
+    home: [16, 3, 0, 9, 1, 0, 6]
+    away: [17, 5, 0, 16, 4, 0, 4]
+  2503897: # Sivasspor vs. Fenerbahçe | Date = 2018-10-20
+    home: [17, 4, 0, 14, 2, 0, 3]
+    away: [13, 4, 0, 14, 1, 0, 4]
+  2504114: # Yeni Malatyaspor vs. Kasımpaşa | Date = 2019-04-29
+    home: [12, 5, 0, 9, 3, 0, 12]
+    away: [12, 6, 0, 15, 5, 0, 3]
+  2503949: # Alanyaspor vs. Beşiktaş | Date = 2018-12-07
+    home: [13, 3, 0, 15, 3, 0, 7]
+    away: [9, 3, 0, 16, 2, 0, 10]
+  2503847: # Sivasspor vs. Kasımpaşa | Date = 2018-08-26
+    home: [31, 3, 0, 8, 0, 0, 7]
+    away: [9, 6, 0, 9, 3, 0, 2]
+  2504130: # Göztepe vs. Antalyaspor | Date = 2019-05-05
+    home: [17, 11, 0, 7, 0, 0, 6]
+    away: [9, 1, 0, 9, 6, 1, 0]
+  2398295: # Bursaspor vs. Kayserispor | Date = 2018-08-18
+    home: [9, 2, 0, 11, 2, 0, 6]
+    away: [4, 0, 0, 12, 2, 0, 4]
+  2504012: # Kasımpaşa vs. Galatasaray | Date = 2019-02-17
+    home: [13, 5, 0, 16, 3, 0, 8]
+    away: [10, 6, 0, 10, 5, 0, 4]
+  2504081: # Sivasspor vs. Beşiktaş | Date = 2019-04-22
+    home: [8, 4, 0, 18, 1, 0, 4]
+    away: [21, 6, 0, 15, 3, 0, 8]
+  2503937: # Göztepe vs. İstanbul Başakşehir | Date = 2018-11-26
+    home: [15, 4, 0, 8, 4, 0, 7]
+    away: [15, 7, 0, 13, 3, 0, 1]
+  2504107: # Rizespor vs. Sivasspor | Date = 2019-04-27
+    home: [23, 5, 0, 10, 1, 0, 5]
+    away: [6, 3, 0, 11, 3, 0, 2]
+  2504051: # Konyaspor vs. Rizespor | Date = 2019-03-16
+    home: [9, 1, 0, 16, 1, 1, 6]
+    away: [10, 4, 0, 17, 2, 0, 3]
+  2504092: # Göztepe vs. BB Erzurumspor | Date = 2019-04-20
+    home: [22, 5, 0, 17, 2, 0, 11]
+    away: [11, 6, 0, 12, 3, 0, 6]
+  2398296: # Antalyaspor vs. Konyaspor | Date = 2018-08-18
+    home: [12, 9, 0, 17, 1, 0, 7]
+    away: [10, 4, 0, 19, 5, 1, 3]
+  2503973: # Bursaspor vs. Yeni Malatyaspor | Date = 2018-12-23
+    home: [8, 2, 0, 13, 1, 0, 5]
+    away: [4, 1, 0, 11, 3, 1, 1]
+  2504040: # Galatasaray vs. Antalyaspor | Date = 2019-03-11
+    home: [15, 7, 0, 5, 2, 0, 6]
+    away: [14, 7, 0, 11, 1, 0, 6]
+  2504109: # Antalyaspor vs. BB Erzurumspor | Date = 2019-04-27
+    home: [11, 2, 0, 7, 1, 0, 2]
+    away: [17, 4, 0, 8, 1, 0, 5]
+  2504052: # BB Erzurumspor vs. Trabzonspor | Date = 2019-03-16
+    home: [20, 7, 0, 11, 2, 0, 3]
+    away: [13, 3, 0, 13, 3, 0, 4]
+  2504008: # Beşiktaş vs. Bursaspor | Date = 2019-02-09
+    home: [11, 7, 0, 17, 1, 0, 4]
+    away: [8, 3, 0, 14, 1, 0, 3]
+  2503871: # Akhisarspor vs. Galatasaray | Date = 2018-09-23
+    home: [10, 5, 0, 15, 4, 0, 1]
+    away: [12, 3, 0, 13, 3, 0, 6]
+  2503952: # Kasımpaşa vs. Kayserispor | Date = 2018-12-10
+    home: [25, 5, 0, 13, 3, 0, 11]
+    away: [17, 10, 0, 15, 2, 0, 3]
+  2504090: # Akhisarspor vs. Antalyaspor | Date = 2019-04-20
+    home: [21, 9, 0, 15, 2, 0, 17]
+    away: [10, 6, 0, 8, 2, 0, 1]
+  2504065: # Bursaspor vs. Trabzonspor | Date = 2019-04-12
+    home: [18, 3, 0, 18, 3, 0, 10]
+    away: [11, 3, 0, 11, 3, 0, 7]
+  2503883: # Göztepe vs. Konyaspor | Date = 2018-09-30
+    home: [13, 9, 0, 11, 3, 0, 7]
+    away: [10, 2, 0, 15, 4, 0, 6]
+  2504038: # Alanyaspor vs. BB Erzurumspor | Date = 2019-03-10
+    home: [18, 6, 0, 13, 1, 0, 6]
+    away: [6, 3, 0, 21, 2, 0, 2]
+  2503860: # Göztepe vs. Kayserispor | Date = 2018-09-15
+    home: [16, 6, 0, 11, 1, 0, 4]
+    away: [9, 1, 0, 10, 2, 0, 1]
+  2504157: # Trabzonspor vs. Beşiktaş | Date = 2019-05-18
+    home: [19, 8, 0, 12, 3, 0, 7]
+    away: [8, 3, 0, 9, 2, 0, 4]
+  2504035: # BB Erzurumspor vs. Galatasaray | Date = 2019-03-03
+    home: [18, 6, 0, 11, 0, 0, 6]
+    away: [14, 4, 0, 11, 1, 0, 9]
+  2504061: # Rizespor vs. Beşiktaş | Date = 2019-04-08
+    home: [19, 6, 0, 8, 1, 0, 3]
+    away: [11, 11, 0, 10, 2, 0, 2]
+  2503906: # BB Erzurumspor vs. Kasımpaşa | Date = 2018-10-27
+    home: [14, 5, 0, 18, 4, 1, 6]
+    away: [18, 7, 0, 9, 1, 0, 8]
+  2503870: # BB Erzurumspor vs. Ankaragücü | Date = 2018-09-21
+    home: [25, 8, 0, 14, 3, 0, 12]
+    away: [3, 1, 0, 8, 2, 1, 2]
+  2503961: # İstanbul Başakşehir vs. Galatasaray | Date = 2018-12-15
+    home: [17, 5, 0, 12, 4, 0, 7]
+    away: [9, 4, 0, 13, 2, 0, 2]
+  2504056: # Alanyaspor vs. Bursaspor | Date = 2019-04-06
+    home: [18, 4, 0, 15, 6, 0, 4]
+    away: [10, 3, 0, 13, 2, 0, 2]
+  2503982: # Yeni Malatyaspor vs. Göztepe | Date = 2019-01-19
+    home: [9, 5, 0, 13, 1, 0, 2]
+    away: [10, 3, 0, 11, 1, 0, 11]
+  2504079: # Fenerbahçe vs. Galatasaray | Date = 2019-04-14
+    home: [6, 2, 0, 16, 5, 1, 2]
+    away: [14, 2, 0, 12, 4, 0, 5]
+  2504063: # Ankaragücü vs. Fenerbahçe | Date = 2019-04-07
+    home: [12, 3, 0, 20, 4, 1, 5]
+    away: [14, 6, 0, 8, 3, 1, 7]
+  2504028: # Antalyaspor vs. Ankaragücü | Date = 2019-03-01
+    home: [17, 5, 0, 8, 3, 0, 4]
+    away: [10, 4, 0, 23, 6, 0, 4]
+  2504010: # Akhisarspor vs. Ankaragücü | Date = 2019-02-16
+    home: [17, 8, 0, 11, 4, 0, 9]
+    away: [9, 2, 0, 23, 4, 1, 0]
+  2503849: # Konyaspor vs. Bursaspor | Date = 2018-08-26
+    home: [16, 6, 0, 18, 2, 0, 11]
+    away: [12, 4, 0, 14, 3, 0, 6]
+  2503181: # Fiorentina vs. SPAL | Date = 2018-09-22
+    home: [15, 5, 0, 8, 1, 0, 11]
+    away: [5, 2, 0, 11, 2, 0, 1]
+  2418089: # Udinese vs. Sampdoria | Date = 2018-08-26
+    home: [13, 5, 0, 6, 1, 0, 8]
+    away: [9, 4, 0, 10, 3, 0, 7]
+  2503486: # Chievo vs. Sampdoria | Date = 2019-05-19
+    home: [4, 1, 0, 13, 3, 1, 4]
+    away: [9, 6, 0, 9, 0, 0, 7]
+  2418135: # Juventus vs. Napoli | Date = 2018-09-29
+    home: [14, 9, 0, 14, 3, 0, 7]
+    away: [9, 6, 0, 11, 5, 1, 4]
+  2503270: # Sassuolo vs. Udinese | Date = 2018-12-02
+    home: [17, 3, 0, 13, 3, 0, 13]
+    away: [3, 1, 0, 16, 2, 0, 2]
+  2418086: # Napoli vs. Milan | Date = 2018-08-25
+    home: [21, 13, 0, 12, 2, 0, 5]
+    away: [6, 4, 0, 9, 2, 0, 1]
+  2418080: # Cagliari vs. Sassuolo | Date = 2018-08-26
+    home: [12, 7, 0, 14, 4, 0, 7]
+    away: [12, 6, 0, 14, 4, 1, 2]
+  2503226: # Atalanta vs. Parma | Date = 2018-10-27
+    home: [21, 14, 0, 6, 0, 0, 6]
+    away: [9, 5, 0, 8, 2, 0, 6]
+  2418076: # Parma vs. Udinese | Date = 2018-08-19
+    home: [9, 6, 0, 10, 2, 0, 4]
+    away: [16, 6, 0, 13, 2, 0, 5]
+  2503186: # Sampdoria vs. Internazionale | Date = 2018-09-22
+    home: [9, 4, 0, 12, 3, 0, 3]
+    away: [14, 5, 0, 14, 2, 0, 12]
+  2503265: # Chievo vs. Lazio | Date = 2018-12-02
+    home: [5, 2, 0, 11, 4, 0, 4]
+    away: [19, 7, 0, 11, 2, 0, 6]
+  2503465: # Sassuolo vs. Frosinone | Date = 2019-05-05
+    home: [14, 5, 0, 14, 2, 0, 8]
+    away: [5, 3, 0, 19, 3, 0, 1]
+  2503267: # Frosinone vs. Cagliari | Date = 2018-12-02
+    home: [25, 11, 0, 13, 1, 0, 5]
+    away: [18, 7, 0, 15, 7, 1, 1]
+  2418079: # Torino vs. Roma | Date = 2018-08-19
+    home: [8, 5, 0, 10, 1, 0, 6]
+    away: [16, 13, 0, 14, 3, 0, 5]
+  2418078: # Sassuolo vs. Internazionale | Date = 2018-08-19
+    home: [7, 5, 0, 23, 3, 0, 4]
+    away: [11, 4, 0, 11, 2, 0, 4]
+  2503473: # Atalanta vs. Genoa | Date = 2019-05-11
+    home: [8, 4, 0, 14, 1, 0, 0]
+    away: [13, 3, 0, 21, 3, 0, 4]
+  2503234: # Torino vs. Fiorentina | Date = 2018-10-27
+    home: [12, 4, 0, 13, 2, 0, 4]
+    away: [8, 5, 0, 20, 4, 0, 5]
+  2418088: # SPAL vs. Parma | Date = 2018-08-26
+    home: [15, 5, 0, 13, 5, 0, 7]
+    away: [3, 0, 0, 14, 2, 0, 2]
+  2418071: # Bologna vs. SPAL | Date = 2018-08-19
+    home: [8, 3, 0, 16, 4, 1, 7]
+    away: [10, 5, 0, 11, 2, 0, 0]
+  2503272: # Torino vs. Genoa | Date = 2018-12-02
+    home: [23, 10, 0, 14, 3, 0, 5]
+    away: [8, 2, 0, 20, 4, 1, 5]
+  2418091: # Bologna vs. Internazionale | Date = 2018-09-01
+    home: [7, 1, 0, 7, 1, 0, 3]
+    away: [10, 4, 0, 10, 1, 0, 7]
+  2503246: # Chievo vs. Bologna | Date = 2018-11-11
+    home: [12, 6, 0, 15, 3, 0, 5]
+    away: [12, 6, 0, 18, 3, 0, 6]
+  2503214: # SPAL vs. Internazionale | Date = 2018-10-07
+    home: [9, 6, 0, 13, 6, 0, 10]
+    away: [6, 4, 0, 20, 2, 0, 9]
+  2503467: # Genoa vs. Roma | Date = 2019-05-05
+    home: [13, 6, 0, 14, 1, 0, 4]
+    away: [11, 5, 0, 11, 2, 0, 7]
+  2503266: # Fiorentina vs. Juventus | Date = 2018-12-01
+    home: [12, 7, 0, 14, 6, 0, 4]
+    away: [9, 6, 0, 8, 3, 0, 9]
+  2503484: # Milan vs. Frosinone | Date = 2019-05-19
+    home: [9, 3, 0, 13, 1, 0, 5]
+    away: [6, 2, 0, 7, 0, 0, 7]
+  2503485: # Sassuolo vs. Roma | Date = 2019-05-18
+    home: [9, 3, 0, 10, 2, 0, 5]
+    away: [17, 6, 0, 10, 4, 0, 5]
+  2503468: # Parma vs. Sampdoria | Date = 2019-05-05
+    home: [9, 6, 0, 14, 4, 1, 2]
+    away: [14, 10, 0, 7, 3, 1, 2]
+  2418084: # Internazionale vs. Torino | Date = 2018-08-26
+    home: [9, 6, 0, 16, 1, 0, 5]
+    away: [10, 7, 0, 12, 2, 0, 4]
+  2503470: # Juventus vs. Torino | Date = 2019-05-03
+    home: [11, 4, 0, 11, 3, 0, 7]
+    away: [9, 2, 0, 9, 3, 0, 3]
+  2503230: # Lazio vs. Internazionale | Date = 2018-10-29
+    home: [11, 4, 0, 14, 3, 0, 7]
+    away: [13, 7, 0, 10, 3, 0, 6]
+  2418137: # Roma vs. Lazio | Date = 2018-09-29
+    home: [10, 7, 0, 11, 3, 0, 8]
+    away: [11, 5, 0, 10, 1, 0, 9]
+  2418186: # Milan vs. Juventus | Date = 2018-11-11
+    home: [5, 2, 0, 16, 3, 1, 2]
+    away: [12, 8, 0, 9, 1, 0, 5]
+  2503466: # Udinese vs. Internazionale | Date = 2019-05-04
+    home: [3, 3, 0, 19, 1, 0, 2]
+    away: [11, 4, 0, 11, 3, 0, 9]
+  2418073: # Empoli vs. Cagliari | Date = 2018-08-19
+    home: [9, 4, 0, 19, 3, 0, 6]
+    away: [12, 5, 0, 19, 3, 0, 6]
+  2503269: # Sampdoria vs. Bologna | Date = 2018-12-01
+    home: [8, 6, 0, 14, 3, 0, 1]
+    away: [8, 4, 0, 10, 3, 0, 4]
+  2503255: # Cagliari vs. Torino | Date = 2018-11-26
+    home: [3, 1, 0, 12, 2, 0, 3]
+    away: [8, 5, 0, 13, 0, 0, 4]
+  2503481: # Lazio vs. Bologna | Date = 2019-05-20
+    home: [10, 5, 0, 11, 2, 0, 4]
+    away: [13, 6, 0, 11, 1, 0, 6]
+  2503482: # Genoa vs. Cagliari | Date = 2019-05-18
+    home: [16, 9, 0, 13, 2, 1, 11]
+    away: [4, 3, 0, 21, 1, 0, 3]
+  2503462: # Milan vs. Bologna | Date = 2019-05-06
+    home: [13, 5, 0, 9, 3, 1, 5]
+    away: [14, 7, 0, 20, 5, 2, 10]
+  2503213: # Napoli vs. Sassuolo | Date = 2018-10-07
+    home: [12, 7, 0, 11, 2, 0, 4]
+    away: [10, 7, 0, 8, 2, 1, 4]
+  2503257: # Genoa vs. Sampdoria | Date = 2018-11-25
+    home: [10, 5, 0, 17, 2, 0, 7]
+    away: [6, 2, 0, 15, 1, 0, 6]
+  2503182: # Frosinone vs. Juventus | Date = 2018-09-23
+    home: [2, 0, 0, 16, 3, 0, 3]
+    away: [18, 8, 0, 8, 1, 0, 5]
+  2503488: # Empoli vs. Torino | Date = 2019-05-19
+    home: [11, 9, 0, 12, 1, 0, 7]
+    away: [10, 6, 0, 19, 1, 0, 3]
+  2503483: # Parma vs. Fiorentina | Date = 2019-05-19
+    home: [9, 5, 0, 15, 0, 0, 3]
+    away: [12, 6, 0, 22, 1, 0, 7]
+  2503461: # Lazio vs. Atalanta | Date = 2019-05-05
+    home: [7, 5, 0, 15, 4, 0, 2]
+    away: [10, 6, 0, 11, 3, 0, 5]
+  2503250: # Roma vs. Sampdoria | Date = 2018-11-11
+    home: [10, 6, 0, 8, 1, 0, 7]
+    away: [4, 3, 0, 10, 1, 0, 7]
+  2503464: # Empoli vs. Fiorentina | Date = 2019-05-05
+    home: [6, 4, 0, 15, 3, 0, 4]
+    away: [20, 11, 0, 17, 1, 1, 7]
+  2503245: # Atalanta vs. Internazionale | Date = 2018-11-11
+    home: [16, 10, 0, 11, 3, 0, 9]
+    away: [6, 2, 0, 13, 5, 1, 6]
+  2503478: # Torino vs. Sassuolo | Date = 2019-05-12
+    home: [17, 11, 0, 15, 1, 0, 11]
+    away: [7, 3, 0, 17, 5, 1, 1]
+  2503249: # Genoa vs. Napoli | Date = 2018-11-10
+    home: [8, 3, 0, 15, 4, 0, 2]
+    away: [13, 7, 0, 6, 2, 0, 7]
+  2418096: # Parma vs. Juventus | Date = 2018-09-01
+    home: [8, 7, 0, 15, 1, 0, 4]
+    away: [20, 10, 0, 9, 3, 0, 7]
+  2418424: # Roma vs. Juventus | Date = 2019-05-12
+    home: [9, 4, 0, 8, 3, 0, 3]
+    away: [5, 4, 0, 7, 1, 0, 3]
+  2503169: # Cagliari vs. Milan | Date = 2018-09-16
+    home: [7, 3, 0, 12, 1, 0, 3]
+    away: [12, 7, 0, 13, 1, 0, 8]
+  2503480: # Juventus vs. Atalanta | Date = 2019-05-19
+    home: [11, 4, 0, 15, 3, 1, 5]
+    away: [11, 7, 0, 14, 1, 0, 8]
+  2418085: # Juventus vs. Lazio | Date = 2018-08-25
+    home: [14, 9, 0, 12, 3, 0, 6]
+    away: [8, 3, 0, 13, 2, 0, 2]
+  2503472: # Sampdoria vs. Empoli | Date = 2019-05-12
+    home: [11, 7, 0, 10, 2, 0, 8]
+    away: [5, 4, 0, 15, 1, 0, 2]
+  2418072: # Chievo vs. Juventus | Date = 2018-08-18
+    home: [7, 2, 0, 7, 2, 0, 0]
+    away: [23, 11, 0, 9, 0, 0, 8]
+  2503476: # SPAL vs. Napoli | Date = 2019-05-12
+    home: [10, 5, 0, 11, 2, 0, 1]
+    away: [17, 8, 0, 20, 1, 0, 12]
+  2503463: # Napoli vs. Cagliari | Date = 2019-05-05
+    home: [17, 8, 0, 11, 2, 0, 6]
+    away: [4, 2, 0, 12, 3, 1, 2]
+  2503487: # Udinese vs. SPAL | Date = 2019-05-18
+    home: [10, 4, 0, 17, 4, 0, 8]
+    away: [12, 5, 0, 13, 4, 0, 6]
+  2503231: # Milan vs. Sampdoria | Date = 2018-10-28
+    home: [8, 7, 0, 11, 3, 0, 5]
+    away: [3, 2, 0, 9, 2, 0, 1]
+  2503475: # Fiorentina vs. Milan | Date = 2019-05-11
+    home: [8, 3, 0, 15, 2, 0, 5]
+    away: [10, 5, 0, 8, 1, 0, 6]
+  2503203: # Internazionale vs. Cagliari | Date = 2018-09-29
+    home: [12, 8, 0, 13, 1, 0, 9]
+    away: [4, 1, 0, 11, 4, 0, 4]
+  2418074: # Lazio vs. Napoli | Date = 2018-08-18
+    home: [9, 5, 0, 8, 0, 0, 4]
+    away: [11, 6, 0, 5, 0, 0, 7]
+  2503471: # Internazionale vs. Chievo | Date = 2019-05-13
+    home: [16, 11, 0, 10, 2, 0, 17]
+    away: [3, 0, 0, 17, 3, 1, 0]
+  2503271: # SPAL vs. Empoli | Date = 2018-12-01
+    home: [9, 5, 0, 14, 3, 1, 4]
+    away: [13, 8, 0, 14, 3, 0, 9]
+  2418436: # Napoli vs. Internazionale | Date = 2019-05-19
+    home: [14, 6, 0, 8, 3, 0, 3]
+    away: [10, 7, 0, 10, 1, 0, 12]
+  2503477: # Bologna vs. Parma | Date = 2019-05-13
+    home: [15, 10, 0, 9, 1, 0, 13]
+    away: [3, 1, 0, 15, 6, 1, 3]
+  2418083: # Genoa vs. Empoli | Date = 2018-08-26
+    home: [10, 4, 0, 14, 3, 0, 3]
+    away: [12, 8, 0, 15, 2, 0, 6]
+  2418167: # Napoli vs. Roma | Date = 2018-10-28
+    home: [18, 6, 0, 7, 0, 0, 17]
+    away: [7, 5, 0, 6, 5, 0, 3]
+  2503268: # Milan vs. Parma | Date = 2018-12-02
+    home: [19, 6, 0, 9, 2, 0, 8]
+    away: [7, 1, 0, 15, 2, 0, 8]
+  2503469: # Chievo vs. SPAL | Date = 2019-05-04
+    home: [8, 3, 0, 13, 3, 0, 1]
+    away: [14, 8, 0, 12, 0, 0, 5]
+  2503251: # Sassuolo vs. Lazio | Date = 2018-11-11
+    home: [9, 4, 0, 15, 4, 0, 2]
+    away: [7, 3, 0, 21, 3, 0, 6]
+  2503474: # Cagliari vs. Lazio | Date = 2019-05-11
+    home: [14, 6, 0, 11, 2, 0, 4]
+    away: [10, 5, 0, 13, 4, 0, 2]
+  2503479: # Frosinone vs. Udinese | Date = 2019-05-12
+    home: [13, 5, 0, 15, 2, 0, 14]
+    away: [11, 8, 0, 17, 3, 0, 10]
+  2418075: # Milan vs. Genoa | Date = 2018-10-31
+    home: [19, 10, 0, 11, 2, 0, 7]
+    away: [7, 2, 0, 17, 2, 0, 2]
+  2503228: # Empoli vs. Juventus | Date = 2018-10-27
+    home: [6, 4, 0, 13, 2, 0, 6]
+    away: [12, 7, 0, 17, 3, 0, 10]
+  2418070: # Atalanta vs. Frosinone | Date = 2018-08-20
+    home: [16, 10, 0, 14, 0, 0, 4]
+    away: [6, 1, 0, 10, 2, 0, 4]
+  2418081: # Fiorentina vs. Chievo | Date = 2018-08-26
+    home: [19, 15, 0, 14, 1, 0, 2]
+    away: [5, 3, 0, 8, 3, 0, 3]
+  2418206: # Roma vs. Internazionale | Date = 2018-12-02
+    home: [15, 6, 0, 11, 1, 0, 4]
+    away: [16, 7, 0, 13, 1, 0, 7]
+  2418082: # Frosinone vs. Bologna | Date = 2018-08-26
+    home: [11, 7, 0, 15, 2, 0, 2]
+    away: [10, 5, 0, 12, 1, 0, 5]
+  2418087: # Roma vs. Atalanta | Date = 2018-08-27
+    home: [21, 11, 0, 9, 1, 0, 3]
+    away: [17, 10, 0, 13, 1, 0, 11]
+  2503247: # Empoli vs. Udinese | Date = 2018-11-11
+    home: [9, 5, 0, 6, 2, 0, 4]
+    away: [22, 9, 0, 11, 2, 0, 13]
