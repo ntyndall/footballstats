@@ -5,8 +5,8 @@
 
 build_raw_data <- function(KEYS, singleFixture) {
   # Get team information from fixture data frame
-  matchID <- singleFixture$id %>% as.integer
-  teamIDs <- c(singleFixture$localteam_id, singleFixture$visitorteam_id)
+  matchID <- singleFixture$zzz.matchID %>% as.integer
+  teamIDs <- c(singleFixture$home.id, singleFixture$away.id)
 
   # Allowed Commentaries
   allowedCommentaries <-  c(
@@ -16,8 +16,14 @@ build_raw_data <- function(KEYS, singleFixture) {
 
   # Basic fields to return
   retFields <- c(
-    "id", "formatted_date", "localteam_name", "localteam_id", "visitorteam_name",
-    "visitorteam_id", "localteam_score", "visitorteam_score"
+    "zzz.matchID",
+    "zzz.date",
+    "home.team",
+    "home.id",
+    "away.team",
+    "away.id",
+    "home.score",
+    "away.score"
   )
 
   commKey <- paste0('csmt_commentary:', KEYS$COMP, ":", KEYS$SEASON, ":")
@@ -37,10 +43,12 @@ build_raw_data <- function(KEYS, singleFixture) {
         KEYS$RED$KEYS() %>%
         purrr::flatten_chr()
 
-      ordKeys <- KEYS %>% footballstats::order_commentaries(
-        commentaryKeys = cKeys
-      ) %>%
-        rev
+      # Order the keys
+      ordKeys <- KEYS %>%
+        footballstats::order_commentaries(
+          commentaryKeys = cKeys
+        ) %>%
+          rev
 
       # Get the matchIDs
       matchIDs <- ordKeys %>%
@@ -57,7 +65,7 @@ build_raw_data <- function(KEYS, singleFixture) {
       localOrAway <- KEYS$RED$pipeline(
         .commands = lapply(
           X = paste0("csm:", KEYS$COMP, ":", KEYS$SEASON, ':', matchIDs),
-          FUN = function(x) x %>% KEYS$PIPE$HGET("localteam_id")
+          FUN = function(x) x %>% KEYS$PIPE$HGET("home.id")
         )
       ) %>%
         purrr::flatten_chr()
