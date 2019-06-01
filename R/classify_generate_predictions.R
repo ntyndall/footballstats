@@ -21,7 +21,7 @@
 generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
 
   # Order the fixture list dataframe
-  fixtureList <- fixtureList[fixtureList$formatted_date %>%
+  fixtureList <- fixtureList[fixtureList$zzz.date %>%
     as.Date(format = '%d.%m.%Y') %>%
     as.integer %>%
     order, ]
@@ -32,8 +32,8 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
   fixtureRow <- fixtureList %>% nrow
 
   # Parse important information
-  KEYS$COMP <- fixtureList$comp_id %>% footballstats::prs_comp()
-  KEYS$SEASON <- fixtureList$season %>% footballstats::prs_season()
+  KEYS$COMP <- fixtureList$zzz.compID %>% footballstats::prs_comp()
+  KEYS$SEASON <- fixtureList$zzz.season %>% footballstats::prs_season()
 
   # Set up slack details
   emojiHash <- footballstats::classify_emoji()
@@ -54,8 +54,8 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
     singleFixture <- fixtureList[i, ]
 
     # Names of competing teams
-    homeName <- singleFixture$localteam_name
-    awayName <- singleFixture$visitorteam_name
+    homeName <- singleFixture$home.team
+    awayName <- singleFixture$away.team
 
     # Call in here
     predicted <- KEYS %>%
@@ -77,7 +77,7 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
     actualA <- predicted$away
 
     # Take format of [2-1], split, convert and decide on win / lose / draw.
-    fTime <- singleFixture$ft_score
+    fTime <- singleFixture$zzz.score
     if (KEYS$TEST || fTime %>% `!=`('[-]')) {
       result <- fTime %>%
         footballstats::prs_ftscore() %>%
@@ -97,7 +97,7 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
     }
 
     # Print out a new group of dates?
-    cDate <- singleFixture$formatted_date
+    cDate <- singleFixture$zzz.date
     if (todaysDate %>% `!=`(cDate)) {
       todaysDate <- cDate
       totalTxt %<>% c(paste0(' -- *', todaysDate, '* --'))
@@ -106,9 +106,9 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
     # Logs for console and for slack
     totalTxt %<>% c(
       paste0(
-        singleFixture$localteam_id %>% blnk(),
+        singleFixture$home.id %>% blnk(),
         " `[", actualH, "] ", homeName, " vs. ", awayName, " [", actualA, "]` ",
-        singleFixture$visitorteam_id %>% blnk()
+        singleFixture$away.id %>% blnk()
       ) %>%
         as.character
     )
@@ -124,7 +124,7 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
         as.integer
 
       # Create the hash of prediction information
-      paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':', month, ':', singleFixture$id) %>%
+      paste0('csdm_pred:', KEYS$COMP, ':', KEYS$SEASON, ':', month, ':', singleFixture$zzz.matchID) %>%
         KEYS$RED$HMSET(
           field = c("localteam", "visitorteam", "home", "away", "week", "prediction", "slack"),
           value = c(homeName, awayName, actualH, actualA, cDate, "-", "false")
@@ -132,7 +132,7 @@ generate_predictions <- function(KEYS, fixtureList, cMethod, datModel) {
 
       # Also push the match ID to a list
       "all_predictions" %>% KEYS$RED$SADD(
-        member = singleFixture$id
+        member = singleFixture$zzz.matchID
       )
     }
   }
