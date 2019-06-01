@@ -291,6 +291,7 @@ aevent_info <- function(KEYS, matchIDs, matchEvents) {
 
 amatch_info <- function(KEYS, ...) {
 
+  valuesToRetain <- c()
   # Data input
   input <- list(...)
   matches <- if (input %>% length %>% `>`(0)) {
@@ -318,7 +319,8 @@ amatch_info <- function(KEYS, ...) {
     }
 
     # If getting match info - make sure all matches have actually ended and been played!
-    matches %<>% subset(matches$zzz.status %>% `==`('FT') %>% `&`(matches$zzz.score %>% `!=`("[-]")))
+    #matches %<>% subset(matches$zzz.status %>% `==`('FT') %>% `&`(matches$zzz.score %>% `!=`("[-]")))
+    matches %<>% subset(zzz.score %>% `!=`("[-]"))
 
     # Push unique team ID's to a list for analysis later
     KEYS$RED$pipeline(
@@ -372,12 +374,13 @@ amatch_info <- function(KEYS, ...) {
         KEYS$SEASON, ":", matchesToAdd$zzz.matchID
       )
 
+      matchesToAdd$zzz.events <- NULL
       # Push data to redis
       KEYS$RED$pipeline(
         .commands = lapply(
           X = 1:(matchKeys %>% length),
           FUN = function(x) matchKeys[x] %>% KEYS$PIPE$HMSET(
-            field = valuesToRetain,
+            field = matches %>% names %>% head(-1),
             value = matchesToAdd[x, ] %>% as.character
           )
         )
