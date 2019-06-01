@@ -14,6 +14,12 @@ insert_headtohead <- function(KEYS) {
   # Rename data set
   dat <- footballstats::headtohead
 
+  dat$single %<>%
+    footballstats::rename_columns(mapping = "api")
+  dat$matches %<>% as.data.frame(stringsAsFactors = FALSE) %>%
+    footballstats::rename_columns(mapping = "api") %>%
+    as.list
+
   # Set up commentary data
   comNames <- dat$commentaryData %>% names
 
@@ -32,7 +38,7 @@ insert_headtohead <- function(KEYS) {
 
   # Set up basic data
   basNames <- dat$matches %>% names
-  basicKeys <- paste0("csm:1204:2017:", dat$matches$id)
+  basicKeys <- paste0("csm:1204:2017:", dat$matches$zzz.matchID)
 
   # Add all basic data
   KEYS$RED$pipeline(
