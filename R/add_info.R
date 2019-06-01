@@ -363,10 +363,12 @@ amatch_info <- function(KEYS, ...) {
 
     # If any addMatches then subset the data frame
     if (addMatches %>% any) {
+      # Header names to redis
+      hRed <- matches %>% names %>% utils::head(-1)
       # Only those that haven't been added
-      matchesToAdd <- matches %>% subset(
-        subset = addMatches
-      )
+      matchesToAdd <- matches %>%
+        subset(addMatches) %>%
+        dplyr::select(hRed)
 
       # Define the redis matchKey
       matchKeys <- paste0(
@@ -380,7 +382,7 @@ amatch_info <- function(KEYS, ...) {
         .commands = lapply(
           X = 1:(matchKeys %>% length),
           FUN = function(x) matchKeys[x] %>% KEYS$PIPE$HMSET(
-            field = matches %>% names %>% head(-1),
+            field = hRed,
             value = matchesToAdd[x, ] %>% as.character
           )
         )
