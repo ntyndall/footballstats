@@ -31,6 +31,7 @@ missing_commentaries <- function(KEYS) {
     FUN = function(x) paste0("csmt_*:", x, "*") %>% KEYS$RED$KEYS() %>% purrr::flatten_chr()
   )
 
+  missing.results <- data.frame(stringsAsFactors = FALSE)
   # Loop over all seasons (Just for reporting purposes)
   for (i in 1:(uniqueSeasons %>% length)) {
 
@@ -71,7 +72,7 @@ missing_commentaries <- function(KEYS) {
           X = missingComm,
           FUN = function(x) {
             x %>% KEYS$PIPE$HMGET(
-              field = c("localteam_name", "visitorteam_name", "formatted_date")
+              field = c("home.team", "away.team", "zzz.date")
             )
           }
         )
@@ -80,6 +81,16 @@ missing_commentaries <- function(KEYS) {
       # Get the new matched up matchIDs too
       newIDs <- missingComm %>%
         footballstats::flatt(4)
+
+      missing.results %<>% rbind(
+        data.frame(
+          ID = newIDs,
+          home = results %>% purrr::map(1) %>% purrr::flatten_chr(),
+          away = results %>% purrr::map(2) %>% purrr::flatten_chr(),
+          date = results %>% purrr::map(3) %>% purrr::flatten_chr() %>% as.Date(format = "%d.%m.%Y"),
+          stringsAsFactors = FALSE
+        )
+      )
 
       # Now print out the results!
       cat(
