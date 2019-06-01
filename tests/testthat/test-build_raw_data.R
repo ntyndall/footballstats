@@ -8,8 +8,8 @@ test_that("Can I build a simple raw data frame before it gets compressed to aggr
 
   # Recreate the match data that is in redis
   inter.data <- KEYS %>%
-    footballstats::build_raw_data(
-      singleFixture = footballstats::headtohead$single
+    build_raw_data(
+      singleFixture = footballstats::headtohead$single %>% footballstats::rename_columns(mapping = "api")
     )
 
   expect_is( inter.data, "data.frame" )

@@ -20,7 +20,7 @@ test_that("Make sure if commentary doesn't exist then the function can respond w
   expect_equal( message %>% length, 3 )
 
   # Make sure the message contains the missing details
-  for (i in c("localteam_name", "visitorteam_name")) {
+  for (i in c("home.team", "away.team")) {
     expect_true( message[3] %>% grepl(pattern = match.data[[i]]) )
   }
 

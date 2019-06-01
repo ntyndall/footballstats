@@ -10,7 +10,8 @@ test_that("Check the keys are as they should be by adding match data", {
     footballstats::amatch_info(footballstats::data.2017[1:10, ])
 
   # Check redis for expected output
-  matchIDs <- "csm:*" %>% KEYS$RED$KEYS() %>%
+  matchIDs <- "csm:*" %>%
+    KEYS$RED$KEYS() %>%
     purrr::flatten_chr() %>%
     strsplit(split = ':') %>%
     purrr::map(4) %>%
@@ -18,6 +19,6 @@ test_that("Check the keys are as they should be by adding match data", {
     as.integer %>%
     sort
 
-  expect_equal( newMatchData$id %>% as.integer %>% sort, matchIDs )
+  expect_equal( newMatchData$zzz.matchID %>% as.integer %>% sort, matchIDs )
 
 })

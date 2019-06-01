@@ -65,7 +65,8 @@ test_that("Adding multiple events to redis", {
   expect_equal( eventsInRedis %>% length, numRows )
 
   # Running it again has no effect
-  KEYS %>% aevent_info(
+  KEYS %>%
+    footballstats::aevent_info(
     matchIDs = footballstats::matchData$id,
     matchEvents = allEvents
   )

@@ -7,6 +7,7 @@ test_that("Create a table from match data", {
 
   # Order the match data first and create a table
   matchData <- footballstats::matchData %>%
+    footballstats::rename_columns(mapping = "api") %>%
     footballstats::order_matchdata()
 
   KEYS %>% footballstats::create_table(
@@ -43,8 +44,8 @@ test_that("Create a table from match data", {
       purrr::flatten_chr() %>%
       as.integer
 
-    print(positions)
-    #expect_equal( positions, c(5, 6, 10, 7, 9, 10, 11) )
+    # print(positions)
+    # expect_equal( positions, c(5, 6, 10, 7, 9, 9, 11) )
     expect_equal(1, 1)
   }
 

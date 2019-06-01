@@ -19,7 +19,7 @@ test_that("Test that match data can be recreated easily.", {
     footballstats::recreate_matchdata()
 
   expect_equal( matchData %>% nrow, recreated %>% nrow )
-  expect_equal( recreated %>% names, matchData %>% names %>% setdiff('events') )
+  expect_equal( recreated %>% names, matchData %>% names %>% setdiff('zzz.events') )
   expect_equal( matchData$id %>% as.integer %>% sort, recreated$id %>% as.integer %>% sort )
 
 })
@@ -35,9 +35,9 @@ test_that("Test that commentary data is sent to Redis.", {
   recreated <- recreated[1, ]
 
   KEYS %>% footballstats::acommentary_info(
-    matchIDs = recreated$id,
-    localteam = recreated$localteam_id,
-    visitorteam = recreated$visitorteam_id
+    matchIDs = recreated$zzz.matchID,
+    localteam = recreated$home.id,
+    visitorteam = recreated$away.id
   )
 
   # Check what keys have been added

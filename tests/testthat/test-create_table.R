@@ -7,6 +7,7 @@ test_that("Create a table from match data", {
 
   # Order the match data first
   matchData <- footballstats::matchData %>%
+    footballstats::rename_columns(mapping = "api") %>%
     footballstats::order_matchdata()
 
   KEYS %>% footballstats::create_table(
