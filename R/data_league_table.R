@@ -46,7 +46,7 @@ create_table <- function(KEYS, matchData) {
   matchList[c("zzz.date", "home.score", "away.score")] %<>% lapply(as.integer)
 
   # Get all unique teamIDs
-  uniqueTeams <- c(matchList$home.teamID, matchList$away.teamID) %>%
+  uniqueTeams <- c(matchList$home.id, matchList$away.id) %>%
     unique
 
   uniqueNames <- c(matchList$home.team, matchList$away.team) %>%
@@ -68,7 +68,7 @@ create_table <- function(KEYS, matchData) {
   # Stack useful vectorc
   allInfo <- list(
     ids = matchList$zzz.matchID %>% rep(2),
-    tids = c(matchList$home.teamID, matchList$away.teamID),
+    tids = c(matchList$home.id, matchList$away.id),
     teams = c(matchList$home.team, matchList$away.name),
     pts = c(
       sapply(res, FUN = function(x) if (x > 0) 3 else if (x < 0) 0 else 1),
