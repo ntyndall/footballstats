@@ -33,6 +33,12 @@ predict_matches <- function(KEYS, datModel, ..., cMethod = "xgboost") {
 
   # Generate predictions based on actual fixtures!
   if (fixtureList %>% is.null %>% `!`()) {
+    # Rename fixture list
+    fixtureList %<>%
+      footballstats::rename_columns(
+        mapping = "api"
+      )
+
     numOfPredicted <- KEYS %>%
       footballstats::generate_predictions(
         fixtureList = fixtureList,
