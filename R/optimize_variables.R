@@ -126,6 +126,7 @@ optimize_variables <- function(total.metrics, GRIDS, optimizeModels = TRUE,
             all.results <- total.metrics %>%
               footballstats::sub_metrics(
                 colNames = colNames,
+                GRIDS = GRIDS,
                 odds.frame = odds.frame
               )
 
