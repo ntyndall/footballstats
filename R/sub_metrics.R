@@ -14,6 +14,14 @@ sub_metrics <- function(total.metrics, colNames, GRIDS, odds.frame = data.frame(
     style = 3
   )
 
+  # Grids -
+  DAYS <- GRIDS$DAYS
+  XG_BOUND <- GRIDS$XG_BOUND
+  GRID_PTS <- GRIDS$PARAM_GPOINTS
+  GRID_BOUND <- GRIDS$PARAM_GBOUNDARY
+  DECAY <- GRIDS$PARAM_DECAY
+  TOTAL_PERC <- GRIDS$PARAM_TOTALPER
+
   # Fix index values for now!
   i <- j <- k <- l <- m <- 1
 
@@ -67,7 +75,7 @@ sub_metrics <- function(total.metrics, colNames, GRIDS, odds.frame = data.frame(
       # Append positions on
       result.dat$`position.h` <- current.row$`position.h` %>% `/`(current.row$zzz.til)
       result.dat$`position.a` <- current.row$`position.a` %>% `/`(current.row$zzz.til)
-      result.dat$res <- current.row$result
+      result.dat$res <- current.row$`zzz.result`
       total.results %<>% rbind(result.dat)
       allMatchIDs %<>% c(current.row$zzz.matchID)
 

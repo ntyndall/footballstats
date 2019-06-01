@@ -141,7 +141,7 @@ optimize_sort_ha <- function(cFrame, oFrame, gridPoints, mygrid, boundaries, ha 
   oFrame %>% names -> nuNames
 
   # Find the consistent team (Brighton) and map it to home
-  cFrame$til <- NULL
+  oFrame$zzz.til <- cFrame$zzz.til <- NULL
   # Just list all the rules out first!
 
   # Get standard columns

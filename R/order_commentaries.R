@@ -31,7 +31,7 @@ order_commentaries <-function(KEYS, commentaryKeys) {
   dates <- KEYS$RED$pipeline(
     .commands = lapply(
       X = paste0('csm:', KEYS$COMP, ':', KEYS$SEASON, ':', matchIDs),
-      FUN = function(x) x %>% KEYS$PIPE$HGET("formatted_date")
+      FUN = function(x) x %>% KEYS$PIPE$HGET("zzz.date")
     )
   ) %>%
     purrr::flatten_chr() %>%

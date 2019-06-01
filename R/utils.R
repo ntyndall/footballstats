@@ -251,7 +251,8 @@ teams_in_league <- function(compID) { # nocov start
 
 
 create_sink <- function(fName) { # nocov start
-  fName %<>% paste0('_', Sys.Date() %>% format('%d-%m-%y'), '.log')
+  fName %<>%
+    paste0('_', Sys.Date() %>% format('%d-%m-%y'), '.log')
 
   # Create the file
   logFile <- file(

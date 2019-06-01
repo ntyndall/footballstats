@@ -28,7 +28,7 @@ stats_from_yaml <- function(KEYS) {
   seasons <- all.data %>%
     names
 
-  for (s in seasons) {
+   for (s in seasons) {
     # Subset the season
     season.data <- all.data %>%
       `[[`(s)
@@ -76,7 +76,7 @@ stats_from_yaml <- function(KEYS) {
         # Get the teamIDs
         teamIDs <- statsKey %>%
           paste(collapse = ':') %>%
-          KEYS$RED$HMGET(field = c("localteam_id", "visitorteam_id")) %>%
+          KEYS$RED$HMGET(field = c("home.id", "away.id")) %>%
           lapply(as.integer) %>%
           purrr::flatten_int()
 
