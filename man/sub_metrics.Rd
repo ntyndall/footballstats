@@ -4,5 +4,5 @@
 \alias{sub_metrics}
 \title{Sub Metrics}
 \usage{
-sub_metrics(total.metrics, colNames, odds.frame = data.frame())
+sub_metrics(total.metrics, colNames, GRIDS, odds.frame = data.frame())
 }
