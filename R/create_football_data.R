@@ -6,7 +6,7 @@
 #' @export
 
 
-create_football_data <- function() {
+create_football_data <- function(GRIDS) {
   
   # Get all files
   location <- "~/Documents/footballstats/inst/football-data/"
@@ -25,16 +25,8 @@ create_football_data <- function() {
   KEYS <- footballstats::keys_for_testing(
     dbnum = 4
   )
-  # Set up the grids
-  GRIDS <- list(
-    XG_BOUND = KEYS$XG_BOUND,
-    DAYS = KEYS$DAYS,
-    PARAM_GPOINTS = KEYS$PARAM_GPOINTS,
-    PARAM_GBOUNDARY = KEYS$PARAM_GBOUNDARY,
-    PARAM_DECAY = KEYS$PARAM_DECAY,
-    PARAM_TOTALPER = KEYS$PARAM_TOTALPER
-  )
   
+  # Reset database for good measure
   KEYS$RED$FLUSHDB()
   
   # Loop over all the file names
@@ -189,4 +181,11 @@ create_football_data <- function() {
       }
     }
   }
+  
+  return(
+    list(
+      train = total.metrics,
+      test = test.metrics
+    )
+  )
 }
