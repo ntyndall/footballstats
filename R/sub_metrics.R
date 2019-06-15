@@ -106,6 +106,10 @@ sub_metrics <- function(total.metrics, colNames, GRIDS, odds.frame = data.frame(
   allMatchIDs %<>%
     `[`(total.results %>% stats::complete.cases())
 
+  # Also same for data
+  total.results %<>%
+    subset(total.results %>% stats::complete.cases())
+
   return(
     list(
       data = total.results,
