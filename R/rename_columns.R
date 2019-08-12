@@ -5,7 +5,7 @@
 
 rename_columns <- function(d.set, mapping = "") {
   # Read the mappings from yaml
-  myMappings <- "~/Documents/footballstats/inst/mappings/details.yaml" %>%
+  myMappings <- system.file('mappings', 'details.yaml', package = 'footballstats') %>%
     yaml::yaml.load_file() %>%
     `[[`(mapping)
 
