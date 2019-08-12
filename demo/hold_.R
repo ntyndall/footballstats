@@ -1,19 +1,26 @@
+predicted.raw.data <- new.data <- metrics$test.raw
+new.metrics <- metrics$test
+
+# # I may need to parse out incomplete cases!
+# INCOMPLETE <- new.metrics %>% complete.cases() %>% `!`()
+# if (INCOMPLETE %>% any) {
+#   INCOMPLETE %>% which
+# }
+
+# new.metrics[INCOMPLETE %>% which, ]
+#predicted.raw.data <- new.data %>%
+#  subset(zzz.matchID %in% new.metrics$matchIDs)
 
 
 
-predicted.raw.data <- new.data %>% 
-  subset(zzz.matchID %in% new.metrics$matchIDs)
+ACTRESULTS <- new.metrics$res
+test.data <- new.metrics
 
-
-
-predResults <- new.metrics$data
-ACTRESULTS <- predResults$res
-test.data <- new.metrics$data
 
 test.data$res[test.data$res == 'D'] <- 'L'
-TOTEST <- test.data %>% 
-  mltools::scale_data() %>% 
-  `[[`("data") %>% 
+TOTEST <- test.data %>%
+  mltools::scale_data() %>%
+  `[[`("data") %>%
   mltools::scaled_to_discrete(boundLen = 4) %>%
   mltools::create_sparse(boundLen = 4)
 
@@ -29,13 +36,11 @@ logicalVec <- FINALRESULTS %>% `==`(test.data$res)
 
 logicalVec %>% sum %>% `/`(logicalVec %>% length)
 
-# SHIT
-# What is my actual earning!!!
 
 winnings <- c()
 for (i in 1:(logicalVec %>% length)) {
   # If TRUE then won some money here
-  
+
   if (logicalVec[i]) {
     # Find out if it's a win / lose correct prediction
     if (FINALRESULTS[i] == 'W') {
@@ -68,10 +73,9 @@ resultsToPlot <- data.frame(
   actual = test.data$res,
   correct = FINALRESULTS %>% `==`(test.data$res) %>% as.integer,
   winnings = winnings,
-  season = "2018/2019",
-  league = "B1",
-  winProb = "x",
+  season = predicted.raw.data$zzz.season,
+  league = predicted.raw.data$zzz.division,
   stringsAsFactors = FALSE
 )
 
-
+# Now slice it in various ways
