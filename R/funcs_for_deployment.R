@@ -49,6 +49,10 @@ analyse_and_predict <- function(deployed = FALSE, addAll = TRUE,
     # Get the dates and seasons from yaml file
     KEYS %<>% footballstats::dates_from_yaml()
 
+    # Look for matches ~ 2 weeks in the past
+    KEYS$DATE_FROM <- Sys.Date() %>% `-`(14) %>% footballstats::format_dates()
+    KEYS$DATE_TO <- Sys.Date() %>% footballstats::format_dates()
+
     # Only add data if it is within the season window
     if (KEYS$ACTIVE && addAll) {
       cat(" ACTIVE ] ).\n")
