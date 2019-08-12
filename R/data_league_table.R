@@ -58,9 +58,13 @@ create_table <- function(KEYS, matchData) {
     purrr::flatten_chr()
 
   # Get previous week for EVERY
-  lastData <- KEYS %>% footballstats::get_last_week(uniqueTeams = uniqueTeams)
+  lastData <- KEYS %>%
+    footballstats::get_last_week(
+      uniqueTeams = uniqueTeams
+    )
 
-  scores <- c(matchList$home.score, matchList$away.score)
+  scores <- matchList$home.score %>%
+    c(matchList$away.score)
 
   # Get points from result
   res <- matchList$home.score - matchList$away.score
@@ -124,7 +128,7 @@ create_table <- function(KEYS, matchData) {
         tName <- singleTeam$teams %>% unique %>% `[`(1)
 
         # Get cumulative sum
-        csum <- function(x) x %>% cumsum %>% `[`(-1)
+        csum <- function(z) z %>% cumsum %>% `[`(-1)
 
         # Character teamid
         charInd <- newUniques[x] %>% as.character
@@ -217,6 +221,7 @@ weekly_positions <- function(KEYS) {
 
     # Are there any teams missing??
     allPlayed <- allTeams %in% teamIDs
+
     if (allPlayed %>% all %>% `!`()) {
       lookPrevious <- allTeams %>% subset(allPlayed %>% `!`())
       for (j in 1:(lookPrevious %>% length)) {
@@ -245,7 +250,8 @@ weekly_positions <- function(KEYS) {
       }
     }
 
-    subKeyLen <- subKeys %>% length
+    subKeyLen <- subKeys %>%
+      length
 
     for (j in 1:subKeyLen) {
       # At this point I need to order them by something!
@@ -262,14 +268,14 @@ weekly_positions <- function(KEYS) {
       # build the dataframe
       singleWeek %<>% rbind(subFrame)
     }
-    # order frame by points.. gd.. then gf...
-    singleWeek <- singleWeek[
-      order(
-        singleWeek$PTS,
-        singleWeek$GD,
-        singleWeek$GF,
-        decreasing = TRUE
-      ), ]
+
+    # order frame by PTS -> GD -> GF
+    singleWeek %<>%
+      dplyr::arrange(
+        dplyr::desc(PTS),
+        dplyr::desc(GD),
+        dplyr::desc(GF)
+      )
 
     # Push list of positions to the cw_pl hashmap ...
     paste0('cw_pl:', KEYS$COMP, ':', KEYS$SEASON, ':', uniqKeys[i]) %>%
