@@ -74,3 +74,38 @@ calculate_winnings <- function(odds.results, winInfo) {
     return(totSum %>% `-`(lostMoney))
   }
 }
+
+####
+
+calculate_winnings2 <- function(logicalVec, PRED_RESULTS, ACTUAL_RESULTS, odd.data) {
+  notAnalysed <- 0
+  odd.data$zzz.bet365Homewin %<>% as.numeric
+  odd.data$zzz.bet365Draw %<>% as.numeric
+  odd.data$zzz.bet365Awaywin %<>% as.numeric
+  winnings <- c()
+  for (i in 1:(logicalVec %>% length)) {
+    # If TRUE then won some money here
+    if (logicalVec[i]) {
+      # Find out if it's a win / lose correct prediction
+      if (PRED_RESULTS[i] == 'W') {
+        winnings %<>% c(odd.data$zzz.bet365Homewin[i] %>% `-`(1))
+      } else {
+        # Must have lost / draw / lose?
+        #if (test.metrics.scoring$zzz.bet365Awaywin[i] %>% `>`(2) %>% `&`(test.metrics.scoring$zzz.bet365Draw[i] %>% `>`(2))) {
+        # What was the original bet?!?! Draw/ Lose?
+        winnings %<>% c(
+          if (ACTUAL_RESULTS[i] == 'D') {
+            odd.data$zzz.bet365Draw[i] %>% `*`(0.5) %>% `-`(1)
+          } else if (odd.data$zzz.bet365Awaywin[i] < 2.0) {
+            0
+          } else {
+            odd.data$zzz.bet365Awaywin[i] %>% `*`(0.5) %>% `-`(1)
+          }
+        )
+      }
+    } else {
+      winnings %<>% c(-1)
+    }
+  }
+  return(winnings)
+}
