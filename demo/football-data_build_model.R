@@ -34,10 +34,13 @@ for (i in 1:(fNames %>% length)) {
 
   # Get full data set for a particular league
   full.data <- fNames[i] %>%
-    read.csv2(
+    read.table(
+      sep = ",",
+      header = T,
       stringsAsFactors = FALSE
     )
 
+  full.data$Season <- "2018/2019"
   # Now get all the unique seasons
   uniqueSeasons <- full.data$Season %>%
     unique
@@ -84,7 +87,7 @@ for (i in 1:(fNames %>% length)) {
     new.data$away.id <- teamIDs[new.data$away.team] %>% as.character
 
     # Order it
-    new.data %<>% footballstats::order_matchdata(formatter = "%d/%m/%y")
+    new.data %<>% footballstats::order_matchdata(formatter = "%d/%m/%Y")
 
     # Assign season and competition
     KEYS$SEASON <- uniqueSeasons[j] %>%
@@ -96,7 +99,7 @@ for (i in 1:(fNames %>% length)) {
 
     # Create table
     cat(paste0(Sys.time(), ' | Creating the league table ... \n'))
-    KEYS %>% create_table(
+    KEYS %>% footballstats::create_table(
       matchData = new.data
     )
 
@@ -175,51 +178,96 @@ for (i in 1:(fNames %>% length)) {
     } else {
       total.metrics %<>% rbind(new.metrics$data)
     }
-
-
   }
 }
 
-win.lose <- total.metrics
+
+training.metrics <- metrics$train
+win.lose <- metrics$train
 
 win.lose$res[win.lose$res == 'D'] <- 'L'
 
-# Filter out "" from zzz.bet365
-win.lose %<>% subset(
-  zzz.bet365Awaywin %>% `!=`("") %>%
-    `|`(zzz.bet365Draw %>% `!=`("")) %>%
-    `|`(zzz.bet365Homewin %>% `!=`(""))
-)
+
+build_and_test_fd <- function(train.data, test.data, test.meta) {
+  ACTUAL_RESULTS <- test.data$res
+
+  train.data$res[train.data$res == 'D'] <- 'L'
+  test.data$res[test.data$res == 'D'] <- 'L'
+  TESTING_RESULTS <- test.data$res
+
+  TRAINER <- train.data %>%
+    mltools::scale_data()
+
+  # tData <- TRAINER$data %>% mltools::scaled_to_discrete(boundLen = 4) %>% mltools::create_sparse(boundLen = 4)
+
+  results.xgb <- gen_xgb(TRAINER$data, cName = 'res')
+
+  testing.data <- test.data %>%
+    footballstats::scale_data(TRAINER$scaler) %>%
+    mltools::scaled_to_discrete(boundLen = 4)
+
+  # GOT TO MAKE SURE BETWEEN 1 AND 5 (Scaler might not encapsulate everything)
+  testing.data[testing.data %>% `==`(0)] <- 1
+  testing.data %<>% mltools::create_sparse(boundLen = 4)
+
+  PRED_RESULTS <- predict(
+    results.xgb$model,
+    testing.data
+  )
+
+  PRED_RESULTS[PRED_RESULTS %>% `==`(1)] <- 'W'
+  PRED_RESULTS[PRED_RESULTS %>% `==`(0)] <- 'L'
+
+  winnings <- calculate_winnings2(
+    logicalVec = PRED_RESULTS %>% `==`(TESTING_RESULTS),
+    PRED_RESULTS = PRED_RESULTS,
+    ACTUAL_RESULTS = ACTUAL_RESULTS,
+    odd.data = test.meta
+  )
+
+  print(winnings %>% sum)
+
+  return(
+    data.frame(
+      actual = ACTUAL_RESULTS,
+      predicted = PRED_RESULTS,
+      winnings = winnings,
+      stringsAsFactors = FALSE
+    )
+  )
+}
 
 
-
-win.lose$zzz.bet365Homewin %<>% as.numeric
-win.lose$zzz.bet365Awaywin %<>% as.numeric
-win.lose$zzz.bet365Draw %<>% as.numeric
 
 new.win.lose <- win.lose %>% mltools::scale_data()
 
 # Now build a model somewhere?!
-results.xgb <- gen_xgb(new.win.lose$data, cName = "res")
+results.xgb <- mltools::gen_xgb(new.win.lose$data, cName = "res")
 results.nn <- mltools::gen_nn(new.win.lose$data, logs = TRUE)
 
-originalRESULTS <- test.metrics$res
+footballstats::scale_data()
+
+
+
+#originalRESULTS <- test.metrics$res
+
+
 
 # Can I use test.metrics to get a feel for accuracy??
-test.metrics.scoring <- test.metrics %>%
-  dplyr::select(zzz.bet365Homewin, zzz.bet365Awaywin, zzz.bet365Draw, res)
+#test.metrics.scoring <- test.metrics %>%
+#  dplyr::select(zzz.bet365Homewin, zzz.bet365Awaywin, zzz.bet365Draw, res)
 
 test.metrics$zzz.bet365Awaywin <- test.metrics$zzz.bet365Draw <- test.metrics$zzz.bet365Homewin <- NULL
 test.metrics$res[test.metrics$res == 'D'] <- 'L'
 CURRENT_RESULTS <- test.metrics$res
 test.metrics$res <- CURRENT_RESULTS
-TOTEST <- test.metrics %>% mltools::scale_data() %>% `[[`("data") %>% mltools::scaled_to_discrete(boundLen = 4) %>%
-  mltools::create_sparse(boundLen = 4)
 
 
-FINALRESULTS <- predict(results.xgb$model, TOTEST)
-FINALRESULTS[FINALRESULTS %>% `==`(1)] <- "W"
-FINALRESULTS[FINALRESULTS %>% `==`(0)] <- "L"
+
+
+save(results.xgb, file = "~/Documents/currentXGB.rda")
+
+
 
 # -- Assume bets are all £1
 
@@ -290,3 +338,5 @@ win.lose %<>% subset(nas)
 
 results$model -> testxgb
 save(testxgb, file = "~/Documents/footballstats/temp/testxgb.rda")
+results.xgb$model -> xgb.E0
+save(xgb.E0, file = "~/Documents/footballstats/temp/xgbE0.rda")
